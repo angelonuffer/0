@@ -1,0 +1,12 @@
+#0 "pt.0" *
+
+#escreva "import fs from 'node:fs';"
+
+#escreva (
+  try {
+    process.stdout.write(importe(process.argv[2]))
+  } catch (erro) {
+    process.stderr.write(erro.toString())
+    process.exit(1)
+  }
+)

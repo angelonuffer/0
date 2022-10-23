@@ -1,0 +1,149 @@
+#0 "pt.0" *
+
+teste "Variável" (
+  teste "Armazena valores." (
+    i = 10
+    i deve_ser 10
+  )
+  teste "Incrementa e decrementa valores." (
+    i = 20
+    i ++
+    i deve_ser 21
+    i --
+    i deve_ser 20
+  )
+  teste "Dá erro ao receber valor de outra classe." (
+    i = 5
+    (i = "ab") deve_dar_erro "Variável 'i' é da classe 'Número'."
+    j = "cd"
+    (j = 10) deve_dar_erro "Variável 'j' é da classe 'Texto'."
+  )
+)
+
+teste "Lógico" (
+  teste "Comparação de valores lógicos." (
+    (não V) deve_ser F
+    (não F) deve_ser V
+    (V e F) deve_ser F
+    (V e V) deve_ser V
+    (F ou F) deve_ser F
+    (F ou V) deve_ser V
+  )
+  teste "Comparação de valores numéricos." (
+    (2 == 2) deve_ser V
+    (2 != 2) deve_ser F
+    (2 > 1) deve_ser V
+    (40 < 30) deve_ser F
+    (4 >= 4) deve_ser V
+    (5 <= 4) deve_ser F
+  )
+)
+
+teste "Número" (
+  teste "Operações aritméticas." (
+    (2 + 3) deve_ser 5
+    (5 - 1) deve_ser 4
+    (3 * 4) deve_ser 12
+    (6 / 2) deve_ser 3
+  )
+)
+
+teste "Condicional" (
+  teste "Bloco 'se'." (
+    i = 1
+    j = 2
+    se (i == 1) (
+      i = 3
+    ) senão (
+      j = 4
+    )
+    i deve_ser 3
+    j deve_ser 2
+    se (i != 3) (
+      i = 5
+    ) senão (
+      j = 6
+    )
+    i deve_ser 3
+    j deve_ser 6
+  )
+)
+
+teste "Repetição" (
+  teste "Bloco 'enquanto'." (
+    i = 0
+    enquanto (i < 5) (
+      i ++
+    )
+    i deve_ser 5
+  )
+)
+
+teste "Função" (
+  teste "Tem escopo próprio." (
+    função Nulo teste_i () (
+      i = 5
+    )
+    teste_i
+    i deve_dar_erro "(i) Chamada inválida."
+  )
+  teste "Acessa o escopo da declaração." (
+    i = 10
+    função Nulo incremente_i () (
+      i ++
+    )
+    incremente_i
+    incremente_i
+    i deve_ser 12
+  )
+  teste "Recebe argumentos da chamada." (
+    i = 10
+    j = 20
+    função Nulo some (Número some_i, Número some_j) (
+      i += some_i
+      j -= some_j
+    )
+    some 3 5
+    i deve_ser 13
+    j deve_ser 15
+  )
+  teste "Retorna valores." (
+    função Número retorne_5 () (
+      retorne 5
+    )
+    retorne_5 deve_ser 5
+  )
+)
+
+teste "Lista" (
+  teste "Inclui itens." (
+    variável lista[] Número
+    (lista tamanho) deve_ser 0
+    lista inclua 5
+    (lista tamanho) deve_ser 1
+  )
+  teste "Recupera itens." (
+    variável lista[] Número
+    lista inclua 20
+    lista inclua 40
+    lista[0] deve_ser 20
+    lista[1] deve_ser 40
+  )
+  teste "Atualiza itens." (
+    variável lista[] Número
+    lista inclua 30
+    lista[0] = 50
+    lista[0] deve_ser 50
+  )
+  teste "Deleta itens." (
+    variável lista[] Número
+    lista inclua 60
+    lista inclua 70
+    lista inclua 80
+    (lista tamanho) deve_ser 3
+    lista delete 1
+    (lista tamanho) deve_ser 2
+    lista[0] deve_ser 60
+    lista[1] deve_ser 80
+  )
+)
