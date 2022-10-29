@@ -22,6 +22,19 @@ class Macro {
   }
 }
 
+class Classe {
+  constructor (atributos) {
+    this.classe = "Classe"
+    this.atributos = atributos
+  }
+}
+
+class Objeto {
+  constructor (classe) {
+    this.classe = classe
+  }
+}
+
 const GLOBAIS = {
   "#0": new Macro((escopo, chamada) => {
     const novo_escopo = {...GLOBAIS}
@@ -72,7 +85,13 @@ const GLOBAIS = {
       return expressão
     }
     const chamadas = analise(expressão)
-    if (chamadas.length === 1) if (expressão.includes("[")) return Buffer.from(expressão.slice(0, -1).split("[").map(parte => avalie(escopo, parte)).join("[") + "]")
+    if (chamadas.length === 1) {
+      if (expressão.includes("[")) return Buffer.from(expressão.slice(0, -1).split("[").map(parte => avalie(escopo, parte)).join("[") + "]")
+      if (expressão.includes(".") && ! expressão.includes('"')) {
+        const [nome, atributo] = expressão.split(".")
+        return Buffer.from(nome + "[" + escopo[nome].classe.atributos.indexOf(atributo) + "]")
+      }
+    }
     return Buffer.concat(chamadas.map(chamada => {
       if (escopo.hasOwnProperty(chamada[0]) && escopo[chamada[0]] instanceof Macro) return escopo[chamada[0]].chame(escopo, chamada)
       if (escopo.hasOwnProperty(chamada[1]) && escopo[chamada[1]] instanceof Macro) return escopo[chamada[1]].chame(escopo, chamada)
@@ -107,8 +126,12 @@ const GLOBAIS = {
     ].join("\n")
     return Buffer.from("")
   }),
-  "#7": new Macro((escopo, [nome, macro, valor]) => {
-    const classe = classe_de(escopo, valor)
+  "#7": new Macro((escopo, [nome, macro, ...valor]) => {
+    const classe = classe_de(escopo, valor[0])
+    if (classe === "Classe") {
+      escopo[nome] = new Objeto(escopo[valor[0]])
+      return Buffer.from("let " + nome + "=[" + valor.slice(1).map(a => avalie(escopo, a)).join(",") + "];")
+    }
     let _let = "let "
     if (nome.includes("[")) {
       nome = nome.slice(0, -1).split("[").map(parte => avalie(escopo, parte)).join("[") + "]"
@@ -119,7 +142,7 @@ const GLOBAIS = {
     } else {
       escopo[nome] = new Variável(classe, nome)
     }
-    return Buffer.from(_let + nome + "=" + avalie(escopo, valor) + ";")
+    return Buffer.from(_let + nome + "=" + avalie(escopo, valor[0]) + ";")
   }),
   "#8": new Macro((escopo, [macro, expressão]) => {
     if (/^-?\d+$/.test(expressão)) return "Número"
@@ -185,6 +208,17 @@ const GLOBAIS = {
   "#37": new Função("Nulo", ["Lista", "Número"], (escopo, lista, i) => Buffer.from(lista + ".splice(" + i + ",1);")),
   "#38": new Macro((escopo, [macro, valor]) => Buffer.from(valor.slice(1, -1))),
   "#39": new Macro((escopo, chamada) => Buffer.from("console.log(" + chamada.slice(1).join("+") + ");")),
+  "#40": new Macro((escopo, [macro, nome, código]) => {
+    const atributos = []
+    avalie({
+      atributo: new Macro((escopo, [macro, classe, nome]) => {
+        atributos.push(nome)
+        return Buffer.from("")
+      }),
+    }, código)
+    escopo[nome] = new Classe(atributos)
+    return Buffer.from("")
+  })
 }
 
 const importe = caminho => GLOBAIS["#0"].chame({}, ["#0", '"' + caminho + '"'])
@@ -192,9 +226,4 @@ const analise = expressão => GLOBAIS["#2"].chame({}, ["#2", expressão])
 const avalie = (escopo, expressão) => GLOBAIS["#3"].chame(escopo, ["#3", expressão])
 const classe_de = (escopo, código) => GLOBAIS["#8"].chame(escopo, ["#8", código])
 
-try {
-  process.stdout.write(importe(process.argv[2]))
-} catch (erro) {
-  process.stderr.write(erro.toString())
-  process.exit(1)
-}
+process.stdout.write(importe(process.argv[2]))

@@ -147,3 +147,15 @@ teste "Lista" (
     lista[1] deve_ser 80
   )
 )
+
+teste "Classe" (
+  teste "Declara uma nova classe." (
+    classe Carro (
+      atributo Texto cor
+      atributo Número rodas
+    )
+    carro = Carro "branco" 4
+    carro.cor deve_ser "branco"
+    carro.rodas deve_ser 4
+  )
+)
