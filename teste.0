@@ -158,4 +158,15 @@ teste "Classe" (
     carro.cor deve_ser "branco"
     carro.rodas deve_ser 4
   )
+  teste "Pode ter métodos." (
+    classe Carro (
+      atributo Texto cor
+      método Nulo pinte (Texto cor) (
+        @cor = cor
+      )
+    )
+    carro = Carro "branco"
+    carro.pinte "vermelho"
+    carro.cor deve_ser "vermelho"
+  )
 )

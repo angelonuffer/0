@@ -23,9 +23,11 @@ class Macro {
 }
 
 class Classe {
-  constructor (atributos) {
+  constructor (atributos, nomes_métodos, métodos) {
     this.classe = "Classe"
     this.atributos = atributos
+    this.nomes_métodos = nomes_métodos
+    this.métodos = métodos
   }
 }
 
@@ -97,6 +99,12 @@ const GLOBAIS = {
       if (escopo.hasOwnProperty(chamada[1]) && escopo[chamada[1]] instanceof Macro) return escopo[chamada[1]].chame(escopo, chamada)
       if (escopo.hasOwnProperty(chamada[0]) && escopo[chamada[0]] instanceof Função) return escopo[chamada[0]].chame(escopo, ...chamada.slice(1).map(a => avalie(escopo, a)))
       if (escopo.hasOwnProperty(chamada[1]) && escopo[chamada[1]] instanceof Função) return escopo[chamada[1]].chame(escopo, avalie(escopo, chamada[0]), ...chamada.slice(2).map(a => avalie(escopo, a)))
+      if (chamada[0].includes(".")) {
+        const [nome, método] = chamada[0].split(".")
+        if (escopo[nome] instanceof Objeto) {
+          return Buffer.from(Object.keys(escopo)[Object.values(escopo).indexOf(escopo[nome].classe)] + "[" + escopo[nome].classe.nomes_métodos.indexOf(método) + "](" + nome + "," + chamada.slice(1).map(a => avalie(escopo, a)).join(",") + ");")
+        }
+      }
       throw "(" + chamada.join(" ") + ") Chamada inválida."
     }))
   }),
@@ -127,6 +135,7 @@ const GLOBAIS = {
     return Buffer.from("")
   }),
   "#7": new Macro((escopo, [nome, macro, ...valor]) => {
+    if (nome.startsWith("@")) return Buffer.from("_[" + escopo.atributos.indexOf(nome.slice(1)) + "]=" + avalie(escopo, valor[0]) + ";")
     const classe = classe_de(escopo, valor[0])
     if (classe === "Classe") {
       escopo[nome] = new Objeto(escopo[valor[0]])
@@ -210,14 +219,28 @@ const GLOBAIS = {
   "#39": new Macro((escopo, chamada) => Buffer.from("console.log(" + chamada.slice(1).join("+") + ");")),
   "#40": new Macro((escopo, [macro, nome, código]) => {
     const atributos = []
+    const nomes_métodos = []
+    const métodos = []
     avalie({
       atributo: new Macro((escopo, [macro, classe, nome]) => {
         atributos.push(nome)
         return Buffer.from("")
       }),
+      método: new Macro((escopo_da_declaração, [macro, classe_de_retorno, nome, argumentos, código]) => {
+        nomes_métodos.push(nome)
+        const novo_escopo = {
+          ...escopo_da_declaração.escopo_da_declaração_da_classe,
+          atributos,
+        }
+        argumentos = argumentos.slice(1, -1).split(", ").filter(a => a.length > 0).map(a => a.split(" "))
+        argumentos.forEach(([classe, nome]) => novo_escopo[nome] = new Variável(classe, nome))
+        métodos.push(Buffer.from("(_," + argumentos.map(a => a[1]).join(",") + ")=>{" + avalie(novo_escopo, código) + "}"))
+        return Buffer.from("")
+      }),
+      escopo_da_declaração_da_classe: escopo,
     }, código)
-    escopo[nome] = new Classe(atributos)
-    return Buffer.from("")
+    escopo[nome] = new Classe(atributos, nomes_métodos, métodos)
+    return Buffer.from("let " + nome + "=[" + métodos.join(",") + "];")
   })
 }
 
