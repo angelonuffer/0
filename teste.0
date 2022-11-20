@@ -169,4 +169,23 @@ teste "Classe" (
     carro.pinte "vermelho"
     carro.cor deve_ser "vermelho"
   )
+  teste "Pode herdar atributos." (
+    classe Eletrodoméstico (
+      atributo Texto cor
+    )
+    classe Geladeira (
+      estende Eletrodoméstico
+      atributo Número portas
+    )
+    geladeira = Geladeira "branco" 2
+    geladeira.cor deve_ser "branco"
+    geladeira.portas deve_ser 2
+    classe Fogão (
+      estende Eletrodoméstico
+      atributo Número bocas
+    )
+    fogão = Fogão "preto" 4
+    fogão.cor deve_ser "preto"
+    fogão.bocas deve_ser 4
+  )
 )

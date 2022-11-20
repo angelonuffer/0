@@ -238,6 +238,10 @@ const GLOBAIS = {
         return Buffer.from("")
       }),
       escopo_da_declaração_da_classe: escopo,
+      estende: new Macro((escopo, [macro, classe]) => {
+        atributos.push(...escopo.escopo_da_declaração_da_classe[classe].atributos)
+        return Buffer.from("")
+      }),
     }, código)
     escopo[nome] = new Classe(atributos, nomes_métodos, métodos)
     return Buffer.from("let " + nome + "=[" + métodos.join(",") + "];")
