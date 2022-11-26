@@ -240,6 +240,8 @@ const GLOBAIS = {
       escopo_da_declaração_da_classe: escopo,
       estende: new Macro((escopo, [macro, classe]) => {
         atributos.push(...escopo.escopo_da_declaração_da_classe[classe].atributos)
+        nomes_métodos.push(...escopo.escopo_da_declaração_da_classe[classe].nomes_métodos)
+        métodos.push(Buffer.from("..." + classe))
         return Buffer.from("")
       }),
     }, código)

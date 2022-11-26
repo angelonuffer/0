@@ -188,4 +188,34 @@ teste "Classe" (
     fogão.cor deve_ser "preto"
     fogão.bocas deve_ser 4
   )
+  teste "Pode herdar métodos." (
+    classe Eletrodoméstico (
+      atributo Texto cor
+      método Nulo pinte (Texto cor) (
+        @cor = cor
+      )
+    )
+    classe Geladeira (
+      estende Eletrodoméstico
+    )
+    geladeira = Geladeira "branco"
+    geladeira.pinte "preto"
+    geladeira.cor deve_ser "preto"
+    classe Fogão (
+      estende Eletrodoméstico
+      atributo Lógico boca_1
+      atributo Lógico boca_2
+      método Nulo acenda (Número boca) (
+        se (boca == 1) (
+          @boca_1 = V
+        ) senão ()
+      )
+    )
+    fogão = Fogão "preto" F F
+    fogão.pinte "branco"
+    fogão.acenda 1
+    fogão.cor deve_ser "branco"
+    fogão.boca_1 deve_ser V
+    fogão.boca_2 deve_ser F
+  )
 )
