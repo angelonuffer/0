@@ -81,6 +81,44 @@ class Espaço extends Componente {
   }
 }
 
+class CampoSenha extends Coluna {
+  constructor(texto_rótulo) {
+    super()
+    this.e.style.padding = "16px"
+    let rótulo = document.createElement("label")
+    this.e.appendChild(rótulo)
+    rótulo.textContent = texto_rótulo + ":"
+    this.campo = document.createElement("input")
+    this.e.appendChild(this.campo)
+    this.campo.type = "password"
+    this.campo.style.padding = "8px"
+  }
+}
+
+class Botão extends Componente {
+  constructor(texto, chame) {
+    super()
+    this.e.textContent = texto
+    this.habilitar()
+    this.e.style.color = "#fff"
+    this.e.style.textAlign = "center"
+    this.e.style.margin = "16px"
+    this.e.style.padding = "8px"
+    this.e.style.borderRadius = "50vh"
+    this.e.addEventListener("click", () => {
+      if (this.habilitado) chame()
+    })
+  }
+  desabilitar() {
+    this.habilitado = false
+    this.e.style.backgroundColor = "#aaa"
+  }
+  habilitar() {
+    this.habilitado = true
+    this.e.style.backgroundColor = COR_PRINCIPAL
+  }
+}
+
 class Tela extends Coluna {
   constructor(texto_título) {
     super()
@@ -134,10 +172,48 @@ class TelaLista extends Tela {
   }
 }
 
+class TelaLogin extends Tela {
+  constructor() {
+    super("Login Github")
+    let pat = new CampoSenha("Personal Access Token")
+    this.adicione(pat)
+    pat.campo.addEventListener("paste", evento => {
+      pat.campo.value = evento.clipboardData.getData("text")
+      pat.campo.blur()
+    })
+    let nome = new Texto("")
+    this.adicione(nome)
+    nome.e.style.padding = "16px"
+    pat.campo.addEventListener("blur", () => {
+      nome.e.textContent = ""
+      entrar.desabilitar()
+      fetch("https://api.github.com/graphql", {
+        method: "POST",
+        headers: {
+          Authorization: "bearer " + pat.campo.value,
+        },
+        body: JSON.stringify({
+          query: "query { viewer { login } }",
+        })
+      }).then(r => r.json()).then(resposta => {
+        nome.e.textContent = "github.com/" + resposta.data.viewer.login
+        entrar.habilitar()
+      })
+    })
+    this.adicione(new Espaço())
+    let entrar = new Botão("ENTRAR", () => {
+      document.body.removeChild(this.e)
+      new TelaLista()
+    })
+    this.adicione(entrar)
+    entrar.desabilitar()
+  }
+}
+
 const COR_PRINCIPAL = "#cd0000"
 
 window.addEventListener("load", () => {
   document.body.style.margin = 0
   document.body.style.height = "100vh"
-  new TelaLista()
+  new TelaLogin()
 })
