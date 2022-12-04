@@ -11,6 +11,9 @@ class Componente {
   set cresce(valor) {
     this.e.style.flexGrow = valor
   }
+  ao_clicar(chame) {
+    this.e.addEventListener("click", chame)
+  }
 }
 
 class Coluna extends Componente {
@@ -35,6 +38,8 @@ class Barra extends Linha {
     this.e.style.backgroundColor = COR_PRINCIPAL
     this.e.style.color = "#fff"
     this.e.style.padding = "16px"
+    this.e.style.gap = "12px"
+    this.e.style.alignItems = "center"
   }
 }
 
@@ -76,31 +81,63 @@ class Espaço extends Componente {
   }
 }
 
+class Tela extends Coluna {
+  constructor(texto_título) {
+    super()
+    document.body.appendChild(this.e)
+    this.e.style.position = "absolute"
+    this.e.style.top = 0
+    this.e.style.left = 0
+    this.e.style.width = "100%"
+    this.e.style.height = "100%"
+    this.e.style.backgroundColor = "#fff"
+    this.barra_superior = new Barra()
+    this.adicione(this.barra_superior)
+    this.título = new Título(texto_título)
+    this.barra_superior.adicione(this.título)
+  }
+}
+
+class TelaTemporária extends Tela {
+  constructor(texto_título) {
+    super(texto_título)
+    let voltar = new Ícone("arrow_back")
+    this.barra_superior.adicione(voltar)
+    voltar.ao_clicar(() => {
+      document.body.removeChild(this.e)
+    })
+    this.barra_superior.adicione(this.título)
+  }
+}
+
+class TelaLista extends Tela {
+  constructor() {
+    super("0")
+    let linha = new Linha()
+    this.adicione(linha)
+    let início = new Ícone("home")
+    linha.adicione(início)
+    let lista = new Lista()
+    this.adicione(lista)
+    lista.cresce = 1
+    let barra_inferior = new Barra()
+    this.adicione(barra_inferior)
+    let página_lista = new Ícone("list")
+    barra_inferior.adicione(página_lista)
+    let espaço = new Espaço()
+    barra_inferior.adicione(espaço)
+    let adicionar = new Ícone("add")
+    barra_inferior.adicione(adicionar)
+    adicionar.ao_clicar(() => {
+      new TelaTemporária("Adicionar")
+    })
+  }
+}
+
 const COR_PRINCIPAL = "#cd0000"
 
 window.addEventListener("load", () => {
   document.body.style.margin = 0
   document.body.style.height = "100vh"
-  let coluna = new Coluna()
-  document.body.appendChild(coluna.e)
-  coluna.altura = "100%"
-  let barra_superior = new Barra()
-  coluna.adicione(barra_superior)
-  let título = new Título("0")
-  barra_superior.adicione(título)
-  let linha = new Linha()
-  coluna.adicione(linha)
-  let início = new Ícone("home")
-  linha.adicione(início)
-  let lista = new Lista()
-  coluna.adicione(lista)
-  lista.cresce = 1
-  let barra_inferior = new Barra()
-  coluna.adicione(barra_inferior)
-  let página_lista = new Ícone("list")
-  barra_inferior.adicione(página_lista)
-  let espaço = new Espaço()
-  barra_inferior.adicione(espaço)
-  let adicionar = new Ícone("add")
-  barra_inferior.adicione(adicionar)
+  new TelaLista()
 })
