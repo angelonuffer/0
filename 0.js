@@ -1,219 +1,123 @@
-class Componente {
-  constructor() {
-    this.e = document.createElement("span")
-  }
-  adicione(filho) {
-    this.e.appendChild(filho.e)
-  }
-  set altura(valor) {
-    this.e.style.height = valor
-  }
-  set cresce(valor) {
-    this.e.style.flexGrow = valor
-  }
-  ao_clicar(chame) {
-    this.e.addEventListener("click", chame)
-  }
-}
-
-class Coluna extends Componente {
-  constructor() {
-    super()
-    this.e.style.display = "flex"
-    this.e.style.flexDirection = "column"
-  }
-}
-
-class Linha extends Componente {
-  constructor() {
-    super()
-    this.e.style.display = "flex"
-    this.e.style.flexDirection = "row"
-  }
-}
-
-class Barra extends Linha {
-  constructor() {
-    super()
-    this.e.style.backgroundColor = COR_PRINCIPAL
-    this.e.style.color = "#fff"
-    this.e.style.padding = "16px"
-    this.e.style.gap = "12px"
-    this.e.style.alignItems = "center"
-  }
-}
-
-class Texto extends Componente {
-  constructor(texto) {
-    super()
-    this.e.textContent = texto
-  }
-}
-
-class Título extends Texto {
-  constructor(texto) {
-    super(texto)
-    this.cresce = 1
-    this.e.style.fontSize = "24px"
-  }
-}
-
-class Ícone extends Componente {
-  constructor(nome) {
-    super()
-    this.e.classList.add("material-icons")
-    this.e.textContent = nome
-    this.e.style.fontSize = 24
-    this.e.style.padding = "12px"
-  }
-}
-
-class Lista extends Coluna {
-  constructor() {
-    super()
-  }
-}
-
-class Espaço extends Componente {
-  constructor() {
-    super()
-    this.e.style.flexGrow = 1
-  }
-}
-
-class CampoSenha extends Coluna {
-  constructor(texto_rótulo) {
-    super()
-    this.e.style.padding = "16px"
-    let rótulo = document.createElement("label")
-    this.e.appendChild(rótulo)
-    rótulo.textContent = texto_rótulo + ":"
-    this.campo = document.createElement("input")
-    this.e.appendChild(this.campo)
-    this.campo.type = "password"
-    this.campo.style.padding = "8px"
-  }
-}
-
-class Botão extends Componente {
-  constructor(texto, chame) {
-    super()
-    this.e.textContent = texto
-    this.habilitar()
-    this.e.style.color = "#fff"
-    this.e.style.textAlign = "center"
-    this.e.style.margin = "16px"
-    this.e.style.padding = "8px"
-    this.e.style.borderRadius = "50vh"
-    this.e.addEventListener("click", () => {
-      if (this.habilitado) chame()
-    })
-  }
-  desabilitar() {
-    this.habilitado = false
-    this.e.style.backgroundColor = "#aaa"
-  }
-  habilitar() {
-    this.habilitado = true
-    this.e.style.backgroundColor = COR_PRINCIPAL
-  }
-}
-
-class Tela extends Coluna {
-  constructor(texto_título) {
-    super()
-    document.body.appendChild(this.e)
-    this.e.style.position = "absolute"
-    this.e.style.top = 0
-    this.e.style.left = 0
-    this.e.style.width = "100%"
-    this.e.style.height = "100%"
-    this.e.style.backgroundColor = "#fff"
-    this.barra_superior = new Barra()
-    this.adicione(this.barra_superior)
-    this.título = new Título(texto_título)
-    this.barra_superior.adicione(this.título)
-  }
-}
-
-class TelaTemporária extends Tela {
-  constructor(texto_título) {
-    super(texto_título)
-    let voltar = new Ícone("arrow_back")
-    this.barra_superior.adicione(voltar)
-    voltar.ao_clicar(() => {
-      document.body.removeChild(this.e)
-    })
-    this.barra_superior.adicione(this.título)
-  }
-}
-
-class TelaLista extends Tela {
-  constructor() {
-    super("0")
-    let linha = new Linha()
-    this.adicione(linha)
-    let início = new Ícone("home")
-    linha.adicione(início)
-    let lista = new Lista()
-    this.adicione(lista)
-    lista.cresce = 1
-    let barra_inferior = new Barra()
-    this.adicione(barra_inferior)
-    let página_lista = new Ícone("list")
-    barra_inferior.adicione(página_lista)
-    let espaço = new Espaço()
-    barra_inferior.adicione(espaço)
-    let adicionar = new Ícone("add")
-    barra_inferior.adicione(adicionar)
-    adicionar.ao_clicar(() => {
-      new TelaTemporária("Adicionar")
-    })
-  }
-}
-
-class TelaLogin extends Tela {
-  constructor() {
-    super("Login Github")
-    let pat = new CampoSenha("Personal Access Token")
-    this.adicione(pat)
-    pat.campo.addEventListener("paste", evento => {
-      pat.campo.value = evento.clipboardData.getData("text")
-      pat.campo.blur()
-    })
-    let nome = new Texto("")
-    this.adicione(nome)
-    nome.e.style.padding = "16px"
-    pat.campo.addEventListener("blur", () => {
-      nome.e.textContent = ""
-      entrar.desabilitar()
-      fetch("https://api.github.com/graphql", {
-        method: "POST",
-        headers: {
-          Authorization: "bearer " + pat.campo.value,
-        },
-        body: JSON.stringify({
-          query: "query { viewer { login } }",
-        })
-      }).then(r => r.json()).then(resposta => {
-        nome.e.textContent = "github.com/" + resposta.data.viewer.login
-        entrar.habilitar()
-      })
-    })
-    this.adicione(new Espaço())
-    let entrar = new Botão("ENTRAR", () => {
-      document.body.removeChild(this.e)
-      new TelaLista()
-    })
-    this.adicione(entrar)
-    entrar.desabilitar()
-  }
-}
-
 const COR_PRINCIPAL = "#cd0000"
+
+const conta_github = {
+  nome: "",
+  atributos: [
+    {
+      nome: "Personal Access Token",
+      tipo: "Senha",
+      valor: "",
+    },
+  ],
+}
+
+const atributo = (objeto, nome) => objeto.atributos.find(atributo => atributo.nome === nome)
+
+let _pat = atributo(conta_github, "Personal Access Token").valor
+Object.defineProperty(atributo(conta_github, "Personal Access Token"), "valor", {
+  set(valor) {
+    _pat = valor
+    conta_github.nome = ""
+    if (valor.length === 40) {
+      consulte_github("query { viewer { login } }", resposta => conta_github.nome = resposta.viewer.login)
+    }
+  },
+  get() {
+    return _pat
+  }
+})
+
+const consulte_github = (consulta, responda) => {
+  fetch("https://api.github.com/graphql", {
+    method: "POST",
+    headers: {
+      Authorization: "bearer " + atributo(conta_github, "Personal Access Token").valor,
+    },
+    body: JSON.stringify({
+      query: consulta,
+    })
+  }).then(r => r.json()).then(resposta => responda(resposta.data))
+}
+
+const represente_atributo = (atributo) => {
+  const span = document.createElement("span")
+  span.style.display = "flex"
+  span.style.flexDirection = "column"
+  const label = document.createElement("label")
+  label.textContent = atributo.nome + ":"
+  span.appendChild(label)
+  const input = document.createElement("input")
+  if (atributo.tipo === "Senha") input.type = "password"
+  input.style.padding = "8px"
+  input.style.borderWidth = "0px"
+  input.style.borderBottomWidth = "1px"
+  input.style.outline = "0px"
+  input.textContent = atributo.nome + ":"
+  input.addEventListener("keyup", () => atributo.valor = input.value)
+  span.appendChild(input)
+  return span
+}
+
+const represente_objeto = (objeto) => {
+  const span = document.createElement("span")
+  span.style.display = "flex"
+  span.style.flexDirection = "column"
+  span.style.flexGrow = 1
+  const barra_superior = document.createElement("span")
+  barra_superior.style.backgroundColor = COR_PRINCIPAL
+  barra_superior.style.padding = "16px"
+  barra_superior.style.color = "#fff"
+  barra_superior.style.fontSize = "24px"
+  let _nome = objeto.nome
+  Object.defineProperty(objeto, "nome", {
+    set(novo_nome) {
+      _nome = novo_nome
+      if (novo_nome.length > 0) {
+        barra_superior.textContent = novo_nome
+        span.insertBefore(barra_superior, span.firstChild)
+        span.appendChild(barra_inferior)
+      } else {
+        if (span.contains(barra_superior)) span.removeChild(barra_superior)
+        if (span.contains(barra_inferior)) span.removeChild(barra_inferior)
+      }
+    },
+  })
+  const corpo = document.createElement("span")
+  corpo.style.padding = "16px"
+  corpo.style.flexGrow = 1
+  objeto.atributos.map(represente_atributo).forEach(filho => corpo.appendChild(filho))
+  span.appendChild(corpo)
+  const barra_inferior = document.createElement("span")
+  barra_inferior.style.backgroundColor = COR_PRINCIPAL
+  barra_inferior.style.padding = "16px"
+  barra_inferior.style.color = "#fff"
+  barra_inferior.style.display = "flex"
+  barra_inferior.style.gap = "12px"
+  const lista = ícone("list")
+  barra_inferior.appendChild(lista)
+  const formulário = ícone("edit_document")
+  barra_inferior.appendChild(formulário)
+  selecione(formulário)
+  return span
+}
+
+const ícone = (nome) => {
+  const span = document.createElement("span")
+  span.style.padding = "12px"
+  span.style.borderRadius = "8px"
+  span.classList.add("material-icons")
+  span.textContent = nome
+  return span
+}
+
+const selecione = (elemento) => {
+  elemento.style.backgroundColor = "#fff2"
+}
 
 window.addEventListener("load", () => {
   document.body.style.margin = 0
+  document.body.style.fontFamily = "sans-serif"
+  document.body.style.display = "flex"
   document.body.style.height = "100vh"
-  new TelaLogin()
+  document.body.appendChild(represente_objeto(conta_github))
 })
