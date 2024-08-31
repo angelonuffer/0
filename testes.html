@@ -8,7 +8,19 @@
 </head>
 <body>
   <div id="mocha"></div>
-  <script type="module" src="setup.js"></script>
-  <script type="module" src="run.js"></script>
+  <script type="module">
+    import 'https://unpkg.com/chai@4.1.2/chai.js'
+
+    mocha.setup('tdd')
+  </script>
+  <script type="module">
+    import "./teste_função.js"
+    import "./teste_aritmética.js"
+    import "./teste_variáveis.js"
+    import "./teste_importação.js"
+
+    mocha.checkLeaks()
+    mocha.run()
+  </script>
 </body>
 </html>
