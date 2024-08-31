@@ -1,8 +1,8 @@
-import função from "./função.js"
+import avaliar from "./avaliar.js"
 
 suite("variáveis", () => {
   test("= atribui valores a variáveis", async () => {
-    chai.expect(await função(`
+    chai.expect(await avaliar(`
       a = 5
       b = 8
       #1 = a + b
