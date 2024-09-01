@@ -31,10 +31,10 @@ const avaliar = async (expressão, escopo) => {
   if (soma > -1) return await avaliar(expressão.slice(0, soma), escopo) + await avaliar(expressão.slice(soma + 1), escopo)
   const subtração = expressão.indexOf("-")
   if (subtração > -1) return await avaliar(expressão.slice(0, subtração), escopo) - await avaliar(expressão.slice(subtração + 1), escopo)
-  const início_chamada = expressão.indexOf("(")
+  const início_chamada = expressão.lastIndexOf("(")
   if (início_chamada > -1) {
     const fim_chamada = expressão.lastIndexOf(")")
-    const função = escopo[expressão.slice(0, início_chamada)]
+    const função = await avaliar(expressão.slice(0, início_chamada), escopo)
     return função(await avaliar(expressão.slice(início_chamada + 1, fim_chamada), escopo))
   }
 }

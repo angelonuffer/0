@@ -7,4 +7,9 @@ suite("importação", () => {
       #1 = retorna_5()
     `)).to.be.eql(5)
   })
+  test("pode chamar a função na mesma linha que importa", async () => {
+    chai.expect(await avaliar(`
+      #1 = #0("./retorna_5.0")()
+    `)).to.be.eql(5)
+  })
 })
