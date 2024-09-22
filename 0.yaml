@@ -1,0 +1,85 @@
+0:
+  - +:
+    - $: atribuição
+    - $: espaço
+
+atribuição:
+  - - $: nome
+    - $: espaço
+    - "="
+    - $: espaço
+    - $: valor
+
+nome:
+  - +:
+    - "#"
+    - _
+    - .:
+      - "0"
+      - "9"
+    - .:
+      - a
+      - z
+
+valor:
+  - $: chamada
+  - $: importação
+  - $: valor_numérico
+  - $: valor_texto
+  - $: nome
+
+chamada:
+  - - - $: importação
+      - $: nome
+    - ()
+
+importação:
+  - - "#0("
+    - $: valor_texto
+    - )
+
+valor_numérico:
+  - $: soma
+  - $: subtração
+  - $: número
+
+soma:
+  - -
+      - $: número
+      - $: nome
+    - $: espaço
+    - +
+    - $: espaço
+    - - $: valor_numérico
+      - $: nome
+
+subtração:
+  - -
+      - $: número
+      - $: nome
+    - $: espaço
+    - "-"
+    - $: espaço
+    - - $: valor_numérico
+      - $: nome
+
+número:
+  - +:
+    - .:
+      - "0"
+      - "9"
+
+valor_texto:
+  - - "\""
+    - - +:
+        - .:
+          - " "
+          - "10FFFF"
+          - "\""
+      - ~
+    - "\""
+
+espaço:
+  - +:
+    - " "
+    - .: 000A
