@@ -1,4 +1,3 @@
-
 # Linguagem 0
 
 Uma linguagem de programação funcional projetada para ser universal. A 0 está sendo criada com dois valores fundamentais em mente:
@@ -10,6 +9,11 @@ Uma linguagem de programação funcional projetada para ser universal. A 0 está
 O nome 0 foi escolhido por sua simplicidade e universalidade. O zero é um conceito fundamental na matemática e é representado da mesma forma em diversos idiomas, refletindo a natureza inclusiva e acessível da linguagem.
 
 Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor do mundo, promovendo a eficiência e a clareza no desenvolvimento de software.
+
+## Sintaxe
+
+A sintaxe está definida no arquivo [0.yaml](https://0-d0e.pages.dev/0.yaml) e pode ser melhor entendida com a ajuda dos [diagramas](https://0-d0e.pages.dev/diagramas.html) e [exemplos](https://0-d0e.pages.dev/testes.html).
+
 ## Licença
 
 [![CC0](https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Cc-zero.svg/26px-Cc-zero.svg.png) CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.pt-br)
