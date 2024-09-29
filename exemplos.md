@@ -1,47 +1,33 @@
 # Exemplos de códigos na linguagem 0
 
-## Funções
+## Exportando Funções
 
-As funções são interpretadas e retornam o valor de #1.
+A expressão retorna a função declarada com o nome "#".
 
 ```
-#1 = 42
+#() = 42
 ---
 42
 ```
 
 ```
-#1 = 4
+#() = 4
 ---
 4
 ```
 
 ## Aritmética
 
-O operador + soma dois números.
+Os operadores "+" e "-" são usados para adição e subtração.
 
 ```
-#1 = 42 + 5
+#() = 42 + 5
 ---
 47
 ```
 
 ```
-#1 = 4 + 8
----
-12
-```
-
-O operador - subtrai dois números.
-
-```
-#1 = 42 - 5
----
-37
-```
-
-```
-#1 = 4 - 8
+#() = 4 - 8
 ---
 -4
 ```
@@ -53,7 +39,7 @@ O operador = atribui valores a variáveis.
 ```
 a = 5
 b = 8
-#1 = a + b
+#() = a + b
 ---
 13
 ```
@@ -64,7 +50,7 @@ b = 8
 
 ```
 retorna_5 = #0("./retorna_5.0")
-#1 = retorna_5()
+#() = retorna_5()
 ---
 5
 ```
@@ -72,7 +58,7 @@ retorna_5 = #0("./retorna_5.0")
 É possível chamar a função na mesma linha que importa.
 
 ```
-#1 = #0("./retorna_5.0")()
+#() = #0("./retorna_5.0")()
 ---
 5
 ```

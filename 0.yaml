@@ -1,7 +1,15 @@
 0:
   - +:
+    - $: exportação
     - $: atribuição
     - $: espaço
+
+exportação:
+  - - "#()"
+    - $: espaço
+    - "="
+    - $: espaço
+    - $: valor
 
 atribuição:
   - - $: nome

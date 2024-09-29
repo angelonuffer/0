@@ -3,6 +3,9 @@ import jsyaml from "https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs"
 
 const sintaxe = jsyaml.load(await fetch("./0.yaml").then(a => a.text()))
 const semântica = {
+  exportação: (exportação, escopo) => {
+    escopo["#"] = () => exportação[4]
+  },
   atribuição: (atribuição, escopo) => {
     escopo[atribuição[0]] = atribuição[4]
     return atribuição[4]
@@ -25,5 +28,5 @@ const semântica = {
 
 export default async expressão => {
   const escopo = await avaliar(sintaxe, semântica, expressão)
-  return escopo["#1"]
+  return escopo["#"]()
 }
