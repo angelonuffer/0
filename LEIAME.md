@@ -12,7 +12,7 @@ Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor 
 
 ## Sintaxe
 
-A sintaxe está definida no arquivo [0.yaml](https://0-d0e.pages.dev/0.yaml) e pode ser melhor entendida com a ajuda dos [diagramas](https://0-d0e.pages.dev/diagramas.html) e [exemplos](https://0-d0e.pages.dev/testes.html).
+A sintaxe está definida no arquivo [0.yaml](https://0-d0e.pages.dev/0.yaml) e pode ser melhor entendida com a ajuda dos [diagramas](https://0-d0e.pages.dev/diagramas.html) e [exemplos](https://0-d0e.pages.dev/exemplos.html).
 
 ## Licença
 

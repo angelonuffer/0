@@ -1,0 +1,36 @@
+<style>
+  pre {
+    border: 1px solid #000;
+    border-radius: 5px;
+    padding: 8px;
+  }
+  pre img {
+    display: block;
+    margin-top: 8px;
+  }
+</style>
+<script type="module">
+  import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js"
+  import _0 from "./0.js"
+
+  fetch("./exemplos.md").then(e => e.text()).then(e => {
+    document.body.innerHTML = marked.parse(e)
+    document.body.querySelectorAll("code").forEach(async c => {
+      const [código, expectativa] = c.textContent.split("\n---\n")
+      const retorno = await _0(código)
+      if (`${retorno}\n` === expectativa) {
+        const img = document.createElement("img")
+        img.src = "https://img.shields.io/badge/passou-070"
+        c.parentElement.appendChild(img)
+        return
+      }
+      const img = document.createElement("img")
+      img.style.marginBottom = "8px"
+      img.src = "https://img.shields.io/badge/falhou-f00"
+      c.parentElement.appendChild(img)
+      const code = document.createElement("code")
+      code.textContent = retorno
+      c.parentElement.appendChild(code)
+    })
+  })
+</script>
