@@ -1,6 +1,6 @@
 # Exemplos de códigos na linguagem 0
 
-## Exportando Funções
+## Exportação
 
 A expressão retorna a função declarada com o nome "#".
 
@@ -46,10 +46,10 @@ b = 8
 
 ## Importação
 
-#0 é uma função que importa uma função a partir do caminho do arquivo.
+A função "#" importa um arquivo a partir do caminho.
 
 ```
-retorna_5 = #0("./retorna_5.0")
+retorna_5 = #("./retorna_5.0")
 #() = retorna_5()
 ---
 5
@@ -58,7 +58,7 @@ retorna_5 = #0("./retorna_5.0")
 É possível chamar a função na mesma linha que importa.
 
 ```
-#() = #0("./retorna_5.0")()
+#() = #("./retorna_5.0")()
 ---
 5
 ```

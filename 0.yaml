@@ -42,7 +42,7 @@ chamada:
     - ()
 
 importação:
-  - - "#0("
+  - - "#("
     - $: valor_texto
     - )
 
