@@ -10,7 +10,10 @@ const semântica = {
     escopo[atribuição[0]] = atribuição[4]
     return atribuição[4]
   },
-  nome: nome => nome.join(""),
+  nome: nome => {
+    if (nome[1][0]) return nome[0] + nome[1][0].join("")
+    return nome[0]
+  },
   número: número => parseFloat(número.map(n => n[0]).join("")),
   soma: (soma, escopo) => {
     if (escopo[soma[0]]) soma[0] = escopo[soma[0]]
@@ -22,11 +25,8 @@ const semântica = {
   valor_texto: valor_texto => valor_texto[1].join(""),
   chamada: async (chamada, escopo) => {
     if (escopo[chamada[0]]) chamada[0] = escopo[chamada[0]]
-    return (await avaliar(sintaxe, semântica, chamada[0]))["#1"]
+    return (await avaliar(sintaxe, semântica, chamada[0]))["#"]()
   },
 }
 
-export default async expressão => {
-  const escopo = await avaliar(sintaxe, semântica, expressão)
-  return escopo["#"]()
-}
+export default async expressão => await avaliar(sintaxe, semântica, expressão)

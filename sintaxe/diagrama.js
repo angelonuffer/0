@@ -51,6 +51,14 @@ export default sintaxe => {
 }
 
 const item = (declaração, x, y) => {
+  if (declaração === "") {
+    return {
+      trilho: "",
+      textos: [],
+      largura: 0,
+      altura: 10,
+    }
+  }
   if (typeof declaração === "string") {
     const largura = declaração.length * largura_caractere
     return {
@@ -161,7 +169,7 @@ const item = (declaração, x, y) => {
         altura += altura_série
         altura_subitem_anterior = altura_série
       }
-      else if (declaração[i] !== null) {
+      else {
         const {
           trilho: trilho_subitem,
           textos: textos_subitem,
@@ -176,7 +184,6 @@ const item = (declaração, x, y) => {
         altura += altura_subitem
         altura_subitem_anterior = altura_subitem
       }
-      if (declaração[i] === null) altura += 10
       finais.push([x, y])
     }
     if (declaração.length > 1) {

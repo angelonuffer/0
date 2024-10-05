@@ -13,6 +13,7 @@
     margin-top: 8px;
   }
 </style>
+<body></body>
 <script type="module">
   import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js"
   import _0 from "./0.js"
@@ -21,7 +22,8 @@
     document.body.innerHTML = marked.parse(e)
     document.body.querySelectorAll("code").forEach(async c => {
       const [código, expectativa] = c.textContent.split("\n---\n")
-      const retorno = await _0(código)
+      let escopo = await _0(código)
+      let retorno = escopo["#"]()
       if (`${retorno}\n` === expectativa) {
         const img = document.createElement("img")
         img.src = "https://img.shields.io/badge/passou-070"
@@ -32,9 +34,22 @@
       img.style.marginBottom = "8px"
       img.src = "https://img.shields.io/badge/falhou-f00"
       c.parentElement.appendChild(img)
-      const code = document.createElement("code")
-      code.textContent = retorno
-      c.parentElement.appendChild(code)
+      if (retorno === undefined) retorno = ""
+      const div_retorno = document.createElement("div")
+      div_retorno.textContent = "retorno\n  " + retorno
+      c.parentElement.appendChild(div_retorno)
+      const div_escopo = document.createElement("div")
+      div_escopo.textContent = "escopo\n" + Object.entries(escopo).map(e => {
+        const tipo = typeof e[1]
+        if (tipo === "string") return `  ${e[0]} = "${e[1]}"\n`
+        if (tipo === "function") return `  ${e[0]}() = ${e[1]()}\n`
+        return {
+          nome: e[0],
+          tipo,
+          valor: e[1],
+        }
+      }).join("")
+      c.parentElement.appendChild(div_escopo)
     })
   })
 </script>
