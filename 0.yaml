@@ -51,11 +51,13 @@ importação:
     - )
 
 valor_numérico:
-  - $: soma
+  - $: multiplicação
+  - $: divisão
+  - $: adição
   - $: subtração
   - $: número
 
-soma:
+adição:
   - -
       - $: número
       - $: nome
@@ -71,6 +73,26 @@ subtração:
       - $: nome
     - $: espaço
     - "-"
+    - $: espaço
+    - - $: valor_numérico
+      - $: nome
+
+multiplicação:
+  - -
+      - $: número
+      - $: nome
+    - $: espaço
+    - "*"
+    - $: espaço
+    - - $: valor_numérico
+      - $: nome
+
+divisão:
+  - -
+      - $: número
+      - $: nome
+    - $: espaço
+    - "/"
     - $: espaço
     - - $: valor_numérico
       - $: nome

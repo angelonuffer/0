@@ -15,12 +15,14 @@ const semântica = {
     return nome[0]
   },
   número: número => parseFloat(número.map(n => n[0]).join("")),
-  soma: (soma, escopo) => {
-    if (escopo[soma[0]]) soma[0] = escopo[soma[0]]
-    if (escopo[soma[4]]) soma[4] = escopo[soma[4]]
-    return soma[0] + soma[4]
+  adição: (adição, escopo) => {
+    if (escopo[adição[0]]) adição[0] = escopo[adição[0]]
+    if (escopo[adição[4]]) adição[4] = escopo[adição[4]]
+    return adição[0] + adição[4]
   },
   subtração: subtração => subtração[0] - subtração[4],
+  multiplicação: multiplicação => multiplicação[0] * multiplicação[4],
+  divisão: divisão => divisão[0] / divisão[4],
   importação: importação => fetch(importação[1]).then(a => a.text()),
   valor_texto: valor_texto => valor_texto[1].join(""),
   chamada: async (chamada, escopo) => {

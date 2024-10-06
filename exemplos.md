@@ -16,9 +16,11 @@ A expressão retorna a função declarada com o nome "#".
 4
 ```
 
-## Aritmética
+## Tipo número
 
-Os operadores "+" e "-" são usados para adição e subtração.
+Os seguintes operadores são usados para operações com valores do tipo número.
+
+### Adição (+)
 
 ```
 #() = 42 + 5
@@ -26,10 +28,28 @@ Os operadores "+" e "-" são usados para adição e subtração.
 47
 ```
 
+### Subtração (-)
+
 ```
 #() = 4 - 8
 ---
 -4
+```
+
+### Multiplicação (*)
+
+```
+#() = 3 * 4
+---
+12
+```
+
+### Divisão (/)
+
+```
+#() = 8 / 2
+---
+4
 ```
 
 ## Variáveis
