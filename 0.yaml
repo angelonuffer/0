@@ -40,11 +40,11 @@ valor:
   - $: expressão_numérica
   - $: número
   - $: valor_texto
-  - $: nome
+  - $: variável
 
 chamada:
   - - - $: importação
-      - $: nome
+      - $: variável
     - ()
 
 importação:
@@ -60,31 +60,31 @@ expressão_lógica:
 e:
   - -
       - $: número
-      - $: nome
+      - $: variável
     - $: espaço
     - "&"
     - $: espaço
     - - $: expressão_lógica
       - $: número
-      - $: nome
+      - $: variável
 
 ou:
   - -
       - $: número
-      - $: nome
+      - $: variável
     - $: espaço
     - "|"
     - $: espaço
     - - $: expressão_lógica
       - $: número
-      - $: nome
+      - $: variável
 
 não:
   - - "!"
     - $: espaço
     - - $: expressão_lógica
       - $: número
-      - $: nome
+      - $: variável
 
 expressão_numérica:
   - $: multiplicação
@@ -95,46 +95,38 @@ expressão_numérica:
 adição:
   - -
       - $: número
-      - $: nome
+      - $: variável
     - $: espaço
     - +
     - $: espaço
-    - - $: expressão_numérica
-      - $: número
-      - $: nome
+    - $: valor
 
 subtração:
   - -
       - $: número
-      - $: nome
+      - $: variável
     - $: espaço
     - "-"
     - $: espaço
-    - - $: expressão_numérica
-      - $: número
-      - $: nome
+    - $: valor
 
 multiplicação:
   - -
       - $: número
-      - $: nome
+      - $: variável
     - $: espaço
     - "*"
     - $: espaço
-    - - $: expressão_numérica
-      - $: número
-      - $: nome
+    - $: valor
 
 divisão:
   - -
       - $: número
-      - $: nome
+      - $: variável
     - $: espaço
     - "/"
     - $: espaço
-    - - $: expressão_numérica
-      - $: número
-      - $: nome
+    - $: valor
 
 número:
   - +:
@@ -151,6 +143,9 @@ valor_texto:
           - "\""
       - ""
     - "\""
+
+variável:
+  - $: nome
 
 espaço:
   - +:

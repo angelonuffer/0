@@ -18,16 +18,13 @@ const semântica = {
   ou: ou => ou[0] !== 0 ? ou[0] : ou[4] !== 0 ? ou[4] : 0,
   não: não => não[2] !== 0? 0 : 1,
   número: número => parseFloat(número.map(n => n[0]).join("")),
-  adição: (adição, escopo) => {
-    if (escopo[adição[0]]) adição[0] = escopo[adição[0]]
-    if (escopo[adição[4]]) adição[4] = escopo[adição[4]]
-    return adição[0] + adição[4]
-  },
+  adição: adição => adição[0] + adição[4],
   subtração: subtração => subtração[0] - subtração[4],
   multiplicação: multiplicação => multiplicação[0] * multiplicação[4],
   divisão: divisão => divisão[0] / divisão[4],
   importação: importação => fetch(importação[1]).then(a => a.text()),
   valor_texto: valor_texto => valor_texto[1].join(""),
+  variável: (variável, escopo) => escopo[variável],
   chamada: async (chamada, escopo) => {
     if (escopo[chamada[0]]) chamada[0] = escopo[chamada[0]]
     return (await avaliar(sintaxe, semântica, chamada[0])).escopo["#"]()
