@@ -56,6 +56,12 @@ expressão_lógica:
   - $: e
   - $: ou
   - $: não
+  - $: maior_que
+  - $: menor_que
+  - $: igual_a
+  - $: diferente_de
+  - $: maior_ou_igual_a
+  - $: menor_ou_igual_a
 
 e:
   - -
@@ -85,6 +91,60 @@ não:
     - - $: expressão_lógica
       - $: número
       - $: variável
+
+maior_que:
+  - -
+      - $: número
+      - $: variável
+    - $: espaço
+    - ">"
+    - $: espaço
+    - $: valor
+
+menor_que:
+  - -
+      - $: número
+      - $: variável
+    - $: espaço
+    - <
+    - $: espaço
+    - $: valor
+
+igual_a:
+  - -
+      - $: número
+      - $: variável
+    - $: espaço
+    - ==
+    - $: espaço
+    - $: valor
+
+diferente_de:
+  - -
+      - $: número
+      - $: variável
+    - $: espaço
+    - "!="
+    - $: espaço
+    - $: valor
+
+maior_ou_igual_a:
+  - -
+      - $: número
+      - $: variável
+    - $: espaço
+    - ">="
+    - $: espaço
+    - $: valor
+
+menor_ou_igual_a:
+  - -
+      - $: número
+      - $: variável
+    - $: espaço
+    - <=
+    - $: espaço
+    - $: valor
 
 expressão_numérica:
   - $: multiplicação

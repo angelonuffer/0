@@ -90,9 +90,9 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 ## Tipo número
 
-Os seguintes operadores são usados para operações com valores do tipo número.
+### Operadores aritméticos
 
-### Adição (+)
+#### Adição (+)
 
 ```
 #() = 42 + 5
@@ -100,7 +100,7 @@ Os seguintes operadores são usados para operações com valores do tipo número
 47
 ```
 
-### Subtração (-)
+#### Subtração (-)
 
 ```
 #() = 4 - 8
@@ -108,7 +108,7 @@ Os seguintes operadores são usados para operações com valores do tipo número
 -4
 ```
 
-### Multiplicação (*)
+#### Multiplicação (*)
 
 ```
 #() = 3 * 4
@@ -116,12 +116,134 @@ Os seguintes operadores são usados para operações com valores do tipo número
 12
 ```
 
-### Divisão (/)
+#### Divisão (/)
 
 ```
 #() = 8 / 2
 ---
 4
+```
+
+### Comparadores
+
+#### Maior que (>)
+
+```
+#() = 2 > 8
+---
+0
+```
+
+```
+#() = 8 > 2
+---
+1
+```
+
+```
+#() = 8 > 8
+---
+0
+```
+
+#### Menor que (<)
+
+```
+#() = 8 < 2
+---
+0
+```
+
+```
+#() = 2 < 8
+---
+1
+```
+
+```
+#() = 8 < 8
+---
+0
+```
+
+#### Igual a (==)
+
+```
+#() = 8 == 2
+---
+0
+```
+
+```
+#() = 2 == 8
+---
+0
+```
+
+```
+#() = 8 == 8
+---
+1
+```
+
+#### Diferente de (!=)
+
+```
+#() = 8 != 2
+---
+1
+```
+
+```
+#() = 2 != 8
+---
+1
+```
+
+```
+#() = 8 != 8
+---
+0
+```
+
+#### Maior ou igual a (>=)
+
+```
+#() = 8 >= 2
+---
+1
+```
+
+```
+#() = 2 >= 8
+---
+0
+```
+
+```
+#() = 8 >= 8
+---
+1
+```
+
+#### Menor ou igual a (<=)
+
+```
+#() = 8 <= 2
+---
+0
+```
+
+```
+#() = 2 <= 8
+---
+1
+```
+
+```
+#() = 8 <= 8
+---
+1
 ```
 
 ## Variáveis
