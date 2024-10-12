@@ -36,7 +36,9 @@ nome:
 valor:
   - $: chamada
   - $: importação
-  - $: valor_numérico
+  - $: expressão_lógica
+  - $: expressão_numérica
+  - $: número
   - $: valor_texto
   - $: nome
 
@@ -50,12 +52,45 @@ importação:
     - $: valor_texto
     - )
 
-valor_numérico:
+expressão_lógica:
+  - $: e
+  - $: ou
+  - $: não
+
+e:
+  - -
+      - $: número
+      - $: nome
+    - $: espaço
+    - "&"
+    - $: espaço
+    - - $: expressão_lógica
+      - $: número
+      - $: nome
+
+ou:
+  - -
+      - $: número
+      - $: nome
+    - $: espaço
+    - "|"
+    - $: espaço
+    - - $: expressão_lógica
+      - $: número
+      - $: nome
+
+não:
+  - - "!"
+    - $: espaço
+    - - $: expressão_lógica
+      - $: número
+      - $: nome
+
+expressão_numérica:
   - $: multiplicação
   - $: divisão
   - $: adição
   - $: subtração
-  - $: número
 
 adição:
   - -
@@ -64,7 +99,8 @@ adição:
     - $: espaço
     - +
     - $: espaço
-    - - $: valor_numérico
+    - - $: expressão_numérica
+      - $: número
       - $: nome
 
 subtração:
@@ -74,7 +110,8 @@ subtração:
     - $: espaço
     - "-"
     - $: espaço
-    - - $: valor_numérico
+    - - $: expressão_numérica
+      - $: número
       - $: nome
 
 multiplicação:
@@ -84,7 +121,8 @@ multiplicação:
     - $: espaço
     - "*"
     - $: espaço
-    - - $: valor_numérico
+    - - $: expressão_numérica
+      - $: número
       - $: nome
 
 divisão:
@@ -94,7 +132,8 @@ divisão:
     - $: espaço
     - "/"
     - $: espaço
-    - - $: valor_numérico
+    - - $: expressão_numérica
+      - $: número
       - $: nome
 
 número:

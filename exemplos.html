@@ -3,6 +3,11 @@
 <meta http-equiv="pragma" content="no-cache">
 
 <style>
+  div#resumo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
   pre {
     border: 1px solid #000;
     border-radius: 5px;
@@ -14,25 +19,88 @@
   }
 </style>
 <body></body>
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js" integrity="sha512-CSBhVREyzHAjAFfBlIBakjoRUKp5h7VSweP0InR/pAJyptH7peuhCsqAI/snV+TwZmXZqoUklpXp6R6wMnYf5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="module">
   import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js"
   import _0 from "./0.js"
+  import diagrama from "./sintaxe/diagrama.js"
 
-  fetch("./exemplos.md").then(e => e.text()).then(e => {
+  fetch("./exemplos.md").then(e => e.text()).then(async e => {
     document.body.innerHTML = marked.parse(e)
-    document.body.querySelectorAll("code").forEach(async c => {
+    let total = 0
+    let passaram = 0
+    let falharam = 0
+    let deram_erro = 0
+    await Promise.all([...document.body.querySelectorAll("code")].map(async c => {
+      total++
       const [código, expectativa] = c.textContent.split("\n---\n")
-      let escopo = await _0(código)
+      let escopo
+      let parte
+      let caminho
+      try {
+        const depuração = await _0(código)
+        escopo = depuração.escopo
+        parte = depuração.parte
+        caminho = depuração.caminho
+      }
+      catch (e) {
+        deram_erro++
+        const img = document.createElement("img")
+        img.src = "https://img.shields.io/badge/erro-f00"
+        c.parentElement.appendChild(img)
+        console.error(e)
+        return
+      }
+      if (parte === undefined) parte = ""
+      if (caminho === undefined) caminho = ""
+      if (parte !== código) {
+        deram_erro++
+        const caractere_erro = document.createElement("span")
+        caractere_erro.style.backgroundColor = "#f00"
+        caractere_erro.textContent = código.charAt(parte.length)
+        c.innerHTML = parte + caractere_erro.outerHTML + c.textContent.slice(parte.length + 1)
+        const img = document.createElement("img")
+        img.style.marginBottom = "8px"
+        img.src = "https://img.shields.io/badge/erro-f00"
+        c.parentElement.appendChild(img)
+        const avaliar_caminho = (caminho, indentação) => {
+          if (Array.isArray(caminho)) return `\n${indentação}- ${caminho.map(c => avaliar_caminho(c, `${indentação}  `)).join(`${indentação}- `)}\n`
+          if (typeof caminho === "string") return `"${caminho}"\n`
+          if (caminho.nome) {
+            caminho.caminho_percorrido = caminho.caminho_percorrido.reduce((acc, curr) => {
+              if (Array.isArray(curr)) {
+                curr = curr.every(item => typeof item === 'string') ? curr.join("") : curr
+              }
+              if (typeof curr === 'string') {
+                if (typeof acc[acc.length - 1] === 'string') {
+                  acc[acc.length - 1] += curr;
+                } else {
+                  acc.push(curr);
+                }
+              } else {
+                acc.push(curr);
+              }
+              return acc;
+            }, []);
+            return `\n${indentação}- $: ${caminho.nome}\n${avaliar_caminho([caminho.caminho_percorrido], indentação)}`
+          }
+          return "\n"
+        }
+        c.parentElement.appendChild(diagrama(jsyaml.load("caminho:\n" + avaliar_caminho([caminho], "  "))))
+        return
+      }
       let retorno = escopo["#"]()
       if (`${retorno}\n` === expectativa) {
+        passaram++
         const img = document.createElement("img")
         img.src = "https://img.shields.io/badge/passou-070"
         c.parentElement.appendChild(img)
         return
       }
+      falharam++
       const img = document.createElement("img")
       img.style.marginBottom = "8px"
-      img.src = "https://img.shields.io/badge/falhou-f00"
+      img.src = "https://img.shields.io/badge/falhou-ff0"
       c.parentElement.appendChild(img)
       if (retorno === undefined) retorno = ""
       const div_retorno = document.createElement("div")
@@ -50,6 +118,35 @@
         }
       }).join("")
       c.parentElement.appendChild(div_escopo)
-    })
+    }))
+    const div_resumo = document.createElement("div")
+    div_resumo.id = "resumo"
+    const div_total = document.createElement("div")
+    const img_total = document.createElement("img")
+    img_total.src = `https://img.shields.io/badge/total-${total}-000`
+    div_total.appendChild(img_total)
+    div_resumo.appendChild(div_total)
+    if (passaram > 0) {
+      const div_passaram = document.createElement("div")
+      const img_passaram = document.createElement("img")
+      img_passaram.src = `https://img.shields.io/badge/passaram-${passaram}_(${Math.round(passaram * 100 / total)}%25)-070`
+      div_passaram.appendChild(img_passaram)
+      div_resumo.appendChild(div_passaram)
+    }
+    if (falharam > 0) {
+      const div_falharam = document.createElement("div")
+      const img_falharam = document.createElement("img")
+      img_falharam.src = `https://img.shields.io/badge/falharam-${falharam}_(${Math.round(falharam * 100 / total)}%25)-ff0`
+      div_falharam.appendChild(img_falharam)
+      div_resumo.appendChild(div_falharam)
+    }
+    if (deram_erro > 0) {
+      const div_deram_erro = document.createElement("div")
+      const img_deram_erro = document.createElement("img")
+      img_deram_erro.src = `https://img.shields.io/badge/deram_erro-${deram_erro}_(${Math.round(deram_erro * 100 / total)}%25)-f00`
+      div_deram_erro.appendChild(img_deram_erro)
+      div_resumo.appendChild(div_deram_erro)
+    }
+    document.body.insertBefore(div_resumo, document.body.children[0])
   })
 </script>

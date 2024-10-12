@@ -1,7 +1,16 @@
 export default async (sintaxe, semântica, expressão) => {
   const escopo = {}
-  await item(escopo, sintaxe, Object.values(sintaxe)[0], semântica, expressão)
-  return escopo
+  const {
+    parte,
+    valor,
+    caminho,
+  } = await item(escopo, sintaxe, Object.values(sintaxe)[0], semântica, expressão)
+  return {
+    escopo,
+    parte,
+    valor,
+    caminho,
+  }
 }
 
 const item = async (escopo, sintaxe, declaração, semântica, expressão) => {
@@ -10,6 +19,7 @@ const item = async (escopo, sintaxe, declaração, semântica, expressão) => {
     return {
       parte: declaração,
       valor: declaração,
+      caminho: declaração,
     }
   }
   if (declaração["."]) {
@@ -35,37 +45,50 @@ const item = async (escopo, sintaxe, declaração, semântica, expressão) => {
     return {
       parte: expressão[0],
       valor: expressão[0],
+      caminho: expressão[0],
     }
   }
   if (declaração["+"]) {
     const {
       parte,
       valor,
+      caminho,
     } = await item(escopo, sintaxe, declaração["+"], semântica, expressão)
     if (parte === undefined) return {}
     const resto = await item(escopo, sintaxe, declaração, semântica, expressão.slice(parte.length))
     if (resto.parte === undefined) return {
       parte,
       valor: [valor],
+      caminho: [caminho],
     }
     return {
       parte: parte + resto.parte,
       valor: [valor, ...resto.valor],
+      caminho: [caminho, ...resto.caminho],
     }
   }
   if (declaração["$"]) {
     const {
       parte,
       valor,
+      caminho,
     } = await item(escopo, sintaxe, sintaxe[declaração["$"]], semântica, expressão)
     if (parte === undefined) return {}
-    if (semântica[declaração["$"]]) return {
-      parte,
-      valor: await semântica[declaração["$"]](valor, escopo),
+    if (semântica[declaração["$"]]) {
+      const novo_valor = await semântica[declaração["$"]](valor, escopo)
+      return {
+        parte,
+        valor: novo_valor,
+        caminho: {
+          nome: declaração["$"],
+          caminho_percorrido: caminho,
+        },
+      }
     }
     return {
       parte,
       valor,
+      caminho,
     }
   }
   if (Array.isArray(declaração)) {
@@ -86,16 +109,19 @@ const sequência = async (escopo, sintaxe, declaração, semântica, expressão)
   const {
     parte,
     valor,
+    caminho,
   } = await item(escopo, sintaxe, declaração[0], semântica, expressão)
   if (parte === undefined) return {}
   if (declaração.length === 1) return {
     parte,
     valor: [valor],
+    caminho: [caminho],
   }
   const resto = await sequência(escopo, sintaxe, declaração.slice(1), semântica, expressão.slice(parte.length))
   if (resto.parte === undefined) return {}
   return {
     parte: parte + resto.parte,
-    valor: [valor, ...resto.valor]
+    valor: [valor, ...resto.valor],
+    caminho: [caminho, ...resto.caminho],
   }
 }

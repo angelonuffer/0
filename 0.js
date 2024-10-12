@@ -14,6 +14,9 @@ const semântica = {
     if (nome[1][0]) return nome[0] + nome[1][0].join("")
     return nome[0]
   },
+  e: e => e[0] !== 0 && e[4] !== 0 ? e[4] : 0,
+  ou: ou => ou[0] !== 0 ? ou[0] : ou[4] !== 0 ? ou[4] : 0,
+  não: não => não[2] !== 0? 0 : 1,
   número: número => parseFloat(número.map(n => n[0]).join("")),
   adição: (adição, escopo) => {
     if (escopo[adição[0]]) adição[0] = escopo[adição[0]]
@@ -27,7 +30,7 @@ const semântica = {
   valor_texto: valor_texto => valor_texto[1].join(""),
   chamada: async (chamada, escopo) => {
     if (escopo[chamada[0]]) chamada[0] = escopo[chamada[0]]
-    return (await avaliar(sintaxe, semântica, chamada[0]))["#"]()
+    return (await avaliar(sintaxe, semântica, chamada[0])).escopo["#"]()
   },
 }
 
