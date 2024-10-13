@@ -258,6 +258,54 @@ b = 8
 13
 ```
 
+## Tipo texto
+
+Concatenando textos.
+
+```
+olá = "Olá, "
+#() = olá + "mundo!"
+---
+Olá, mundo!
+```
+
+Obtendo um caractere a partir da posição no texto, começando na posição 0.
+
+```
+olá = "Olá, "
+#() = olá[0]
+---
+O
+```
+
+```
+olá = "Olá, "
+i = 2
+#() = olá[i]
+---
+á
+```
+
+Substituindo um caractere do texto.
+
+```
+animal = "pato"
+animal[0] = "g"
+#() = animal
+---
+gato
+```
+
+Removendo um caractere do texto.
+
+```
+objeto = "bolsa"
+objeto[3] = ""
+#() = objeto
+---
+bola
+```
+
 ## Importação
 
 A função "#" importa um arquivo a partir do caminho.

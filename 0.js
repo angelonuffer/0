@@ -29,12 +29,17 @@ const semântica = {
   multiplicação: multiplicação => multiplicação[0] * multiplicação[4],
   divisão: divisão => divisão[0] / divisão[4],
   importação: importação => fetch(importação[1]).then(a => a.text()),
-  valor_texto: valor_texto => valor_texto[1].join(""),
+  valor_texto: v => {
+    if (v[1] === "") return ""
+    return v[1].join("")
+  },
+  parte: (v, escopo) => escopo[v[0]][v[2]],
   variável: (variável, escopo) => escopo[variável],
   chamada: async (chamada, escopo) => {
     if (escopo[chamada[0]]) chamada[0] = escopo[chamada[0]]
     return (await avaliar(sintaxe, semântica, chamada[0])).escopo["#"]()
   },
+  substituição: (v, escopo) => escopo[v[0]] = `${escopo[v[0]].slice(0, v[2])}${v[7]}${escopo[v[0]].slice(v[2] + 1)}`,
 }
 
 export default async expressão => await avaliar(sintaxe, semântica, expressão)

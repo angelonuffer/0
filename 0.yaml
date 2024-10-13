@@ -2,6 +2,7 @@
   - +:
     - $: exportação
     - $: atribuição
+    - $: substituição
     - $: espaço
 
 exportação:
@@ -31,6 +32,9 @@ nome:
           - .:
             - a
             - z
+          - .:
+            - À
+            - ÿ
       - ""
 
 valor:
@@ -40,6 +44,7 @@ valor:
   - $: expressão_numérica
   - $: número
   - $: valor_texto
+  - $: parte
   - $: variável
 
 chamada:
@@ -204,8 +209,24 @@ valor_texto:
       - ""
     - "\""
 
+parte:
+  - - $: nome
+    - "["
+    - $: valor
+    - "]"
+
 variável:
   - $: nome
+
+substituição:
+  - - $: nome
+    - "["
+    - $: valor
+    - "]"
+    - $: espaço
+    - "="
+    - $: espaço
+    - $: valor
 
 espaço:
   - +:
