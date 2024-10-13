@@ -44,8 +44,10 @@ valor:
   - $: expressão_numérica
   - $: número
   - $: valor_texto
+  - $: lista
   - $: parte
   - $: variável
+  - $: nulo
 
 chamada:
   - - - $: importação
@@ -209,6 +211,17 @@ valor_texto:
       - ""
     - "\""
 
+lista:
+  - - "["
+    - - - - +:
+            - - $: valor
+              - ","
+              - $: espaço
+          - ""
+        - $: valor
+      - ""
+    - "]"
+
 parte:
   - - $: nome
     - "["
@@ -221,7 +234,8 @@ variável:
 substituição:
   - - $: nome
     - "["
-    - $: valor
+    - - $: valor
+      - ""
     - "]"
     - $: espaço
     - "="
@@ -232,3 +246,6 @@ espaço:
   - +:
     - " "
     - .: 000A
+
+nulo:
+  - "~"

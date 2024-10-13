@@ -306,6 +306,54 @@ objeto[3] = ""
 bola
 ```
 
+## Tipo lista
+
+Incluindo item.
+
+```
+frutas = ["laranja", "banana", "abacaxi"]
+frutas[] = "maçã"
+#() = frutas
+---
+["laranja", "banana", "abacaxi", "maçã"]
+```
+
+Obtendo um item a partir da posição na lista, começando na posição 0.
+
+```
+frutas = ["laranja", "banana", "abacaxi"]
+#() = frutas[0]
+---
+laranja
+```
+
+```
+frutas = ["laranja", "banana", "abacaxi"]
+#() = frutas[1]
+---
+banana
+```
+
+Substituindo um item.
+
+```
+frutas = ["laranja", "banana", "abacaxi"]
+frutas[1] = "maçã"
+#() = frutas
+---
+["laranja", "maçã", "abacaxi"]
+```
+
+Removendo um item.
+
+```
+frutas = ["laranja", "banana", "abacaxi"]
+frutas[1] = ~
+#() = frutas
+---
+["laranja", "abacaxi"]
+```
+
 ## Importação
 
 A função "#" importa um arquivo a partir do caminho.

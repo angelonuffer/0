@@ -102,6 +102,22 @@
         return
       }
       let retorno = escopo["#"]()
+      if (Array.isArray(retorno)) {
+        const arrays_iguais = (arr1, arr2) => {
+          if (arr1.length !== arr2.length) return false;
+          for (let i = 0; i < arr1.length; i++) {
+            if (arr1[i] !== arr2[i]) return false;
+          }
+          return true;
+        }
+        if (arrays_iguais(retorno, JSON.parse(expectativa))) {
+          passaram++
+          const img = document.createElement("img")
+          img.src = "https://img.shields.io/badge/passou-070"
+          c.parentElement.appendChild(img)
+          return
+        }
+      }
       if (`${retorno}\n` === expectativa) {
         passaram++
         const img = document.createElement("img")

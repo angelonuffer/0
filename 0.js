@@ -33,13 +33,29 @@ const semântica = {
     if (v[1] === "") return ""
     return v[1].join("")
   },
+  lista: v => [...v[1][0].map(v => v[0]), v[1][1]],
   parte: (v, escopo) => escopo[v[0]][v[2]],
   variável: (variável, escopo) => escopo[variável],
   chamada: async (chamada, escopo) => {
     if (escopo[chamada[0]]) chamada[0] = escopo[chamada[0]]
     return (await avaliar(sintaxe, semântica, chamada[0])).escopo["#"]()
   },
-  substituição: (v, escopo) => escopo[v[0]] = `${escopo[v[0]].slice(0, v[2])}${v[7]}${escopo[v[0]].slice(v[2] + 1)}`,
+  substituição: (v, escopo) => {
+    if (v[2] === "") if (Array.isArray(escopo[v[0]])) {
+      escopo[v[0]].push(v[7])
+      return
+    }
+    if (Array.isArray(escopo[v[0]])) {
+      if (v[7] === null) {
+        escopo[v[0]].splice(v[2], 1)
+        return
+      }
+      escopo[v[0]][v[2]] = v[7]
+      return
+    }
+    escopo[v[0]] = `${escopo[v[0]].slice(0, v[2])}${v[7]}${escopo[v[0]].slice(v[2] + 1)}`
+  },
+  nulo: v => null,
 }
 
 export default async expressão => await avaliar(sintaxe, semântica, expressão)
