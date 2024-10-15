@@ -34,7 +34,10 @@ const semântica = {
     return v[1].join("")
   },
   lista: v => [...v[1][0].map(v => v[0]), v[1][1]],
-  parte: (v, escopo) => escopo[v[0]][v[2]],
+  parte: (v, escopo) => {
+    if (v[3] !== "") return escopo[v[0]].slice(v[2], v[3][1])
+    return escopo[v[0]][v[2]]
+  },
   variável: (variável, escopo) => escopo[variável],
   chamada: async (chamada, escopo) => {
     if (escopo[chamada[0]]) chamada[0] = escopo[chamada[0]]

@@ -260,50 +260,26 @@ b = 8
 
 ## Tipo texto
 
-Concatenando textos.
-
 ```
-olá = "Olá, "
-#() = olá + "mundo!"
+#() = "Viva o momento."
 ---
-Olá, mundo!
+Viva o momento.
 ```
 
-Obtendo um caractere a partir da posição no texto, começando na posição 0.
+Fatiando o texto.
 
 ```
-olá = "Olá, "
-#() = olá[0]
+frase = "Viva o momento."
+#() = frase[0]
 ---
-O
+V
 ```
 
 ```
-olá = "Olá, "
-i = 2
-#() = olá[i]
+frase = "Viva o momento."
+#() = frase[0:4]
 ---
-á
-```
-
-Substituindo um caractere do texto.
-
-```
-animal = "pato"
-animal[0] = "g"
-#() = animal
----
-gato
-```
-
-Removendo um caractere do texto.
-
-```
-objeto = "bolsa"
-objeto[3] = ""
-#() = objeto
----
-bola
+Viva
 ```
 
 ## Tipo lista

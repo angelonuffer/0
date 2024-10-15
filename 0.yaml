@@ -226,6 +226,9 @@ parte:
   - - $: nome
     - "["
     - $: valor
+    - - - ":"
+        - $: valor
+      - ""
     - "]"
 
 variável:

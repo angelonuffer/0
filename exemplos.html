@@ -142,6 +142,12 @@
       c.parentElement.appendChild(div_escopo)
     }))
     const div_resumo = document.createElement("div")
+    div_resumo.style.position = "fixed"
+    div_resumo.style.backgroundColor = "#fff"
+    div_resumo.style.padding = "8px"
+    div_resumo.style.borderRadius = "8px"
+    div_resumo.style.top = "8px"
+    div_resumo.style.right = "8px"
     div_resumo.id = "resumo"
     const div_total = document.createElement("div")
     const img_total = document.createElement("img")
@@ -169,6 +175,7 @@
       div_deram_erro.appendChild(img_deram_erro)
       div_resumo.appendChild(div_deram_erro)
     }
-    document.body.insertBefore(div_resumo, document.body.children[0])
+    document.body.appendChild(div_resumo)
+    document.body.style.marginTop = div_resumo.offsetHeight + 8
   })
 </script>
