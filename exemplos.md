@@ -318,6 +318,49 @@ frutas = ["abacaxi", "banana", "caju"]
 ["abacaxi", "banana", "carambola"]
 ```
 
+## Tipo objeto
+
+Acessando um atributo.
+
+```
+filosofia = {
+  nome: "Existencialismo",
+  conceito: "A existência precede a essência",
+}
+#() = filosofia["nome"]
+---
+Existencialismo
+```
+
+```
+filosofia = {
+  nome: "Existencialismo",
+  conceito: "A existência precede a essência",
+}
+#() = filosofia.conceito
+---
+A existência precede a essência
+```
+
+Espalhando os atributos de um objeto existente num novo.
+
+```
+filosofia = {
+  nome: "Existencialismo",
+  conceito: "A existência precede a essência",
+}
+#() = {
+  ...filosofia,
+  perspectiva: "Foco na liberdade individual e responsabilidade pessoal",
+}
+---
+{
+  "nome": "Existencialismo",
+  "conceito": "A existência precede a essência",
+  "perspectiva": "Foco na liberdade individual e responsabilidade pessoal"
+}
+```
+
 ## Importação
 
 A função "#" importa um arquivo a partir do caminho.

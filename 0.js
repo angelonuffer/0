@@ -47,9 +47,21 @@ const semântica = {
     }
     return nova_lista
   },
+  objeto: v => {
+    let novo_objeto = {}
+    for (const item of v[2]) {
+      if (item[0] === "...") novo_objeto = {
+        ...novo_objeto,
+        ...item[1],
+      }
+      else novo_objeto[item[0]] = item[3]
+    }
+    return novo_objeto
+  },
   parte: (v, escopo) => {
-    if (v[3] !== "") return escopo[v[0]].slice(v[2], v[3][1])
-    return escopo[v[0]][v[2]]
+    if (v[1][0] === ".") return escopo[v[0]][v[1][1]]
+    if (v[1][2] !== "") return escopo[v[0]].slice(v[1][1], v[1][2][1])
+    return escopo[v[0]][v[1][1]]
   },
   variável: (variável, escopo) => escopo[variável],
   chamada: async (chamada, escopo) => {

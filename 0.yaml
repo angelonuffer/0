@@ -45,6 +45,7 @@ valor:
   - $: valor_texto
   - $: modelo_texto
   - $: lista
+  - $: objeto
   - $: parte
   - $: variável
 
@@ -241,14 +242,32 @@ lista:
       - ""
     - "]"
 
+objeto:
+  - - "{"
+    - $: espaço
+    - +:
+      - - ...
+        - $: valor
+        - ","
+        - $: espaço
+      - - $: nome
+        - ":"
+        - $: espaço
+        - $: valor
+        - ","
+        - $: espaço
+    - "}"
+
 parte:
   - - $: nome
-    - "["
-    - $: valor
-    - - - ":"
+    - - - "["
         - $: valor
-      - ""
-    - "]"
+        - - - ":"
+            - $: valor
+          - ""
+        - "]"
+      - - "."
+        - $: nome
 
 variável:
   - $: nome

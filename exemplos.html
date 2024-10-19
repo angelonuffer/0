@@ -120,6 +120,29 @@
           }
         }
         catch (e) {
+          console.error(e)
+        }
+      }
+      if (typeof retorno === "object") {
+        const objetos_iguais = (obj1, obj2) => {
+          if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) return obj1 === obj2;
+          const chaves1 = Object.keys(obj1);
+          const chaves2 = Object.keys(obj2);
+          if (chaves1.length !== chaves2.length) return false;
+          for (let chave of chaves1) if (!objetos_iguais(obj1[chave], obj2[chave])) return false;
+          return true;
+        };
+        try {
+          if (objetos_iguais(retorno, JSON.parse(expectativa))) {
+            passaram++
+            const img = document.createElement("img")
+            img.src = "https://img.shields.io/badge/passou-070"
+            c.parentElement.appendChild(img)
+            return
+          }
+        }
+        catch (e) {
+          console.error(e)
         }
       }
       if (`${retorno}\n` === expectativa) {
