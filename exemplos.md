@@ -293,50 +293,29 @@ O céu é o limite.
 
 ## Tipo lista
 
-Incluindo item.
+Fatiando a lista.
 
 ```
-frutas = ["laranja", "banana", "abacaxi"]
-frutas[] = "maçã"
-#() = frutas
----
-["laranja", "banana", "abacaxi", "maçã"]
-```
-
-Obtendo um item a partir da posição na lista, começando na posição 0.
-
-```
-frutas = ["laranja", "banana", "abacaxi"]
+frutas = ["abacaxi", "banana", "caju"]
 #() = frutas[0]
 ---
-laranja
+abacaxi
 ```
 
 ```
-frutas = ["laranja", "banana", "abacaxi"]
-#() = frutas[1]
+frutas = ["abacaxi", "banana", "caju"]
+#() = frutas[0:2]
 ---
-banana
+["abacaxi", "banana"]
 ```
 
-Substituindo um item.
+Espalhando os itens de uma lista existente numa nova.
 
 ```
-frutas = ["laranja", "banana", "abacaxi"]
-frutas[1] = "maçã"
-#() = frutas
+frutas = ["abacaxi", "banana", "caju"]
+#() = [...frutas[0:2], "carambola"]
 ---
-["laranja", "maçã", "abacaxi"]
-```
-
-Removendo um item.
-
-```
-frutas = ["laranja", "banana", "abacaxi"]
-frutas[1] = ~
-#() = frutas
----
-["laranja", "abacaxi"]
+["abacaxi", "banana", "carambola"]
 ```
 
 ## Importação

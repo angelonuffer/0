@@ -2,7 +2,6 @@
   - +:
     - $: exportação
     - $: atribuição
-    - $: substituição
     - $: espaço
 
 exportação:
@@ -48,7 +47,6 @@ valor:
   - $: lista
   - $: parte
   - $: variável
-  - $: nulo
 
 chamada:
   - - - $: importação
@@ -231,11 +229,15 @@ interpolação:
 lista:
   - - "["
     - - - - +:
-            - - $: valor
+            - - - - "..."
+                  - $: valor
+                - $: valor
               - ","
               - $: espaço
           - ""
-        - $: valor
+        - - - "..."
+            - $: valor
+          - $: valor
       - ""
     - "]"
 
@@ -251,21 +253,7 @@ parte:
 variável:
   - $: nome
 
-substituição:
-  - - $: nome
-    - "["
-    - - $: valor
-      - ""
-    - "]"
-    - $: espaço
-    - "="
-    - $: espaço
-    - $: valor
-
 espaço:
   - +:
     - " "
     - .: 000A
-
-nulo:
-  - "~"
