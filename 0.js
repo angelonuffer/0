@@ -33,6 +33,11 @@ const semântica = {
     if (v[1] === "") return ""
     return v[1].join("")
   },
+  modelo_texto: v => {
+    if (v[1] === "") return ""
+    return v[1].join("")
+  },
+  interpolação: v => v[1],
   lista: v => [...v[1][0].map(v => v[0]), v[1][1]],
   parte: (v, escopo) => {
     if (v[3] !== "") return escopo[v[0]].slice(v[2], v[3][1])

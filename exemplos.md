@@ -282,6 +282,15 @@ frase = "Viva o momento."
 Viva
 ```
 
+Gerando novos textos a partir do modelo.
+
+```
+frase = "O céu é azul."
+#() = `${frase[0:7]} o limite.`
+---
+O céu é o limite.
+```
+
 ## Tipo lista
 
 Incluindo item.

@@ -44,6 +44,7 @@ valor:
   - $: expressão_numérica
   - $: número
   - $: valor_texto
+  - $: modelo_texto
   - $: lista
   - $: parte
   - $: variável
@@ -210,6 +211,22 @@ valor_texto:
           - "\""
       - ""
     - "\""
+
+modelo_texto:
+  - - "`"
+    - - +:
+        - $: interpolação
+        - .:
+          - " "
+          - "10FFFF"
+          - "`"
+      - ""
+    - "`"
+
+interpolação:
+  - - "${"
+    - $: valor
+    - "}"
 
 lista:
   - - "["
