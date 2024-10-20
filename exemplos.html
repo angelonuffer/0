@@ -101,7 +101,7 @@
         c.parentElement.appendChild(diagrama(jsyaml.load(`caminho:\n${avaliar_caminho([caminho], "  ")}`)))
         return
       }
-      let retorno = escopo["#"]()
+      let retorno = escopo()
       if (Array.isArray(retorno)) {
         const arrays_iguais = (arr1, arr2) => {
           if (arr1.length !== arr2.length) return false;
