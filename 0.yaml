@@ -3,6 +3,7 @@
     - $: exportação
     - $: importação
     - $: atribuição
+    - $: declaração_função
     - $: espaço
 
 exportação:
@@ -24,6 +25,16 @@ importação:
 
 atribuição:
   - - $: nome
+    - $: espaço
+    - "="
+    - $: espaço
+    - $: expressão
+
+declaração_função:
+  - - $: nome
+    - (
+    - $: nome
+    - )
     - $: espaço
     - "="
     - $: espaço
@@ -109,7 +120,10 @@ valor:
       - ""
     - "}"
   - - $: nome
-    - ()
+    - (
+    - - $: expressão
+      - ""
+    - )
   - - $: nome
     - "["
     - $: expressão

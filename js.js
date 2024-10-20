@@ -58,6 +58,11 @@ const semântica = {
     const inicializador = inicializar(v[0], e)
     e.preparação.push(`${inicializador}${e.nomes[v[0]]}=${v[4]}`)
   },
+  declaração_função: async (v, e) => {
+    const inicializador = inicializar(v[0], e)
+    inicializar(v[2], e)
+    e.preparação.push(`${inicializador}${e.nomes[v[0]]}=(${e.nomes[v[2]]})=>${v[7]}`)
+  },
   espaço: () => {},
   expressão: v => {
     if (v[0] === "!") return `${v[2]}===0?1:0`
@@ -88,12 +93,13 @@ const semântica = {
       if (v[2][1] === "") return `{${v[1][0]}}`
       return `{${v[2][0]},${v[2][1].map(v => v[2]).join(",")}}`
     }
-    if (v[1] === "()") return `${e.nomes[v[0]]}()`
+    if (v[1] === "(") return `${e.nomes[v[0]]}(${v[2]})`
     if (v[1] === "[") {
       if (v[3] === ":") return `${e.nomes[v[0]]}.slice(${v[2]},${v[4]})`
       return `${e.nomes[v[0]]}[${v[2]}]`
     }
     if (v[1] === ".") return `${e.nomes[v[0]]}["${v[2]}"]`
+    inicializar(v, e)
     return e.nomes[v]
   },
   nome: v => {
@@ -112,7 +118,7 @@ const semântica = {
 
 const js = async expressão => {
   const depuração = await avaliar(sintaxe, semântica, expressão)
-  depuração.valor = depuração.valor.filter(item => item !== undefined)[0]
+  depuração.valor = depuração.valor.find(item => item !== undefined)
   return depuração
 }
 

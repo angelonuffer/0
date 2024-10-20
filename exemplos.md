@@ -371,3 +371,12 @@ filosofia = {
   "perspectiva": "Foco na liberdade individual e responsabilidade pessoal"
 }
 ```
+
+## Função
+
+```
+quadrado(x) = x * x
+#() = quadrado(5)
+---
+25
+```
