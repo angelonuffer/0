@@ -1,6 +1,7 @@
 0:
   - +:
     - $: exportação
+    - $: importação
     - $: atribuição
     - $: espaço
 
@@ -9,14 +10,120 @@ exportação:
     - $: espaço
     - "="
     - $: espaço
-    - $: valor
+    - $: expressão
+
+importação:
+  - - $: nome
+    - $: espaço
+    - "#"
+    - $: espaço
+    - +:
+      - .:
+        - " "
+        - "10FFFF"
 
 atribuição:
   - - $: nome
     - $: espaço
     - "="
     - $: espaço
+    - $: expressão
+
+espaço:
+  - +:
+    - " "
+    - .: 000A
+
+expressão:
+  - - "!"
+    - $: espaço
     - $: valor
+  - - $: valor
+    - $: espaço
+    - - "&"
+      - "|"
+      - "=="
+      - "!="
+      - ">="
+      - "<="
+      - ">"
+      - "<"
+      - "*"
+      - "/"
+      - "+"
+      - "-"
+    - $: espaço
+    - $: expressão
+  - $: valor
+
+valor:
+  - - +:
+      - .:
+        - "0"
+        - "9"
+  - - "\""
+    - - +:
+        - .:
+          - " "
+          - "10FFFF"
+          - "\""
+      - ""
+    - "\""
+  - - "`"
+    - - +:
+        - - ${
+          - $: expressão
+          - "}"
+        - .:
+          - " "
+          - "10FFFF"
+          - "`"
+      - ""
+    - "`"
+  - - "["
+    - - $: espaço
+      - ""
+    - - - $: item_lista
+        - - +:
+            - - ","
+              - $: espaço
+              - $: item_lista
+          - ""
+        - - - ","
+            - $: espaço
+          - ""
+      - ""
+    - "]"
+  - - "{"
+    - - $: espaço
+      - ""
+    - - - $: item_objeto
+        - - +:
+            - - ","
+              - $: espaço
+              - $: item_objeto
+          - ""
+        - - - ","
+            - $: espaço
+          - ""
+      - ""
+    - "}"
+  - - $: nome
+    - ()
+  - - $: nome
+    - "["
+    - $: expressão
+    - ":"
+    - $: expressão
+    - "]"
+  - - $: nome
+    - "["
+    - $: expressão
+    - "]"
+  - - $: nome
+    - .
+    - $: nome
+  - $: nome
 
 nome:
   - - - _
@@ -36,243 +143,15 @@ nome:
             - ÿ
       - ""
 
-valor:
-  - $: chamada
-  - $: importação
-  - $: expressão_lógica
-  - $: expressão_numérica
-  - $: número
-  - $: valor_texto
-  - $: modelo_texto
-  - $: lista
-  - $: objeto
-  - $: parte
-  - $: variável
-
-chamada:
-  - - - $: importação
-      - $: variável
-    - ()
-
-importação:
-  - - "#("
-    - $: valor_texto
-    - )
-
-expressão_lógica:
-  - $: e
-  - $: ou
-  - $: não
-  - $: maior_que
-  - $: menor_que
-  - $: igual_a
-  - $: diferente_de
-  - $: maior_ou_igual_a
-  - $: menor_ou_igual_a
-
-e:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - "&"
-    - $: espaço
-    - - $: expressão_lógica
-      - $: número
-      - $: variável
-
-ou:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - "|"
-    - $: espaço
-    - - $: expressão_lógica
-      - $: número
-      - $: variável
-
-não:
-  - - "!"
-    - $: espaço
-    - - $: expressão_lógica
-      - $: número
-      - $: variável
-
-maior_que:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - ">"
-    - $: espaço
+item_lista:
+  - $: expressão
+  - - ...
     - $: valor
 
-menor_que:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - <
-    - $: espaço
-    - $: valor
-
-igual_a:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - ==
-    - $: espaço
-    - $: valor
-
-diferente_de:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - "!="
-    - $: espaço
-    - $: valor
-
-maior_ou_igual_a:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - ">="
-    - $: espaço
-    - $: valor
-
-menor_ou_igual_a:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - <=
-    - $: espaço
-    - $: valor
-
-expressão_numérica:
-  - $: multiplicação
-  - $: divisão
-  - $: adição
-  - $: subtração
-
-adição:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - +
-    - $: espaço
-    - $: valor
-
-subtração:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - "-"
-    - $: espaço
-    - $: valor
-
-multiplicação:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - "*"
-    - $: espaço
-    - $: valor
-
-divisão:
-  - -
-      - $: número
-      - $: variável
-    - $: espaço
-    - "/"
-    - $: espaço
-    - $: valor
-
-número:
-  - +:
-    - .:
-      - "0"
-      - "9"
-
-valor_texto:
-  - - "\""
-    - - +:
-        - .:
-          - " "
-          - "10FFFF"
-          - "\""
-      - ""
-    - "\""
-
-modelo_texto:
-  - - "`"
-    - - +:
-        - $: interpolação
-        - .:
-          - " "
-          - "10FFFF"
-          - "`"
-      - ""
-    - "`"
-
-interpolação:
-  - - "${"
-    - $: valor
-    - "}"
-
-lista:
-  - - "["
-    - - - - +:
-            - - - - "..."
-                  - $: valor
-                - $: valor
-              - ","
-              - $: espaço
-          - ""
-        - - - "..."
-            - $: valor
-          - $: valor
-      - ""
-    - "]"
-
-objeto:
-  - - "{"
-    - $: espaço
-    - +:
-      - - ...
-        - $: valor
-        - ","
-        - $: espaço
-      - - $: nome
-        - ":"
-        - $: espaço
-        - $: valor
-        - ","
-        - $: espaço
-    - "}"
-
-parte:
+item_objeto:
   - - $: nome
-    - - - "["
-        - $: valor
-        - - - ":"
-            - $: valor
-          - ""
-        - "]"
-      - - "."
-        - $: nome
-
-variável:
-  - $: nome
-
-espaço:
-  - +:
-    - " "
-    - .: 000A
+    - ":"
+    - $: espaço
+    - $: expressão
+  - - ...
+    - $: valor
