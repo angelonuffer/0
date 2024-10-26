@@ -46,9 +46,10 @@ const inicializar = (nome, e) => {
 
 const semântica = {
   exportação: (v, e) => {
-    if (e.preparação) return `()=>{${e.preparação.join(";")};return ${v[4]}}`
-    if (v[4][0] === "{") return `()=>{return ${v[4]}}`
-    return `()=>${v[4]}`
+    inicializar(v[1], e)
+    if (e.preparação) return `(${e.nomes[v[1]]})=>{${e.preparação.join(";")};return ${v[6]}}`
+    if (v[6][0] === "{") return `(${e.nomes[v[1]]})=>{return ${v[6]}}`
+    return `(${e.nomes[v[1]]})=>${v[6]}`
   },
   importação: async (v, e) => {
     const inicializador = inicializar(v[0], e)

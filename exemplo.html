@@ -1,0 +1,12 @@
+<div>x = <input id="x" /></div>
+<div>x² = <span id="quadrado" /></div>
+<script type="module">
+  import _0 from "./0.js"
+  
+  const input_x = document.getElementById("x")
+  const span_quadrado = document.getElementById("quadrado")
+  const quadrado = await _0(`
+    #(x) = x * x
+  `)
+  input_x.addEventListener("input", () => span_quadrado.textContent = quadrado(parseFloat(input_x.value)))
+</script>

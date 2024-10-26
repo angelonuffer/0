@@ -37,11 +37,11 @@
       let escopo
       let parte
       let caminho
+      let função
       try {
-        const depuração = await _0(código)
-        escopo = depuração.escopo
-        parte = depuração.parte
-        caminho = depuração.caminho
+        função = await _0(código)
+        parte = função.depuração.parte
+        caminho = função.depuração.caminho
       }
       catch (e) {
         deram_erro++
@@ -101,7 +101,7 @@
         c.parentElement.appendChild(diagrama(jsyaml.load(`caminho:\n${avaliar_caminho([caminho], "  ")}`)))
         return
       }
-      let retorno = escopo()
+      let retorno = função()
       if (Array.isArray(retorno)) {
         const arrays_iguais = (arr1, arr2) => {
           if (arr1.length !== arr2.length) return false;
