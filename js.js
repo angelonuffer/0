@@ -77,12 +77,15 @@ const semântica = {
       ">",
       "<",
     ].indexOf(v[2]) > -1) return `${v[0]}${v[2]}${v[4]}?1:0`
+    if (v[2] === ":") return `typeof ${v[0]}===typeof ${v[4]}?1:0`
     if (Array.isArray(v)) return `${v[0]}${v[2]}${v[4]}`
     return v
   },
   valor: (v, e) => {
     if (Array.isArray(v[0])) return v[0].join("")
-    if (v[0] === "\"") return `"${v[1].join("")}"`
+    if (v[0] === "\"")
+      if (v[1] === "") return '""'
+      else return `"${v[1].join("")}"`
     if (v[0] === "`") return `\`${v[1].map(v => v[0] === "${"? v.join(""): v).join("")}\``
     if (v[0] === "[") {
       if (v[2] === "") return "[]"
