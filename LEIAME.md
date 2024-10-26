@@ -20,7 +20,7 @@ A sintaxe está definida no arquivo [0.yaml](https://0-d0e.pages.dev/0.yaml) e p
 <div>x = <input id="x" /></div>
 <div>x² = <span id="quadrado" /></div>
 <script type="module">
-  import _0 from "./0.js"
+  import _0 from "https://0-d0e.pages.dev/0.js"
   
   const input_x = document.getElementById("x")
   const span_quadrado = document.getElementById("quadrado")
