@@ -102,6 +102,7 @@ const semântica = {
       if (v[3] === ":") return `${e.nomes[v[0]]}.slice(${v[2]},${v[4]})`
       return `${e.nomes[v[0]]}[${v[2]}]`
     }
+    if (v[1] === "[.]") return `${e.nomes[v[0]]}.length`
     if (v[1] === ".") return `${e.nomes[v[0]]}["${v[2]}"]`
     inicializar(v, e)
     return e.nomes[v]

@@ -139,6 +139,8 @@ valor:
     - $: expressão
     - "]"
   - - $: nome
+    - "[.]"
+  - - $: nome
     - .
     - $: nome
   - $: nome

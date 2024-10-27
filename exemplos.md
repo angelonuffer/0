@@ -302,6 +302,15 @@ frase = "O céu é azul."
 O céu é o limite.
 ```
 
+Obtendo o tamanho do texto.
+
+```
+frase = "O céu é o limite."
+#() = frase[.]
+---
+17
+```
+
 ## Tipo lista
 
 Fatiando a lista.
@@ -327,6 +336,15 @@ frutas = ["abacaxi", "banana", "caju"]
 #() = [...frutas[0:2], "carambola"]
 ---
 ["abacaxi", "banana", "carambola"]
+```
+
+Obtendo o tamanho da lista.
+
+```
+frutas = ["abacaxi", "banana", "caju"]
+#() = frutas[.]
+---
+3
 ```
 
 ## Tipo objeto
