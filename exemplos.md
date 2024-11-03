@@ -326,7 +326,8 @@ abacaxi
 frutas = ["abacaxi", "banana", "caju"]
 #() = frutas[0:2]
 ---
-["abacaxi", "banana"]
+- abacaxi
+- banana
 ```
 
 Espalhando os itens de uma lista existente numa nova.
@@ -335,7 +336,9 @@ Espalhando os itens de uma lista existente numa nova.
 frutas = ["abacaxi", "banana", "caju"]
 #() = [...frutas[0:2], "carambola"]
 ---
-["abacaxi", "banana", "carambola"]
+- abacaxi
+- banana
+- carambola
 ```
 
 Obtendo o tamanho da lista.
@@ -383,11 +386,9 @@ filosofia = {
   perspectiva: "Foco na liberdade individual e responsabilidade pessoal",
 }
 ---
-{
-  "nome": "Existencialismo",
-  "conceito": "A existência precede a essência",
-  "perspectiva": "Foco na liberdade individual e responsabilidade pessoal"
-}
+nome: Existencialismo
+conceito: A existência precede a essência
+perspectiva: Foco na liberdade individual e responsabilidade pessoal
 ```
 
 ## Função
