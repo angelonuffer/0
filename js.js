@@ -53,7 +53,7 @@ const semântica = {
   },
   importação: async (v, e) => {
     const inicializador = inicializar(v[0], e)
-    e.preparação.push(`${inicializador}${e.nomes[v[0]]}=${(await js(await fetch(v[4].join("")).then(a => a.text()))).valor}`)
+    e.preparação.push(`${inicializador}${e.nomes[v[0]]}=${await js(await fetch(v[4].join("")).then(a => a.text()))}`)
   },
   atribuição: (v, e) => {
     const inicializador = inicializar(v[0], e)
@@ -121,10 +121,6 @@ const semântica = {
   },
 }
 
-const js = async expressão => {
-  const depuração = await avaliar(sintaxe, semântica, expressão)
-  depuração.valor = depuração.valor.find(item => item !== undefined)
-  return depuração
-}
+const js = expressão => avaliar(sintaxe, semântica, expressão)
 
 export default js

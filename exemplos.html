@@ -33,75 +33,24 @@
     let deram_erro = 0
     await Promise.all([...document.body.querySelectorAll("code")].map(async c => {
       total++
-      const [código, expectativa] = c.textContent.split("\n---\n")
-      let escopo
-      let parte
-      let caminho
-      let função
+      const [expressão, expectativa] = c.textContent.split("\n---\n")
+      let retorno
       try {
-        função = await _0(código)
-        parte = função.depuração.parte
-        caminho = função.depuração.caminho
+        retorno = (await _0(expressão))()
       }
-      catch (e) {
+      catch (erro) {
         deram_erro++
         const img = document.createElement("img")
         img.src = "https://img.shields.io/badge/erro-f00"
         c.parentElement.appendChild(img)
-        console.error(e)
-        return
-      }
-      if (parte === undefined) parte = ""
-      if (caminho === undefined) caminho = ""
-      if (parte !== código) {
-        deram_erro++
-        const caractere_erro = document.createElement("span")
-        caractere_erro.style.backgroundColor = "#f00"
-        caractere_erro.textContent = código.charAt(parte.length)
-        c.innerHTML = parte + caractere_erro.outerHTML + c.textContent.slice(parte.length + 1)
-        const img = document.createElement("img")
-        img.style.marginBottom = "8px"
-        img.src = "https://img.shields.io/badge/erro-f00"
-        c.parentElement.appendChild(img)
-        const avaliar_caminho = (caminho, indentação) => {
-          if (Array.isArray(caminho)) {
-            const juntar_textos = lista => {
-              lista = lista.reduce((acc, curr) => {
-                if (Array.isArray(curr)) curr = juntar_textos(curr)
-                if (typeof curr !== 'string') {
-                  acc.push(curr)
-                  return acc
-                }
-                if (typeof acc[acc.length - 1] !== 'string') {
-                  acc.push(curr)
-                  return acc
-                }
-                acc[acc.length - 1] += curr
-                return acc
-              }, [])
-              if (lista.length === 1 && typeof lista[0] === "string") return lista[0]
-              return lista
-            }
-            caminho = juntar_textos(caminho)
-            if (! Array.isArray(caminho)) return avaliar_caminho(caminho, indentação)
-            return `${caminho.map(c => {
-              if (Array.isArray(c)) return `${indentação}-\n${avaliar_caminho(c, `${indentação}  `)}`
-              return avaliar_caminho(c, indentação)
-            }).join("")}`
-          }
-          if (caminho.nome) {
-            return `${indentação}-\n${indentação}  - $: ${caminho.nome}\n${avaliar_caminho([caminho.caminho_percorrido], `${indentação}  `)}`
-          }
-          if (typeof caminho === "string") {
-            if (caminho === "\n") return `${indentação}- .: 000A\n`
-            return `${indentação}- "${caminho.replace(/[^\\]?"/g, '\\"')}"\n`
-          }
-          throw new Error(JSON.stringify(caminho))
+        const avaliar_erro = (erro, expressão_superior = "") => {
+          if (erro.cause.tentativas) return [[erro.cause.expressão, [erro.cause.declaração], ...erro.cause.tentativas.map(avaliar_erro)]]
+          return erro.cause.declaração
         }
-        c.parentElement.appendChild(diagrama(jsyaml.load(`caminho:\n${avaliar_caminho([caminho], "  ")}`)))
+        c.parentElement.appendChild(diagrama({tentativas: [avaliar_erro(erro)]}))
+        console.error(erro)
         return
       }
-      let retorno = função()
       if (Array.isArray(retorno)) {
         const arrays_iguais = (arr1, arr2) => {
           if (arr1.length !== arr2.length) return false;
@@ -161,12 +110,6 @@
       const div_retorno = document.createElement("div")
       div_retorno.textContent = "retorno\n  " + JSON.stringify(retorno)
       c.parentElement.appendChild(div_retorno)
-      const div_escopo = document.createElement("div")
-      div_escopo.textContent = "escopo\n" + Object.entries(escopo).map(e => {
-        if (typeof e[1] === "function") return `  ${e[0]}() = ${JSON.stringify(e[1]())}\n`
-        return `  ${e[0]} = ${JSON.stringify(e[1])}\n`
-      }).join("")
-      c.parentElement.appendChild(div_escopo)
     }))
     const div_resumo = document.createElement("div")
     div_resumo.style.position = "fixed"
