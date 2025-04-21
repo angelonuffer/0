@@ -274,7 +274,7 @@ b = 8
 ```
 #() = "Viva o momento."
 ---
-Viva o momento.
+"Viva o momento."
 ```
 
 Fatiando o texto.
@@ -283,14 +283,14 @@ Fatiando o texto.
 frase = "Viva o momento."
 #() = frase[0]
 ---
-V
+"V"
 ```
 
 ```
 frase = "Viva o momento."
 #() = frase[0:4]
 ---
-Viva
+"Viva"
 ```
 
 Gerando novos textos a partir do modelo.
@@ -299,7 +299,7 @@ Gerando novos textos a partir do modelo.
 frase = "O céu é azul."
 #() = `${frase[0:7]} o limite.`
 ---
-O céu é o limite.
+"O céu é o limite."
 ```
 
 Obtendo o tamanho do texto.
@@ -319,15 +319,14 @@ Fatiando a lista.
 frutas = ["abacaxi", "banana", "caju"]
 #() = frutas[0]
 ---
-abacaxi
+"abacaxi"
 ```
 
 ```
 frutas = ["abacaxi", "banana", "caju"]
 #() = frutas[0:2]
 ---
-- abacaxi
-- banana
+["abacaxi","banana"]
 ```
 
 Espalhando os itens de uma lista existente numa nova.
@@ -336,9 +335,7 @@ Espalhando os itens de uma lista existente numa nova.
 frutas = ["abacaxi", "banana", "caju"]
 #() = [...frutas[0:2], "carambola"]
 ---
-- abacaxi
-- banana
-- carambola
+["abacaxi","banana","carambola"]
 ```
 
 Obtendo o tamanho da lista.
@@ -361,7 +358,7 @@ filosofia = {
 }
 #() = filosofia["nome"]
 ---
-Existencialismo
+"Existencialismo"
 ```
 
 ```
@@ -371,7 +368,7 @@ filosofia = {
 }
 #() = filosofia.conceito
 ---
-A existência precede a essência
+"A existência precede a essência"
 ```
 
 Espalhando os atributos de um objeto existente num novo.
@@ -386,9 +383,7 @@ filosofia = {
   perspectiva: "Foco na liberdade individual e responsabilidade pessoal",
 }
 ---
-nome: Existencialismo
-conceito: A existência precede a essência
-perspectiva: Foco na liberdade individual e responsabilidade pessoal
+{"nome":"Existencialismo","conceito":"A existência precede a essência","perspectiva":"Foco na liberdade individual e responsabilidade pessoal"}
 ```
 
 ## Função

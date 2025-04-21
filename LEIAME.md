@@ -11,25 +11,7 @@ O nome 0 foi escolhido por sua simplicidade e universalidade. O zero é um conce
 Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor do mundo, promovendo a eficiência e a clareza no desenvolvimento de software.
 
 ## Sintaxe
-
-A sintaxe está definida no arquivo [0.yaml](https://0-d0e.pages.dev/0.yaml) e pode ser melhor entendida com a ajuda dos [diagramas](https://0-d0e.pages.dev/diagramas.html) e [exemplos](https://0-d0e.pages.dev/exemplos.html).
-
-## Incluindo num módulo ES6
-
-```html
-<div>x = <input id="x" /></div>
-<div>x² = <span id="quadrado" /></div>
-<script type="module">
-  import _0 from "https://0-d0e.pages.dev/0.js"
-  
-  const input_x = document.getElementById("x")
-  const span_quadrado = document.getElementById("quadrado")
-  const quadrado = await _0(`
-    #(x) = x * x
-  `)
-  input_x.addEventListener("input", () => span_quadrado.textContent = quadrado(parseFloat(input_x.value)))
-</script>
-```
+A sintaxe é definida diretamente no interpretador [0.js](https://0-d0e.pages.dev/0.js) e pode ser compreendida mais facilmente com o auxílio dos [exemplos](https://0-d0e.pages.dev/exemplos.html).
 
 ## Licença
 
