@@ -270,6 +270,24 @@ const operação = (operador, transformador) => transformar(
   ([valor1, , , , valor2], escopo) => [escopo2 => transformador(valor1(escopo2), valor2(escopo2)), escopo],
 );
 
+const lambda = transformar(
+  seq(
+    símbolo("("),
+    nome,
+    símbolo(")"),
+    espaço,
+    símbolo("=>"),
+    espaço,
+    declaração_posterior(() => expressão),
+  ),
+  ([, parâmetro, , , , , valor], escopo) => {
+    return [escopo2 => (arg) => {
+      const escopo3 = { ...escopo2, [parâmetro]: arg };
+      return valor(escopo3);
+    }, escopo];
+  },
+);
+
 const chamada_função = transformar(
   seq(
     nome,
@@ -295,6 +313,7 @@ const expressão = alt("expressão",
   operação(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
   operação("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
   operação(":", (v1, v2) => typeof v1 === typeof v2 ? 1 : 0),
+  lambda,
   chamada_função,
   termo,
 );
@@ -349,26 +368,6 @@ const atribuição = transformar(
   },
 );
 
-const declaração_função = transformar(
-  seq(
-    nome,
-    símbolo("("),
-    nome,
-    símbolo(")"),
-    espaço,
-    símbolo("="),
-    espaço,
-    expressão,
-  ),
-  ([nome, , parâmetro, , , , , valor], escopo) => {
-    const escopo2 = { ...escopo, [nome]: (arg) => {
-      const escopo3 = { ...escopo2, [parâmetro]: arg };
-      return valor(escopo3);
-    }};
-    return [null, escopo2];
-  },
-);
-
 const avaliar = async código => {
   const [[, , resultado], restante] = await seq(
     opcional(
@@ -381,9 +380,8 @@ const avaliar = async código => {
     ),
     opcional(
       vários(
-        alt("declaração",
+        alt("atribuição",
           atribuição,
-          declaração_função,
           espaço,
         ),
       ),

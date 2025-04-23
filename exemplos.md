@@ -389,7 +389,7 @@ filosofia = {
 ## Função
 
 ```
-quadrado(x) = x * x
+quadrado = (x) => x * x
 #() = quadrado(5)
 ---
 25
