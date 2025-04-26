@@ -1,137 +1,187 @@
-const alt = (identificação, ...analisadores) => (código, escopo) => {
-  const tentarAnalisadores = async ([analisadorAtual, ...restantes]) => {
-    if (!analisadorAtual) {
-      throw new Error(`Esperava ${identificação}.`, { cause: { código } });
-    }
-    try {
-      return await analisadorAtual(código, escopo);
-    } catch (e) {
-      return tentarAnalisadores(restantes);
-    }
-  };
-  return tentarAnalisadores(analisadores);
-};
+export default código => _0(código)
 
-const seq = (...analisadores) => async (código, escopo) => {
-  if (analisadores.length === 0) return [[], código, escopo];
-  const [resultado, novoRestante, escopo2] = await analisadores[0](código, escopo);
-  const [resultadosRestantes, restanteFinal, escopo3] = await seq(...analisadores.slice(1))(novoRestante, escopo2);
-  return [[resultado, ...resultadosRestantes], restanteFinal, escopo3];
-};
-
-const espaço = (código, escopo) => {
-  const i = código.search(/\S/);
-  if (i === 0) throw new Error("Espaço não encontrado.", { cause: { código } });
-  return [null, código.slice(i), escopo];
-};
-
-const número = (código, escopo) => {
-  const número = código.match(/^\d+/);
-  if (número) {
-    return [() => parseInt(número[0], 10), código.slice(número[0].length), escopo];
+const _0 = async código => {
+  const [escopo, resto] = opcional(importações, [])(código)
+  const [escopo2, resto2] = opcional(atribuições, e => e)(resto)
+  const [valor, resto3] = exportação(resto2)
+  if (resto3.length > 0) {
+    throw new Error("Erro de sintaxe.", {
+      cause: {
+        código: resto3,
+      },
+    })
   }
-  throw new Error("Número não encontrado.", {
-    cause: { código },
-  });
-};
+  const escopo3 = await Promise.all(escopo)
+  return () => valor(escopo2(Object.fromEntries(escopo3)))
+}
 
-const símbolo = símbolo => (código, escopo) => {
+const alt = (identificação, ...analisadores) => {
+  if (analisadores.length === 0) {
+    return código => {
+      throw new Error(`Esperava ${identificação}.`, { cause: { código } });
+    };
+  }
+  const próximo_alt = alt(identificação, ...analisadores.slice(1));
+  return código => {
+    try {
+      return analisadores[0](código);
+    } catch (e) {
+      if (analisadores.length === 1) {
+        throw new Error(`Esperava ${identificação}.`, { cause: { código } });
+      }
+    }
+    return próximo_alt(código);
+  }
+}
+
+const seq = (...analisadores) => {
+  if (analisadores.length === 0) {
+    return código => [[], código];
+  }
+  const próximo_seq = seq(...analisadores.slice(1));
+  return código => {
+    const [valor, resto] = analisadores[0](código);
+    const [valor2, resto2] = próximo_seq(resto);
+    return [[valor, ...valor2], resto2];
+  };
+}
+
+const símbolo = símbolo => código => {
   if (código.startsWith(símbolo)) {
-    return [símbolo, código.slice(símbolo.length), escopo];
+    return [símbolo, código.slice(símbolo.length)];
   }
   throw new Error(`Esperava '${símbolo}'.`, {
     cause: { código },
   });
 };
 
-const declaração_posterior = analisador => async (código, escopo) => {
-  const [resultado, restante, novoEscopo] = await analisador()(código, escopo);
-  return [resultado, restante, novoEscopo];
-};
-
-const transformar = (analisador, transformador) => async (código, escopo) => {
-  const [resultado, restante, novoEscopo] = await analisador(código, escopo);
-  const [novoResultado, escopoFinal] = await transformador(resultado, novoEscopo);
-  return [novoResultado, restante, escopoFinal];
-};
-
-const não = transformar(
-  seq(
-    símbolo("!"),
-    espaço,
-    declaração_posterior(() => expressão),
-  ),
-  ([, , v], escopo) => [escopo => v(escopo) === 0 ? 1 : 0, escopo],
-);
-
-const nome = (código, escopo) => {
-  const nome = código.match(/^[a-zA-Z_][a-zA-Z0-9_]*/);
-  if (nome) {
-    return [nome[0], código.slice(nome[0].length), escopo];
+const regex = regex => código => {
+  const valor = código.match(regex);
+  if (valor) {
+    return [valor[0], código.slice(valor[0].length)];
   }
-  throw new Error("Nome não encontrado.");
-};
-
-const texto = (código, escopo) => {
-  const texto = código.match(/^"([^"]*)"/);
-  if (texto) {
-    return [() => texto[1], código.slice(texto[0].length), escopo];
-  }
-  throw new Error("Texto não encontrado.", {
+  throw new Error(`Esperava ${regex}.`, {
     cause: { código },
   });
-}
+};
+
+const opcional = (analisador, valor_padrão) => código => {
+  try {
+    return analisador(código);
+  } catch (e) {
+    return [valor_padrão, código];
+  }
+};
+
+const vários = analisador => código => {
+  const [valor, resto] = analisador(código);
+  try {
+    const [valor2, resto2] = vários(analisador)(resto);
+    return [[valor, ...valor2], resto2];
+  } catch (e) {
+    return [[valor], resto];
+  }
+};
+
+const transformar = (analisador, transformador) => código => {
+  const [valor, resto] = analisador(código);
+  return [transformador(valor), resto];
+};
+
+const operação = (operador, transformador) => transformar(
+  seq(
+    código => termo(código),
+    espaço,
+    símbolo(operador),
+    espaço,
+    código => expressão(código),
+  ),
+  ([valor1, , , , valor2]) => escopo => transformador(valor1(escopo), valor2(escopo)),
+);
+
+const nome = regex(/^[a-zA-Z_][a-zA-Z0-9_]*/);
+
+const endereço = regex(/\S+/);
+
+const espaço = regex(/\s+/);
+
+const número = transformar(regex(/^\d+/), v => () => parseInt(v));
+
+const texto = transformar(regex(/^"([^"]*)"/), v => () => v.slice(1, -1));
+
+const importação = transformar(
+  seq(
+    nome,
+    espaço,
+    símbolo("#"),
+    espaço,
+    endereço,
+    espaço,
+  ),
+  async ([nome, , , , endereço]) => [nome, await _0(await (await fetch(endereço)).text())],
+);
+
+const importações = vários(importação)
+
+const atribuição = seq(
+  nome,
+  espaço,
+  símbolo("="),
+  espaço,
+  código => expressão(código),
+  espaço,
+)
+
+const atribuições = transformar(
+  vários(atribuição),
+  atribuições => escopo => atribuições.reduce((escopo2, [nome, , , , valor]) => ({
+    ...escopo2,
+    [nome]: valor(escopo2),
+  }), escopo),
+);
+
+const chamada_função = transformar(
+  seq(
+    nome,
+    símbolo("("),
+    opcional(código => expressão(código), () => {}),
+    símbolo(")"),
+  ),
+  ([nome, , arg]) => escopo => escopo[nome](arg(escopo)),
+);
 
 const fatia = transformar(
   seq(
     nome,
     símbolo("["),
-    declaração_posterior(() => expressão),
+    código => expressão(código),
     símbolo("]"),
   ),
-  ([nome, , índice], escopo) => [escopo2 => escopo2[nome][índice(escopo2)], escopo],
+  ([nome, , índice]) => escopo => escopo[nome][índice(escopo)],
 );
 
 const fatia2 = transformar(
   seq(
     nome,
     símbolo("["),
-    declaração_posterior(() => expressão),
+    código => expressão(código),
     símbolo(":"),
-    declaração_posterior(() => expressão),
+    código => expressão(código),
     símbolo("]"),
   ),
-  ([nome, , índice1, , índice2], escopo) => [escopo2 => escopo2[nome].slice(índice1(escopo2), índice2(escopo2)), escopo],
+  ([nome, , índice1, , índice2]) => escopo => escopo[nome].slice(índice1(escopo), índice2(escopo)),
 );
 
-const conteúdo_modelo = (código, escopo) => {
-  const conteúdo = código.match(/[^`$]+/);
-  if (conteúdo) {
-    return [() => conteúdo[0], código.slice(conteúdo[0].length), escopo];
-  }
-  throw new Error("Modelo não encontrado.", {
-    cause: { código },
-  });
-};
+const conteúdo_modelo = transformar(regex(/[^`$]+/), v => () => v);
 
 const expressão_modelo = transformar(
   seq(
     símbolo("${"),
-    declaração_posterior(() => expressão),
+    código => expressão(código),
     símbolo("}"),
   ),
-  ([, valor], escopo) => [escopo2 => valor(escopo2), escopo],
+  ([, valor]) => escopo => valor(escopo),
 );
-
-const vários = analisador => async (código, escopo) => {
-  try {
-    const [resultado, restante, escopoAtualizado] = await analisador(código, escopo);
-    const [resultadosRestantes, restanteFinal, escopoFinal] = await vários(analisador)(restante, escopoAtualizado);
-    return [[resultado, ...resultadosRestantes], restanteFinal, escopoFinal];
-  } catch (e) {
-    return [[], código, escopo];
-  }
-};
 
 const modelo = transformar(
   seq(
@@ -144,13 +194,7 @@ const modelo = transformar(
     ),
     símbolo("`"),
   ),
-  ([, conteúdo,], escopo) => [
-    escopo2 => {
-      const valor = conteúdo.map(item => (typeof item === 'function' ? item(escopo2) : item)).join('');
-      return valor.replace(/\$\{([^}]+)\}/g, (_, nome) => escopo2[nome] || '');
-    },
-    escopo,
-  ],
+  ([, conteúdo,]) => escopo => conteúdo.map(v => v(escopo)).join(""),
 )
 
 const tamanho = transformar(
@@ -158,16 +202,8 @@ const tamanho = transformar(
     nome,
     símbolo("[.]"),
   ),
-  ([nome], escopo) => [escopo2 => escopo2[nome].length, escopo],
+  ([nome]) => escopo => escopo[nome].length,
 );
-
-const opcional = analisador => async (código, escopo) => {
-  try {
-    return await analisador(código, escopo);
-  } catch (e) {
-    return [null, código, escopo];
-  }
-};
 
 const lista = transformar(
   seq(
@@ -175,26 +211,21 @@ const lista = transformar(
     opcional(
       vários(
         seq(
-          opcional(símbolo("...")),
-          declaração_posterior(() => expressão),
-          opcional(símbolo(",")),
+          opcional(símbolo("..."), ""),
+          código => expressão(código),
+          símbolo(","),
           espaço,
         )
       ),
     ),
-    opcional(símbolo("...")),
-    declaração_posterior(() => expressão),
+    opcional(símbolo("..."), ""),
+    código => expressão(código),
     símbolo("]"),
   ),
-  ([, valores, espalhamento, valor], escopo) => {
-    const valoresLista = valores
-      ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)])
-      : [];
-    return [escopo2 => [
-      ...valoresLista,
-      ...(espalhamento ? valor(escopo2) : [valor(escopo2)]),
-    ], escopo];
-  },
+  ([, valores, espalhamento, valor]) => escopo => [
+    ...(valores ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)]) : []),
+    ...(espalhamento ? valor(escopo) : [valor(escopo)]),
+  ]
 );
 
 const objeto = transformar(
@@ -208,13 +239,13 @@ const objeto = transformar(
             nome,
             símbolo(":"),
             espaço,
-            declaração_posterior(() => expressão),
+            código => expressão(código),
             símbolo(","),
             espaço,
           ),
           seq(
             símbolo("..."),
-            declaração_posterior(() => termo),
+            código => expressão(código),
             símbolo(","),
             espaço,
           ),
@@ -223,18 +254,11 @@ const objeto = transformar(
     ),
     símbolo("}"),
   ),
-  ([, , valores], escopo) => {
-    return [escopo2 => {
-      const valoresObjeto = valores
-      ? valores.flatMap(v => 
-        v[0] === "..."
-          ? Object.entries(v[1](escopo2))
-          : [[v[0], v[3](escopo2)]]
-        )
-      : [];
-      return Object.fromEntries(valoresObjeto);
-    }, escopo];
-  },
+  ([, , valores]) => escopo => Object.fromEntries(valores ? valores.flatMap(v => 
+    v[0] === "..."
+      ? Object.entries(v[1](escopo))
+      : [[v[0], v[3](escopo)]]
+    ) : [])
 );
 
 const atributo = transformar(
@@ -243,31 +267,7 @@ const atributo = transformar(
     símbolo("."),
     nome,
   ),
-  ([objeto, , atributo], escopo) => [escopo2 => escopo2[objeto][atributo], escopo],
-);
-
-const termo = alt("termo",
-  número,
-  texto,
-  fatia,
-  fatia2,
-  modelo,
-  tamanho,
-  lista,
-  objeto,
-  atributo,
-  transformar(nome, (variável, escopo) => [escopo2 => escopo2[variável], escopo]),
-);
-
-const operação = (operador, transformador) => transformar(
-  seq(
-    termo,
-    espaço,
-    símbolo(operador),
-    espaço,
-    declaração_posterior(() => expressão),
-  ),
-  ([valor1, , , , valor2], escopo) => [escopo2 => transformador(valor1(escopo2), valor2(escopo2)), escopo],
+  ([objeto, , atributo]) => escopo => escopo[objeto][atributo],
 );
 
 const lambda = transformar(
@@ -278,24 +278,33 @@ const lambda = transformar(
     espaço,
     símbolo("=>"),
     espaço,
-    declaração_posterior(() => expressão),
+    código => expressão(código),
   ),
-  ([, parâmetro, , , , , valor], escopo) => {
-    return [escopo2 => (arg) => {
-      const escopo3 = { ...escopo2, [parâmetro]: arg };
-      return valor(escopo3);
-    }, escopo];
-  },
+  ([, parâmetro, , , , , valor]) => escopo => (arg) => valor({ ...escopo, [parâmetro]: arg }),
 );
 
-const chamada_função = transformar(
+const termo = alt("termo",
+  chamada_função,
+  número,
+  texto,
+  fatia,
+  fatia2,
+  modelo,
+  tamanho,
+  lista,
+  objeto,
+  atributo,
+  lambda,
+  transformar(nome, v => escopo => escopo[v]),
+)
+
+const não = transformar(
   seq(
-    nome,
-    símbolo("("),
-    opcional(declaração_posterior(() => expressão)),
-    símbolo(")"),
+    símbolo("!"),
+    espaço,
+    código => expressão(código),
   ),
-  ([nome, , arg], escopo) => [escopo2 => escopo2[nome](arg ? arg(escopo2) : undefined), escopo],
+  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
 );
 
 const expressão = alt("expressão",
@@ -313,10 +322,8 @@ const expressão = alt("expressão",
   operação(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
   operação("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
   operação(":", (v1, v2) => typeof v1 === typeof v2 ? 1 : 0),
-  lambda,
-  chamada_função,
   termo,
-);
+)
 
 const exportação = transformar(
   seq(
@@ -326,76 +333,5 @@ const exportação = transformar(
     espaço,
     expressão,
   ),
-  ([, , , , valor], escopo) => [() => valor(escopo), escopo],
-);
-
-const conteúdo = (código, escopo) => {
-  const conteúdo = código.match(/\S+/);
-  if (conteúdo) {
-    return [conteúdo[0], código.slice(conteúdo[0].length), escopo];
-  }
-  throw new Error("Endereço não encontrado.", {
-    cause: { código },
-  });
-};
-
-const importação = transformar(
-  seq(
-    nome,
-    espaço,
-    símbolo("#"),
-    espaço,
-    conteúdo,
-  ),
-  async ([nome, , , , endereço], escopo) => {
-    const valor = await avaliar(await (await fetch(endereço)).text(), escopo);
-    const novoEscopo = { ...escopo, [nome]: valor };
-    return [null, novoEscopo];
-  },
-);
-
-const atribuição = transformar(
-  seq(
-    nome,
-    espaço,
-    símbolo("="),
-    espaço,
-    expressão,
-  ),
-  ([nome, , , , valor], escopo) => {
-    const novoEscopo = { ...escopo, [nome]: valor(escopo) };
-    return [null, novoEscopo];
-  },
-);
-
-const avaliar = async código => {
-  const [[, , resultado], restante] = await seq(
-    opcional(
-      vários(
-        alt("importação",
-          importação,
-          espaço,
-        ),
-      ),
-    ),
-    opcional(
-      vários(
-        alt("atribuição",
-          atribuição,
-          espaço,
-        ),
-      ),
-    ),
-    exportação,
-  )(código, {});
-  if (restante.length > 0) {
-    throw new Error("Erro de sintaxe.", {
-      cause: {
-        código: restante,
-      },
-    });
-  }
-  return resultado;
-};
-
-export default avaliar;
+  valor => valor[4],
+)
