@@ -1,8 +1,12 @@
 # Exemplos de códigos na linguagem 0
 
+Este documento apresenta exemplos de uso da linguagem 0, explicando conceitos básicos e avançados com exemplos práticos.
+
 ## Exportação
 
-A expressão retorna a função declarada com o nome "#".
+A exportação permite que uma função ou valor seja declarado e utilizado em outros módulos.
+
+Exemplo:
 
 ```
 42
@@ -10,9 +14,13 @@ A expressão retorna a função declarada com o nome "#".
 42
 ```
 
+Neste caso, o valor '42' é exportado como o valor padrão do módulo.
+
 ## Importação
 
-O comando "#" importa um arquivo a partir do caminho.
+A importação permite reutilizar código de outros módulos. O comando '#' é usado para importar um módulo pelo caminho especificado.
+
+Exemplo:
 
 ```
 retorna_5 # ./retorna_5.0
@@ -22,13 +30,17 @@ retorna_5()
 5
 ```
 
+Aqui, o arquivo 'retorna_5.0' é importado, e a função 'retorna_5' é chamada, retornando o valor '5'.
+
 ## Tipo lógico
 
-O valor 0 é considerado falso. Qualquer outro valor é considerado verdadeiro.
+Valores lógicos são usados para representar verdadeiro ou falso. Na linguagem 0, o valor '0' é considerado falso, e qualquer outro valor é considerado verdadeiro.
 
 ### Operador e (&)
 
-Se qualquer valor for falso, retorna falso.
+O operador lógico '&' retorna falso ('0') se qualquer um dos operandos for falso. Caso ambos sejam verdadeiros, retorna o segundo valor.
+
+Exemplos:
 
 ```
 0 & 0
@@ -48,8 +60,6 @@ Se qualquer valor for falso, retorna falso.
 0
 ```
 
-Se os dois valores forem verdadeiros, retorna o segundo.
-
 ```
 1 & 2
 ---
@@ -58,15 +68,15 @@ Se os dois valores forem verdadeiros, retorna o segundo.
 
 ### Operador ou (|)
 
-Se os dois valores forem falsos, retorna falso.
+O operador lógico '|' retorna falso ('0') se ambos os operandos forem falsos. Caso contrário, retorna o primeiro valor verdadeiro.
+
+Exemplos:
 
 ```
 0 | 0
 ---
 0
 ```
-
-Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 ```
 0 | 1
@@ -88,6 +98,10 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 ### Operador não (!)
 
+O operador lógico '!' inverte o valor lógico. Se o valor for verdadeiro, retorna falso, e vice-versa.
+
+Exemplos:
+
 ```
 ! 0
 ---
@@ -102,9 +116,13 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 ## Tipo número
 
+Números são usados para realizar operações matemáticas e comparações.
+
 ### Operadores aritméticos
 
 #### Adição (+)
+
+Soma dois números.
 
 ```
 42 + 5
@@ -114,6 +132,8 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 #### Subtração (-)
 
+Subtrai o segundo número do primeiro.
+
 ```
 4 - 8
 ---
@@ -121,6 +141,8 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 ```
 
 #### Multiplicação (*)
+
+Multiplica dois números.
 
 ```
 3 * 4
@@ -130,6 +152,8 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 #### Divisão (/)
 
+Divide o primeiro número pelo segundo.
+
 ```
 8 / 2
 ---
@@ -138,7 +162,11 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 ### Comparadores
 
+Comparadores são usados para comparar dois valores.
+
 #### Maior que (>)
+
+Retorna '1' (verdadeiro) se o primeiro valor for maior que o segundo, caso contrário retorna '0' (falso).
 
 ```
 2 > 8
@@ -160,6 +188,8 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 #### Menor que (<)
 
+Retorna '1' (verdadeiro) se o primeiro valor for menor que o segundo, caso contrário retorna '0' (falso).
+
 ```
 8 < 2
 ---
@@ -180,6 +210,8 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 #### Igual a (==)
 
+Retorna '1' (verdadeiro) se os dois valores forem iguais, caso contrário retorna '0' (falso).
+
 ```
 8 == 2
 ---
@@ -199,6 +231,8 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 ```
 
 #### Diferente de (!=)
+
+Retorna '1' (verdadeiro) se os dois valores forem diferentes, caso contrário retorna '0' (falso).
 
 ```
 8 != 2
@@ -260,7 +294,9 @@ Se qualquer valor for verdadeiro, retorna o primeiro verdadeiro.
 
 ## Variáveis
 
-O operador = atribui valores a variáveis.
+Variáveis armazenam valores que podem ser usados posteriormente. O operador '=' é usado para atribuir valores.
+
+Exemplo:
 
 ```
 a = 5
@@ -273,13 +309,19 @@ a + b
 
 ## Tipo texto
 
+Textos são sequências de caracteres delimitadas por aspas.
+
+Exemplo:
+
 ```
 "Viva o momento."
 ---
 "Viva o momento."
 ```
 
-Fatiando o texto.
+### Fatiando o texto
+
+É possível acessar partes específicas de um texto usando índices.
 
 ```
 frase = "Viva o momento."
@@ -297,7 +339,9 @@ frase[0:4]
 "Viva"
 ```
 
-Gerando novos textos a partir do modelo.
+### Gerando novos textos
+
+Textos podem ser combinados dinamicamente.
 
 ```
 frase = "O céu é azul."
@@ -307,7 +351,9 @@ frase = "O céu é azul."
 "O céu é o limite."
 ```
 
-Obtendo o tamanho do texto.
+### Obtendo o tamanho do texto
+
+O operador '[.]' retorna o tamanho do texto.
 
 ```
 frase = "O céu é o limite."
@@ -319,7 +365,9 @@ frase[.]
 
 ## Tipo lista
 
-Fatiando a lista.
+Listas armazenam coleções de valores.
+
+### Fatiando a lista
 
 ```
 frutas = ["abacaxi", "banana", "caju"]
@@ -337,7 +385,9 @@ frutas[0:2]
 ["abacaxi","banana"]
 ```
 
-Espalhando os itens de uma lista existente numa nova.
+### Espalhando itens
+
+Itens de uma lista podem ser espalhados em uma nova lista.
 
 ```
 frutas = ["abacaxi", "banana", "caju"]
@@ -347,7 +397,7 @@ frutas = ["abacaxi", "banana", "caju"]
 ["abacaxi","banana","carambola"]
 ```
 
-Obtendo o tamanho da lista.
+### Obtendo o tamanho da lista
 
 ```
 frutas = ["abacaxi", "banana", "caju"]
@@ -359,7 +409,9 @@ frutas[.]
 
 ## Tipo objeto
 
-Acessando um atributo.
+Objetos armazenam pares de chave-valor.
+
+### Acessando atributos
 
 ```
 filosofia = {
@@ -383,7 +435,7 @@ filosofia.conceito
 "A existência precede a essência"
 ```
 
-Espalhando os atributos de um objeto existente num novo.
+### Espalhando atributos
 
 ```
 filosofia = {
@@ -401,6 +453,8 @@ filosofia = {
 
 ## Função
 
+Funções encapsulam lógica reutilizável.
+
 ```
 quadrado = (x) => x * x
 
@@ -410,6 +464,8 @@ quadrado(5)
 ```
 
 ## Comparador de tipos
+
+Compara se dois valores são do mesmo tipo.
 
 ```
 1 : 2
