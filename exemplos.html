@@ -79,7 +79,7 @@
       const [expressão, expectativa] = c.textContent.slice(0, -1).split("\n---\n")
       let retorno
       try {
-        retorno = (await _0(expressão))()
+        retorno = await _0(expressão)
       }
       catch (erro) {
         deram_erro.push(c)

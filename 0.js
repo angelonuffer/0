@@ -12,7 +12,7 @@ const _0 = async código => {
     })
   }
   const escopo3 = await Promise.all(escopo)
-  return () => valor(escopo2(Object.fromEntries(escopo3)))
+  return valor(escopo2(Object.fromEntries(escopo3)))
 }
 
 const alt = (identificação, ...analisadores) => {
@@ -273,7 +273,7 @@ const atributo = transformar(
 const lambda = transformar(
   seq(
     símbolo("("),
-    nome,
+    opcional(nome, ""),
     símbolo(")"),
     espaço,
     símbolo("=>"),
