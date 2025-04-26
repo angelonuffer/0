@@ -3,7 +3,7 @@ export default código => _0(código)
 const _0 = async código => {
   const [escopo, resto] = opcional(importações, [])(código)
   const [escopo2, resto2] = opcional(atribuições, e => e)(resto)
-  const [valor, resto3] = exportação(resto2)
+  const [valor, resto3] = expressão(resto2)
   if (resto3.length > 0) {
     throw new Error("Erro de sintaxe.", {
       cause: {
@@ -323,15 +323,4 @@ const expressão = alt("expressão",
   operação("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
   operação(":", (v1, v2) => typeof v1 === typeof v2 ? 1 : 0),
   termo,
-)
-
-const exportação = transformar(
-  seq(
-    símbolo("#()"),
-    espaço,
-    símbolo("="),
-    espaço,
-    expressão,
-  ),
-  valor => valor[4],
 )
