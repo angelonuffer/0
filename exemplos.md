@@ -292,9 +292,9 @@ Retorna '1' (verdadeiro) se os dois valores forem diferentes, caso contrário re
 1
 ```
 
-## Variáveis
+## Constantes
 
-Variáveis armazenam valores que podem ser usados posteriormente. O operador '=' é usado para atribuir valores.
+Constantes armazenam valores que não podem ser alterados posteriormente. O operador '=' é usado para atribuir valores.
 
 Exemplo:
 

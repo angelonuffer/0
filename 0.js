@@ -85,7 +85,7 @@ const vários = analisador => código => {
 
 const transformar = (analisador, transformador) => código => {
   const [valor, resto] = analisador(código);
-  return [transformador(valor), resto];
+  return [transformador(valor, código), resto];
 };
 
 const operação = (operador, transformador) => transformar(
@@ -134,10 +134,17 @@ const atribuição = seq(
 
 const atribuições = transformar(
   vários(atribuição),
-  atribuições => escopo => atribuições.reduce((escopo2, [nome, , , , valor]) => ({
-    ...escopo2,
-    [nome]: valor(escopo2),
-  }), escopo),
+  (atribuições, código) => escopo => atribuições.reduce((escopo2, [nome, , , , valor]) => {
+    if (escopo2[nome] !== undefined) {
+      throw new Error(`A constante '${nome}' não pode ser alterada.`, {
+        cause: { código },
+      });
+    }
+    return {
+      ...escopo2,
+      [nome]: valor(escopo2),
+    }
+  }, escopo),
 );
 
 const chamada_função = transformar(
