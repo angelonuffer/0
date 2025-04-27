@@ -321,6 +321,5 @@ const expressão = alt("expressão",
   operação("!=", (v1, v2) => v1 !== v2 ? 1 : 0),
   operação(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
   operação("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
-  operação(":", (v1, v2) => typeof v1 === typeof v2 ? 1 : 0),
   termo,
 )

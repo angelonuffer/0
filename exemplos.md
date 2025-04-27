@@ -462,19 +462,3 @@ quadrado(5)
 ---
 25
 ```
-
-## Comparador de tipos
-
-Compara se dois valores são do mesmo tipo.
-
-```
-1 : 2
----
-1
-```
-
-```
-1 : ""
----
-0
-```
