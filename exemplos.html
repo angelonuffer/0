@@ -17,6 +17,10 @@
     display: flex;
     flex-direction: column;
     gap: 1vh;
+    border-color: #000;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 1vh;
   }
   pre {
     border: 1px solid #000;
@@ -50,6 +54,11 @@
       background-color: #000;
       color: #fff;
     }
+    div#resumo {
+      background-color: #111;
+      color: #fff;
+      border: 1px solid #444;
+    }
     pre {
       background-color: #111;
       color: #fff;
@@ -72,6 +81,7 @@
 
   fetch("./exemplos.md").then(e => e.text()).then(async e => {
     document.body.innerHTML = marked.parse(e)
+    const startTime = performance.now();
     let passaram = []
     let falharam = []
     let deram_erro = []
@@ -123,9 +133,10 @@
       div_retorno.textContent = representação_retorno
       c.parentElement.appendChild(div_retorno)
     }))
+    const endTime = performance.now();
+    const executionTime = Math.round(endTime - startTime);
     const div_resumo = document.createElement("div")
     div_resumo.style.position = "fixed"
-    div_resumo.style.backgroundColor = "#fff"
     div_resumo.style.padding = "8px"
     div_resumo.style.borderRadius = "8px"
     div_resumo.style.top = "8px"
@@ -172,6 +183,9 @@
       div_resumo.appendChild(div_deram_erro)
       remover_testes_que_passaram()
     }
+    const div_tempo = document.createElement("div")
+    div_tempo.textContent = `${executionTime} ms`
+    div_resumo.appendChild(div_tempo)
     document.body.appendChild(div_resumo)
     document.body.style.marginTop = div_resumo.offsetHeight + 8
   })
