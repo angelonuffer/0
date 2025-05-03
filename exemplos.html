@@ -87,35 +87,46 @@
     let deram_erro = []
     await Promise.all([...document.body.querySelectorAll("code")].map(async c => {
       const [expressão, expectativa] = c.textContent.slice(0, -1).split("\n---\n")
-      let retorno
-      try {
-        retorno = await _0(expressão)
-      }
-      catch (erro) {
+      const [promessa_valor, resto] = (() => {
+        try {
+          return _0(expressão)
+        } catch (e) {
+          console.error(e)
+          return [null, null]
+        }
+      })()
+      const valor = await promessa_valor
+      if (resto === null) {
         deram_erro.push(c)
         const img = document.createElement("img")
         img.src = "https://img.shields.io/badge/erro-f00"
         c.parentElement.appendChild(img)
         const div_erro = document.createElement("div")
         div_erro.className = "erro"
+        div_erro.textContent = "Erro interno."
         c.parentElement.appendChild(div_erro)
-        if (erro.cause && erro.cause.código) {
-          div_erro.textContent = erro.message
-          const erroPos = expressão.length - erro.cause.código.length;
-          const highlightedExpr = expressão.substring(0, erroPos) +
-            `<span style="background-color: red; color: white">` +
-            (expressão[erroPos] === "\n" ? "↵\n" : expressão[erroPos]) +
-            `</span>` +
-            expressão.substring(erroPos + 1);
-          c.innerHTML = highlightedExpr;
-        } else {
-          div_erro.textContent = "Erro interno."
-          console.error(erro)
-        }
         return
       }
-      const representação_retorno = JSON.stringify(retorno)
-      if (representação_retorno === expectativa) {
+      if (resto.length > 0) {
+        deram_erro.push(c)
+        const img = document.createElement("img")
+        img.src = "https://img.shields.io/badge/erro-f00"
+        c.parentElement.appendChild(img)
+        const div_erro = document.createElement("div")
+        div_erro.className = "erro"
+        div_erro.textContent = "Erro de sintaxe."
+        c.parentElement.appendChild(div_erro)
+        const erroPos = expressão.length - resto.length;
+        const highlightedExpr = expressão.substring(0, erroPos) +
+          `<span style="background-color: red; color: white">` +
+          (expressão[erroPos] === "\n" ? "↵\n" : expressão[erroPos]) +
+          `</span>` +
+          expressão.substring(erroPos + 1);
+        c.innerHTML = highlightedExpr;
+        return
+      }
+      const representação_valor = JSON.stringify(valor)
+      if (representação_valor === expectativa) {
         passaram.push(c)
         const img = document.createElement("img")
         img.src = "https://img.shields.io/badge/passou-070"
@@ -127,11 +138,10 @@
       img.style.marginBottom = "8px"
       img.src = "https://img.shields.io/badge/falhou-ff0"
       c.parentElement.appendChild(img)
-      if (retorno === undefined) retorno = ""
-      const div_retorno = document.createElement("div")
-      div_retorno.classList.add("falha")
-      div_retorno.textContent = representação_retorno
-      c.parentElement.appendChild(div_retorno)
+      const div_valor = document.createElement("div")
+      div_valor.classList.add("falha")
+      div_valor.textContent = representação_valor
+      c.parentElement.appendChild(div_valor)
     }))
     const endTime = performance.now();
     const executionTime = Math.round(endTime - startTime);

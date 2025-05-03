@@ -1,37 +1,11 @@
-export default código => _0(código)
-
-const _0 = async código => {
-  const [escopo, resto] = opcional(importações, [])(código)
-  const [escopo2, resto2] = opcional(atribuições, e => e)(resto)
-  const [valor, resto3] = expressão(resto2)
-  if (resto3.length > 0) {
-    throw new Error("Erro de sintaxe.", {
-      cause: {
-        código: resto3,
-      },
-    })
-  }
-  const escopo3 = await Promise.all(escopo)
-  return valor(escopo2(Object.fromEntries(escopo3)))
-}
-
-const alt = (identificação, ...analisadores) => {
-  if (analisadores.length === 0) {
-    return código => {
-      throw new Error(`Esperava ${identificação}.`, { cause: { código } });
-    };
-  }
-  const próximo_alt = alt(identificação, ...analisadores.slice(1));
+const alt = (...analisadores) => {
+  if (analisadores.length === 0) return código => [null, código];
+  const próximo_alt = alt(...analisadores.slice(1));
   return código => {
-    try {
-      return analisadores[0](código);
-    } catch (e) {
-      if (analisadores.length === 1) {
-        throw new Error(`Esperava ${identificação}.`, { cause: { código } });
-      }
-    }
-    return próximo_alt(código);
-  }
+    const [valor, resto] = analisadores[0](código);
+    if (valor === null) return próximo_alt(código);
+    return [valor, resto];
+  };
 }
 
 const seq = (...analisadores) => {
@@ -41,142 +15,101 @@ const seq = (...analisadores) => {
   const próximo_seq = seq(...analisadores.slice(1));
   return código => {
     const [valor, resto] = analisadores[0](código);
+    if (valor === null) return [null, código];
     const [valor2, resto2] = próximo_seq(resto);
+    if (valor2 === null) return [null, código];
     return [[valor, ...valor2], resto2];
   };
 }
 
 const símbolo = símbolo => código => {
-  if (código.startsWith(símbolo)) {
-    return [símbolo, código.slice(símbolo.length)];
-  }
-  throw new Error(`Esperava '${símbolo}'.`, {
-    cause: { código },
-  });
+  if (código.startsWith(símbolo)) return [símbolo, código.slice(símbolo.length)];
+  return [null, código];
 };
 
 const regex = regex => código => {
   const valor = código.match(regex);
-  if (valor) {
-    return [valor[0], código.slice(valor[0].length)];
-  }
-  throw new Error(`Esperava ${regex}.`, {
-    cause: { código },
-  });
+  if (valor) if (valor.index === 0) return [valor[0], código.slice(valor[0].length)];
+  return [null, código];
 };
 
 const opcional = (analisador, valor_padrão) => código => {
-  try {
-    return analisador(código);
-  } catch (e) {
-    return [valor_padrão, código];
-  }
+  const [valor, resto] = analisador(código);
+  if (valor === null) return [valor_padrão, código];
+  return [valor, resto];
 };
 
-const vários = analisador => código => {
-  const [valor, resto] = analisador(código);
-  try {
-    const [valor2, resto2] = vários(analisador)(resto);
+const vários = analisador => {
+  const analisador2 = código => {
+    const [valor, resto] = analisador(código);
+    if (valor === null) return [null, código];
+    const [valor2, resto2] = analisador2(resto);
+    if (valor2 === null) return [[valor], resto];
     return [[valor, ...valor2], resto2];
-  } catch (e) {
-    return [[valor], resto];
-  }
+  };
+  return analisador2;
 };
 
 const transformar = (analisador, transformador) => código => {
   const [valor, resto] = analisador(código);
-  return [transformador(valor, código), resto];
+  if (valor === null) return [null, código];
+  return [transformador(valor), resto];
 };
 
-const operação = (operador, transformador) => transformar(
-  seq(
-    código => termo(código),
-    espaço,
-    símbolo(operador),
-    espaço,
-    código => expressão(código),
-  ),
-  ([valor1, , , , valor2]) => escopo => transformador(valor1(escopo), valor2(escopo)),
-);
-
-const nome = regex(/^[a-zA-Z_][a-zA-Z0-9_]*/);
+const nome = regex(/[a-zA-Z_][a-zA-Z0-9_]*/);
 
 const endereço = regex(/\S+/);
 
 const espaço = regex(/\s+/);
 
-const número = transformar(regex(/^\d+/), v => () => parseInt(v));
+const número = transformar(regex(/\d+/), v => () => parseInt(v));
 
-const texto = transformar(regex(/^"([^"]*)"/), v => () => v.slice(1, -1));
+const texto = transformar(regex(/"([^"]*)"/), v => () => v.slice(1, -1));
 
-const importação = transformar(
+const operações = {
+  "&": (v1, v2) => v1 === 0 ? 0 : v2,
+  "|": (v1, v2) => v1 !== 0 ? v1 : v2,
+  "+": (v1, v2) => v1 + v2,
+  "-": (v1, v2) => v1 - v2,
+  "*": (v1, v2) => v1 * v2,
+  "/": (v1, v2) => v1 / v2,
+  ">=": (v1, v2) => v1 >= v2 ? 1 : 0,
+  "<=": (v1, v2) => v1 <= v2 ? 1 : 0,
+  ">": (v1, v2) => v1 > v2 ? 1 : 0,
+  "<": (v1, v2) => v1 < v2 ? 1 : 0,
+  "==": (v1, v2) => v1 === v2 ? 1 : 0,
+  "!=": (v1, v2) => v1 !== v2 ? 1 : 0,
+}
+
+const não = transformar(
   seq(
-    nome,
-    espaço,
-    símbolo("#"),
-    espaço,
-    endereço,
-    espaço,
+    símbolo("!"),
+    opcional(espaço),
+    código => termo(código),
   ),
-  async ([nome, , , , endereço]) => [nome, await _0(await (await fetch(endereço)).text())],
-);
-
-const importações = vários(importação)
-
-const atribuição = seq(
-  nome,
-  espaço,
-  símbolo("="),
-  espaço,
-  código => expressão(código),
-  espaço,
+  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
 )
 
-const atribuições = transformar(
-  vários(atribuição),
-  (atribuições, código) => escopo => atribuições.reduce((escopo2, [nome, , , , valor]) => {
-    if (escopo2[nome] !== undefined) {
-      throw new Error(`A constante '${nome}' não pode ser alterada.`, {
-        cause: { código },
-      });
-    }
-    return {
-      ...escopo2,
-      [nome]: valor(escopo2),
-    }
-  }, escopo),
-);
-
-const chamada_função = transformar(
-  seq(
-    nome,
-    símbolo("("),
-    opcional(código => expressão(código), () => {}),
-    símbolo(")"),
-  ),
-  ([nome, , arg]) => escopo => escopo[nome](arg(escopo)),
-);
+const valor_constante = transformar(
+  nome,
+  v => escopo => escopo[v],
+)
 
 const fatia = transformar(
   seq(
     nome,
     símbolo("["),
     código => expressão(código),
+    opcional(seq(
+      símbolo(":"),
+      código => expressão(código),
+    ), []),
     símbolo("]"),
   ),
-  ([nome, , índice]) => escopo => escopo[nome][índice(escopo)],
-);
-
-const fatia2 = transformar(
-  seq(
-    nome,
-    símbolo("["),
-    código => expressão(código),
-    símbolo(":"),
-    código => expressão(código),
-    símbolo("]"),
-  ),
-  ([nome, , índice1, , índice2]) => escopo => escopo[nome].slice(índice1(escopo), índice2(escopo)),
+  ([nome, , índice1, [, índice2]]) => escopo => {
+    if (índice2 === undefined) return escopo[nome][índice1(escopo)];
+    return escopo[nome].slice(índice1(escopo), índice2(escopo))
+  },
 );
 
 const conteúdo_modelo = transformar(regex(/[^`$]+/), v => () => v);
@@ -194,7 +127,7 @@ const modelo = transformar(
   seq(
     símbolo("`"),
     vários(
-      alt("conteúdo do modelo",
+      alt(
         expressão_modelo,
         conteúdo_modelo,
       ),
@@ -220,19 +153,14 @@ const lista = transformar(
         seq(
           opcional(símbolo("..."), ""),
           código => expressão(código),
-          símbolo(","),
-          espaço,
+          opcional(símbolo(",")),
+          opcional(espaço),
         )
       ),
     ),
-    opcional(símbolo("..."), ""),
-    código => expressão(código),
     símbolo("]"),
   ),
-  ([, valores, espalhamento, valor]) => escopo => [
-    ...(valores ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)]) : []),
-    ...(espalhamento ? valor(escopo) : [valor(escopo)]),
-  ]
+  ([, valores]) => escopo => valores ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)]) : [],
 );
 
 const objeto = transformar(
@@ -241,20 +169,20 @@ const objeto = transformar(
     opcional(espaço),
     opcional(
       vários(
-        alt("atributo",
+        alt(
           seq(
             nome,
             símbolo(":"),
-            espaço,
+            opcional(espaço),
             código => expressão(código),
-            símbolo(","),
-            espaço,
+            opcional(símbolo(",")),
+            opcional(espaço),
           ),
           seq(
             símbolo("..."),
             código => expressão(código),
-            símbolo(","),
-            espaço,
+            opcional(símbolo(",")),
+            opcional(espaço),
           ),
         ),
       ),
@@ -282,51 +210,96 @@ const lambda = transformar(
     símbolo("("),
     opcional(nome, ""),
     símbolo(")"),
-    espaço,
+    opcional(espaço),
     símbolo("=>"),
-    espaço,
+    opcional(espaço),
     código => expressão(código),
   ),
   ([, parâmetro, , , , , valor]) => escopo => (arg) => valor({ ...escopo, [parâmetro]: arg }),
 );
 
-const termo = alt("termo",
-  chamada_função,
+const chamada_função = transformar(
+  seq(
+    nome,
+    símbolo("("),
+    opcional(código => expressão(código), () => {}),
+    símbolo(")"),
+  ),
+  ([nome, , arg]) => escopo => escopo[nome](arg(escopo)),
+);
+
+const termo = alt(
   número,
+  não,
   texto,
   fatia,
-  fatia2,
   modelo,
   tamanho,
   lista,
   objeto,
   atributo,
   lambda,
-  transformar(nome, v => escopo => escopo[v]),
+  chamada_função,
+  valor_constante,
 )
 
-const não = transformar(
+const expressão = transformar(
   seq(
-    símbolo("!"),
-    espaço,
-    código => expressão(código),
+    termo,
+    opcional(seq(
+      opcional(espaço),
+      alt(...Object.keys(operações).map(literal => símbolo(literal))),
+      opcional(espaço),
+      código => expressão(código),
+    ))
   ),
-  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
-);
-
-const expressão = alt("expressão",
-  operação("&", (v1, v2) => v1 === 0 ? 0 : v2),
-  operação("|", (v1, v2) => v1 !== 0 ? v1 : v2),
-  não,
-  operação("+", (v1, v2) => v1 + v2),
-  operação("-", (v1, v2) => v1 - v2),
-  operação("*", (v1, v2) => v1 * v2),
-  operação("/", (v1, v2) => v1 / v2),
-  operação(">", (v1, v2) => v1 > v2 ? 1 : 0),
-  operação("<", (v1, v2) => v1 < v2 ? 1 : 0),
-  operação("==", (v1, v2) => v1 === v2 ? 1 : 0),
-  operação("!=", (v1, v2) => v1 !== v2 ? 1 : 0),
-  operação(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
-  operação("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
-  termo,
+  ([v1, operação]) => {
+    if (operação === undefined) return v1
+    const [, operador, , v2] = operação || []
+    if (operador === undefined) return v1
+    return escopo => operações[operador](v1(escopo), v2(escopo))
+  },
 )
+
+const _0 = transformar(
+  seq(
+    opcional(vários(
+      seq(
+        seq(
+          nome,
+          opcional(espaço),
+          símbolo("#"),
+          opcional(espaço),
+          endereço,
+        ),
+        espaço,
+      ),
+    ), []),
+    opcional(vários(
+      seq(
+        seq(
+          nome,
+          opcional(espaço),
+          símbolo("="),
+          opcional(espaço),
+          expressão,
+        ),
+        espaço,
+      ),
+    ), []),
+    expressão,
+  ),
+  async ([importações, atribuições, valor]) => {
+    return valor(atribuições.reduce((escopo, [[nome, , , , valor]]) => {
+      return {
+        ...escopo,
+        [nome]: valor(escopo),
+      };
+    }, Object.fromEntries(await Promise.all(importações.map(async importação => {
+      const [[nome, , , , endereço]] = importação;
+      return [nome, await _0(await (await fetch(endereço)).text())[0]]
+    })))))
+  },
+)
+
+export default _0
