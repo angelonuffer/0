@@ -86,6 +86,7 @@
     let falharam = []
     let deram_erro = []
     await Promise.all([...document.body.querySelectorAll("code")].map(async c => {
+      if (!c.textContent.includes("\n---\n")) return
       const [expressão, expectativa] = c.textContent.slice(0, -1).split("\n---\n")
       const [promessa_valor, resto] = (() => {
         try {

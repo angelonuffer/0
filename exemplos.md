@@ -160,6 +160,60 @@ Divide o primeiro número pelo segundo.
 4
 ```
 
+### Precedência de operadores aritméticos
+
+Na linguagem 0, os operadores de multiplicação (`*`) e divisão (`/`) têm precedência maior do que os operadores de adição (`+`) e subtração (`-`). Isso significa que, em expressões sem parênteses, as operações de multiplicação e divisão são realizadas antes das de adição e subtração.
+
+#### Exemplos:
+
+```
+2 + 3 * 4
+---
+14
+```
+
+Explicação: Primeiro, calcula-se `3 * 4`, que resulta em `12`. Em seguida, soma-se `2`, resultando em `14`.
+
+```
+10 - 6 / 2
+---
+7
+```
+
+Explicação: Primeiro, calcula-se `6 / 2`, que resulta em `3`. Em seguida, subtrai-se de `10`, resultando em `7`.
+
+#### Combinação de operadores:
+
+```
+8 / 2 + 3 * 2
+---
+10
+```
+
+Explicação: Primeiro, calcula-se `8 / 2`, que resulta em `4`, e `3 * 2`, que resulta em `6`. Depois, soma-se `4 + 6`, resultando em `10`.
+
+#### Uso de parênteses para alterar a ordem:
+
+Se você deseja alterar a ordem de execução, pode usar parênteses para forçar a avaliação de certas partes da expressão primeiro.
+
+```
+(2 + 3) * 4
+---
+20
+```
+
+Explicação: Primeiro, calcula-se `2 + 3`, que resulta em `5`. Em seguida, multiplica-se por `4`, resultando em `20`.
+
+```
+10 - (6 / 2)
+---
+7
+```
+
+Explicação: Primeiro, calcula-se `6 / 2`, que resulta em `3`. Em seguida, subtrai-se de `10`, resultando em `7`.
+
+Esses exemplos mostram como a precedência dos operadores afeta o resultado das expressões e como os parênteses podem ser usados para controlar a ordem de execução.
+
 ### Comparadores
 
 Comparadores são usados para comparar dois valores.
