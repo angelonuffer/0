@@ -580,7 +580,7 @@ Esta função calcula a área de um retângulo, dado sua largura e altura.
 Esta função retorna o maior valor entre dois números fornecidos.
 
 ```
-maior = (a, b) => a > b & a | b
+maior = (a, b) => a > b ? a : b
 
 maior(8, 3)
 ---
@@ -588,7 +588,7 @@ maior(8, 3)
 ```
 
 ```
-maior = (a, b) => a > b & a | b
+maior = (a, b) => a > b ? a : b
 
 maior(2, 9)
 ---

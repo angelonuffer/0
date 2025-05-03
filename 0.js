@@ -320,8 +320,29 @@ const termo4 = operação(
   ),
 );
 
+const termo5 = transformar(
+  seq(
+    termo4,
+    opcional(seq(
+      opcional(espaço),
+      símbolo("?"),
+      opcional(espaço),
+      código => expressão(código),
+      opcional(espaço),
+      símbolo(":"),
+      opcional(espaço),
+      código => expressão(código),
+    )),
+  ),
+  ([condição, resto]) => {
+    if (!resto) return condição;
+    const [, , , valor_se_verdadeiro, , , , valor_se_valso] = resto;
+    return escopo => condição(escopo) !== 0 ? valor_se_verdadeiro(escopo) : valor_se_valso(escopo);
+  },
+);
+
 const expressão = operação(
-  termo4,
+  termo5,
   alt(
     operador("&", (v1, v2) => v1 !== 0 ? v2 : 0),
     operador("|", (v1, v2) => v1 !== 0 ? v1 : v2),
