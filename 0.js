@@ -56,7 +56,7 @@ const transformar = (analisador, transformador) => código => {
   return [transformador(valor), resto];
 };
 
-const nome = regex(/[a-zA-Z_][a-zA-Z0-9_]*/);
+const nome = regex(/[a-zA-ZÀ-ÿ_][a-zA-ZÀ-ÿ0-9_]*/);
 
 const endereço = regex(/\S+/);
 
@@ -208,24 +208,50 @@ const atributo = transformar(
 const lambda = transformar(
   seq(
     símbolo("("),
-    opcional(nome, ""),
+    opcional(
+      vários(
+        seq(
+          nome,
+          opcional(espaço),
+          opcional(símbolo(",")),
+          opcional(espaço),
+        )
+      ),
+      []
+    ),
     símbolo(")"),
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),
     código => expressão(código),
   ),
-  ([, parâmetro, , , , , valor]) => escopo => (arg) => valor({ ...escopo, [parâmetro]: arg }),
+  ([, parâmetros, , , , , valor]) => escopo => (...args) =>
+    valor(
+      parâmetros.reduce(
+        (novoEscopo, [nome], i) => ({ ...novoEscopo, [nome]: args[i] }),
+        { ...escopo }
+      )
+    ),
 );
 
 const chamada_função = transformar(
   seq(
     nome,
     símbolo("("),
-    opcional(código => expressão(código), () => {}),
+    opcional(
+      vários(
+        seq(
+          código => expressão(código),
+          opcional(espaço),
+          opcional(símbolo(",")),
+          opcional(espaço),
+        )
+      ),
+      []
+    ),
     símbolo(")"),
   ),
-  ([nome, , arg]) => escopo => escopo[nome](arg(escopo)),
+  ([nome, , args]) => escopo => escopo[nome](...args.map(arg => arg[0](escopo))),
 );
 
 const termo = alt(
@@ -246,20 +272,23 @@ const termo = alt(
 const expressão = transformar(
   seq(
     termo,
-    opcional(seq(
+    opcional(vários(seq(
       opcional(espaço),
       alt(...Object.keys(operações).map(literal => símbolo(literal))),
       opcional(espaço),
-      código => expressão(código),
-    ))
+      termo,
+    )), []),
   ),
-  ([v1, operação]) => {
-    if (operação === undefined) return v1
-    const [, operador, , v2] = operação || []
-    if (operador === undefined) return v1
-    return escopo => operações[operador](v1(escopo), v2(escopo))
-  },
-)
+  ([primeiroTermo, operaçõesSequenciais]) => {
+    if (operaçõesSequenciais.length === 0) return primeiroTermo;
+    return escopo => 
+      operaçõesSequenciais.reduce(
+      (resultado, [, operador, , próximoTermo]) => 
+        operações[operador](resultado, próximoTermo(escopo)),
+      primeiroTermo(escopo)
+      );
+  }
+);
 
 const _0 = transformar(
   seq(

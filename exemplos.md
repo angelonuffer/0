@@ -462,3 +462,83 @@ quadrado(5)
 ---
 25
 ```
+
+Funções podem receber mais de um parâmetro para realizar operações mais complexas.
+
+### Soma de dois números
+
+Esta função recebe dois números como parâmetros e retorna a soma deles.
+
+```
+soma = (a, b) => a + b
+
+soma(3, 7)
+---
+10
+```
+
+### Verificar se um número está dentro de um intervalo
+
+Esta função verifica se um número está dentro de um intervalo definido por dois valores (mínimo e máximo).
+
+```
+dentro_intervalo = (n, mín, máx) => n >= mín & n <= máx
+
+dentro_intervalo(5, 1, 10)
+---
+1
+```
+
+```
+dentro_intervalo = (n, mín, máx) => n >= mín & n <= máx
+
+dentro_intervalo(15, 1, 10)
+---
+0
+```
+
+### Concatenar dois textos
+
+Esta função recebe dois textos e os combina em uma única string.
+
+```
+concatena = (texto1, texto2) => `${texto1} ${texto2}`
+
+concatena("Olá", "mundo!")
+---
+"Olá mundo!"
+```
+
+### Calcular a área de um retângulo
+
+Esta função calcula a área de um retângulo, dado sua largura e altura.
+
+```
+área_retangulo = (largura, altura) => largura * altura
+
+área_retangulo(5, 10)
+---
+50
+```
+
+### Encontrar o maior de dois números
+
+Esta função retorna o maior valor entre dois números fornecidos.
+
+```
+maior = (a, b) => a > b & a | b
+
+maior(8, 3)
+---
+8
+```
+
+```
+maior = (a, b) => a > b & a | b
+
+maior(2, 9)
+---
+9
+```
+
+Esses exemplos mostram como funções com múltiplos parâmetros podem ser usadas para resolver problemas variados de forma simples e eficiente.
