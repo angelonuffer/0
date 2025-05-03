@@ -56,6 +56,32 @@ const transformar = (analisador, transformador) => código => {
   return [transformador(valor), resto];
 };
 
+const operador = (literal, funcao) => transformar(
+  símbolo(literal),
+  () => funcao
+);
+
+const operação = (termo, operadores) => transformar(
+  seq(
+    termo,
+    opcional(vários(seq(
+      opcional(espaço),
+      operadores,
+      opcional(espaço),
+      termo,
+    )), []),
+  ),
+  ([primeiroTermo, operaçõesSequenciais]) => {
+    if (operaçõesSequenciais.length === 0) return primeiroTermo;
+    return escopo => 
+      operaçõesSequenciais.reduce(
+        (resultado, [, operador, , próximoTermo]) => 
+          operador(resultado, próximoTermo(escopo)),
+        primeiroTermo(escopo)
+      );
+  },
+);
+
 const nome = regex(/[a-zA-ZÀ-ÿ_][a-zA-ZÀ-ÿ0-9_]*/);
 
 const endereço = regex(/\S+/);
@@ -70,7 +96,7 @@ const não = transformar(
   seq(
     símbolo("!"),
     opcional(espaço),
-    código => termo(código),
+    código => expressão(código),
   ),
   ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
 )
@@ -250,7 +276,7 @@ const parênteses = transformar(
   ([, , valor]) => valor
 );
 
-const termo = alt(
+const termo1 = alt(
   número,
   não,
   texto,
@@ -266,90 +292,41 @@ const termo = alt(
   parênteses,
 )
 
-const operador = (literal, funcao) => transformar(
-  símbolo(literal),
-  () => funcao
-);
-
-const operação = ([primeiroTermo, operaçõesSequenciais]) => {
-  if (operaçõesSequenciais.length === 0) return primeiroTermo;
-  return escopo => 
-    operaçõesSequenciais.reduce(
-      (resultado, [, operador, , próximoTermo]) => 
-        operador(resultado, próximoTermo(escopo)),
-      primeiroTermo(escopo)
-    );
-}
-
-const expressão1 = transformar(
-  seq(
-    termo,
-    opcional(vários(seq(
-      opcional(espaço),
-      alt(
-        operador(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
-        operador("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
-        operador(">", (v1, v2) => v1 > v2 ? 1 : 0),
-        operador("<", (v1, v2) => v1 < v2 ? 1 : 0),
-        operador("==", (v1, v2) => v1 === v2 ? 1 : 0),
-        operador("!=", (v1, v2) => v1 !== v2 ? 1 : 0),
-      ),
-      opcional(espaço),
-      termo,
-    )), []),
+const termo2 = operação(
+  termo1,
+  alt(
+    operador("*", (v1, v2) => v1 * v2),
+    operador("/", (v1, v2) => v1 / v2),
   ),
-  operação,
-);
+)
 
-const expressão2 = transformar(
-  seq(
-    expressão1,
-    opcional(vários(seq(
-      opcional(espaço),
-      alt(
-        operador("&", (v1, v2) => v1 !== 0 ? v2 : 0),
-        operador("|", (v1, v2) => v1 !== 0 ? v1 : v2),
-      ),
-      opcional(espaço),
-      expressão1,
-    )), []),
+const termo3 = operação(
+  termo2,
+  alt(
+    operador("+", (v1, v2) => v1 + v2),
+    operador("-", (v1, v2) => v1 - v2),
   ),
-  operação,
 );
 
-const expressão3 = transformar(
-  seq(
-    expressão2,
-    opcional(vários(seq(
-      opcional(espaço),
-      alt(
-        operador("*", (v1, v2) => v1 * v2),
-        operador("/", (v1, v2) => v1 / v2),
-      ),
-      opcional(espaço),
-      expressão2,
-    )), []),
+const termo4 = operação(
+  termo3,
+  alt(
+    operador(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
+    operador("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
+    operador(">", (v1, v2) => v1 > v2 ? 1 : 0),
+    operador("<", (v1, v2) => v1 < v2 ? 1 : 0),
+    operador("==", (v1, v2) => v1 === v2 ? 1 : 0),
+    operador("!=", (v1, v2) => v1 !== v2 ? 1 : 0),
   ),
-  operação,
 );
 
-const expressão4 = transformar(
-  seq(
-    expressão3,
-    opcional(vários(seq(
-      opcional(espaço),
-      alt(
-        operador("+", (v1, v2) => v1 + v2),
-        operador("-", (v1, v2) => v1 - v2),
-      ),
-      opcional(espaço),
-      expressão3,
-    )), []),
+const expressão = operação(
+  termo4,
+  alt(
+    operador("&", (v1, v2) => v1 !== 0 ? v2 : 0),
+    operador("|", (v1, v2) => v1 !== 0 ? v1 : v2),
   ),
-  operação,
 );
-
-const expressão = expressão4
 
 const _0 = transformar(
   seq(
