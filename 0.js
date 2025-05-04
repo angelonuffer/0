@@ -159,6 +159,7 @@ const tamanho = transformar(
 const lista = transformar(
   seq(
     símbolo("["),
+    opcional(espaço),
     opcional(
       vários(
         seq(
@@ -171,7 +172,7 @@ const lista = transformar(
     ),
     símbolo("]"),
   ),
-  ([, valores]) => escopo => valores ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)]) : [],
+  ([, , valores]) => escopo => valores ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)]) : [],
 );
 
 const objeto = transformar(

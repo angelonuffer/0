@@ -1,0 +1,55 @@
+wasm = [0, 97, 115, 109]
+versão = [1, 0, 0, 0]
+
+sequência = (itens) => [itens[.], ...itens]
+
+seção = (id, bytes) => [id, ...sequência(bytes)]
+
+tipos = (quantidade, bytes) => seção(1, [quantidade, ...bytes])
+
+tipo_função = (parâmetros, retornos) => [
+  96,
+  ...sequência(parâmetros),
+  ...sequência(retornos),
+]
+
+i32 = 127
+i64 = 126
+f32 = 125
+f64 = 124
+
+funções = (itens) => seção(3, sequência(itens))
+
+exportação = (quantidade, bytes) => seção(7, [quantidade, ...bytes])
+
+exportação_função = (nome, índice) => [...sequência(nome), 0, índice]
+
+código = (locais, corpo) => seção(10, [
+  1,
+  ...sequência([
+    ...sequência(locais),
+    ...corpo,
+  ]),
+])
+
+i32_const = (número) => [65, número]
+i64_const = (número) => [66, número]
+f32_const = (número) => [67, número]
+f64_const = (número) => [68, número]
+fim_função = [11]
+
+[
+  ...wasm,
+  ...versão,
+  ...tipos(1, [
+    ...tipo_função([], [i32]),
+  ]),
+  ...funções([0]),
+  ...exportação(1, [
+    ...exportação_função([48], 0),
+  ]),
+  ...código([], [
+    ...i32_const(42),
+    ...fim_função,
+  ])
+]
