@@ -113,12 +113,15 @@ const fatia = transformar(
     código => expressão(código),
     opcional(seq(
       símbolo(":"),
-      código => expressão(código),
+      opcional(código => expressão(código)),
     ), []),
     símbolo("]"),
   ),
-  ([nome, , índice1, [, índice2]]) => escopo => {
-    if (índice2 === undefined) return escopo[nome][índice1(escopo)];
+  ([nome, , índice1, [símbolo_fatia, índice2]]) => escopo => {
+    if (índice2 === undefined) {
+      if (símbolo_fatia === ":") return escopo[nome].slice(índice1(escopo));
+      return escopo[nome][índice1(escopo)];
+    }
     return escopo[nome].slice(índice1(escopo), índice2(escopo))
   },
 );
@@ -237,11 +240,11 @@ const lambda = transformar(
     opcional(espaço),
     código => expressão(código),
   ),
-  ([, parâmetros, , , , , valor]) => escopo => (...args) =>
+  ([, parâmetros, , , , , valor]) => escopo => (escopo2, ...args) =>
     valor(
       parâmetros.reduce(
-        (novoEscopo, [nome], i) => ({ ...novoEscopo, [nome]: args[i] }),
-        { ...escopo }
+        (escopo3, [nome], i) => ({ ...escopo3, [nome]: args[i] }),
+        { ...escopo, ...escopo2 }
       )
     ),
 );
@@ -250,6 +253,7 @@ const chamada_função = transformar(
   seq(
     nome,
     símbolo("("),
+    opcional(espaço),
     opcional(
       vários(
         seq(
@@ -261,9 +265,10 @@ const chamada_função = transformar(
       ),
       []
     ),
+    opcional(espaço),
     símbolo(")"),
   ),
-  ([nome, , args]) => escopo => escopo[nome](...args.map(arg => arg[0](escopo))),
+  ([nome, , , args]) => escopo => escopo[nome](escopo, ...args.map(arg => arg[0](escopo))),
 );
 
 const parênteses = transformar(

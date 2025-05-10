@@ -3,9 +3,11 @@ versão = [1, 0, 0, 0]
 
 sequência = (itens) => [itens[.], ...itens]
 
+achatar = (lista) => lista[.] == 1 ? lista[0] : [...lista[0], ...achatar(lista[1:])]
+
 seção = (id, bytes) => [id, ...sequência(bytes)]
 
-tipos = (quantidade, bytes) => seção(1, [quantidade, ...bytes])
+seção_tipos = (itens) => seção(1, [itens[.], ...achatar(itens)])
 
 tipo_função = (parâmetros, retornos) => [
   96,
@@ -18,17 +20,17 @@ i64 = 126
 f32 = 125
 f64 = 124
 
-funções = (itens) => seção(3, sequência(itens))
+seção_funções = (itens) => seção(3, sequência(itens))
 
-exportação = (quantidade, bytes) => seção(7, [quantidade, ...bytes])
+seção_exportação = (exportações) => seção(7, [exportações[.], ...achatar(exportações)])
 
 exportação_função = (nome, índice) => [...sequência(nome), 0, índice]
 
-código = (locais, corpo) => seção(10, [
+seção_código = (locais, corpo) => seção(10, [
   1,
   ...sequência([
     ...sequência(locais),
-    ...corpo,
+    ...achatar(corpo),
   ]),
 ])
 
@@ -38,18 +40,25 @@ f32_const = (número) => [67, número]
 f64_const = (número) => [68, número]
 fim_função = [11]
 
-[
+módulo = (tipos, funções, exportação, código) => [
   ...wasm,
   ...versão,
-  ...tipos(1, [
-    ...tipo_função([], [i32]),
-  ]),
-  ...funções([0]),
-  ...exportação(1, [
-    ...exportação_função([48], 0),
-  ]),
-  ...código([], [
-    ...i32_const(42),
-    ...fim_função,
-  ])
+  ...tipos,
+  ...funções,
+  ...exportação,
+  ...código,
 ]
+
+módulo(
+  seção_tipos([
+    tipo_função([], [i32]),
+  ]),
+  seção_funções([0]),
+  seção_exportação([
+    exportação_função([48], 0),
+  ]),
+  seção_código([], [
+    i32_const(42),
+    fim_função,
+  ])
+)
