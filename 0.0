@@ -20,6 +20,19 @@ i64 = 126
 f32 = 125
 f64 = 124
 
+seção_importação = (importações) => seção(2, [
+  importações[.],
+  ...achatar(importações),
+])
+
+importar_memória = (nome_módulo, nome_memória, limite) => [
+  ...sequência(nome_módulo),
+  ...sequência(nome_memória),
+  2,
+  0,
+  limite,
+]
+
 seção_funções = (itens) => seção(3, sequência(itens))
 
 seção_exportação = (exportações) => seção(7, [exportações[.], ...achatar(exportações)])
@@ -36,10 +49,12 @@ código = (locais, corpo) => sequência([
   ...achatar(corpo),
 ])
 
+i32_carregar_8_sem_sinal = (offset, align) => [44, align, offset]
 i32_const = (número) => [65, número]
 i64_const = (número) => [66, número]
 f32_const = (número) => [67, número]
 f64_const = (número) => [68, número]
+obter_local = (i) => [32, i]
 fim_função = [11]
 
 declaração_tipos_funções = (funções) => funções[.] == 1 ? [
@@ -55,9 +70,15 @@ tipos_funções = (funções) => funções[.] == 1 ? [0] : [
 ]
 
 códigos_funções = (funções) => funções[.] == 1 ? [
-  código([], funções[0][2]),
+  código([], [
+    ...funções[0][2],
+    fim_função,
+  ]),
 ] : [
-  código([], funções[0][2]),
+  código([], [
+    ...funções[0][2],
+    fim_função,
+  ]),
   ...códigos_funções(funções[1:]),
 ]
 
@@ -65,6 +86,9 @@ módulo = (funções) => [
   ...wasm,
   ...versão,
   ...seção_tipos(declaração_tipos_funções(funções)),
+  ...seção_importação([
+    importar_memória([35], [36], 1),
+  ]),
   ...seção_funções(tipos_funções(funções)),
   ...seção_exportação([
     exportação_função([48], 0),
@@ -75,8 +99,8 @@ módulo = (funções) => [
 função = (parâmetros, retornos, código) => [parâmetros, retornos, código]
 
 módulo([
-  função([], [i32], [
-    i32_const(42),
-    fim_função,
+  função([i32], [i32], [
+    i32_const(0),
+    i32_carregar_8_sem_sinal(0, 0),
   ]),
 ])

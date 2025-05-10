@@ -117,11 +117,21 @@
     URL.revokeObjectURL(url);
   });
 
+  const memory = new WebAssembly.Memory({ initial: 1, maximum: 1 });
   const wasmModule = new WebAssembly.Module(new Uint8Array(wasm));
-  const wasmInstance = new WebAssembly.Instance(wasmModule);
+  const wasmInstance = new WebAssembly.Instance(wasmModule, {
+    "#": {
+      "$": memory
+    }
+  });
+  
+  const encoder = new TextEncoder();
 
   const _0 = expressão => {
-    return [wasmInstance.exports["0"](), ""]
+    const encodedExpression = encoder.encode(expressão);
+    const memoryBuffer = new Uint8Array(memory.buffer);
+    memoryBuffer.set(encodedExpression, 0);
+    return [wasmInstance.exports["0"](expressão.length), ""]
   }
 
   fetch("./exemplos.md").then(e => e.text()).then(async e => {
