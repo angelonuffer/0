@@ -15,10 +15,10 @@ tipo_função = (parâmetros, retornos) => [
   ...sequência(retornos),
 ]
 
-i32 = 127
-i64 = 126
-f32 = 125
-f64 = 124
+inteiro_32 = 127
+inteiro_64 = 126
+real_32 = 125
+real_64 = 124
 
 seção_importação = (importações) => seção(2, [
   importações[.],
@@ -49,11 +49,11 @@ código = (locais, corpo) => sequência([
   ...achatar(corpo),
 ])
 
-i32_carregar_8_sem_sinal = (offset, align) => [44, align, offset]
-i32_const = (número) => [65, número]
-i64_const = (número) => [66, número]
-f32_const = (número) => [67, número]
-f64_const = (número) => [68, número]
+inteiro_32_carregar_8_natural = (offset, align) => [44, align, offset]
+inteiro_32_constante = (número) => [65, número]
+inteiro_64_constante = (número) => [66, número]
+real_32_constante = (número) => [67, número]
+real_64_constante = (número) => [68, número]
 obter_local = (i) => [32, i]
 fim_função = [11]
 
@@ -99,8 +99,8 @@ módulo = (funções) => [
 função = (parâmetros, retornos, código) => [parâmetros, retornos, código]
 
 módulo([
-  função([i32], [i32], [
-    i32_const(0),
-    i32_carregar_8_sem_sinal(0, 0),
+  função([inteiro_32], [inteiro_32], [
+    inteiro_32_constante(0),
+    inteiro_32_carregar_8_natural(0, 0),
   ]),
 ])
