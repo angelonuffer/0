@@ -109,20 +109,26 @@ const valor_constante = transformar(
 const fatia = transformar(
   seq(
     nome,
-    símbolo("["),
-    código => expressão(código),
-    opcional(seq(
-      símbolo(":"),
-      opcional(código => expressão(código)),
-    ), []),
-    símbolo("]"),
+    vários(
+      seq(
+        símbolo("["),
+        código => expressão(código),
+        opcional(seq(
+          símbolo(":"),
+          opcional(código => expressão(código)),
+        ), []),
+        símbolo("]"),
+      )
+    ),
   ),
-  ([nome, , índice1, [símbolo_fatia, índice2]]) => escopo => {
-    if (índice2 === undefined) {
-      if (símbolo_fatia === ":") return escopo[nome].slice(índice1(escopo));
-      return escopo[nome][índice1(escopo)];
-    }
-    return escopo[nome].slice(índice1(escopo), índice2(escopo))
+  ([nome, fatias]) => escopo => {
+    return fatias.reduce((resultado, [ , índice1, [símbolo_fatia, índice2]]) => {
+      if (índice2 === undefined) {
+        if (símbolo_fatia === ":") return resultado.slice(índice1(escopo));
+        return resultado[índice1(escopo)];
+      }
+      return resultado.slice(índice1(escopo), índice2(escopo));
+    }, escopo[nome]);
   },
 );
 

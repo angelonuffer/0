@@ -26,12 +26,14 @@ seção_exportação = (exportações) => seção(7, [exportações[.], ...achat
 
 exportação_função = (nome, índice) => [...sequência(nome), 0, índice]
 
-seção_código = (locais, corpo) => seção(10, [
-  1,
-  ...sequência([
-    ...sequência(locais),
-    ...achatar(corpo),
-  ]),
+seção_código = (códigos) => seção(10, [
+  códigos[.],
+  ...achatar(códigos),
+])
+
+código = (locais, corpo) => sequência([
+  ...sequência(locais),
+  ...achatar(corpo),
 ])
 
 i32_const = (número) => [65, número]
@@ -40,25 +42,41 @@ f32_const = (número) => [67, número]
 f64_const = (número) => [68, número]
 fim_função = [11]
 
-módulo = (tipos, funções, exportação, código) => [
-  ...wasm,
-  ...versão,
-  ...tipos,
-  ...funções,
-  ...exportação,
-  ...código,
+declaração_tipos_funções = (funções) => funções[.] == 1 ? [
+  tipo_função(funções[0][0], funções[0][1]),
+] : [
+  tipo_função(funções[0][0], funções[0][1]),
+  ...declaração_tipos_funções(funções[1:]),
 ]
 
-módulo(
-  seção_tipos([
-    tipo_função([], [i32]),
-  ]),
-  seção_funções([0]),
-  seção_exportação([
+tipos_funções = (funções) => funções[.] == 1 ? [0] : [
+  ...tipos_funções(funções[1:]),
+  funções[.] - 1,
+]
+
+códigos_funções = (funções) => funções[.] == 1 ? [
+  código([], funções[0][2]),
+] : [
+  código([], funções[0][2]),
+  ...códigos_funções(funções[1:]),
+]
+
+módulo = (funções) => [
+  ...wasm,
+  ...versão,
+  ...seção_tipos(declaração_tipos_funções(funções)),
+  ...seção_funções(tipos_funções(funções)),
+  ...seção_exportação([
     exportação_função([48], 0),
   ]),
-  seção_código([], [
+  ...seção_código(códigos_funções(funções)),
+]
+
+função = (parâmetros, retornos, código) => [parâmetros, retornos, código]
+
+módulo([
+  função([], [i32], [
     i32_const(42),
     fim_função,
-  ])
-)
+  ]),
+])
