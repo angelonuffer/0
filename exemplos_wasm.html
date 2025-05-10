@@ -131,7 +131,8 @@
     const encodedExpression = encoder.encode(expressão);
     const memoryBuffer = new Uint8Array(memory.buffer);
     memoryBuffer.set(encodedExpression, 0);
-    return [wasmInstance.exports["0"](expressão.length), ""]
+    const [valor, resto] = wasmInstance.exports["0"](expressão.length)
+    return [valor, expressão.slice(resto)]
   }
 
   fetch("./exemplos.md").then(e => e.text()).then(async e => {
