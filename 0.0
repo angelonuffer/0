@@ -49,13 +49,70 @@ código = (locais, corpo) => sequência([
   ...achatar(corpo),
 ])
 
+inteiro_32_carregar = (offset, align) => [40, align, offset]
+inteiro_64_carregar = (offset, align) => [41, align, offset]
+real_32_carregar = (offset, align) => [42, align, offset]
+real_64_carregar = (offset, align) => [43, align, offset]
+
+inteiro_32_carregar_8_inteiro = (offset, align) => [45, align, offset]
+inteiro_32_carregar_16_inteiro = (offset, align) => [46, align, offset]
+inteiro_64_carregar_8_inteiro = (offset, align) => [50, align, offset]
+inteiro_64_carregar_16_inteiro = (offset, align) => [51, align, offset]
+inteiro_64_carregar_32_inteiro = (offset, align) => [52, align, offset]
+
 inteiro_32_carregar_8_natural = (offset, align) => [44, align, offset]
+inteiro_32_carregar_16_natural = (offset, align) => [47, align, offset]
+inteiro_64_carregar_8_natural = (offset, align) => [48, align, offset]
+inteiro_64_carregar_16_natural = (offset, align) => [49, align, offset]
+inteiro_64_carregar_32_natural = (offset, align) => [53, align, offset]
+
+inteiro_32_descarregar = (offset, align) => [54, align, offset]
+inteiro_64_descarregar = (offset, align) => [55, align, offset]
+real_32_descarregar = (offset, align) => [56, align, offset]
+real_64_descarregar = (offset, align) => [57, align, offset]
+
+inteiro_32_descarregar_8 = (offset, align) => [58, align, offset]
+inteiro_32_descarregar_16 = (offset, align) => [59, align, offset]
+inteiro_64_descarregar_8 = (offset, align) => [60, align, offset]
+inteiro_64_descarregar_16 = (offset, align) => [61, align, offset]
+inteiro_64_descarregar_32 = (offset, align) => [62, align, offset]
+
 inteiro_32_constante = (número) => [65, número]
 inteiro_64_constante = (número) => [66, número]
 real_32_constante = (número) => [67, número]
 real_64_constante = (número) => [68, número]
+
 obter_local = (i) => [32, i]
+
 fim_função = [11]
+
+adicionar_inteiro_32 = () => [106]
+adicionar_inteiro_64 = () => [107]
+subtrair_inteiro_32 = () => [108]
+subtrair_inteiro_64 = () => [109]
+multiplicar_inteiro_32 = () => [110]
+multiplicar_inteiro_64 = () => [111]
+dividir_inteiro_32 = () => [112]
+dividir_inteiro_64 = () => [113]
+
+adicionar_real_32 = () => [114]
+adicionar_real_64 = () => [115]
+subtrair_real_32 = () => [116]
+subtrair_real_64 = () => [117]
+multiplicar_real_32 = () => [118]
+multiplicar_real_64 = () => [119]
+dividir_real_32 = () => [120]
+dividir_real_64 = () => [121]
+
+comparar_igual_inteiro_32 = () => [70]
+comparar_igual_inteiro_64 = () => [71]
+comparar_menor_inteiro_32 = () => [72]
+comparar_menor_inteiro_64 = () => [73]
+comparar_maior_inteiro_32 = () => [74]
+comparar_maior_inteiro_64 = () => [75]
+
+retornar = () => [15]
+chamar_função = (índice) => [16, índice]
 
 declaração_tipos_funções = (funções) => funções[.] == 1 ? [
   tipo_função(funções[0][0], funções[0][1]),
