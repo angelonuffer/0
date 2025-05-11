@@ -596,3 +596,18 @@ maior(2, 9)
 ```
 
 Esses exemplos mostram como funções com múltiplos parâmetros podem ser usadas para resolver problemas variados de forma simples e eficiente.
+
+## Comentários
+
+Na linguagem 0, comentários podem ser adicionados ao código usando `//`. Eles são ignorados durante a execução e servem para documentar ou explicar partes do código.
+
+Exemplo:
+
+```
+// Este é um comentário explicando o código abaixo
+soma = (a, b) => a + b
+
+soma(3, 7)
+---
+10
+```

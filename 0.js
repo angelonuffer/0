@@ -361,8 +361,20 @@ const expressão = operação(
   ),
 );
 
+const comentário = transformar(
+  seq(
+    símbolo("//"),
+    regex(/[^\n]*/),
+    opcional(espaço),
+  ),
+  () => () => null
+);
+
+const ignorar_comentários = vários(comentário);
+
 const _0 = transformar(
   seq(
+    opcional(ignorar_comentários),
     opcional(vários(
       seq(
         seq(
@@ -375,6 +387,7 @@ const _0 = transformar(
         espaço,
       ),
     ), []),
+    opcional(ignorar_comentários),
     opcional(vários(
       seq(
         seq(
@@ -387,9 +400,10 @@ const _0 = transformar(
         espaço,
       ),
     ), []),
+    opcional(ignorar_comentários),
     expressão,
   ),
-  async ([importações, atribuições, valor]) => {
+  async ([, importações, , atribuições, , valor]) => {
     return valor(atribuições.reduce((escopo, [[nome, , , , valor]]) => {
       return {
         ...escopo,
@@ -400,6 +414,6 @@ const _0 = transformar(
       return [nome, await _0(await (await fetch(endereço)).text())[0]]
     })))))
   },
-)
+);
 
 export default _0
