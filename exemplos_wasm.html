@@ -103,7 +103,7 @@
   import interpretador_js from "./0.js"
 
   const code_wasm = document.getElementById("wasm")
-  const [promessa_wasm, resto] = interpretador_js("wasm # 0.0 wasm")
+  const [promessa_wasm, resto] = interpretador_js("wasm # 0.wasm.0 wasm")
   const wasm = await promessa_wasm
   code_wasm.innerHTML = JSON.stringify(wasm)
 
