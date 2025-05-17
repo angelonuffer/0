@@ -1,18 +1,18 @@
-wasm = [0, 97, 115, 109]
-versão = [1, 0, 0, 0]
+wasm = [0 97 115 109]
+versão = [1 0 0 0]
 
-sequência = (itens) => [itens[.], ...itens]
+sequência = (itens) => [itens[.] ...itens]
 
-achatar = (lista) => lista[.] == 1 ? lista[0] : [...lista[0], ...achatar(lista[1:])]
+achatar = (lista) => lista[.] == 1 ? lista[0] : [...lista[0] ...achatar(lista[1:])]
 
-seção = (id, bytes) => [id, ...sequência(bytes)]
+seção = (id bytes) => [id ...sequência(bytes)]
 
-seção_tipos = (itens) => seção(1, [itens[.], ...achatar(itens)])
+seção_tipos = (itens) => seção(1 [itens[.] ...achatar(itens)])
 
-tipo_função = (parâmetros, retornos) => [
-  96,
-  ...sequência(parâmetros),
-  ...sequência(retornos),
+tipo_função = (parâmetros retornos) => [
+  96
+  ...sequência(parâmetros)
+  ...sequência(retornos)
 ]
 
 inteiro_32 = 127
@@ -20,74 +20,74 @@ inteiro_64 = 126
 real_32 = 125
 real_64 = 124
 
-seção_importação = (importações) => seção(2, [
-  importações[.],
-  ...achatar(importações),
+seção_importação = (importações) => seção(2 [
+  importações[.]
+  ...achatar(importações)
 ])
 
-importar_memória = (nome_módulo, nome_memória, limite) => [
-  ...sequência(nome_módulo),
-  ...sequência(nome_memória),
-  2,
-  0,
-  limite,
+importar_memória = (nome_módulo nome_memória limite) => [
+  ...sequência(nome_módulo)
+  ...sequência(nome_memória)
+  2
+  0
+  limite
 ]
 
-seção_funções = (itens) => seção(3, sequência(itens))
+seção_funções = (itens) => seção(3 sequência(itens))
 
-seção_exportação = (exportações) => seção(7, [exportações[.], ...achatar(exportações)])
+seção_exportação = (exportações) => seção(7 [exportações[.] ...achatar(exportações)])
 
-exportação_função = (nome, índice) => [...sequência(nome), 0, índice]
+exportação_função = (nome índice) => [...sequência(nome) 0 índice]
 
-seção_código = (códigos) => seção(10, [
-  códigos[.],
-  ...achatar(códigos),
+seção_código = (códigos) => seção(10 [
+  códigos[.]
+  ...achatar(códigos)
 ])
 
-código = (locais, corpo) => sequência([
-  ...sequência(locais),
-  ...achatar(corpo),
+código = (locais corpo) => sequência([
+  ...sequência(locais)
+  ...achatar(corpo)
 ])
 
 fim = () => [11]
 retornar = () => [15]
-chamar = (índice) => [16, índice]
+chamar = (índice) => [16 índice]
 
-obter_local = (i) => [32, i]
-definir_local = (i) => [33, i]
+obter_local = (i) => [32 i]
+definir_local = (i) => [33 i]
 
-carregar_inteiro_32 = (offset, align) => [40, align, offset]
-carregar_inteiro_64 = (offset, align) => [41, align, offset]
-carregar_real_32 = (offset, align) => [42, align, offset]
-carregar_real_64 = (offset, align) => [43, align, offset]
+carregar_inteiro_32 = (offset align) => [40 align offset]
+carregar_inteiro_64 = (offset align) => [41 align offset]
+carregar_real_32 = (offset align) => [42 align offset]
+carregar_real_64 = (offset align) => [43 align offset]
 
-carregar_8_inteiro_32 = (offset, align) => [44, align, offset]
-carregar_8_natural_32 = (offset, align) => [45, align, offset]
-carregar_16_inteiro_32 = (offset, align) => [46, align, offset]
-carregar_16_natural_32 = (offset, align) => [47, align, offset]
+carregar_8_inteiro_32 = (offset align) => [44 align offset]
+carregar_8_natural_32 = (offset align) => [45 align offset]
+carregar_16_inteiro_32 = (offset align) => [46 align offset]
+carregar_16_natural_32 = (offset align) => [47 align offset]
 
-carregar_8_inteiro_64 = (offset, align) => [48, align, offset]
-carregar_8_natural_64 = (offset, align) => [49, align, offset]
-carregar_16_inteiro_64 = (offset, align) => [50, align, offset]
-carregar_16_natural_64 = (offset, align) => [51, align, offset]
-carregar_32_inteiro_64 = (offset, align) => [52, align, offset]
-carregar_32_natural_64 = (offset, align) => [53, align, offset]
+carregar_8_inteiro_64 = (offset align) => [48 align offset]
+carregar_8_natural_64 = (offset align) => [49 align offset]
+carregar_16_inteiro_64 = (offset align) => [50 align offset]
+carregar_16_natural_64 = (offset align) => [51 align offset]
+carregar_32_inteiro_64 = (offset align) => [52 align offset]
+carregar_32_natural_64 = (offset align) => [53 align offset]
 
-armazenar_inteiro_32 = (offset, align) => [54, align, offset]
-armazenar_inteiro_64 = (offset, align) => [55, align, offset]
-armazenar_real_32 = (offset, align) => [56, align, offset]
-armazenar_real_64 = (offset, align) => [57, align, offset]
+armazenar_inteiro_32 = (offset align) => [54 align offset]
+armazenar_inteiro_64 = (offset align) => [55 align offset]
+armazenar_real_32 = (offset align) => [56 align offset]
+armazenar_real_64 = (offset align) => [57 align offset]
 
-armazenar_8_inteiro_32 = (offset, align) => [58, align, offset]
-armazenar_16_inteiro_32 = (offset, align) => [59, align, offset]
-armazenar_8_inteiro_64 = (offset, align) => [60, align, offset]
-armazenar_16_inteiro_64 = (offset, align) => [61, align, offset]
-armazenar_32_inteiro_64 = (offset, align) => [62, align, offset]
+armazenar_8_inteiro_32 = (offset align) => [58 align offset]
+armazenar_16_inteiro_32 = (offset align) => [59 align offset]
+armazenar_8_inteiro_64 = (offset align) => [60 align offset]
+armazenar_16_inteiro_64 = (offset align) => [61 align offset]
+armazenar_32_inteiro_64 = (offset align) => [62 align offset]
 
-constante_inteiro_32 = (número) => [65, número]
-constante_inteiro_64 = (número) => [66, número]
-constante_real_32 = (número) => [67, número]
-constante_real_64 = (número) => [68, número]
+constante_inteiro_32 = (número) => [65 número]
+constante_inteiro_64 = (número) => [66 número]
+constante_real_32 = (número) => [67 número]
+constante_real_64 = (número) => [68 número]
 
 igual_0_inteiro_32 = () => [69]
 igual_inteiro_32 = () => [70]
@@ -150,52 +150,52 @@ multiplicar_real_64 = () => [162]
 dividir_real_64 = () => [163]
 
 declaração_tipos_funções = (funções) => funções[.] == 1 ? [
-  tipo_função(funções[0][0], funções[0][1]),
+  tipo_função(funções[0][0] funções[0][1])
 ] : [
-  tipo_função(funções[0][0], funções[0][1]),
-  ...declaração_tipos_funções(funções[1:]),
+  tipo_função(funções[0][0] funções[0][1])
+  ...declaração_tipos_funções(funções[1:])
 ]
 
 tipos_funções = (funções) => funções[.] == 1 ? [0] : [
-  ...tipos_funções(funções[1:]),
-  funções[.] - 1,
+  ...tipos_funções(funções[1:])
+  funções[.] - 1
 ]
 
 códigos_funções = (funções) => funções[.] == 1 ? [
-  código([], [
-    ...funções[0][2],
-    fim(),
-  ]),
+  código([] [
+    ...funções[0][2]
+    fim()
+  ])
 ] : [
-  código([], [
-    ...funções[0][2],
-    fim(),
-  ]),
-  ...códigos_funções(funções[1:]),
+  código([] [
+    ...funções[0][2]
+    fim()
+  ])
+  ...códigos_funções(funções[1:])
 ]
 
 módulo = (funções) => [
-  ...wasm,
-  ...versão,
-  ...seção_tipos(declaração_tipos_funções(funções)),
+  ...wasm
+  ...versão
+  ...seção_tipos(declaração_tipos_funções(funções))
   ...seção_importação([
-    importar_memória([35], [36], 1),
-  ]),
-  ...seção_funções(tipos_funções(funções)),
+    importar_memória([35] [36] 1)
+  ])
+  ...seção_funções(tipos_funções(funções))
   ...seção_exportação([
-    exportação_função([48], 0),
-  ]),
-  ...seção_código(códigos_funções(funções)),
+    exportação_função([48] 0)
+  ])
+  ...seção_código(códigos_funções(funções))
 ]
 
-função = (parâmetros, retornos, código) => [parâmetros, retornos, código]
+função = (parâmetros retornos código) => [parâmetros retornos código]
 
 módulo([
-  função([inteiro_32], [inteiro_32, inteiro_32], [
-    constante_inteiro_32(0),
-    carregar_8_natural_32(0, 0),
-    constante_inteiro_32(48),
-    subtrair_inteiro_32(),
-    obter_local(0),
-  ]),
+  função([inteiro_32] [inteiro_32 inteiro_32] [
+    constante_inteiro_32(0)
+    carregar_8_natural_32(0 0)
+    constante_inteiro_32(48)
+    subtrair_inteiro_32()
+    obter_local(0)
+  ])
 ])
