@@ -172,7 +172,7 @@ tipos_funções = (funções) => funções[.] == 2 ? [0] : [
 códigos_funções = (funções) => funções[.] == 2 ? [
   código([] [
     ...achatar(mapear(funções[1] (função) => função({
-      código: 0
+      [funções[0][0]]: 0
     })))
     fim()
   ])
