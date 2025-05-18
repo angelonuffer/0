@@ -192,7 +192,14 @@ const objeto = transformar(
       vários(
         alt(
           seq(
-            nome,
+            alt(
+              nome,
+              seq(
+                símbolo("["),
+                código => expressão(código),
+                símbolo("]"),
+              ),
+            ),
             símbolo(":"),
             opcional(espaço),
             código => expressão(código),
@@ -210,11 +217,16 @@ const objeto = transformar(
     ),
     símbolo("}"),
   ),
-  ([, , valores]) => escopo => Object.fromEntries(valores ? valores.flatMap(v => 
-    v[0] === "..."
-      ? Object.entries(v[1](escopo))
-      : [[v[0], v[3](escopo)]]
-    ) : [])
+  ([, , valores]) => escopo => {
+    return valores ? valores.reduce((resultado, v) => {
+      if (v[0] === "...") {
+        return { ...resultado, ...v[1](escopo) };
+      } else {
+        const chave = typeof v[0] === "string" ? v[0] : v[0][1](escopo);
+        return { ...resultado, [chave]: v[3](escopo) };
+      }
+    }, {}) : {};
+  }
 );
 
 const atributo = transformar(

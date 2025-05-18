@@ -505,6 +505,22 @@ filosofia = {
 {"nome":"Existencialismo","conceito":"A existência precede a essência","perspectiva":"Foco na liberdade individual e responsabilidade pessoal"}
 ```
 
+### Propriedade calculada em objeto
+
+Propriedades calculadas permitem definir chaves dinamicamente em um objeto, com base em expressões.
+
+```
+chave = "dinâmica"
+
+objeto = {
+  [chave]: "valor associado",
+}
+
+objeto["dinâmica"]
+---
+"valor associado"
+```
+
 ## Função
 
 Funções encapsulam lógica reutilizável.
