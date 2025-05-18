@@ -591,6 +591,22 @@ Esta função calcula a área de um retângulo, dado sua largura e altura.
 50
 ```
 
+### Calcular a área de um triângulo
+
+Esta função calcula a área de um triângulo com base na base e na altura fornecidas.
+
+```
+área_triangulo = (base, altura) => (
+  divisor = 2
+  área = (base * altura) / divisor
+  área
+)
+
+área_triangulo(10, 8)
+---
+40
+```
+
 ### Encontrar o maior de dois números
 
 Esta função retorna o maior valor entre dois números fornecidos.

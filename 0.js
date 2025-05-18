@@ -293,11 +293,22 @@ const parênteses = transformar(
   seq(
     símbolo("("),
     opcional(espaço),
+    opcional(código => declarações_constantes(código), []),
+    opcional(espaço),
     código => expressão(código),
     opcional(espaço),
     símbolo(")"),
   ),
-  ([, , valor]) => valor
+  ([, , constantes, , valor]) => escopo => {
+    const escopoComConstantes = constantes.reduce(
+      (escopoAtual, [[nome, , , , valor]]) => {
+        const novoValor = valor(escopoAtual);
+        return { ...escopoAtual, [nome]: novoValor };
+      },
+      escopo
+    );
+    return valor(escopoComConstantes);
+  }
 );
 
 const termo1 = alt(
@@ -384,6 +395,19 @@ const comentário = transformar(
 
 const ignorar_comentários = vários(comentário);
 
+const declarações_constantes = vários(
+  seq(
+    seq(
+      nome,
+      opcional(espaço),
+      símbolo("="),
+      opcional(espaço),
+      expressão,
+    ),
+    espaço,
+  ),
+)
+
 const _0 = transformar(
   seq(
     opcional(ignorar_comentários),
@@ -400,18 +424,7 @@ const _0 = transformar(
       ),
     ), []),
     opcional(ignorar_comentários),
-    opcional(vários(
-      seq(
-        seq(
-          nome,
-          opcional(espaço),
-          símbolo("="),
-          opcional(espaço),
-          expressão,
-        ),
-        espaço,
-      ),
-    ), []),
+    opcional(declarações_constantes, []),
     opcional(ignorar_comentários),
     expressão,
   ),
