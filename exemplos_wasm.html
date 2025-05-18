@@ -130,8 +130,9 @@
   const _0 = expressão => {
     const encodedExpression = encoder.encode(expressão);
     const memoryBuffer = new Uint8Array(memory.buffer);
-    memoryBuffer.set(encodedExpression, 0);
-    const [valor, resto] = wasmInstance.exports["0"](expressão.length)
+    memoryBuffer.set([expressão.length], 0)
+    memoryBuffer.set(encodedExpression, 4);
+    const [valor, resto] = wasmInstance.exports["0"](0)
     return [valor, expressão.slice(resto)]
   }
 

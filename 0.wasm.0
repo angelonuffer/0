@@ -1,9 +1,14 @@
+achatar = (lista) => lista[.] == 1 ? lista[0] : [...lista[0] ...achatar(lista[1:])]
+
+mapear = (lista mapeador) => lista[.] == 1 ? [mapeador(lista[0])] : achatar([
+  mapear([lista[0]] mapeador)
+  mapear(lista[1:] mapeador)
+])
+
 wasm = [0 97 115 109]
 versão = [1 0 0 0]
 
 sequência = (itens) => [itens[.] ...itens]
-
-achatar = (lista) => lista[.] == 1 ? lista[0] : [...lista[0] ...achatar(lista[1:])]
 
 seção = (id bytes) => [id ...sequência(bytes)]
 
@@ -149,53 +154,68 @@ subtrair_real_64 = () => [161]
 multiplicar_real_64 = () => [162]
 dividir_real_64 = () => [163]
 
-declaração_tipos_funções = (funções) => funções[.] == 1 ? [
-  tipo_função(funções[0][0] funções[0][1])
-] : [
-  tipo_função(funções[0][0] funções[0][1])
-  ...declaração_tipos_funções(funções[1:])
-]
+declaração_tipos_funções = (funções) => funções[.] == 2 ? [
+  tipo_função(
+    mapear(funções[0] () => inteiro_32)
+    mapear(funções[1] () => inteiro_32)
+  )
+] : achatar([
+  declaração_tipos_funções(funções[0:2])
+  declaração_tipos_funções(funções[2:])
+])
 
-tipos_funções = (funções) => funções[.] == 1 ? [0] : [
-  ...tipos_funções(funções[1:])
+tipos_funções = (funções) => funções[.] == 2 ? [0] : [
+  ...tipos_funções(funções[2:])
   funções[.] - 1
 ]
 
-códigos_funções = (funções) => funções[.] == 1 ? [
+códigos_funções = (funções) => funções[.] == 2 ? [
   código([] [
-    ...funções[0][2]
+    ...achatar(mapear(funções[1] (função) => função({
+      código: 0
+    })))
     fim()
   ])
-] : [
-  código([] [
-    ...funções[0][2]
-    fim()
-  ])
-  ...códigos_funções(funções[1:])
-]
+] : achatar([
+  códigos_funções(funções[0:2])
+  códigos_funções(funções[2:])
+])
 
-módulo = (funções) => [
-  ...wasm
-  ...versão
-  ...seção_tipos(declaração_tipos_funções(funções))
-  ...seção_importação([
+módulo = (funções) => achatar([
+  wasm
+  versão
+  seção_tipos(declaração_tipos_funções(funções))
+  seção_importação([
     importar_memória([35] [36] 1)
   ])
-  ...seção_funções(tipos_funções(funções))
-  ...seção_exportação([
+  seção_funções(tipos_funções(funções))
+  seção_exportação([
     exportação_função([48] 0)
   ])
-  ...seção_código(códigos_funções(funções))
+  seção_código(códigos_funções(funções))
+])
+
+fatiar = (sequência i) => [
+  constante_inteiro_32(sequência + i + 4)
+  carregar_8_natural_32(0 0)
 ]
 
-função = (parâmetros retornos código) => [parâmetros retornos código]
+número = (valor) => [
+  constante_inteiro_32(valor)
+]
+
+subtrair = (valores) => [
+  ...valores[0]
+  ...valores[1]
+  subtrair_inteiro_32()
+]
 
 módulo([
-  função([inteiro_32] [inteiro_32 inteiro_32] [
-    constante_inteiro_32(0)
-    carregar_8_natural_32(0 0)
-    constante_inteiro_32(48)
-    subtrair_inteiro_32()
-    obter_local(0)
-  ])
+  ["código"] [
+    (escopo) => subtrair([
+      fatiar(escopo.código 0)
+      número(48)
+    ])
+    (escopo) => fatiar(escopo.código 0)
+  ]
 ])
