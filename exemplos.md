@@ -14,11 +14,11 @@ Exemplo:
 42
 ```
 
-Neste caso, o valor '42' é exportado como o valor padrão do módulo.
+Neste caso, o valor `42` é exportado como o valor padrão do módulo.
 
 ## Importação
 
-A importação permite reutilizar código de outros módulos. O comando '#' é usado para importar um módulo pelo caminho especificado.
+A importação permite reutilizar código de outros módulos. O comando `#` é usado para importar um módulo pelo caminho especificado.
 
 Exemplo:
 
@@ -30,15 +30,15 @@ retorna_5()
 5
 ```
 
-Aqui, o arquivo 'retorna_5.0' é importado, e a função 'retorna_5' é chamada, retornando o valor '5'.
+Aqui, o arquivo `retorna_5.0` é importado, e a função `retorna_5` é chamada, retornando o valor `5`.
 
 ## Tipo lógico
 
-Valores lógicos são usados para representar verdadeiro ou falso. Na linguagem 0, o valor '0' é considerado falso, e qualquer outro valor é considerado verdadeiro.
+Valores lógicos são usados para representar verdadeiro ou falso. Na linguagem 0, o valor `0` é considerado falso, e qualquer outro valor é considerado verdadeiro.
 
 ### Operador e (&)
 
-O operador lógico '&' retorna falso ('0') se qualquer um dos operandos for falso. Caso ambos sejam verdadeiros, retorna o segundo valor.
+O operador lógico `&` retorna falso (`0`) se qualquer um dos operandos for falso. Caso ambos sejam verdadeiros, retorna o segundo valor.
 
 Exemplos:
 
@@ -68,7 +68,7 @@ Exemplos:
 
 ### Operador ou (|)
 
-O operador lógico '|' retorna falso ('0') se ambos os operandos forem falsos. Caso contrário, retorna o primeiro valor verdadeiro.
+O operador lógico `|` retorna falso (`0`) se ambos os operandos forem falsos. Caso contrário, retorna o primeiro valor verdadeiro.
 
 Exemplos:
 
@@ -98,7 +98,7 @@ Exemplos:
 
 ### Operador não (!)
 
-O operador lógico '!' inverte o valor lógico. Se o valor for verdadeiro, retorna falso, e vice-versa.
+O operador lógico `!` inverte o valor lógico. Se o valor for verdadeiro, retorna falso, e vice-versa.
 
 Exemplos:
 
@@ -220,7 +220,7 @@ Comparadores são usados para comparar dois valores.
 
 #### Maior que (>)
 
-Retorna '1' (verdadeiro) se o primeiro valor for maior que o segundo, caso contrário retorna '0' (falso).
+Retorna `1` (verdadeiro) se o primeiro valor for maior que o segundo, caso contrário retorna `0` (falso).
 
 ```
 2 > 8
@@ -242,7 +242,7 @@ Retorna '1' (verdadeiro) se o primeiro valor for maior que o segundo, caso contr
 
 #### Menor que (<)
 
-Retorna '1' (verdadeiro) se o primeiro valor for menor que o segundo, caso contrário retorna '0' (falso).
+Retorna `1` (verdadeiro) se o primeiro valor for menor que o segundo, caso contrário retorna `0` (falso).
 
 ```
 8 < 2
@@ -264,7 +264,7 @@ Retorna '1' (verdadeiro) se o primeiro valor for menor que o segundo, caso contr
 
 #### Igual a (==)
 
-Retorna '1' (verdadeiro) se os dois valores forem iguais, caso contrário retorna '0' (falso).
+Retorna `1` (verdadeiro) se os dois valores forem iguais, caso contrário retorna `0` (falso).
 
 ```
 8 == 2
@@ -286,7 +286,7 @@ Retorna '1' (verdadeiro) se os dois valores forem iguais, caso contrário retorn
 
 #### Diferente de (!=)
 
-Retorna '1' (verdadeiro) se os dois valores forem diferentes, caso contrário retorna '0' (falso).
+Retorna `1` (verdadeiro) se os dois valores forem diferentes, caso contrário retorna `0` (falso).
 
 ```
 8 != 2
@@ -348,7 +348,7 @@ Retorna '1' (verdadeiro) se os dois valores forem diferentes, caso contrário re
 
 ## Constantes
 
-Constantes armazenam valores que não podem ser alterados posteriormente. O operador '=' é usado para atribuir valores.
+Constantes armazenam valores que não podem ser alterados posteriormente. O operador `=` é usado para atribuir valores.
 
 Exemplo:
 
@@ -407,7 +407,7 @@ frase = "O céu é azul."
 
 ### Obtendo o tamanho do texto
 
-O operador '[.]' retorna o tamanho do texto.
+O operador `[.]` retorna o tamanho do texto.
 
 ```
 frase = "O céu é o limite."
@@ -424,7 +424,7 @@ Listas armazenam coleções de valores.
 ### Fatiando a lista
 
 ```
-frutas = ["abacaxi", "banana", "caju"]
+frutas = ["abacaxi" "banana" "caju"]
 
 frutas[0]
 ---
@@ -432,7 +432,7 @@ frutas[0]
 ```
 
 ```
-frutas = ["abacaxi", "banana", "caju"]
+frutas = ["abacaxi" "banana" "caju"]
 
 frutas[0:2]
 ---
@@ -444,9 +444,9 @@ frutas[0:2]
 Itens de uma lista podem ser espalhados em uma nova lista.
 
 ```
-frutas = ["abacaxi", "banana", "caju"]
+frutas = ["abacaxi" "banana" "caju"]
 
-[...frutas[0:2], "carambola"]
+[...frutas[0:2] "carambola"]
 ---
 ["abacaxi","banana","carambola"]
 ```
@@ -454,7 +454,7 @@ frutas = ["abacaxi", "banana", "caju"]
 ### Obtendo o tamanho da lista
 
 ```
-frutas = ["abacaxi", "banana", "caju"]
+frutas = ["abacaxi" "banana" "caju"]
 
 frutas[.]
 ---
@@ -469,8 +469,8 @@ Objetos armazenam pares de chave-valor.
 
 ```
 filosofia = {
-  nome: "Existencialismo",
-  conceito: "A existência precede a essência",
+  nome: "Existencialismo"
+  conceito: "A existência precede a essência"
 }
 
 filosofia["nome"]
@@ -480,8 +480,8 @@ filosofia["nome"]
 
 ```
 filosofia = {
-  nome: "Existencialismo",
-  conceito: "A existência precede a essência",
+  nome: "Existencialismo"
+  conceito: "A existência precede a essência"
 }
 
 filosofia.conceito
@@ -493,13 +493,13 @@ filosofia.conceito
 
 ```
 filosofia = {
-  nome: "Existencialismo",
-  conceito: "A existência precede a essência",
+  nome: "Existencialismo"
+  conceito: "A existência precede a essência"
 }
 
 {
-  ...filosofia,
-  perspectiva: "Foco na liberdade individual e responsabilidade pessoal",
+  ...filosofia
+  perspectiva: "Foco na liberdade individual e responsabilidade pessoal"
 }
 ---
 {"nome":"Existencialismo","conceito":"A existência precede a essência","perspectiva":"Foco na liberdade individual e responsabilidade pessoal"}
@@ -513,7 +513,7 @@ Propriedades calculadas permitem definir chaves dinamicamente em um objeto, com 
 chave = "dinâmica"
 
 objeto = {
-  [chave]: "valor associado",
+  [chave]: "valor associado"
 }
 
 objeto["dinâmica"]
@@ -526,7 +526,7 @@ objeto["dinâmica"]
 Funções encapsulam lógica reutilizável.
 
 ```
-quadrado = (x) => x * x
+quadrado = x => x * x
 
 quadrado(5)
 ---
@@ -540,9 +540,9 @@ Funções podem receber mais de um parâmetro para realizar operações mais com
 Esta função recebe dois números como parâmetros e retorna a soma deles.
 
 ```
-soma = (a, b) => a + b
+soma = a b => a + b
 
-soma(3, 7)
+soma(3 7)
 ---
 10
 ```
@@ -552,17 +552,17 @@ soma(3, 7)
 Esta função verifica se um número está dentro de um intervalo definido por dois valores (mínimo e máximo).
 
 ```
-dentro_intervalo = (n, mín, máx) => n >= mín & n <= máx
+dentro_intervalo = n mín máx => n >= mín & n <= máx
 
-dentro_intervalo(5, 1, 10)
+dentro_intervalo(5 1 10)
 ---
 1
 ```
 
 ```
-dentro_intervalo = (n, mín, máx) => n >= mín & n <= máx
+dentro_intervalo = n mín máx => n >= mín & n <= máx
 
-dentro_intervalo(15, 1, 10)
+dentro_intervalo(15 1 10)
 ---
 0
 ```
@@ -572,9 +572,9 @@ dentro_intervalo(15, 1, 10)
 Esta função recebe dois textos e os combina em uma única string.
 
 ```
-concatena = (texto1, texto2) => `${texto1} ${texto2}`
+concatena = texto1 texto2 => `${texto1} ${texto2}`
 
-concatena("Olá", "mundo!")
+concatena("Olá" "mundo!")
 ---
 "Olá mundo!"
 ```
@@ -584,9 +584,9 @@ concatena("Olá", "mundo!")
 Esta função calcula a área de um retângulo, dado sua largura e altura.
 
 ```
-área_retangulo = (largura, altura) => largura * altura
+área_retangulo = largura altura => largura * altura
 
-área_retangulo(5, 10)
+área_retangulo(5 10)
 ---
 50
 ```
@@ -596,13 +596,13 @@ Esta função calcula a área de um retângulo, dado sua largura e altura.
 Esta função calcula a área de um triângulo com base na base e na altura fornecidas.
 
 ```
-área_triangulo = (base, altura) => (
+área_triangulo = base altura => (
   divisor = 2
   área = (base * altura) / divisor
   área
 )
 
-área_triangulo(10, 8)
+área_triangulo(10 8)
 ---
 40
 ```
@@ -612,17 +612,17 @@ Esta função calcula a área de um triângulo com base na base e na altura forn
 Esta função retorna o maior valor entre dois números fornecidos.
 
 ```
-maior = (a, b) => a > b ? a : b
+maior = a b => a > b ? a : b
 
-maior(8, 3)
+maior(8 3)
 ---
 8
 ```
 
 ```
-maior = (a, b) => a > b ? a : b
+maior = a b => a > b ? a : b
 
-maior(2, 9)
+maior(2 9)
 ---
 9
 ```
@@ -637,9 +637,9 @@ Exemplo:
 
 ```
 // Este é um comentário explicando o código abaixo
-soma = (a, b) => a + b
+soma = a b => a + b
 
-soma(3, 7)
+soma(3 7)
 ---
 10
 ```
