@@ -393,6 +393,14 @@ frase[0:11]
 "Que a força"
 ```
 
+```
+frase = "O destino de Hyrule está em suas mãos."
+
+frase[13:]
+---
+"Hyrule está em suas mãos."
+```
+
 ### Gerando novos textos
 
 Textos podem ser combinados dinamicamente.
@@ -437,6 +445,14 @@ series = ["Stranger Things" "Breaking Bad" "Game of Thrones"]
 series[0:2]
 ---
 ["Stranger Things","Breaking Bad"]
+```
+
+```
+jogos = ["The Legend of Zelda" "Super Mario Bros." "Minecraft" "The Witcher"]
+
+jogos[2:]
+---
+["Minecraft","The Witcher"]
 ```
 
 ### Espalhando itens

@@ -116,11 +116,10 @@ const fatia = transformar(
     ), []),
     símbolo("]"),
   ),
-  ([, i, [, j]]) => (escopo, valor) => {
-    if (j === undefined) {
-      return valor[i(escopo)];
-    }
-    return valor.slice(i(escopo), j(escopo));
+  ([, i, [faixa, j]]) => (escopo, valor) => {
+    if (j !== undefined) return valor.slice(i(escopo), j(escopo))
+    if (faixa !== undefined) return valor.slice(i(escopo))
+    return valor[i(escopo)];
   },
 );
 
