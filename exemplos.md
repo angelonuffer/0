@@ -32,6 +32,22 @@ retorna_5()
 
 Aqui, o arquivo `retorna_5.0` é importado, e a função `retorna_5` é chamada, retornando o valor `5`.
 
+## Carregando conteúdo de um arquivo
+
+O comando `@` é usado para carregar o conteúdo de um arquivo diretamente no código.
+
+Exemplo:
+
+```
+frase @ ./frase.txt
+
+frase
+---
+"É perigoso ir sozinho! Pegue isto."
+```
+
+Neste exemplo, o conteúdo do arquivo `mensagem.txt` é carregado e atribuído à variável `conteudo`. Ao acessar `conteudo`, o texto do arquivo é exibido.
+
 ## Tipo lógico
 
 Valores lógicos são usados para representar verdadeiro ou falso. Na linguagem 0, o valor `0` é considerado falso, e qualquer outro valor é considerado verdadeiro.

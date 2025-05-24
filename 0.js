@@ -430,21 +430,39 @@ const _0 = transformar(
         espaço,
       ),
     ), []),
+    opcional(vários(
+      seq(
+        seq(
+          nome,
+          opcional(espaço),
+          símbolo("@"),
+          opcional(espaço),
+          endereço,
+        ),
+        espaço,
+      ),
+    ), []),
     opcional(ignorar_comentários),
     opcional(declarações_constantes, []),
     opcional(ignorar_comentários),
     expressão,
   ),
-  async ([, importações, , atribuições, , valor]) => {
+  async ([, importações, carregamentos, , atribuições, , valor]) => {
     return valor(atribuições.reduce((escopo, [[nome, , , , valor]]) => {
       return {
         ...escopo,
         [nome]: valor(escopo),
       };
-    }, Object.fromEntries(await Promise.all(importações.map(async importação => {
-      const [[nome, , , , endereço]] = importação;
-      return [nome, await _0(await (await fetch(endereço)).text())[0]]
-    })))))
+    }, Object.fromEntries(await Promise.all([
+      ...importações.map(async importação => {
+        const [[nome, , , , endereço]] = importação;
+        return [nome, await _0(await (await fetch(endereço)).text())[0]]
+      }),
+      ...carregamentos.map(async carregamento => {
+        const [[nome, , , , endereço]] = carregamento;
+        return [nome, await (await fetch(endereço)).text()]
+      }),
+    ]))))
   },
 );
 
