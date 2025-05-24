@@ -368,9 +368,9 @@ Textos são sequências de caracteres delimitadas por aspas.
 Exemplo:
 
 ```
-"Viva o momento."
+"Que a força esteja com você."
 ---
-"Viva o momento."
+"Que a força esteja com você."
 ```
 
 ### Fatiando o texto
@@ -378,19 +378,19 @@ Exemplo:
 É possível acessar partes específicas de um texto usando índices.
 
 ```
-frase = "Viva o momento."
+frase = "Que a força esteja com você."
 
 frase[0]
 ---
-"V"
+"Q"
 ```
 
 ```
-frase = "Viva o momento."
+frase = "Que a força esteja com você."
 
-frase[0:4]
+frase[0:11]
 ---
-"Viva"
+"Que a força"
 ```
 
 ### Gerando novos textos
@@ -424,19 +424,19 @@ Listas armazenam coleções de valores.
 ### Fatiando a lista
 
 ```
-frutas = ["abacaxi" "banana" "caju"]
+jogos = ["The Legend of Zelda" "Super Mario Bros." "Minecraft"]
 
-frutas[0]
+jogos[0]
 ---
-"abacaxi"
+"The Legend of Zelda"
 ```
 
 ```
-frutas = ["abacaxi" "banana" "caju"]
+series = ["Stranger Things" "Breaking Bad" "Game of Thrones"]
 
-frutas[0:2]
+series[0:2]
 ---
-["abacaxi","banana"]
+["Stranger Things","Breaking Bad"]
 ```
 
 ### Espalhando itens
@@ -444,19 +444,19 @@ frutas[0:2]
 Itens de uma lista podem ser espalhados em uma nova lista.
 
 ```
-frutas = ["abacaxi" "banana" "caju"]
+filmes = ["Star Wars" "O Senhor dos Anéis" "Matrix"]
 
-[...frutas[0:2] "carambola"]
+[...filmes[0:2] "Jurassic Park"]
 ---
-["abacaxi","banana","carambola"]
+["Star Wars","O Senhor dos Anéis","Jurassic Park"]
 ```
 
 ### Obtendo o tamanho da lista
 
 ```
-frutas = ["abacaxi" "banana" "caju"]
+bandas = ["The Beatles" "Queen" "Pink Floyd"]
 
-frutas[.]
+bandas[.]
 ---
 3
 ```
@@ -468,41 +468,41 @@ Objetos armazenam pares de chave-valor.
 ### Acessando atributos
 
 ```
-filosofia = {
-  nome: "Existencialismo"
-  conceito: "A existência precede a essência"
+jogo = {
+  título: "The Legend of Zelda"
+  gênero: "Aventura"
 }
 
-filosofia["nome"]
+jogo["título"]
 ---
-"Existencialismo"
+"The Legend of Zelda"
 ```
 
 ```
-filosofia = {
-  nome: "Existencialismo"
-  conceito: "A existência precede a essência"
+jogo = {
+  nome: "The Legend of Zelda"
+  gênero: "Aventura"
 }
 
-filosofia.conceito
+jogo.gênero
 ---
-"A existência precede a essência"
+"Aventura"
 ```
 
 ### Espalhando atributos
 
 ```
-filosofia = {
-  nome: "Existencialismo"
-  conceito: "A existência precede a essência"
+jogo = {
+  nome: "The Legend of Zelda"
+  gênero: "Aventura"
 }
 
 {
-  ...filosofia
-  perspectiva: "Foco na liberdade individual e responsabilidade pessoal"
+  ...jogo
+  plataforma: "Nintendo"
 }
 ---
-{"nome":"Existencialismo","conceito":"A existência precede a essência","perspectiva":"Foco na liberdade individual e responsabilidade pessoal"}
+{"nome":"The Legend of Zelda","gênero":"Aventura","plataforma":"Nintendo"}
 ```
 
 ### Propriedade calculada em objeto
@@ -510,15 +510,15 @@ filosofia = {
 Propriedades calculadas permitem definir chaves dinamicamente em um objeto, com base em expressões.
 
 ```
-chave = "dinâmica"
+chave = "personagem"
 
 objeto = {
-  [chave]: "valor associado"
+  [chave]: "Mario"
 }
 
-objeto["dinâmica"]
+objeto["personagem"]
 ---
-"valor associado"
+"Mario"
 ```
 
 ## Função
@@ -572,11 +572,11 @@ dentro_intervalo(15 1 10)
 Esta função recebe dois textos e os combina em uma única string.
 
 ```
-concatena = texto1 texto2 => `${texto1} ${texto2}`
+nome_completo = personagem universo => `${personagem} de ${universo}`
 
-concatena("Olá" "mundo!")
+nome_completo("Geralt" "The Witcher")
 ---
-"Olá mundo!"
+"Geralt de The Witcher"
 ```
 
 ### Calcular a área de um retângulo
