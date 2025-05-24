@@ -240,7 +240,7 @@ const atributo = transformar(
 
 const lambda = transformar(
   seq(
-    símbolo("("),
+    opcional(símbolo("(")),
     opcional(
       vários(
         seq(
@@ -252,7 +252,7 @@ const lambda = transformar(
       ),
       []
     ),
-    símbolo(")"),
+    opcional(símbolo(")")),
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),

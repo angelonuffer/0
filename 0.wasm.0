@@ -1,6 +1,6 @@
-achatar = (lista) => lista[.] == 1 ? lista[0] : [...lista[0] ...achatar(lista[1:])]
+achatar = lista => lista[.] == 1 ? lista[0] : [...lista[0] ...achatar(lista[1:])]
 
-mapear = (lista mapeador) => lista[.] == 1 ? [mapeador(lista[0])] : achatar([
+mapear = lista mapeador => lista[.] == 1 ? [mapeador(lista[0])] : achatar([
   mapear([lista[0]] mapeador)
   mapear(lista[1:] mapeador)
 ])
@@ -8,13 +8,13 @@ mapear = (lista mapeador) => lista[.] == 1 ? [mapeador(lista[0])] : achatar([
 wasm = [0 97 115 109]
 versão = [1 0 0 0]
 
-sequência = (itens) => [itens[.] ...itens]
+sequência = itens => [itens[.] ...itens]
 
-seção = (id bytes) => [id ...sequência(bytes)]
+seção = id bytes => [id ...sequência(bytes)]
 
-seção_tipos = (itens) => seção(1 [itens[.] ...achatar(itens)])
+seção_tipos = itens => seção(1 [itens[.] ...achatar(itens)])
 
-tipo_função = (parâmetros retornos) => [
+tipo_função = parâmetros retornos => [
   96
   ...sequência(parâmetros)
   ...sequência(retornos)
@@ -25,12 +25,12 @@ inteiro_64 = 126
 real_32 = 125
 real_64 = 124
 
-seção_importação = (importações) => seção(2 [
+seção_importação = importações => seção(2 [
   importações[.]
   ...achatar(importações)
 ])
 
-importar_memória = (nome_módulo nome_memória limite) => [
+importar_memória = nome_módulo nome_memória limite => [
   ...sequência(nome_módulo)
   ...sequência(nome_memória)
   2
@@ -38,140 +38,140 @@ importar_memória = (nome_módulo nome_memória limite) => [
   limite
 ]
 
-seção_funções = (itens) => seção(3 sequência(itens))
+seção_funções = itens => seção(3 sequência(itens))
 
-seção_exportação = (exportações) => seção(7 [exportações[.] ...achatar(exportações)])
+seção_exportação = exportações => seção(7 [exportações[.] ...achatar(exportações)])
 
-exportação_função = (nome índice) => [...sequência(nome) 0 índice]
+exportação_função = nome índice => [...sequência(nome) 0 índice]
 
-seção_código = (códigos) => seção(10 [
+seção_código = códigos => seção(10 [
   códigos[.]
   ...achatar(códigos)
 ])
 
-código = (locais corpo) => sequência([
+código = locais corpo => sequência([
   ...sequência(locais)
   ...achatar(corpo)
 ])
 
-fim = () => [11]
-retornar = () => [15]
-chamar = (índice) => [16 índice]
+fim = => [11]
+retornar = => [15]
+chamar = índice => [16 índice]
 
-obter_local = (i) => [32 i]
-definir_local = (i) => [33 i]
+obter_local = i => [32 i]
+definir_local = i => [33 i]
 
-carregar_inteiro_32 = (offset align) => [40 align offset]
-carregar_inteiro_64 = (offset align) => [41 align offset]
-carregar_real_32 = (offset align) => [42 align offset]
-carregar_real_64 = (offset align) => [43 align offset]
+carregar_inteiro_32 = offset align => [40 align offset]
+carregar_inteiro_64 = offset align => [41 align offset]
+carregar_real_32 = offset align => [42 align offset]
+carregar_real_64 = offset align => [43 align offset]
 
-carregar_8_inteiro_32 = (offset align) => [44 align offset]
-carregar_8_natural_32 = (offset align) => [45 align offset]
-carregar_16_inteiro_32 = (offset align) => [46 align offset]
-carregar_16_natural_32 = (offset align) => [47 align offset]
+carregar_8_inteiro_32 = offset align => [44 align offset]
+carregar_8_natural_32 = offset align => [45 align offset]
+carregar_16_inteiro_32 = offset align => [46 align offset]
+carregar_16_natural_32 = offset align => [47 align offset]
 
-carregar_8_inteiro_64 = (offset align) => [48 align offset]
-carregar_8_natural_64 = (offset align) => [49 align offset]
-carregar_16_inteiro_64 = (offset align) => [50 align offset]
-carregar_16_natural_64 = (offset align) => [51 align offset]
-carregar_32_inteiro_64 = (offset align) => [52 align offset]
-carregar_32_natural_64 = (offset align) => [53 align offset]
+carregar_8_inteiro_64 = offset align => [48 align offset]
+carregar_8_natural_64 = offset align => [49 align offset]
+carregar_16_inteiro_64 = offset align => [50 align offset]
+carregar_16_natural_64 = offset align => [51 align offset]
+carregar_32_inteiro_64 = offset align => [52 align offset]
+carregar_32_natural_64 = offset align => [53 align offset]
 
-armazenar_inteiro_32 = (offset align) => [54 align offset]
-armazenar_inteiro_64 = (offset align) => [55 align offset]
-armazenar_real_32 = (offset align) => [56 align offset]
-armazenar_real_64 = (offset align) => [57 align offset]
+armazenar_inteiro_32 = offset align => [54 align offset]
+armazenar_inteiro_64 = offset align => [55 align offset]
+armazenar_real_32 = offset align => [56 align offset]
+armazenar_real_64 = offset align => [57 align offset]
 
-armazenar_8_inteiro_32 = (offset align) => [58 align offset]
-armazenar_16_inteiro_32 = (offset align) => [59 align offset]
-armazenar_8_inteiro_64 = (offset align) => [60 align offset]
-armazenar_16_inteiro_64 = (offset align) => [61 align offset]
-armazenar_32_inteiro_64 = (offset align) => [62 align offset]
+armazenar_8_inteiro_32 = offset align => [58 align offset]
+armazenar_16_inteiro_32 = offset align => [59 align offset]
+armazenar_8_inteiro_64 = offset align => [60 align offset]
+armazenar_16_inteiro_64 = offset align => [61 align offset]
+armazenar_32_inteiro_64 = offset align => [62 align offset]
 
-constante_inteiro_32 = (número) => [65 número]
-constante_inteiro_64 = (número) => [66 número]
-constante_real_32 = (número) => [67 número]
-constante_real_64 = (número) => [68 número]
+constante_inteiro_32 = número => [65 número]
+constante_inteiro_64 = número => [66 número]
+constante_real_32 = número => [67 número]
+constante_real_64 = número => [68 número]
 
-igual_0_inteiro_32 = () => [69]
-igual_inteiro_32 = () => [70]
-diferente_inteiro_32 = () => [71]
-menor_que_inteiro_32 = () => [72]
-menor_que_natural_32 = () => [73]
-maior_que_inteiro_32 = () => [74]
-maior_que_natural_32 = () => [75]
-menor_ou_igual_inteiro_32 = () => [76]
-menor_ou_igual_natural_32 = () => [77]
-maior_ou_igual_inteiro_32 = () => [78]
-maior_ou_igual_natural_32 = () => [79]
+igual_0_inteiro_32 = => [69]
+igual_inteiro_32 = => [70]
+diferente_inteiro_32 = => [71]
+menor_que_inteiro_32 = => [72]
+menor_que_natural_32 = => [73]
+maior_que_inteiro_32 = => [74]
+maior_que_natural_32 = => [75]
+menor_ou_igual_inteiro_32 = => [76]
+menor_ou_igual_natural_32 = => [77]
+maior_ou_igual_inteiro_32 = => [78]
+maior_ou_igual_natural_32 = => [79]
 
-igual_0_inteiro_64 = () => [80]
-igual_inteiro_64 = () => [81]
-diferente_inteiro_64 = () => [82]
-menor_que_inteiro_64 = () => [83]
-menor_que_natural_64 = () => [84]
-maior_que_inteiro_64 = () => [85]
-maior_que_natural_64 = () => [86]
-menor_ou_igual_inteiro_64 = () => [87]
-menor_ou_igual_natural_64 = () => [88]
-maior_ou_igual_inteiro_64 = () => [89]
-maior_ou_igual_natural_64 = () => [90]
+igual_0_inteiro_64 = => [80]
+igual_inteiro_64 = => [81]
+diferente_inteiro_64 = => [82]
+menor_que_inteiro_64 = => [83]
+menor_que_natural_64 = => [84]
+maior_que_inteiro_64 = => [85]
+maior_que_natural_64 = => [86]
+menor_ou_igual_inteiro_64 = => [87]
+menor_ou_igual_natural_64 = => [88]
+maior_ou_igual_inteiro_64 = => [89]
+maior_ou_igual_natural_64 = => [90]
 
-igual_real_32 = () => [91]
-diferente_real_32 = () => [92]
-menor_que_real_32 = () => [93]
-maior_que_real_32 = () => [94]
-menor_ou_igual_real_32 = () => [95]
-maior_ou_igual_real_32 = () => [96]
+igual_real_32 = => [91]
+diferente_real_32 = => [92]
+menor_que_real_32 = => [93]
+maior_que_real_32 = => [94]
+menor_ou_igual_real_32 = => [95]
+maior_ou_igual_real_32 = => [96]
 
-igual_real_64 = () => [97]
-diferente_real_64 = () => [98]
-menor_que_real_64 = () => [99]
-maior_que_real_64 = () => [100]
-menor_ou_igual_real_64 = () => [101]
-maior_ou_igual_real_64 = () => [102]
+igual_real_64 = => [97]
+diferente_real_64 = => [98]
+menor_que_real_64 = => [99]
+maior_que_real_64 = => [100]
+menor_ou_igual_real_64 = => [101]
+maior_ou_igual_real_64 = => [102]
 
-adicionar_inteiro_32 = () => [106]
-subtrair_inteiro_32 = () => [107]
-multiplicar_inteiro_32 = () => [108]
-dividir_inteiro_32 = () => [109]
-dividir_natural_32 = () => [110]
+adicionar_inteiro_32 = => [106]
+subtrair_inteiro_32 = => [107]
+multiplicar_inteiro_32 = => [108]
+dividir_inteiro_32 = => [109]
+dividir_natural_32 = => [110]
 
-adicionar_inteiro_64 = () => [124]
-subtrair_inteiro_64 = () => [125]
-multiplicar_inteiro_64 = () => [126]
-dividir_inteiro_64 = () => [127]
-dividir_natural_64 = () => [128]
+adicionar_inteiro_64 = => [124]
+subtrair_inteiro_64 = => [125]
+multiplicar_inteiro_64 = => [126]
+dividir_inteiro_64 = => [127]
+dividir_natural_64 = => [128]
 
-adicionar_real_32 = () => [146]
-subtrair_real_32 = () => [147]
-multiplicar_real_32 = () => [148]
-dividir_real_32 = () => [149]
+adicionar_real_32 = => [146]
+subtrair_real_32 = => [147]
+multiplicar_real_32 = => [148]
+dividir_real_32 = => [149]
 
-adicionar_real_64 = () => [160]
-subtrair_real_64 = () => [161]
-multiplicar_real_64 = () => [162]
-dividir_real_64 = () => [163]
+adicionar_real_64 = => [160]
+subtrair_real_64 = => [161]
+multiplicar_real_64 = => [162]
+dividir_real_64 = => [163]
 
-declaração_tipos_funções = (funções) => funções[.] == 2 ? [
+declaração_tipos_funções = funções => funções[.] == 2 ? [
   tipo_função(
-    mapear(funções[0] () => inteiro_32)
-    mapear(funções[1] () => inteiro_32)
+    mapear(funções[0] => inteiro_32)
+    mapear(funções[1] => inteiro_32)
   )
 ] : achatar([
   declaração_tipos_funções(funções[0:2])
   declaração_tipos_funções(funções[2:])
 ])
 
-tipos_funções = (funções) => funções[.] == 2 ? [0] : [
+tipos_funções = funções => funções[.] == 2 ? [0] : [
   ...tipos_funções(funções[2:])
   funções[.] - 1
 ]
 
-códigos_funções = (funções) => funções[.] == 2 ? [
+códigos_funções = funções => funções[.] == 2 ? [
   código([] [
-    ...achatar(mapear(funções[1] (função) => função({
+    ...achatar(mapear(funções[1] função => função({
       [funções[0][0]]: 0
     })))
     fim()
@@ -181,7 +181,7 @@ códigos_funções = (funções) => funções[.] == 2 ? [
   códigos_funções(funções[2:])
 ])
 
-módulo = (funções) => achatar([
+módulo = funções => achatar([
   wasm
   versão
   seção_tipos(declaração_tipos_funções(funções))
@@ -195,16 +195,16 @@ módulo = (funções) => achatar([
   seção_código(códigos_funções(funções))
 ])
 
-fatiar = (sequência i) => [
+fatiar = sequência i => [
   constante_inteiro_32(sequência + i + 4)
   carregar_8_natural_32(0 0)
 ]
 
-número = (valor) => [
+número = valor => [
   constante_inteiro_32(valor)
 ]
 
-subtrair = (valores) => [
+subtrair = valores => [
   ...valores[0]
   ...valores[1]
   subtrair_inteiro_32()
@@ -212,10 +212,10 @@ subtrair = (valores) => [
 
 módulo([
   ["código"] [
-    (escopo) => subtrair([
-      fatiar(escopo.código 0)
+    _ => subtrair([
+      fatiar(_.código 0)
       número(48)
     ])
-    (escopo) => fatiar(escopo.código 0)
+    _ => fatiar(_.código 0)
   ]
 ])
