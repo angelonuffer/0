@@ -108,27 +108,19 @@ const valor_constante = transformar(
 
 const fatia = transformar(
   seq(
-    nome,
-    vários(
-      seq(
-        símbolo("["),
-        código => expressão(código),
-        opcional(seq(
-          símbolo(":"),
-          opcional(código => expressão(código)),
-        ), []),
-        símbolo("]"),
-      )
-    ),
+    símbolo("["),
+    código => expressão(código),
+    opcional(seq(
+      símbolo(":"),
+      opcional(código => expressão(código)),
+    ), []),
+    símbolo("]"),
   ),
-  ([nome, fatias]) => escopo => {
-    return fatias.reduce((resultado, [ , índice1, [símbolo_fatia, índice2]]) => {
-      if (índice2 === undefined) {
-        if (símbolo_fatia === ":") return resultado.slice(índice1(escopo));
-        return resultado[índice1(escopo)];
-      }
-      return resultado.slice(índice1(escopo), índice2(escopo));
-    }, escopo[nome]);
+  ([, i, [, j]]) => (escopo, valor) => {
+    if (j === undefined) {
+      return valor[i(escopo)];
+    }
+    return valor.slice(i(escopo), j(escopo));
   },
 );
 
@@ -158,11 +150,8 @@ const modelo = transformar(
 )
 
 const tamanho = transformar(
-  seq(
-    nome,
-    símbolo("[.]"),
-  ),
-  ([nome]) => escopo => escopo[nome].length,
+  símbolo("[.]"),
+  () => (escopo, valor) => valor.length,
 );
 
 const lista = transformar(
@@ -231,11 +220,10 @@ const objeto = transformar(
 
 const atributo = transformar(
   seq(
-    nome,
     símbolo("."),
     nome,
   ),
-  ([objeto, , atributo]) => escopo => escopo[objeto][atributo],
+  ([, atributo]) => (escopo, objeto) => objeto[atributo],
 );
 
 const lambda = transformar(
@@ -269,7 +257,6 @@ const lambda = transformar(
 
 const chamada_função = transformar(
   seq(
-    nome,
     símbolo("("),
     opcional(espaço),
     opcional(
@@ -286,7 +273,7 @@ const chamada_função = transformar(
     opcional(espaço),
     símbolo(")"),
   ),
-  ([nome, , , args]) => escopo => escopo[nome](escopo, ...args.map(arg => arg[0](escopo))),
+  ([, , args]) => (escopo, função) => função(escopo, ...args.map(arg => arg[0](escopo))),
 );
 
 const parênteses = transformar(
@@ -311,40 +298,61 @@ const parênteses = transformar(
   }
 );
 
-const termo1 = alt(
+const termo1 = transformar(
+  seq(
+    alt(
+      valor_constante,
+      parênteses,
+    ),
+    opcional(espaço),
+    vários(
+      alt(
+        fatia,
+        tamanho,
+        atributo,
+        chamada_função,
+      ),
+    ),
+  ),
+  ([valor, , operações]) => escopo => {
+    return operações.reduce(
+      (resultado, operação) => operação(escopo, resultado),
+      valor(escopo)
+    );
+  }
+);
+
+const termo2 = alt(
+  termo1,
   número,
   não,
   texto,
-  fatia,
   modelo,
-  tamanho,
   lista,
   objeto,
-  atributo,
   lambda,
-  chamada_função,
   valor_constante,
   parênteses,
 )
 
-const termo2 = operação(
-  termo1,
+const termo3 = operação(
+  termo2,
   alt(
     operador("*", (v1, v2) => v1 * v2),
     operador("/", (v1, v2) => v1 / v2),
   ),
 )
 
-const termo3 = operação(
-  termo2,
+const termo4 = operação(
+  termo3,
   alt(
     operador("+", (v1, v2) => v1 + v2),
     operador("-", (v1, v2) => v1 - v2),
   ),
 );
 
-const termo4 = operação(
-  termo3,
+const termo5 = operação(
+  termo4,
   alt(
     operador(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
     operador("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
@@ -355,9 +363,9 @@ const termo4 = operação(
   ),
 );
 
-const termo5 = transformar(
+const termo6 = transformar(
   seq(
-    termo4,
+    termo5,
     opcional(seq(
       opcional(espaço),
       símbolo("?"),
@@ -377,7 +385,7 @@ const termo5 = transformar(
 );
 
 const expressão = operação(
-  termo5,
+  termo6,
   alt(
     operador("&", (v1, v2) => v1 !== 0 ? v2 : 0),
     operador("|", (v1, v2) => v1 !== 0 ? v1 : v2),

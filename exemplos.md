@@ -629,6 +629,24 @@ maior(2 9)
 
 Esses exemplos mostram como funções com múltiplos parâmetros podem ser usadas para resolver problemas variados de forma simples e eficiente.
 
+## Funções dentro de listas
+
+Na linguagem 0, é possível armazenar funções dentro de listas e chamá-las diretamente pelo índice. Isso permite criar coleções de comportamentos ou ações.
+
+```
+iniciais = [
+  () => "Bulbasaur"
+  () => "Charmander"
+  () => "Squirtle"
+]
+
+iniciais[1]()
+---
+"Charmander"
+```
+
+Neste exemplo, a lista `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar `()`, executamos essa função e obtemos o resultado.
+
 ## Comentários
 
 Na linguagem 0, comentários podem ser adicionados ao código usando `//`. Eles são ignorados durante a execução e servem para documentar ou explicar partes do código.
