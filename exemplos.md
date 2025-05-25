@@ -396,7 +396,7 @@ Exemplo:
 ```
 frase = "Que a força esteja com você."
 
-frase[0]
+frase[0:1]
 ---
 "Q"
 ```
@@ -440,6 +440,39 @@ frase[.]
 ---
 17
 ```
+
+## Conversão entre caractere e número
+Na linguagem 0, é possível converter um caractere para seu valor numérico (código Unicode) e vice-versa de forma simples.
+
+### Converter caractere em número
+
+Para obter o valor numérico de um caractere, basta acessar o índice `[0]` do texto:
+
+```
+caractere = "A"
+
+caractere[0]
+---
+65
+```
+
+Neste exemplo, `"A"` é convertido para seu código numérico `65`.
+
+### Converter número em caractere
+
+Para obter o caractere correspondente a um valor numérico, basta incluir o número em um modelo de texto:
+
+```
+codigo = 65
+
+`${codigo}`
+---
+"A"
+```
+
+Neste exemplo, `65` é convertido para o caractere `"A"`.
+
+Essas técnicas permitem manipular facilmente caracteres e seus códigos numéricos na linguagem 0.
 
 ## Tipo lista
 

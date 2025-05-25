@@ -119,6 +119,7 @@ const fatia = transformar(
   ([, i, [faixa, j]]) => (escopo, valor) => {
     if (j !== undefined) return valor.slice(i(escopo), j(escopo))
     if (faixa !== undefined) return valor.slice(i(escopo))
+    if (typeof valor === "string") return valor.charCodeAt(i(escopo));
     return valor[i(escopo)];
   },
 );
@@ -145,7 +146,11 @@ const modelo = transformar(
     ),
     símbolo("`"),
   ),
-  ([, conteúdo,]) => escopo => conteúdo.map(v => v(escopo)).join(""),
+  ([, conteúdo,]) => escopo => conteúdo.map(valor => {
+    const valor2 = valor(escopo);
+    if (typeof valor2 === "number") return String.fromCharCode(valor2);
+    return valor2
+  }).join(""),
 )
 
 const tamanho = transformar(
