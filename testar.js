@@ -188,6 +188,161 @@ async function runTests(testCasesToRun, allTestCases) {
   return { passedCount, failedCount, errorCount };
 }
 
+const errorTestCases = [
+  {
+    code: "a = 5 + ;",
+    // In `símbolo` and `regex`, the `found` part is `código.slice(0, 20).split(/\s/)[0]`
+    // For `expressão` -> `termo6` -> `termo5` -> `termo4` -> `termo3` -> `termo2` -> `número` (which is `regex(/\d+/)`)
+    // If `+` is followed by `;`, `stripLeadingWhitespaceAndComments` will process `+ ;` to `+;`
+    // Then `número` (via `regex`) will be called on code starting with `;`.
+    // `regex(/\d+/)` will fail. `found` will be `;`.
+    // So the message should be "Expected regex '\d+' but found ';...'"
+    expectedError: /Syntax Error: Expected regex '\d+' but found ';\.\.\.'/
+  },
+  {
+    code: "print(;",
+    // `parênteses` calls `símbolo(")")`.
+    // Code passed to `símbolo(")")` will be `;`. `stripLeadingWhitespaceAndComments` does nothing.
+    // `símbolo` will try to match `)` but find `;`.
+    // `found` will be `;`.
+    // Message: "Expected token ')' but found ';...'"
+    expectedError: /Syntax Error: Expected token '\)' but found ';\.\.\.'/
+  },
+  {
+    code: "let x = 10 y = 20", // Missing semicolon or operator between expressions (assuming simple top-level parsing)
+    // This depends on how the top-level `expressão` or `declarações_constantes` is structured.
+    // If `declarações_constantes` expects a separator or end, and finds `y` after `10`.
+    // Or if `expressão` after `10` tries to parse `y` as an operator.
+    // `operaçõesSequenciais` in `operação` for `termo4` (for `+`, `-`) or `termo3` (`*`, `/`)
+    // It would try `operadores` then `termo`. If `y` is not a valid operator.
+    // `alt(operador("+",...), operador("-",...))`
+    // `símbolo("+")` on `y` fails. `símbolo("-")` on `y` fails.
+    // `alt` returns the error from the last parser, so `Expected token '-' but found 'y...'`
+    // This assumes `y` is not stripped. `stripLeadingWhitespaceAndComments("y = 20")` is "y = 20".
+    // The `expressão` is `operação(termo6, alt(operador("&"), operador("|")))`.
+    // After `10`, the `opcional(vários(seq(operadores,termo)))` in `operação` for `termo4` (for `+`)
+    // will try `operadores` which is `alt(operador("+",...), operador("-",...))`.
+    // `símbolo("+")` on "y = 20" fails: "Expected token '+' but found 'y...'"
+    // `símbolo("-")` on "y = 20" fails: "Expected token '-' but found 'y...'"
+    // `alt` returns the last error: "Expected token '-' but found 'y...'"
+    expectedError: /Syntax Error: Expected token '-' but found 'y\.\.\.'/
+  },
+  {
+    code: "{a:1 b:2}", // Missing comma in object literal
+    // `objeto` parser: `vários(alt(seq(key,símbolo(":"),expr,opcional(símbolo(","))), seq(símbolo("..."),expr,opcional(símbolo(",")))))`
+    // After `a:1`, it expects `opcional(símbolo(","))`. If comma is not there, this optional parser succeeds with `""`.
+    // Then `vários` tries another iteration. It attempts `alt(...)`.
+    // It tries `seq(key, símbolo(":"), expr, opcional(símbolo(",")))`.
+    // `key` (`alt(nome, seq(símbolo("["),...))`) will parse `b`.
+    // Then `símbolo(":")` is attempted on code starting with `b:2` (after `b` is consumed). No, `nome` consumes `b`. Code is `:2}`.
+    // `símbolo(":")` on `:2}` succeeds. Code is `2}`.
+    // `expressão` on `2}` succeeds (parses `2`). Code is `}`.
+    // `opcional(símbolo(","))` on `}`. `símbolo(",")` fails: "Expected token ',' but found '}...'"
+    // `opcional` returns `""` and original code `}`. This is fine.
+    // The issue is that `vários` should have stopped if the main parser inside it failed before `opcional(símbolo(","))`.
+    // The current `vários` logic: `if (valor === null) return [null, código];`
+    // If `alt(...)` inside `vários` returns `[null, código_com_b_ainda]` because `símbolo(",")` was expected by a `seq` and failed.
+    // `seq` for `key, ":", expr, opcional(",")`: if `opcional(",")` fails it's not an error from `opcional` itself.
+    // The problem is that `b:2` is parsed as a valid entry.
+    // The structure is `símbolo("{"), opcional(vários(alt(SEQ_KV, SEQ_SPREAD))), símbolo("}")`.
+    // `SEQ_KV` is `seq(KEY, símbolo(":"), VAL, opcional(símbolo(",")))`.
+    // For `{a:1 b:2}`:
+    // `a:1` is parsed by `SEQ_KV`. `opcional(símbolo(","))` gets code ` b:2}`. `símbolo(",")` fails. `opcional` returns `""`, code ` b:2}`.
+    // `SEQ_KV` for `a:1` returns `[["a",":",1,""], " b:2}"]`.
+    // `vários` gets this. Then it calls `alt(SEQ_KV, SEQ_SPREAD)` on ` b:2}`.
+    // `SEQ_KV` on ` b:2}`:
+    //   `KEY` parses `b`. Code is `:2}`.
+    //   `símbolo(":")` parses `:`. Code is `2}`.
+    //   `VAL` parses `2`. Code is `}`.
+    //   `opcional(símbolo(","))` gets code `}`. `símbolo(",")` fails. `opcional` returns `""`, code `}`.
+    // `SEQ_KV` for `b:2` returns `[["b",":",2,""], "}`]`.
+    // `vários` gets this. Then it calls `alt(SEQ_KV, SEQ_SPREAD)` on `}`.
+    // `alt` fails. `SEQ_KV` fails (e.g. `KEY` fails on `}`). `SEQ_SPREAD` fails. `alt` returns an error.
+    // `vários` receives `[error, código_original_para_vários_que_era_}]`.
+    // This error from `vários` then propagates.
+    // Error from `KEY` (which is `alt(nome, seq(símbolo("["),...))`) when parsing `}`:
+    //   `nome` (regex) on `}` fails: "Expected regex '[a-zA-ZÀ-ÿ_][a-zA-ZÀ-ÿ0-9_]*' but found '}...'"
+    //   `seq(símbolo("["),...)` on `}` fails. `símbolo("[")` on `}`: "Expected token '[' but found '}...'"
+    // `alt` for `KEY` returns the last error: "Expected token '[' but found '}...'"
+    expectedError: /Syntax Error: Expected token '\[' but found '}\.\.\.'/
+  },
+];
+
+async function runErrorTests(testCases) {
+  if (!testCases || testCases.length === 0) {
+    console.log("No error test cases provided.");
+    return { passedCount: 0, failedCount: 0 };
+  }
+  let passedCount = 0;
+  let failedCount = 0;
+  const totalToRun = testCases.length;
+
+  console.log(`\nRunning ${totalToRun} error message test case(s)...`);
+
+  for (let i = 0; i < totalToRun; i++) {
+    const tc = testCases[i];
+    process.stdout.write(`Error Test ${i + 1}/${totalToRun} (${tc.code.substring(0, 30).replace(/\n/g, "\\n")}...): `);
+
+    try {
+      const executionResult = await _0(tc.code); // _0 is already async or returns promise from transform
+
+      if (executionResult && executionResult[0] && executionResult[0].error === true) {
+        const errorMessage = executionResult[0].message;
+        let match = false;
+        if (tc.expectedError instanceof RegExp) {
+          match = tc.expectedError.test(errorMessage);
+        } else {
+          match = errorMessage === tc.expectedError;
+        }
+
+        if (match) {
+          process.stdout.write("PASS\n");
+          passedCount++;
+        } else {
+          process.stdout.write("FAIL\n");
+          failedCount++;
+          console.log("  --- Code ---");
+          console.log(tc.code);
+          console.log("  --- Expected Error Pattern ---");
+          console.log(String(tc.expectedError));
+          console.log("  --- Actual Error Message ---");
+          console.log(errorMessage);
+          console.log("  --- Full Error Object ---");
+          console.log(JSON.stringify(executionResult[0], null, 2));
+          console.log("  -------------------------");
+        }
+      } else {
+        process.stdout.write("FAIL (No error reported)\n");
+        failedCount++;
+        console.log("  --- Code ---");
+        console.log(tc.code);
+        console.log("  --- Expected Error Pattern ---");
+        console.log(String(tc.expectedError));
+        console.log("  --- Actual Result (No error object) ---");
+        console.log(JSON.stringify(executionResult, null, 2));
+        console.log("  -------------------------");
+      }
+    } catch (e) {
+      // This catch block is for unexpected errors in the test runner or _0 itself,
+      // not for the expected parsing errors.
+      process.stdout.write("ERROR (Test runner exception)\n");
+      failedCount++;
+      console.error("  Exception during error test execution:", e.message);
+      console.log("  --- Code ---");
+      console.log(tc.code);
+      console.log("  -------------------------");
+    }
+  }
+
+  console.log(`\n--- Error Test Summary ---`);
+  console.log(`Total Error Tests: ${totalToRun}`);
+  console.log(`Passed: ${passedCount}`);
+  console.log(`Failed: ${failedCount}`);
+  console.log(`--------------------------`);
+  return { passedCount, failedCount };
+}
+
+
 function displayHelp() {
   console.log(`
 Usage: ./testar.js [options] [test_index]
@@ -255,6 +410,10 @@ async function main() {
   }
 
   await runTests(testsToExecute, allTestCases);
+
+  // Run error tests every time, regardless of other arguments for now
+  // TODO: Consider if error tests should also be selectable by index or a flag
+  await runErrorTests(errorTestCases);
 }
 
 main().catch(error => {

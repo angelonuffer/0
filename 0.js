@@ -20,12 +20,30 @@ function stripLeadingWhitespaceAndComments(código) {
 }
 
 const alt = (...analisadores) => {
-  if (analisadores.length === 0) return código => [null, código];
-  const próximo_alt = alt(...analisadores.slice(1));
+  if (analisadores.length === 0) return código => [null, código]; // Should not happen with new errors
   return código => {
-    const [valor, resto] = analisadores[0](código);
-    if (valor === null) return próximo_alt(código);
-    return [valor, resto];
+    let lastError = null;
+    for (const analisador of analisadores) {
+      const [valor, resto] = analisador(código);
+      if (valor && valor.error) {
+        lastError = [valor, resto]; // Keep the error object and original code
+        // Continue to allow other parsers to try, last error will be from the "most specific" or last attempted parse
+      } else if (valor !== null) {
+        return [valor, resto]; // Success
+      } else {
+        // This case handles the [null, code] return for non-matching optional, which is not an error.
+        // However, if all parsers return this, it's effectively a "no match" scenario.
+        // We need a way to distinguish this from a hard error.
+        // For now, if a specific error object was captured, that takes precedence.
+        // If all return [null, code] (e.g. all are optional and none match), then alt should also return [null, code]
+        // to indicate no match without it being a syntax error.
+        // If lastError is null here, it means the parser returned [null, code]
+        if (!lastError) {
+          lastError = [null, código]; // Default to a generic non-match if no specific error was set
+        }
+      }
+    }
+    return lastError || [null, código]; // Return last captured error, or generic non-match
   };
 }
 
@@ -33,13 +51,25 @@ const seq = (...analisadores) => {
   if (analisadores.length === 0) {
     return código => [[], código];
   }
-  const próximo_seq = seq(...analisadores.slice(1));
   return código => {
-    const [valor, resto] = analisadores[0](código);
-    if (valor === null) return [null, código];
-    const [valor2, resto2] = próximo_seq(resto);
-    if (valor2 === null) return [null, código];
-    return [[valor, ...valor2], resto2];
+    const resultados = [];
+    let código_atual = código;
+    for (const analisador of analisadores) {
+      const [valor, resto] = analisador(código_atual);
+      if (valor && valor.error) {
+        return [valor, código]; // Propagate error immediately, return original code
+      }
+      if (valor === null) {
+        // This indicates a non-match, which in a sequence is an error unless handled by optional.
+        // For simplicity, let's assume seq expects all its components to match.
+        // A more robust system might need to differentiate between "expected non-match" (optional) and "unexpected non-match".
+        // For now, treat as a generic failure if no specific error object was returned by the failing parser.
+        return [{ error: true, message: "Sequence component failed to match", code: código_atual }, código];
+      }
+      resultados.push(valor);
+      código_atual = resto;
+    }
+    return [resultados, código_atual];
   };
 }
 
@@ -52,7 +82,9 @@ const símbolo = valor_símbolo => código_original => {
     const código = stripLeadingWhitespaceAndComments(código_original);
     // Ensure original `símbolo` logic is correctly called
     if (código.startsWith(valor_símbolo)) return [valor_símbolo, código.slice(valor_símbolo.length)];
-    return [null, código]; // Return the stripped code on failure to match token
+    // Return an error object on failure to match token
+    const found = código.slice(0, 20).split(/\s/)[0]; // Show what was found instead
+    return [{ error: true, message: `Expected token '${valor_símbolo}' but found '${found}...'`, code: código }, código_original];
 };
 
 const regex_original = código_input => regex_val => { // Keep original logic for easy wrapping
@@ -66,7 +98,9 @@ const regex = valor_regex => código_original => {
     // Ensure original `regex` logic is correctly called
     const match = código.match(valor_regex);
     if (match && match.index === 0) return [match[0], código.slice(match[0].length)];
-    return [null, código]; // Return the stripped code on failure to match token
+    // Return an error object on failure to match token
+    const found = código.slice(0, 20).split(/\s/)[0]; // Show what was found instead
+    return [{ error: true, message: `Expected regex '${valor_regex}' but found '${found}...'`, code: código }, código_original];
 };
 
 const opcional = (analisador, valor_padrão) => código => {
@@ -438,39 +472,243 @@ const _0 = transformar(
       ),
     ), []),
     opcional(declarações_constantes, []), // Removed ignorar_comentários
-    expressão,
+    expressão, // This is the main parser for the body of the code
   ),
-  async ([importações, carregamentos, atribuições, valor_final_expr_fn]) => {
+  // The 'transformador' function for the main _0 parser
+  (código_original_para_erro) => async ([importações, carregamentos, atribuições, valor_ou_erro_expr]) => {
+    // valor_ou_erro_expr is the direct result from the `expressão` parser.
+    // It can be either the function to execute (on success) or an error object.
+
+    // Handle parsing error for the main expression before doing any async work
+    if (valor_ou_erro_expr && valor_ou_erro_expr.error) {
+      // If `expressão` returned an error, valor_ou_erro_expr is the error object.
+      // The 'resto' part for _0 would be the original code because the top-level seq's transform is involved.
+      return [{
+        error: true,
+        message: `Syntax Error: ${valor_ou_erro_expr.message}`,
+        details: valor_ou_erro_expr
+      }, código_original_para_erro]; // Return the original code passed to _0
+    }
+
+    // If no error in the main expression, valor_ou_erro_expr is valor_final_expr_fn
+    const valor_final_expr_fn = valor_ou_erro_expr;
+
     const escopo_inicial = Object.fromEntries(await Promise.all([
       ...importações.map(async importação_item => {
-        // importação_item from vários(seq(nome, símbolo("#"), endereço))
-        // seq(nome, "#", endereço) produces [nome_str, "#", endereço_str]
-        const [nome_str, , endereço_str] = importação_item[0]; // importação_item is [ [nome,tok,endr] ] due to outer seq in _0's vários
+        const [nome_str, , endereço_str] = importação_item[0];
         const modulo_conteudo_bruto = await (await fetch(endereço_str)).text();
-        const modulo_valor_parse_resultado = _0(modulo_conteudo_bruto); // Retorna [Promise | null, String]
-        if (!modulo_valor_parse_resultado || modulo_valor_parse_resultado[0] === null) {
-            throw new Error(`Falha ao importar módulo: ${nome_str} de ${endereço_str}`);
+        const [resultado_parse_modulo, ] = _0(modulo_conteudo_bruto); // _0 itself returns [result, remaining_code]
+
+        // Check if the result of parsing the module is an error object
+        if (resultado_parse_modulo && resultado_parse_modulo.error) {
+          throw new Error(`Falha ao parsear módulo: ${nome_str} de ${endereço_str}. Erro: ${resultado_parse_modulo.message}`);
         }
-        const modulo_promessa = modulo_valor_parse_resultado[0];
-        return [nome_str, await modulo_promessa];
+        // Also handle the case where _0 might return null or not an error, but still failed (legacy or unexpected)
+        if (!resultado_parse_modulo) {
+             throw new Error(`Falha ao importar módulo (resultado nulo): ${nome_str} de ${endereço_str}`);
+        }
+        // Assuming `resultado_parse_modulo` is the promise containing the module's value if not an error
+        return [nome_str, await resultado_parse_modulo];
       }),
       ...carregamentos.map(async carregamento_item => {
-        // carregamento_item from vários(seq(nome, símbolo("@"), endereço))
-        // seq(nome, "@", endereço) produces [nome_str, "@", endereço_str]
-        const [nome_str, , endereço_str] = carregamento_item[0]; // carregamento_item is [ [nome,tok,endr] ]
+        const [nome_str, , endereço_str] = carregamento_item[0];
         return [nome_str, await (await fetch(endereço_str)).text()];
       }),
     ]));
 
     const escopo_com_atribuições = atribuições.reduce((escopo_atual, atribuição_item) => {
-      // atribuição_item from vários(seq(nome, símbolo("="), expressão))
-      // seq(nome, "=", expressão) produces [nome_str, "=", expressão_fn]
+      const [nome_str, , expressão_fn] = atribuição_item;
+      // What if expressão_fn itself is an error from a failed parse in declarações_constantes?
+      // The current structure of `declarações_constantes` using `vários(seq(...))` would mean
+      // an error in one constant declaration would make `declarações_constantes` return an error.
+      // This error would then be caught by the top-level `seq` in `_0`, and then by the check above.
+      // So, `expressão_fn` here should be a valid function if we've passed the error check.
+      return { ...escopo_atual, [nome_str]: expressão_fn(escopo_atual) };
+    }, escopo_inicial);
+
+    // If valor_final_expr_fn was not an error, it's the function to execute.
+    // The result of this function is the final value of the script.
+    // This is wrapped in a Promise by the async nature of this transform.
+    return valor_final_expr_fn(escopo_com_atribuições);
+  },
+);
+
+// Need to adjust how _0 is called/defined due to the new transform function signature
+// The `transformar` function expects `(analisador, transformador)`
+// The `transformador` is `código => { const [valor, resto] = analisador(código); ... }`
+// Our new `async ([importações...])` function is the core logic.
+// It needs to be wrapped to match the signature `transformador(valor)` where `valor` is `[importações, carregamentos, atribuições, valor_ou_erro_expr]`
+// And this wrapper also needs access to the original code for error reporting.
+
+// Let's redefine _0 slightly.
+// The `seq(...)` is the `analisador`.
+// The second argument to `transformar` needs to be a function that takes the output of `seq`
+// and the original code.
+const analisador_principal = seq(
+  opcional(vários(
+    seq(
+      seq(
+        nome,
+        símbolo("#"),
+        endereço,
+      ),
+    ),
+  ), []),
+  opcional(vários(
+    seq(
+      seq(
+        nome,
+        símbolo("@"),
+        endereço,
+      ),
+    ),
+  ), []),
+  opcional(declarações_constantes, []),
+  expressão,
+);
+
+const transformador_principal = (código_original_input) => async ([importações, carregamentos, atribuições, valor_ou_erro_expr]) => {
+  if (valor_ou_erro_expr && valor_ou_erro_expr.error) {
+    return [{
+      error: true,
+      message: `Syntax Error: ${valor_ou_erro_expr.message}`,
+      details: valor_ou_erro_expr
+    }, código_original_input];
+  }
+
+  const valor_final_expr_fn = valor_ou_erro_expr;
+
+  const escopo_inicial = Object.fromEntries(await Promise.all([
+    ...importações.map(async importação_item => {
+      const [nome_str, , endereço_str] = importação_item[0];
+      const modulo_conteudo_bruto = await (await fetch(endereço_str)).text();
+      // _0 now returns [ [value | errorObj, originalCode], remainingCodeAfter_0_finished ]
+      // We are interested in the first part of the first part.
+      const [resultado_parse_modulo_tupla, ] = _0(modulo_conteudo_bruto);
+      const resultado_parse_modulo = resultado_parse_modulo_tupla[0];
+
+
+      if (resultado_parse_modulo && resultado_parse_modulo.error) {
+        throw new Error(`Falha ao parsear módulo: ${nome_str} de ${endereço_str}. Erro: ${resultado_parse_modulo.message}`);
+      }
+      if (!resultado_parse_modulo && !(resultado_parse_modulo_tupla[0] && resultado_parse_modulo_tupla[0].error) ) { // check if it's not an error already
+           throw new Error(`Falha ao importar módulo (resultado nulo ou inválido): ${nome_str} de ${endereço_str}`);
+      }
+      return [nome_str, await resultado_parse_modulo]; // assuming it's a promise
+    }),
+    ...carregamentos.map(async carregamento_item => {
+      const [nome_str, , endereço_str] = carregamento_item[0];
+      return [nome_str, await (await fetch(endereço_str)).text()];
+    }),
+  ]));
+
+  const escopo_com_atribuições = atribuições.reduce((escopo_atual, atribuição_item) => {
+    const [nome_str, , expressão_fn] = atribuição_item;
+    return { ...escopo_atual, [nome_str]: expressão_fn(escopo_atual) };
+  }, escopo_inicial);
+
+  return valor_final_expr_fn(escopo_com_atribuições);
+};
+
+
+// _0 is a parser function: código_input => [resultado, código_restante]
+// transformar(analisador, transformador_fn) returns such a parser function.
+// The transformador_fn needs to be `valor_parseado => novo_valor_ou_promessa`
+// My current transformador_principal is (código_original_input) => async (valor_parseado) => ...
+// This is not quite right for transformar.
+// transformar expects: (analisador, fn_que_recebe_valor_do_analisador)
+// The fn_que_recebe_valor_do_analisador returns the new "valor" part of the tuple.
+// The "resto" part is handled by transformar.
+
+// Let's simplify the transform logic within _0's definition directly.
+// The `transformar` itself provides the `código` to its transformation function if structured correctly.
+// No, `transformar`'s transform function only gets `valor`. It doesn't get `código`.
+// `transformar = (analisador, transformador) => código => { const [valor, resto] = analisador(código); ... return [transformador(valor), resto]; }`
+
+// This means if `valor_final_expr_fn` is an error, `transformar` will just put that error object as the `valor`
+// part of the `[valor, resto]` tuple. The `_0` function will then return `[errorObject, remainingCode]`.
+// This is ALMOST what we want for the main error handling.
+// The change needed is that the `_0`'s final result should be `[ { error: true, ...}, originalCode ]`
+// and not `[ errorFromParser, remainingCodeAfterError ]`
+
+// So, _0 cannot be just a `transformar(...)`. It needs to be a function that CALLS `transformar`
+// and then adjusts the result if it's an error.
+
+const _0_internal_parser = transformar(
+  analisador_principal, // seq(...) defined above
+  async ([importações, carregamentos, atribuições, valor_final_expr_fn_or_error]) => {
+    // This part is the "transformador" called by `transformar`.
+    // It receives the successful parse result of `analisador_principal`.
+    // If `valor_final_expr_fn_or_error` is an error object, it will be passed as is.
+
+    if (valor_final_expr_fn_or_error && valor_final_expr_fn_or_error.error) {
+      // Propagate the error object so it becomes the "valor" part of _0_internal_parser's result
+      return valor_final_expr_fn_or_error;
+    }
+
+    const valor_final_expr_fn = valor_final_expr_fn_or_error;
+
+    // ... (rest of the async logic for imports, scope, etc. as defined before)
+    const escopo_inicial = Object.fromEntries(await Promise.all([
+      ...importações.map(async importação_item => {
+        const [nome_str, , endereço_str] = importação_item[0];
+        const modulo_conteudo_bruto = await (await fetch(endereço_str)).text();
+        const [resultado_parse_modulo_tupla, ] = _0(modulo_conteudo_bruto); // Recursive call
+        const resultado_parse_modulo = resultado_parse_modulo_tupla[0]; // This is the actual value or error object
+
+        if (resultado_parse_modulo && resultado_parse_modulo.error) {
+          throw new Error(`Falha ao parsear módulo: ${nome_str} de ${endereço_str}. Erro: ${resultado_parse_modulo.message}`);
+        }
+        if (resultado_parse_modulo === null || (typeof resultado_parse_modulo === 'object' && !resultado_parse_modulo.error && !Object.keys(resultado_parse_modulo).length && Object.getPrototypeOf(resultado_parse_modulo) === Object.prototype) ) {
+           // Heuristic: if it's null, or an empty plain object that's not an error, it's likely a failed parse that didn't return a structured error.
+           // This condition tries to catch `[null, code]` or `[{}, code]` if _0 somehow returns that on failure.
+           // The `_0` function should ideally always return a value or a structured error.
+           // The `await resultado_parse_modulo` below might also fail if it's not a promise (e.g. if it's an error object already)
+           // This needs to be robust.
+           // If `resultado_parse_modulo` is an error object, `await` on it won't work.
+           // The structure of _0's return is `[value_or_error_promise, remaining_code]`
+           // So `resultado_parse_modulo_tupla[0]` is the promise or the error object.
+           // And `resultado_parse_modulo` is that promise/error object.
+           // If it's not an error, it should be a promise.
+            throw new Error(`Falha ao importar módulo (parse não retornou valor nem erro específico): ${nome_str} de ${endereço_str}`);
+        }
+        return [nome_str, await resultado_parse_modulo]; // await if it's a promise
+      }),
+      ...carregamentos.map(async carregamento_item => {
+        const [nome_str, , endereço_str] = carregamento_item[0];
+        return [nome_str, await (await fetch(endereço_str)).text()];
+      }),
+    ]));
+
+    const escopo_com_atribuições = atribuições.reduce((escopo_atual, atribuição_item) => {
       const [nome_str, , expressão_fn] = atribuição_item;
       return { ...escopo_atual, [nome_str]: expressão_fn(escopo_atual) };
     }, escopo_inicial);
 
-    return valor_final_expr_fn(escopo_com_atribuições);
-  },
+    return valor_final_expr_fn(escopo_com_atribuições); // This will be a Promise<actual_value>
+  }
 );
+
+// The actual _0 function that wraps _0_internal_parser to adjust error reporting format.
+const _0 = código_input => {
+  const [valor_parseado_ou_erro, código_restante] = _0_internal_parser(código_input);
+
+  if (valor_parseado_ou_erro && valor_parseado_ou_erro.error) {
+    // This is an error object from one of the parsers (símbolo, regex, seq failure, or explicitly from _0_internal_parser's transform)
+    return [ // This is the first element of the tuple _0 returns
+      {
+        error: true,
+        message: `Syntax Error: ${valor_parseado_ou_erro.message}`,
+        details: valor_parseado_ou_erro
+      },
+      código_input // The second element is the original input code
+    ];
+  }
+
+  // If not an error, valor_parseado_ou_erro is a Promise for the final value (due to async transform)
+  // or it could be a direct value if the transform was not async (but ours is).
+  return [valor_parseado_ou_erro, código_restante];
+};
+
 
 export default _0
