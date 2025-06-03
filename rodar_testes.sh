@@ -54,24 +54,39 @@ async function executarTestes() {
     const testFileContent = fs.readFileSync('$TEST_FILE', 'utf-8');
 
     // Executa o código de teste da Linguagem 0
-    // O resultado esperado é uma lista de objetos de teste
-    const evaluationResult = await _0(testFileContent);
+    const parseOutput = _0(testFileContent); // _0 (built with transformar) returns [Promise | null, String]
 
-    // O _0 pode retornar [resultado_real, resto_do_codigo]
-    // ou apenas o resultado_real se não houver 'resto'.
-    // Também, o resultado pode ser uma função que precisa ser chamada.
-    let rawResults = evaluationResult;
-    if (Array.isArray(evaluationResult) && evaluationResult.length > 0 && typeof evaluationResult[0] !== 'undefined') {
-        rawResults = evaluationResult[0];
+    if (!parseOutput || parseOutput[0] === null) {
+        console.error("Erro: Falha ao executar o código do arquivo de teste (parser interno retornou null).");
+        // parseOutput can be null if code is empty, or parseOutput[0] can be null if seq inside _0 failed.
+        // parseOutput[1] would be the remaining code.
+        process.exit(1);
     }
 
-    // Se o resultado for uma função (comum em 0.js), execute-a com um escopo vazio.
+    const promiseValue = parseOutput[0]; // This is the promise from the async transform function in _0
+    // parseOutput[1] is the remaining code string, should be empty if all parsed by _0's seq.
+
+    const evaluatedValue = await promiseValue; // This is the actual value from the async transform function.
+    console.log("DEBUG: evaluatedValue is Array?", Array.isArray(evaluatedValue));
+    console.log("DEBUG: evaluatedValue typeof", typeof evaluatedValue);
+    // console.log("DEBUG: evaluatedValue content", evaluatedValue); // Potentially verbose
+
+    // At this point, evaluatedValue is what uniteste.descrever(...) returned.
+    // This should be the array of test objects.
+    let rawResults = evaluatedValue;
+
+    // Se o resultado for uma função (comum em 0.js para módulos que exportam uma função principal),
+    // execute-a com um escopo vazio.
+    // No nosso caso, o transformador async em _0 já fez a chamada final (valor(escopo)),
+    // então rawResults deveria ser o valor final (a lista de testes).
+    // Manteremos a verificação por segurança ou se a estrutura do teste mudar.
     if (typeof rawResults === 'function') {
-        testResults = rawResults({});
+        testResults = await rawResults({});
     } else {
         testResults = rawResults;
     }
 
+    // testResults deveria ser agora a lista de objetos de teste.
     if (!Array.isArray(testResults)) {
       console.error("Resultado da execução dos testes não foi uma lista como esperado.");
       console.error("Recebido:", testResults);

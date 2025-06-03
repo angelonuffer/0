@@ -1,3 +1,24 @@
+function stripLeadingWhitespaceAndComments(código) {
+  let current_code = código;
+  let made_change;
+  do {
+    made_change = false;
+    // Strip whitespace
+    let match = current_code.match(/^\s+/);
+    if (match) {
+      current_code = current_code.substring(match[0].length);
+      made_change = true;
+    }
+    // Strip // comments, including the newline character
+    match = current_code.match(/^\/\/[^\n]*(\n)?/);
+    if (match) {
+      current_code = current_code.substring(match[0].length);
+      made_change = true;
+    }
+  } while (made_change);
+  return current_code;
+}
+
 const alt = (...analisadores) => {
   if (analisadores.length === 0) return código => [null, código];
   const próximo_alt = alt(...analisadores.slice(1));
@@ -22,15 +43,30 @@ const seq = (...analisadores) => {
   };
 }
 
-const símbolo = símbolo => código => {
-  if (código.startsWith(símbolo)) return [símbolo, código.slice(símbolo.length)];
-  return [null, código];
+const símbolo_original = código_input => símbolo_val => { // Keep original logic but structure for easy wrapping
+  if (código_input.startsWith(símbolo_val)) return [símbolo_val, código_input.slice(símbolo_val.length)];
+  return [null, código_input];
 };
 
-const regex = regex => código => {
-  const valor = código.match(regex);
-  if (valor) if (valor.index === 0) return [valor[0], código.slice(valor[0].length)];
-  return [null, código];
+const símbolo = valor_símbolo => código_original => {
+    const código = stripLeadingWhitespaceAndComments(código_original);
+    // Ensure original `símbolo` logic is correctly called
+    if (código.startsWith(valor_símbolo)) return [valor_símbolo, código.slice(valor_símbolo.length)];
+    return [null, código]; // Return the stripped code on failure to match token
+};
+
+const regex_original = código_input => regex_val => { // Keep original logic for easy wrapping
+  const valor = código_input.match(regex_val);
+  if (valor && valor.index === 0) return [valor[0], código_input.slice(valor[0].length)];
+  return [null, código_input];
+};
+
+const regex = valor_regex => código_original => {
+    const código = stripLeadingWhitespaceAndComments(código_original);
+    // Ensure original `regex` logic is correctly called
+    const match = código.match(valor_regex);
+    if (match && match.index === 0) return [match[0], código.slice(match[0].length)];
+    return [null, código]; // Return the stripped code on failure to match token
 };
 
 const opcional = (analisador, valor_padrão) => código => {
@@ -65,9 +101,7 @@ const operação = (termo, operadores) => transformar(
   seq(
     termo,
     opcional(vários(seq(
-      opcional(espaço),
       operadores,
-      opcional(espaço),
       termo,
     )), []),
   ),
@@ -75,7 +109,7 @@ const operação = (termo, operadores) => transformar(
     if (operaçõesSequenciais.length === 0) return primeiroTermo;
     return escopo => 
       operaçõesSequenciais.reduce(
-        (resultado, [, operador, , próximoTermo]) => 
+        (resultado, [operador, próximoTermo]) => // Adjusted destructuring
           operador(resultado, próximoTermo(escopo)),
         primeiroTermo(escopo)
       );
@@ -86,8 +120,6 @@ const nome = regex(/[a-zA-ZÀ-ÿ_][a-zA-ZÀ-ÿ0-9_]*/);
 
 const endereço = regex(/\S+/);
 
-const espaço = regex(/\s+/);
-
 const número = transformar(regex(/\d+/), v => () => parseInt(v));
 
 const texto = transformar(regex(/"([^"]*)"/), v => () => v.slice(1, -1));
@@ -95,10 +127,9 @@ const texto = transformar(regex(/"([^"]*)"/), v => () => v.slice(1, -1));
 const não = transformar(
   seq(
     símbolo("!"),
-    opcional(espaço),
     código => expressão(código),
   ),
-  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
+  ([, v]) => escopo => v(escopo) === 0 ? 1 : 0,
 )
 
 const valor_constante = transformar(
@@ -161,26 +192,23 @@ const tamanho = transformar(
 const lista = transformar(
   seq(
     símbolo("["),
-    opcional(espaço),
     opcional(
       vários(
         seq(
           opcional(símbolo("..."), ""),
           código => expressão(código),
           opcional(símbolo(",")),
-          opcional(espaço),
         )
       ),
     ),
     símbolo("]"),
   ),
-  ([, , valores]) => escopo => valores ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)]) : [],
+  ([, valores]) => escopo => valores ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)]) : [],
 );
 
 const objeto = transformar(
   seq(
     símbolo("{"),
-    opcional(espaço),
     opcional(
       vários(
         alt(
@@ -194,29 +222,27 @@ const objeto = transformar(
               ),
             ),
             símbolo(":"),
-            opcional(espaço),
             código => expressão(código),
             opcional(símbolo(",")),
-            opcional(espaço),
           ),
           seq(
             símbolo("..."),
             código => expressão(código),
             opcional(símbolo(",")),
-            opcional(espaço),
           ),
         ),
       ),
     ),
     símbolo("}"),
   ),
-  ([, , valores]) => escopo => {
+  ([, valores]) => escopo => { // Adjusted destructuring
     return valores ? valores.reduce((resultado, v) => {
       if (v[0] === "...") {
         return { ...resultado, ...v[1](escopo) };
       } else {
         const chave = typeof v[0] === "string" ? v[0] : v[0][1](escopo);
-        return { ...resultado, [chave]: v[3](escopo) };
+        // Adjusted index for value from v[3] to v[2]
+        return { ...resultado, [chave]: v[2](escopo) };
       }
     }, {}) : {};
   }
@@ -237,20 +263,16 @@ const lambda = transformar(
       vários(
         seq(
           nome,
-          opcional(espaço),
           opcional(símbolo(",")),
-          opcional(espaço),
         )
       ),
       []
     ),
     opcional(símbolo(")")),
-    opcional(espaço),
     símbolo("=>"),
-    opcional(espaço),
     código => expressão(código),
   ),
-  ([, parâmetros, , , , , valor]) => escopo => (escopo2, ...args) =>
+  ([, parâmetros, , , valor]) => escopo => (escopo2, ...args) => // Adjusted destructuring
     valor(
       parâmetros.reduce(
         (escopo3, [nome], i) => ({ ...escopo3, [nome]: args[i] }),
@@ -262,37 +284,30 @@ const lambda = transformar(
 const chamada_função = transformar(
   seq(
     símbolo("("),
-    opcional(espaço),
     opcional(
       vários(
         seq(
           código => expressão(código),
-          opcional(espaço),
           opcional(símbolo(",")),
-          opcional(espaço),
         )
       ),
       []
     ),
-    opcional(espaço),
     símbolo(")"),
   ),
-  ([, , args]) => (escopo, função) => função(escopo, ...args.map(arg => arg[0](escopo))),
+  ([, args]) => (escopo, função) => função(escopo, ...args.map(arg => arg[0](escopo))), // Adjusted destructuring
 );
 
 const parênteses = transformar(
   seq(
     símbolo("("),
-    opcional(espaço),
     opcional(código => declarações_constantes(código), []),
-    opcional(espaço),
     código => expressão(código),
-    opcional(espaço),
     símbolo(")"),
   ),
-  ([, , constantes, , valor]) => escopo => {
+  ([, constantes, valor]) => escopo => { // Adjusted destructuring
     const escopoComConstantes = constantes.reduce(
-      (escopoAtual, [[nome, , , , valor]]) => {
+      (escopoAtual, [[nome, , valor]]) => { // Adjusted destructuring
         const novoValor = valor(escopoAtual);
         return { ...escopoAtual, [nome]: novoValor };
       },
@@ -308,7 +323,6 @@ const termo1 = transformar(
       valor_constante,
       parênteses,
     ),
-    opcional(espaço),
     vários(
       alt(
         fatia,
@@ -318,7 +332,7 @@ const termo1 = transformar(
       ),
     ),
   ),
-  ([valor, , operações]) => escopo => {
+  ([valor, operações]) => escopo => {
     return operações.reduce(
       (resultado, operação) => operação(escopo, resultado),
       valor(escopo)
@@ -371,19 +385,16 @@ const termo6 = transformar(
   seq(
     termo5,
     opcional(seq(
-      opcional(espaço),
       símbolo("?"),
-      opcional(espaço),
       código => expressão(código),
-      opcional(espaço),
       símbolo(":"),
-      opcional(espaço),
       código => expressão(código),
     )),
   ),
   ([condição, resto]) => {
     if (!resto) return condição;
-    const [, , , valor_se_verdadeiro, , , , valor_se_valso] = resto;
+    // Adjusted destructuring: removed spaces, so indices shift
+    const [, valor_se_verdadeiro, , valor_se_valso] = resto;
     return escopo => condição(escopo) !== 0 ? valor_se_verdadeiro(escopo) : valor_se_valso(escopo);
   },
 );
@@ -396,78 +407,69 @@ const expressão = operação(
   ),
 );
 
-const comentário = transformar(
-  seq(
-    símbolo("//"),
-    regex(/[^\n]*/),
-    opcional(espaço),
-  ),
-  () => () => null
-);
-
-const ignorar_comentários = vários(comentário);
-
 const declarações_constantes = vários(
   seq(
-    seq(
-      nome,
-      opcional(espaço),
-      símbolo("="),
-      opcional(espaço),
-      expressão,
-    ),
-    espaço,
-  ),
+    nome,
+    símbolo("="),
+    expressão,
+  )
 )
 
 const _0 = transformar(
   seq(
-    opcional(ignorar_comentários),
-    opcional(vários(
+    opcional(vários( // Removed ignorar_comentários
       seq(
         seq(
           nome,
-          opcional(espaço),
           símbolo("#"),
-          opcional(espaço),
           endereço,
         ),
-        espaço,
+        // espaço, // This was likely for separation between multiple declarations, now handled by stripper
       ),
     ), []),
-    opcional(vários(
+    opcional(vários( // Removed ignorar_comentários
       seq(
         seq(
           nome,
-          opcional(espaço),
           símbolo("@"),
-          opcional(espaço),
           endereço,
         ),
-        espaço,
+        // espaço, // This was likely for separation, now handled by stripper
       ),
     ), []),
-    opcional(ignorar_comentários),
-    opcional(declarações_constantes, []),
-    opcional(ignorar_comentários),
+    opcional(declarações_constantes, []), // Removed ignorar_comentários
     expressão,
   ),
-  async ([, importações, carregamentos, , atribuições, , valor]) => {
-    return valor(atribuições.reduce((escopo, [[nome, , , , valor]]) => {
-      return {
-        ...escopo,
-        [nome]: valor(escopo),
-      };
-    }, Object.fromEntries(await Promise.all([
-      ...importações.map(async importação => {
-        const [[nome, , , , endereço]] = importação;
-        return [nome, await _0(await (await fetch(endereço)).text())[0]]
+  async ([importações, carregamentos, atribuições, valor_final_expr_fn]) => {
+    const escopo_inicial = Object.fromEntries(await Promise.all([
+      ...importações.map(async importação_item => {
+        // importação_item from vários(seq(nome, símbolo("#"), endereço))
+        // seq(nome, "#", endereço) produces [nome_str, "#", endereço_str]
+        const [nome_str, , endereço_str] = importação_item[0]; // importação_item is [ [nome,tok,endr] ] due to outer seq in _0's vários
+        const modulo_conteudo_bruto = await (await fetch(endereço_str)).text();
+        const modulo_valor_parse_resultado = _0(modulo_conteudo_bruto); // Retorna [Promise | null, String]
+        if (!modulo_valor_parse_resultado || modulo_valor_parse_resultado[0] === null) {
+            throw new Error(`Falha ao importar módulo: ${nome_str} de ${endereço_str}`);
+        }
+        const modulo_promessa = modulo_valor_parse_resultado[0];
+        return [nome_str, await modulo_promessa];
       }),
-      ...carregamentos.map(async carregamento => {
-        const [[nome, , , , endereço]] = carregamento;
-        return [nome, await (await fetch(endereço)).text()]
+      ...carregamentos.map(async carregamento_item => {
+        // carregamento_item from vários(seq(nome, símbolo("@"), endereço))
+        // seq(nome, "@", endereço) produces [nome_str, "@", endereço_str]
+        const [nome_str, , endereço_str] = carregamento_item[0]; // carregamento_item is [ [nome,tok,endr] ]
+        return [nome_str, await (await fetch(endereço_str)).text()];
       }),
-    ]))))
+    ]));
+
+    const escopo_com_atribuições = atribuições.reduce((escopo_atual, atribuição_item) => {
+      // atribuição_item from vários(seq(nome, símbolo("="), expressão))
+      // seq(nome, "=", expressão) produces [nome_str, "=", expressão_fn]
+      const [nome_str, , expressão_fn] = atribuição_item;
+      return { ...escopo_atual, [nome_str]: expressão_fn(escopo_atual) };
+    }, escopo_inicial);
+
+    return valor_final_expr_fn(escopo_com_atribuições);
   },
 );
 
