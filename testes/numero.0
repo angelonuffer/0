@@ -3,7 +3,7 @@
 // Importa a biblioteca uniteste.0
 // O caminho para uniteste.0 é relativo à raiz do projeto,
 // assumindo que o script de teste será executado a partir da raiz.
-uniteste = ./uniteste.0 #
+uniteste # ./uniteste.0
 
 // Utiliza a função 'descrever' da biblioteca para agrupar testes.
 // A função 'descrever' recebe o nome da suíte e uma função.
