@@ -446,11 +446,8 @@ const chamada_função = transformar(
           console.log("DEBUG_CALL_EVALUATOR_STEP: Entered function call evaluator. Function to call type:", typeof actual_js_function_val);
 
           const evaluated_js_args = args_details_array.map(arg_detail_seq => {
-              // Adding a log inside the map to see if argument evaluation happens
-              // console.log("DEBUG_CALL_EVALUATOR_STEP: Evaluating an argument.");
               if (typeof arg_detail_seq[0] !== 'function') {
                   console.error("DEBUG_CALL_EVALUATOR_STEP: Argument parser did not return a function for arg an index (problem with `expressão` for arg).");
-                  // This case should ideally not happen if grammar is correct.
                   throw new TypeError("Interpreter Error: Argument expression did not yield an evaluator function.");
               }
               return arg_detail_seq[0](escopo_for_arg_eval);
@@ -458,27 +455,30 @@ const chamada_função = transformar(
 
           if (typeof actual_js_function_val !== 'function') {
               console.error("DEBUG_CALL_EVALUATOR_STEP: actual_js_function_val is NOT a function. Type:", typeof actual_js_function_val, "Value:", actual_js_function_val);
+              // Ensure this error propagates; a TypeError is good.
               throw new TypeError("Interpreter Error: Attempting to call a non-function.");
           }
-          // console.log("DEBUG_CALL_EVALUATOR_STEP: actual_js_function_val (toString):", actual_js_function_val.toString().substring(0, 100));
-          // console.log("DEBUG_CALL_EVALUATOR_STEP: Number of evaluated_js_args:", evaluated_js_args.length);
 
-          let call_result;
+          let result_from_js_call;
           try {
-              // Pass 'escopo_for_arg_eval' as the first 'this/closure' scope arg for our lambdas
-              call_result = actual_js_function_val(escopo_for_arg_eval, ...evaluated_js_args);
+              result_from_js_call = actual_js_function_val(escopo_for_arg_eval, ...evaluated_js_args);
           } catch (e) {
               console.error("DEBUG_CALL_EVALUATOR_STEP: Error DURING actual_js_function_val execution:", e.message, e.stack);
-              throw e;
+              throw e; // Propagate error to be caught by the calling context (e.g. async_transformer_fn)
           }
 
-          console.log("DEBUG_CALL_EVALUATOR_STEP: Raw result of actual_js_function_val call:", call_result);
-          if (Array.isArray(call_result)) {
-              console.log("DEBUG_CALL_EVALUATOR_STEP: Call result is an array. Length:", call_result.length);
+          // The existing debug logs are good.
+          console.log("DEBUG_CALL_EVALUATOR_STEP: Raw result of actual_js_function_val call:", result_from_js_call);
+          if (Array.isArray(result_from_js_call)) {
+              console.log("DEBUG_CALL_EVALUATOR_STEP: Call result is an array. Length:", result_from_js_call.length);
           } else {
-              console.warn("DEBUG_CALL_EVALUATOR_STEP: Call result is NOT an array. Type:", typeof call_result);
+              console.warn("DEBUG_CALL_EVALUATOR_STEP: Call result is NOT an array. Type:", typeof result_from_js_call);
           }
-          return call_result;
+
+          // Explicitly assign to a new variable before returning, for clarity and to avoid any potential
+          // subtle issues with returning directly from the variable that held the try-catch result (highly unlikely to be an issue).
+          const final_call_return_value = result_from_js_call;
+          return final_call_return_value;
       };
   }
 );
@@ -772,6 +772,9 @@ const _0_internal_parser = transformar(
         try {
             const evaluation_result = valor_final_expr_fn(final_scope);
             console.log("DEBUG: Raw result of valor_final_expr_fn(scope):", evaluation_result);
+            if (typeof evaluation_result === 'undefined') {
+                console.warn("WARN_INTERPRETER: The main expression evaluated to 'undefined'. This might indicate an interpreter issue if 'undefined' is not an expected value.");
+            }
             // Check if evaluation_result is an array, as expected by uniteste.descrever
             if (Array.isArray(evaluation_result)) {
                 console.log("DEBUG: evaluation_result is an array. Length:", evaluation_result.length);
