@@ -1,0 +1,37 @@
+// uniteste.0 - Biblioteca de Testes Unitários para Linguagem 0
+
+(
+  // Função interna _testar: executa uma asserção e retorna um objeto de resultado.
+  _testar = (suite, nome, assercaoFn) => (
+    // Lang 0 não tem try-catch explícito no código que vi.
+    // Se `assercaoFn()` causar um erro de execução, o script inteiro pode parar.
+    // Se `assercaoFn()` retornar 0 (falso para Lang 0), é uma falha. Se retornar 1 (verdadeiro), passa.
+    resultado_assercao = assercaoFn() // Executa a função de asserção
+
+    status = resultado_assercao == 1 ? "passou" : "falhou"
+
+    { suite: suite, teste: nome, status: status, mensagem: "" } // Retorna o objeto de resultado
+  )
+
+  // Função _descrever: agrupa testes para uma suíte.
+  // `funcaoBlocoTestes` é uma função fornecida pelo usuário.
+  // Esta função do usuário recebe `testar_na_suite` como argumento.
+  // `testar_na_suite` é uma versão de `_testar` que já conhece o nome da suíte.
+  // A `funcaoBlocoTestes` é responsável por chamar `testar_na_suite`
+  // e retornar uma LISTA de objetos de resultado de teste.
+  _descrever = (nomeSuite, funcaoBlocoTestes) => (
+    // Cria uma função `testar_na_suite` específica para esta suíte.
+    // Esta função será passada para `funcaoBlocoTestes`.
+    testar_na_suite = (nomeTeste, assercaoFn) => _testar(nomeSuite, nomeTeste, assercaoFn)
+
+    // Executa a função do bloco de testes, passando a ela a capacidade de criar testes nesta suíte.
+    // Espera-se que `funcaoBlocoTestes` retorne uma lista de resultados.
+    funcaoBlocoTestes(testar_na_suite)
+  )
+
+  // O objeto que a biblioteca `uniteste.0` expõe quando importada.
+  // Contém a função `descrever`.
+  {
+    descrever: _descrever
+  }
+)

@@ -1,0 +1,28 @@
+// testes/numero.0 - Testes para operações numéricas
+
+// Importa a biblioteca uniteste.0
+// O caminho para uniteste.0 é relativo à raiz do projeto,
+// assumindo que o script de teste será executado a partir da raiz.
+uniteste = ./uniteste.0 #
+
+// Utiliza a função 'descrever' da biblioteca para agrupar testes.
+// A função 'descrever' recebe o nome da suíte e uma função.
+// Essa função, por sua vez, recebe um 'testar' específico da suíte.
+uniteste.descrever("Operações Aritméticas Básicas", (testar) => [
+  testar("Adição", () => 1 + 1 == 2),
+  testar("Subtração", () => 5 - 3 == 2),
+  testar("Multiplicação", () => 2 * 3 == 6),
+  testar("Divisão", () => 10 / 2 == 5),
+  testar("Precedência de Operadores", () => 2 + 2 * 2 == 6)
+])
+
+// Nota: Lang 0 parece não ter um jeito fácil de concatenar listas diretamente
+// ou de forma imperativa construir uma lista grande de resultados de múltiplas suítes.
+// Por enquanto, este arquivo de teste definirá uma única suíte.
+// Se múltiplas chamadas a `descrever` fossem feitas, o resultado de `testes/numero.0`
+// seria apenas o resultado da ÚLTIMA chamada a `descrever`, pois cada uma
+// retornaria sua própria lista de testes.
+// Para múltiplas suítes, precisaríamos de uma função de agregação em `uniteste.0`
+// ou o script runner teria que lidar com múltiplos arquivos de teste.
+// Para este exemplo, manteremos simples com uma suíte.
+```
