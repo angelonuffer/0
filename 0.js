@@ -116,9 +116,15 @@ const opcional = (analisador, valor_padrão) => código => {
 const vários = analisador => código => {
   const resultados = [];
   let código_atual = código;
+  const analisadorId = analisador.toString().substring(0, 70); // Get a short ID for the parser function
+  const isFunctionCallArgsContext = analisadorId.includes("expressão(código)"); // Keep heuristic for specific logging
+
+  console.log(`DEBUG_VARIOS_ENTRY: ID='${analisadorId}' Input='${código_atual.substring(0,50)}'`);
 
   while (true) {
+    if (isFunctionCallArgsContext) console.log("DEBUG_VARIOS_ARGS: Loop start. Current code:", código_atual.substring(0,50));
     const [valor, resto] = analisador(código_atual);
+    if (isFunctionCallArgsContext) console.log("DEBUG_VARIOS_ARGS: Analisador result:", valor ? (valor.error ? valor.message : "OK_VAL") : "NULL_VAL");
 
     if (valor && valor.error) {
       // An error occurred in the sub-parser.
@@ -201,7 +207,11 @@ const endereço = regex(/\S+/);
 
 const número = transformar(regex(/\d+/), v => () => parseInt(v));
 
-const texto = transformar(regex(/"([^"]*)"/), v => () => v.slice(1, -1));
+const texto = transformar(regex(/"([^"]*)"/), v_raw_match => {
+  const string_val = v_raw_match.slice(1, -1);
+  console.log(`DEBUG_TEXTO: Raw match '${v_raw_match}', Value: '${string_val}'`);
+  return () => string_val;
+});
 
 const não = transformar(
   seq(
@@ -412,13 +422,23 @@ const lambda = transformar(
     símbolo("=>"),
     código => expressão(código),
   ),
-  ([, parâmetros, , , valor]) => escopo => (escopo2, ...args) => // Adjusted destructuring
-    valor(
-      parâmetros.reduce(
-        (escopo3, [nome], i) => ({ ...escopo3, [nome]: args[i] }),
-        { ...escopo, ...(escopo2 || {}) }
-      )
-    ),
+  ([, ps, , , evaluator_for_body]) => definition_scope => { // Renamed for clarity
+    // This (outer) function is the lambda's primary evaluator, it returns the actual JS function
+    return (call_scope, ...actual_args) => { // This is the JS function that gets called
+      console.log(`DEBUG_LAMBDA_CALL: Lambda called. Param AST:`, ps, "Actual args received (types):", actual_args.map(a => typeof a));
+      const body_scope = ps.reduce(
+        (scope_acc, param_ast_seq, i) => {
+          const param_name = param_ast_seq[0];
+          console.log(`DEBUG_LAMBDA_BIND: Param '${param_name}', Arg index ${i}, Arg value type: ${typeof actual_args[i]}`);
+          scope_acc[param_name] = actual_args[i];
+          return scope_acc;
+        },
+        {} // Start with a completely empty scope for the body
+      );
+      console.log("DEBUG_LAMBDA_BODY_SCOPE (keys):", Object.keys(body_scope));
+      return evaluator_for_body(body_scope);
+    };
+  }
 );
 
 const chamada_função = transformar(
@@ -442,9 +462,8 @@ const chamada_função = transformar(
       // This outer function is called by 'transformar' when a function call syntax is parsed.
       // It returns the actual evaluator for this specific call.
       return (escopo_for_arg_eval, actual_js_function_val) => {
-          // THIS IS THE EVALUATOR FUNCTION. IT MUST BE CALLED FOR THIS LOG TO APPEAR.
-          console.log("DEBUG_CALL_EVALUATOR_STEP: Entered function call evaluator. Function to call type:", typeof actual_js_function_val);
-
+          console.log("DEBUG_CALL_EVALUATOR_STEP: ENTERED for func type:", typeof actual_js_function_val, "Args_details_array length:", args_details_array ? args_details_array.length : "N/A");
+          // console.log("DEBUG_CALL_EVALUATOR_STEP: Entered specific call evaluator. Args will be evaluated now. Function to call type:", typeof actual_js_function_val); // MODIFIED LOG 1
           const evaluated_js_args = args_details_array.map(arg_detail_seq => {
               if (typeof arg_detail_seq[0] !== 'function') {
                   console.error("DEBUG_CALL_EVALUATOR_STEP: Argument parser did not return a function for arg an index (problem with `expressão` for arg).");
@@ -459,6 +478,8 @@ const chamada_função = transformar(
               throw new TypeError("Interpreter Error: Attempting to call a non-function.");
           }
 
+          console.log("DEBUG_CALL_EVALUATOR_STEP: Evaluated JS args created. Type:", typeof evaluated_js_args, "IsArray:", Array.isArray(evaluated_js_args)); // NEW LOG 2
+          console.log("DEBUG_CALL_EVALUATOR_STEP: Evaluated JS args (types):", evaluated_js_args.map(a => typeof a)); // MODIFIED 기존 LOG
           let result_from_js_call;
           try {
               result_from_js_call = actual_js_function_val(escopo_for_arg_eval, ...evaluated_js_args);
@@ -726,56 +747,95 @@ const _0_internal_parser = transformar(
   async ([importações, carregamentos, atribuições, valor_final_expr_fn_or_error]) => {
     // This part is the "transformador" called by `transformar`.
     // It receives the successful parse result of `analisador_principal`.
-    // If `valor_final_expr_fn_or_error` is an error object, it will be passed as is.
-
-    if (valor_final_expr_fn_or_error && valor_final_expr_fn_or_error.error) {
-      // Propagate the error object so it becomes the "valor" part of _0_internal_parser's result
-      return valor_final_expr_fn_or_error;
+    // If `valor_final_expr_fn_or_error` is an error object from `analisador_principal` (e.g. syntax error), propagate it.
+    if (valor_final_expr_fn_or_error && typeof valor_final_expr_fn_or_error === 'object' && valor_final_expr_fn_or_error.error) {
+      return valor_final_expr_fn_or_error; // This error is from the parser itself (e.g. símbolo, regex failure)
     }
 
-    const valor_final_expr_fn = valor_final_expr_fn_or_error;
+    const valor_final_expr_fn = valor_final_expr_fn_or_error; // This is the evaluator for the current file's main expression.
 
-    // ... (rest of the async logic for imports, scope, etc. as defined before)
-    // This part is kept the same for creating the scope
-    const escopo_inicial = Object.fromEntries(await Promise.all([
-      ...importações.map(async importação_item => {
-        const [nome_str, , endereço_str] = importação_item[0];
-        const modulo_conteudo_bruto = await (await fetch(endereço_str)).text();
-        const [resultado_parse_modulo_tupla, ] = _0(modulo_conteudo_bruto); // Recursive call
-        const resultado_parse_modulo = resultado_parse_modulo_tupla[0]; // This is the actual value or error object
+    let escopo_inicial_calculado;
+    try {
+      escopo_inicial_calculado = Object.fromEntries(await Promise.all([
+        ...importações.map(async importação_item => {
+          const [nome_str, , endereço_str] = importação_item[0];
+          const modulo_response = await fetch(endereço_str);
 
-        if (resultado_parse_modulo && resultado_parse_modulo.error) {
-          throw new Error(`Falha ao parsear módulo: ${nome_str} de ${endereço_str}. Erro: ${resultado_parse_modulo.message}`);
-        }
-        if (resultado_parse_modulo === null || (typeof resultado_parse_modulo === 'object' && !resultado_parse_modulo.error && !Object.keys(resultado_parse_modulo).length && Object.getPrototypeOf(resultado_parse_modulo) === Object.prototype) ) {
-            throw new Error(`Falha ao importar módulo (parse não retornou valor nem erro específico): ${nome_str} de ${endereço_str}`);
-        }
-        return [nome_str, await resultado_parse_modulo]; // await if it's a promise
-      }),
-      ...carregamentos.map(async carregamento_item => {
-        const [nome_str, , endereço_str] = carregamento_item[0];
-        return [nome_str, await (await fetch(endereço_str)).text()];
-      }),
-    ]));
+          if (!modulo_response.ok) {
+            throw new Error(`Falha ao carregar módulo por HTTP: ${nome_str} de ${endereço_str}. Status: ${modulo_response.statusText}`);
+          }
+          const modulo_conteudo_bruto = await modulo_response.text();
+
+          const tupla_retornada_por_0 = _0(modulo_conteudo_bruto);
+          console.log(`DEBUG_IMPORT_DEEPER: For module '${nome_str}', _0 raw return:`, tupla_retornada_por_0);
+          // Safely access [0], assuming tupla_retornada_por_0 might not be a valid array/tuple
+          const resultado_do_0_para_modulo = (Array.isArray(tupla_retornada_por_0) && tupla_retornada_por_0.length > 0) ? tupla_retornada_por_0[0] : undefined;
+
+          // Check if _0 itself returned a direct error object (e.g., syntax error in module code detected by _0's wrapper)
+          if (resultado_do_0_para_modulo && typeof resultado_do_0_para_modulo === 'object' && resultado_do_0_para_modulo.error && resultado_do_0_para_modulo.details) { // errors from _0 wrapper have .details
+            throw new Error(`Falha ao parsear módulo importado '${nome_str}': ${resultado_do_0_para_modulo.message}`);
+          }
+
+          // Check if _0 returned null or undefined instead of a promise (critical failure of _0 for that module code)
+          if (typeof resultado_do_0_para_modulo === 'undefined' || resultado_do_0_para_modulo === null) {
+               throw new Error(`Falha crítica ao importar módulo '${nome_str}': _0 retornou '${String(resultado_do_0_para_modulo)}' para o código do módulo, esperava Promise ou objeto de erro.`);
+          }
+
+          // At this point, resultado_do_0_para_modulo should be a Promise if _0_internal_parser for the module was successful.
+          console.log(`DEBUG_IMPORT: Importing module '${nome_str}'. Valor retornado por _0 (espera-se Promise ou erro de sintaxe já tratado):`, resultado_do_0_para_modulo);
+          const resolved_module_value = await resultado_do_0_para_modulo;
+          console.log(`DEBUG_IMPORT: For module '${nome_str}', valor resolvido da Promise é (type):`, typeof resolved_module_value);
+
+          // Check if the RESOLVED value from the promise is an error object
+          // (this error structure is returned by this async_transform_fn if valor_final_expr_fn is not a function or if it throws)
+          if (typeof resolved_module_value === 'object' && resolved_module_value !== null && resolved_module_value.error) {
+             console.error(`DEBUG_IMPORT: Module '${nome_str}' resolveu para um objeto de erro interno:`, resolved_module_value.message);
+             throw new Error(`Módulo importado '${nome_str}' avaliou para um erro: ${resolved_module_value.message}`);
+          }
+
+          if (typeof resolved_module_value === 'object' && resolved_module_value !== null) {
+              console.log(`DEBUG_IMPORT: Chaves para o objeto resolvido:`, Object.keys(resolved_module_value));
+          } else if (resolved_module_value === undefined) {
+              console.warn(`DEBUG_IMPORT: Module '${nome_str}' resolveu para undefined.`);
+              throw new Error(`Módulo importado '${nome_str}' avaliou para undefined, o que não é permitido.`);
+          } else {
+              console.log(`DEBUG_IMPORT: Valor resolvido (toString):`, String(resolved_module_value));
+          }
+          return [nome_str, resolved_module_value];
+        }),
+        ...carregamentos.map(async carregamento_item => {
+          const [nome_str, , endereço_str] = carregamento_item[0];
+          const carregamento_response = await fetch(endereço_str);
+          if (!carregamento_response.ok) {
+            throw new Error(`Falha ao carregar recurso por HTTP: ${nome_str} de ${endereço_str}. Status: ${carregamento_response.statusText}`);
+          }
+          return [nome_str, await carregamento_response.text()];
+        }),
+      ]));
+    } catch (e) {
+      // This catch block is for errors during the import/loading phase (fetch, _0 recursive calls, promise resolutions)
+      console.error("ERROR during import/loading phase:", e.message, e.stack);
+      return { error: true, message: `Erro durante importação/carregamento: ${e.message}`, details: {name: e.name, stack: e.stack} };
+    }
 
     const escopo_com_atribuições = atribuições.reduce((escopo_atual, atribuição_item) => {
       const [nome_str, , expressão_fn] = atribuição_item;
+      // It's crucial that expressão_fn receives the progressively built scope.
+      // And escopo_inicial_calculado must be valid here.
       return { ...escopo_atual, [nome_str]: expressão_fn(escopo_atual) };
-    }, escopo_inicial);
-    // End of scope setup part that is kept the same.
+    }, escopo_inicial_calculado);
 
-    // New logging and execution for valor_final_expr_fn
     const final_scope = escopo_com_atribuições;
     console.log("DEBUG: Type of valor_final_expr_fn:", typeof valor_final_expr_fn);
+
     if (typeof valor_final_expr_fn === 'function') {
-        console.log("DEBUG: valor_final_expr_fn (toString):", valor_final_expr_fn.toString().substring(0, 200)); // Log first 200 chars
+        console.log("DEBUG: valor_final_expr_fn (toString):", valor_final_expr_fn.toString().substring(0, 200));
         try {
             const evaluation_result = valor_final_expr_fn(final_scope);
             console.log("DEBUG: Raw result of valor_final_expr_fn(scope):", evaluation_result);
             if (typeof evaluation_result === 'undefined') {
                 console.warn("WARN_INTERPRETER: The main expression evaluated to 'undefined'. This might indicate an interpreter issue if 'undefined' is not an expected value.");
             }
-            // Check if evaluation_result is an array, as expected by uniteste.descrever
             if (Array.isArray(evaluation_result)) {
                 console.log("DEBUG: evaluation_result is an array. Length:", evaluation_result.length);
                 if (evaluation_result.length > 0) {
@@ -787,11 +847,20 @@ const _0_internal_parser = transformar(
             return evaluation_result;
         } catch (e) {
             console.error("ERROR during valor_final_expr_fn(final_scope) execution:", e.message, e.stack);
-            throw e; // Re-throw to see if it's caught by rodar_testes.sh
+            return {
+              error: true,
+              message: `Runtime error na execução do módulo: ${e.message}`,
+              details: { name: e.name, stack: e.stack }
+            };
         }
     } else {
-        console.error("ERROR: valor_final_expr_fn is NOT a function. This is unexpected if parsing succeeded.");
-        return valor_final_expr_fn; // Propagate it if it's not a function (e.g. an error obj not caught by transformar)
+        const received_type = typeof valor_final_expr_fn;
+        const received_value_str = String(valor_final_expr_fn).substring(0,100);
+        console.error(`ERROR: Expressão final no módulo não resultou em uma função executável. Recebido tipo: ${received_type}, valor: ${received_value_str}. Isso geralmente indica código de módulo vazio ou não parsável como uma expressão válida.`);
+        return {
+          error: true,
+          message: `Código do módulo não resultou em uma função executável. O resultado do parser para a expressão principal do módulo foi do tipo '${received_type}'.`
+        };
     }
   }
 );
