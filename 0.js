@@ -105,25 +105,70 @@ const regex = valor_regex => código_original => {
 
 const opcional = (analisador, valor_padrão) => código => {
   const [valor, resto] = analisador(código);
-  if (valor === null) return [valor_padrão, código];
-  return [valor, resto];
+  // If 'valor' is null (parser didn't match traditionally)
+  // OR if 'valor' is an error object (parser failed with a structured error)
+  if (valor === null || (typeof valor === 'object' && valor !== null && valor.error === true)) {
+    return [valor_padrão, código]; // Return default value, and original code position
+  }
+  return [valor, resto]; // Successful parse by 'analisador', or 'analisador' returned a non-error, non-null value
 };
 
-const vários = analisador => {
-  const analisador2 = código => {
-    const [valor, resto] = analisador(código);
-    if (valor === null) return [null, código];
-    const [valor2, resto2] = analisador2(resto);
-    if (valor2 === null) return [[valor], resto];
-    return [[valor, ...valor2], resto2];
-  };
-  return analisador2;
+const vários = analisador => código => {
+  const resultados = [];
+  let código_atual = código;
+
+  while (true) {
+    const [valor, resto] = analisador(código_atual);
+
+    if (valor && valor.error) {
+      // An error occurred in the sub-parser.
+      // If we haven't collected any results yet, 'vários' fails (returns null, original code).
+      // If we have collected results, then 'vários' succeeds with what it has.
+      return resultados.length > 0 ? [resultados, código_atual] : [null, código];
+    }
+
+    if (valor === null) {
+      // Sub-parser didn't match (not an error, just no match).
+      // If we haven't collected any results yet, 'vários' fails.
+      // If we have collected results, then 'vários' succeeds with what it has.
+      return resultados.length > 0 ? [resultados, código_atual] : [null, código];
+    }
+
+    // Success, got a value
+    resultados.push(valor);
+
+    // Critical check for infinite loop: if parser succeeded but didn't consume input.
+    if (código_atual === resto) {
+      // If it matched but consumed nothing (e.g., a regex like /a*/ on "bbb" or "" on "")
+      // And we are in this loop, it means 'valor' is not null and not an error.
+      // This indicates a parser that can successfully match zero-length input.
+      // `vários` should not loop infinitely on such a parser.
+      // It should return the results obtained so far (which includes the current zero-length match).
+      return [resultados, código_atual];
+    }
+    código_atual = resto;
+    // If código_atual becomes empty and the parser can't match empty string,
+    // it will result in valor === null in the next iteration, exiting the loop.
+  }
+  // The loop is infinite (`while(true)`) but logic inside handles all exits.
+  // This line should technically be unreachable. If somehow reached, implies empty.
+  // return resultados.length > 0 ? [resultados, código_atual] : [null, código]; // Fallback, though prior returns should cover.
 };
 
-const transformar = (analisador, transformador) => código => {
-  const [valor, resto] = analisador(código);
-  if (valor === null) return [null, código];
-  return [transformador(valor), resto];
+const transformar = (analisador, transformador_fn) => código => {
+  const [valor_parsed, resto] = analisador(código);
+
+  // If the underlying parser failed (returned null or a structured error object),
+  // 'transformar' should propagate this failure directly, without calling the transformador_fn.
+  if (valor_parsed === null || (typeof valor_parsed === 'object' && valor_parsed !== null && valor_parsed.error === true)) {
+    // It's important to return the 'resto' from the analisador's attempt if it was an error object,
+    // or 'código' if it was a simple null non-match, though 'resto' for errors is often original 'código'.
+    // For consistency and to ensure 'resto' reflects what 'analisador' determined:
+    return [valor_parsed, resto];
+  }
+
+  // If valor_parsed is valid, then call the transformador_fn
+  return [transformador_fn(valor_parsed), resto];
 };
 
 const operador = (literal, funcao) => transformar(
@@ -168,7 +213,17 @@ const não = transformar(
 
 const valor_constante = transformar(
   nome,
-  v => escopo => escopo[v],
+  v_nome => escopo => {
+      const looked_up_value = escopo[v_nome];
+      console.log(`DEBUG_VAL_CONST: Looking up '${v_nome}'. Found (type):`, typeof looked_up_value);
+      // To avoid overly verbose logs for functions:
+      // if (typeof looked_up_value !== 'function') {
+      //    console.log(`DEBUG_VAL_CONST: Value for '${v_nome}':`, looked_up_value);
+      // } else {
+      //    console.log(`DEBUG_VAL_CONST: Value for '${v_nome}' is a function.`);
+      // }
+      return looked_up_value;
+  }
 )
 
 const fatia = transformar(
@@ -203,15 +258,15 @@ const expressão_modelo = transformar(
 const modelo = transformar(
   seq(
     símbolo("`"),
-    vários(
+    opcional(vários( // Wrap varios with opcional and default to []
       alt(
         expressão_modelo,
         conteúdo_modelo,
       ),
-    ),
+    ), []),
     símbolo("`"),
   ),
-  ([, conteúdo,]) => escopo => conteúdo.map(valor => {
+  ([, conteúdo,]) => escopo => conteúdo.map(valor => { // conteúdo is now guaranteed an array
     const valor2 = valor(escopo);
     if (typeof valor2 === "number") return String.fromCharCode(valor2);
     return valor2
@@ -234,11 +289,62 @@ const lista = transformar(
           opcional(símbolo(",")),
         )
       ),
+      [] // Default empty array for opcional
     ),
     símbolo("]"),
   ),
-  ([, valores]) => escopo => valores ? valores.flatMap(v => v[0] === "..." ? v[1](escopo) : [v[1](escopo)]) : [],
-);
+  ([, valores]) => escopo => {
+    const resultado_final = [];
+    // Check if 'valores' itself is iterable. This should always be true as it's from opcional(..., []).
+    if (typeof valores[Symbol.iterator] !== 'function') {
+      console.error("CRITICAL_ERROR: 'valores' in lista transformer is not iterable. This should not happen.", valores);
+      // This would be a fundamental issue if reached.
+      throw new TypeError("Internal Error: 'valores' is not iterable in lista transformer.");
+    }
+
+    for (const v of valores) {
+      // Defensive checks for 'v' and its structure (from previous attempts, keep them)
+      if (!v || !Array.isArray(v) || v.length < 2) {
+        console.error(`ERROR: Malformed element 'v' in lista manual loop. v:`, v);
+        continue;
+      }
+      let spreadSymbol = v[0];
+      let current_element_expr_fn = v[1];
+      if (typeof current_element_expr_fn !== 'function') {
+        console.error(`ERROR: Element v[1] is not a function in lista manual loop. v[1]:`, current_element_expr_fn);
+        continue;
+      }
+
+      try {
+        let evaluated_element = current_element_expr_fn(escopo);
+
+        if (spreadSymbol === "...") {
+          if (evaluated_element === null || typeof evaluated_element === 'undefined') {
+            // This is a critical path to test the hypothesis for the original error
+            console.error("CUSTOM_ERROR_PATH: Attempted to spread null or undefined value from list element evaluation.");
+            throw new TypeError("Custom: Attempted to spread null or undefined in lista's manual loop.");
+          } else if (typeof evaluated_element[Symbol.iterator] === 'function') {
+            for (const item of evaluated_element) { // Manually spread
+              resultado_final.push(item);
+            }
+          } else {
+            console.error("CUSTOM_ERROR_PATH: Spread element is not iterable.", evaluated_element);
+            throw new TypeError("Custom: Spread element is not iterable in lista's manual loop.");
+          }
+        } else { // Not a spread element
+          resultado_final.push(evaluated_element);
+        }
+      } catch (e) {
+        // This catch is for errors during current_element_expr_fn(escopo) or the spread logic
+        console.error(`ERROR INSIDE try-catch of lista's manual loop:`);
+        console.error("Original Error Message:", e.message);
+        console.error("Original Error Stack:", e.stack);
+        throw e; // Re-throw
+      }
+    }
+    return resultado_final;
+  }
+); // transformar ends.
 
 const objeto = transformar(
   seq(
@@ -310,7 +416,7 @@ const lambda = transformar(
     valor(
       parâmetros.reduce(
         (escopo3, [nome], i) => ({ ...escopo3, [nome]: args[i] }),
-        { ...escopo, ...escopo2 }
+        { ...escopo, ...(escopo2 || {}) }
       )
     ),
 );
@@ -329,7 +435,52 @@ const chamada_função = transformar(
     ),
     símbolo(")"),
   ),
-  ([, args]) => (escopo, função) => função(escopo, ...args.map(arg => arg[0](escopo))), // Adjusted destructuring
+  // This is the TRANSFORMER_FN for chamada_função
+  // It receives the parsed arguments sequence (from opcional(vários(...)))
+  // It returns a new function: (scope_for_arg_eval, actual_js_function_val) => result_of_call
+  ([, args_details_array]) => { // args_details_array is from opcional(vários(...), [])
+      // This outer function is called by 'transformar' when a function call syntax is parsed.
+      // It returns the actual evaluator for this specific call.
+      return (escopo_for_arg_eval, actual_js_function_val) => {
+          // THIS IS THE EVALUATOR FUNCTION. IT MUST BE CALLED FOR THIS LOG TO APPEAR.
+          console.log("DEBUG_CALL_EVALUATOR_STEP: Entered function call evaluator. Function to call type:", typeof actual_js_function_val);
+
+          const evaluated_js_args = args_details_array.map(arg_detail_seq => {
+              // Adding a log inside the map to see if argument evaluation happens
+              // console.log("DEBUG_CALL_EVALUATOR_STEP: Evaluating an argument.");
+              if (typeof arg_detail_seq[0] !== 'function') {
+                  console.error("DEBUG_CALL_EVALUATOR_STEP: Argument parser did not return a function for arg an index (problem with `expressão` for arg).");
+                  // This case should ideally not happen if grammar is correct.
+                  throw new TypeError("Interpreter Error: Argument expression did not yield an evaluator function.");
+              }
+              return arg_detail_seq[0](escopo_for_arg_eval);
+          });
+
+          if (typeof actual_js_function_val !== 'function') {
+              console.error("DEBUG_CALL_EVALUATOR_STEP: actual_js_function_val is NOT a function. Type:", typeof actual_js_function_val, "Value:", actual_js_function_val);
+              throw new TypeError("Interpreter Error: Attempting to call a non-function.");
+          }
+          // console.log("DEBUG_CALL_EVALUATOR_STEP: actual_js_function_val (toString):", actual_js_function_val.toString().substring(0, 100));
+          // console.log("DEBUG_CALL_EVALUATOR_STEP: Number of evaluated_js_args:", evaluated_js_args.length);
+
+          let call_result;
+          try {
+              // Pass 'escopo_for_arg_eval' as the first 'this/closure' scope arg for our lambdas
+              call_result = actual_js_function_val(escopo_for_arg_eval, ...evaluated_js_args);
+          } catch (e) {
+              console.error("DEBUG_CALL_EVALUATOR_STEP: Error DURING actual_js_function_val execution:", e.message, e.stack);
+              throw e;
+          }
+
+          console.log("DEBUG_CALL_EVALUATOR_STEP: Raw result of actual_js_function_val call:", call_result);
+          if (Array.isArray(call_result)) {
+              console.log("DEBUG_CALL_EVALUATOR_STEP: Call result is an array. Length:", call_result.length);
+          } else {
+              console.warn("DEBUG_CALL_EVALUATOR_STEP: Call result is NOT an array. Type:", typeof call_result);
+          }
+          return call_result;
+      };
+  }
 );
 
 const parênteses = transformar(
@@ -353,24 +504,44 @@ const parênteses = transformar(
 
 const termo1 = transformar(
   seq(
-    alt(
-      valor_constante,
-      parênteses,
-    ),
-    vários(
-      alt(
-        fatia,
-        tamanho,
-        atributo,
-        chamada_função,
-      ),
-    ),
+    alt(valor_constante, parênteses),
+    opcional(vários( // Wrap varios with opcional and default to []
+      alt(fatia, tamanho, atributo, chamada_função),
+    ), [])
   ),
-  ([valor, operações]) => escopo => {
-    return operações.reduce(
-      (resultado, operação) => operação(escopo, resultado),
-      valor(escopo)
-    );
+  // ([valor_base_parsed_repr, ops_array_parsed_repr]) is what transformador gets
+  // valor_base_parsed_repr is from alt(valor_constante, parênteses)
+  // ops_array_parsed_repr is from opcional(vários(...), [])
+  ([valor_base_fn, ops_array]) => { // These are already evaluator functions or array of them
+      return escopo => { // This is the function returned by termo1's transformar
+          console.log("DEBUG_TERMO1: Entered termo1 evaluator.");
+          const base_eval_result = valor_base_fn(escopo);
+          console.log("DEBUG_TERMO1: Result of valor_base_fn(escopo) (type):", typeof base_eval_result);
+          // if (typeof base_eval_result !== 'function') { // Avoid logging full functions
+          //    console.log("DEBUG_TERMO1: base_eval_result value:", base_eval_result);
+          // }
+          console.log("DEBUG_TERMO1: ops_array.length:", ops_array ? ops_array.length : 'ops_array_is_null_or_undefined');
+
+          if (!ops_array || ops_array.length === 0) {
+              console.log("DEBUG_TERMO1: ops_array is empty, returning base_eval_result directly.");
+              return base_eval_result;
+          }
+
+          // The actual reduce logic (keep as is)
+          const final_result = ops_array.reduce(
+              (accumulator, current_op_fn) => {
+                  // console.log("DEBUG_TERMO1_REDUCE: Applying op. Accumulator type:", typeof accumulator);
+                  if (typeof current_op_fn !== 'function') {
+                        console.error("DEBUG_TERMO1_REDUCE: current_op_fn is not a function!", current_op_fn);
+                        throw new TypeError("Interpreter Error: Operation in chain is not a function.");
+                  }
+                  return current_op_fn(escopo, accumulator);
+              },
+              base_eval_result
+          );
+          // console.log("DEBUG_TERMO1: Final result of reduce (type):", typeof final_result);
+          return final_result;
+      };
   }
 );
 
@@ -448,90 +619,6 @@ const declarações_constantes = vários(
     expressão,
   )
 )
-
-const _0 = transformar(
-  seq(
-    opcional(vários( // Removed ignorar_comentários
-      seq(
-        seq(
-          nome,
-          símbolo("#"),
-          endereço,
-        ),
-        // espaço, // This was likely for separation between multiple declarations, now handled by stripper
-      ),
-    ), []),
-    opcional(vários( // Removed ignorar_comentários
-      seq(
-        seq(
-          nome,
-          símbolo("@"),
-          endereço,
-        ),
-        // espaço, // This was likely for separation, now handled by stripper
-      ),
-    ), []),
-    opcional(declarações_constantes, []), // Removed ignorar_comentários
-    expressão, // This is the main parser for the body of the code
-  ),
-  // The 'transformador' function for the main _0 parser
-  (código_original_para_erro) => async ([importações, carregamentos, atribuições, valor_ou_erro_expr]) => {
-    // valor_ou_erro_expr is the direct result from the `expressão` parser.
-    // It can be either the function to execute (on success) or an error object.
-
-    // Handle parsing error for the main expression before doing any async work
-    if (valor_ou_erro_expr && valor_ou_erro_expr.error) {
-      // If `expressão` returned an error, valor_ou_erro_expr is the error object.
-      // The 'resto' part for _0 would be the original code because the top-level seq's transform is involved.
-      return [{
-        error: true,
-        message: `Syntax Error: ${valor_ou_erro_expr.message}`,
-        details: valor_ou_erro_expr
-      }, código_original_para_erro]; // Return the original code passed to _0
-    }
-
-    // If no error in the main expression, valor_ou_erro_expr is valor_final_expr_fn
-    const valor_final_expr_fn = valor_ou_erro_expr;
-
-    const escopo_inicial = Object.fromEntries(await Promise.all([
-      ...importações.map(async importação_item => {
-        const [nome_str, , endereço_str] = importação_item[0];
-        const modulo_conteudo_bruto = await (await fetch(endereço_str)).text();
-        const [resultado_parse_modulo, ] = _0(modulo_conteudo_bruto); // _0 itself returns [result, remaining_code]
-
-        // Check if the result of parsing the module is an error object
-        if (resultado_parse_modulo && resultado_parse_modulo.error) {
-          throw new Error(`Falha ao parsear módulo: ${nome_str} de ${endereço_str}. Erro: ${resultado_parse_modulo.message}`);
-        }
-        // Also handle the case where _0 might return null or not an error, but still failed (legacy or unexpected)
-        if (!resultado_parse_modulo) {
-             throw new Error(`Falha ao importar módulo (resultado nulo): ${nome_str} de ${endereço_str}`);
-        }
-        // Assuming `resultado_parse_modulo` is the promise containing the module's value if not an error
-        return [nome_str, await resultado_parse_modulo];
-      }),
-      ...carregamentos.map(async carregamento_item => {
-        const [nome_str, , endereço_str] = carregamento_item[0];
-        return [nome_str, await (await fetch(endereço_str)).text()];
-      }),
-    ]));
-
-    const escopo_com_atribuições = atribuições.reduce((escopo_atual, atribuição_item) => {
-      const [nome_str, , expressão_fn] = atribuição_item;
-      // What if expressão_fn itself is an error from a failed parse in declarações_constantes?
-      // The current structure of `declarações_constantes` using `vários(seq(...))` would mean
-      // an error in one constant declaration would make `declarações_constantes` return an error.
-      // This error would then be caught by the top-level `seq` in `_0`, and then by the check above.
-      // So, `expressão_fn` here should be a valid function if we've passed the error check.
-      return { ...escopo_atual, [nome_str]: expressão_fn(escopo_atual) };
-    }, escopo_inicial);
-
-    // If valor_final_expr_fn was not an error, it's the function to execute.
-    // The result of this function is the final value of the script.
-    // This is wrapped in a Promise by the async nature of this transform.
-    return valor_final_expr_fn(escopo_com_atribuições);
-  },
-);
 
 // Need to adjust how _0 is called/defined due to the new transform function signature
 // The `transformar` function expects `(analisador, transformador)`
@@ -649,6 +736,7 @@ const _0_internal_parser = transformar(
     const valor_final_expr_fn = valor_final_expr_fn_or_error;
 
     // ... (rest of the async logic for imports, scope, etc. as defined before)
+    // This part is kept the same for creating the scope
     const escopo_inicial = Object.fromEntries(await Promise.all([
       ...importações.map(async importação_item => {
         const [nome_str, , endereço_str] = importação_item[0];
@@ -660,16 +748,6 @@ const _0_internal_parser = transformar(
           throw new Error(`Falha ao parsear módulo: ${nome_str} de ${endereço_str}. Erro: ${resultado_parse_modulo.message}`);
         }
         if (resultado_parse_modulo === null || (typeof resultado_parse_modulo === 'object' && !resultado_parse_modulo.error && !Object.keys(resultado_parse_modulo).length && Object.getPrototypeOf(resultado_parse_modulo) === Object.prototype) ) {
-           // Heuristic: if it's null, or an empty plain object that's not an error, it's likely a failed parse that didn't return a structured error.
-           // This condition tries to catch `[null, code]` or `[{}, code]` if _0 somehow returns that on failure.
-           // The `_0` function should ideally always return a value or a structured error.
-           // The `await resultado_parse_modulo` below might also fail if it's not a promise (e.g. if it's an error object already)
-           // This needs to be robust.
-           // If `resultado_parse_modulo` is an error object, `await` on it won't work.
-           // The structure of _0's return is `[value_or_error_promise, remaining_code]`
-           // So `resultado_parse_modulo_tupla[0]` is the promise or the error object.
-           // And `resultado_parse_modulo` is that promise/error object.
-           // If it's not an error, it should be a promise.
             throw new Error(`Falha ao importar módulo (parse não retornou valor nem erro específico): ${nome_str} de ${endereço_str}`);
         }
         return [nome_str, await resultado_parse_modulo]; // await if it's a promise
@@ -684,8 +762,34 @@ const _0_internal_parser = transformar(
       const [nome_str, , expressão_fn] = atribuição_item;
       return { ...escopo_atual, [nome_str]: expressão_fn(escopo_atual) };
     }, escopo_inicial);
+    // End of scope setup part that is kept the same.
 
-    return valor_final_expr_fn(escopo_com_atribuições); // This will be a Promise<actual_value>
+    // New logging and execution for valor_final_expr_fn
+    const final_scope = escopo_com_atribuições;
+    console.log("DEBUG: Type of valor_final_expr_fn:", typeof valor_final_expr_fn);
+    if (typeof valor_final_expr_fn === 'function') {
+        console.log("DEBUG: valor_final_expr_fn (toString):", valor_final_expr_fn.toString().substring(0, 200)); // Log first 200 chars
+        try {
+            const evaluation_result = valor_final_expr_fn(final_scope);
+            console.log("DEBUG: Raw result of valor_final_expr_fn(scope):", evaluation_result);
+            // Check if evaluation_result is an array, as expected by uniteste.descrever
+            if (Array.isArray(evaluation_result)) {
+                console.log("DEBUG: evaluation_result is an array. Length:", evaluation_result.length);
+                if (evaluation_result.length > 0) {
+                    console.log("DEBUG: First element of evaluation_result:", JSON.stringify(evaluation_result[0]).substring(0, 200));
+                }
+            } else {
+                console.warn("WARN: evaluation_result is NOT an array. Type:", typeof evaluation_result);
+            }
+            return evaluation_result;
+        } catch (e) {
+            console.error("ERROR during valor_final_expr_fn(final_scope) execution:", e.message, e.stack);
+            throw e; // Re-throw to see if it's caught by rodar_testes.sh
+        }
+    } else {
+        console.error("ERROR: valor_final_expr_fn is NOT a function. This is unexpected if parsing succeeded.");
+        return valor_final_expr_fn; // Propagate it if it's not a function (e.g. an error obj not caught by transformar)
+    }
   }
 );
 
