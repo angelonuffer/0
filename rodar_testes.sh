@@ -2,6 +2,8 @@
 
 # rodar_testes.sh - Script para executar testes da Linguagem 0
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+
 # Verifica se o Node.js está instalado
 if ! command -v node &> /dev/null
 then
@@ -19,7 +21,8 @@ TEST_FILE="testes/numero.0"
 # Conteúdo do script JS runner
 # Usamos .mjs para permitir 'import' de alto nível.
 cat > "$JS_RUNNER_SCRIPT" <<EOF
-import _0 from './0.js'; // Importa o interpretador da Linguagem 0
+// Importa o interpretador da Linguagem 0 usando o caminho absoluto
+import _0 from '${SCRIPT_DIR}/0.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -121,6 +124,7 @@ fi
 
 # Executa o script JS runner com Node.js
 # Adiciona a flag para módulos ES
+# Não precisamos mais passar PROJECT_ROOT_PATH como env var
 node --experimental-modules "$JS_RUNNER_SCRIPT"
 
 # Remove o script temporário
