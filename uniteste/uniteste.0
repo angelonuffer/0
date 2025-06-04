@@ -1,0 +1,11 @@
+{
+  descrever: (nome, testes) => {
+    nome,
+    testes,
+  },
+  iguais: (nome, valor1, valor2) => {
+    nome,
+    resultado: valor1 == valor2,
+    mensagem_falha: `Esperava que ${valor1} fosse igual a ${valor2}.`,
+  },
+}

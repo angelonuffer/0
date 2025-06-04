@@ -1,0 +1,11 @@
+uniteste # ../uniteste.0
+
+[
+  uniteste.descrever("Operações Aritméticas Básicas", [
+    uniteste.iguais("Adição", 1 + 1, 2),
+    uniteste.iguais("Subtração", 5 - 3, 2),
+    uniteste.iguais("Multiplicação", 2 * 3, 6),
+    uniteste.iguais("Divisão", 10 / 2, 5),
+    uniteste.iguais("Precedência de Operadores", 2 + 2 * 2, 6),
+  ]),
+]
