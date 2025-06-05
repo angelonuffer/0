@@ -86,7 +86,14 @@ const nome = regex(/[a-zA-ZÀ-ÿ_][a-zA-ZÀ-ÿ0-9_]*/);
 
 const endereço = regex(/\S+/);
 
-const espaço = regex(/\s+/);
+// Matches one or more whitespace characters OR a single-line comment
+const um_espaço_ou_comentário = alt(
+  regex(/\s+/), // Matches one or more whitespace characters
+  seq(símbolo("//"), regex(/[^\n]*\n?/)) // Matches a comment line (// until newline)
+);
+
+// Consumes multiple instances of whitespace blocks or comments
+const espaço = vários(um_espaço_ou_comentário);
 
 const número = transformar(regex(/\d+/), v => () => parseInt(v));
 
@@ -401,17 +408,6 @@ const expressão = operação(
   ),
 );
 
-const comentário = transformar(
-  seq(
-    símbolo("//"),
-    regex(/[^\n]*/),
-    opcional(espaço),
-  ),
-  () => () => null
-);
-
-const ignorar_comentários = vários(comentário);
-
 const declarações_constantes = vários(
   seq(
     seq(
@@ -427,7 +423,7 @@ const declarações_constantes = vários(
 
 const _0 = transformar(
   seq(
-    opcional(ignorar_comentários),
+    opcional(espaço),
     opcional(vários(
       seq(
         seq(
@@ -452,9 +448,9 @@ const _0 = transformar(
         espaço,
       ),
     ), []),
-    opcional(ignorar_comentários),
+    opcional(espaço),
     opcional(declarações_constantes, []),
-    opcional(ignorar_comentários),
+    opcional(espaço),
     expressão,
   ),
   ([, importaçõesDetectadas, carregamentosDetectados, , atribuições, , valor]) => {
