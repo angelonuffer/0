@@ -165,14 +165,19 @@ async function main() {
     process.exit(1);
   }
 
-  if (!Array.isArray(result) || result.length !== 2) {
-    // No change
-    console.error(`Module ${modulePath}'s main function did not return the expected [exitCode, stdOutContent] array.`);
-    console.error(`Received: ${JSON.stringify(result)}`);
-    process.exit(1);
+  let exitCode, rawStdOutContent = ""; // Default stdout to empty
+  if (Array.isArray(result) && result.length === 2) {
+      [exitCode, rawStdOutContent] = result;
+  } else if (typeof result === 'number') {
+      exitCode = result;
+      // rawStdOutContent remains ""
+  } else {
+      console.error(`Module ${modulePath}'s main function did not return an exit code (number) or an [exitCode, stdOutContent] array.`);
+      console.error(`Received: ${JSON.stringify(result)}`);
+      process.exit(1);
   }
 
-  const [exitCode, rawStdOutContent] = result; // Renamed to rawStdOutContent
+  // const [exitCode, rawStdOutContent] = result; // This line is replaced
 
   if (typeof exitCode !== 'number') {
     // No change
