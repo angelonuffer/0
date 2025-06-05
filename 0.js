@@ -277,7 +277,12 @@ const chamada_função = transformar(
     opcional(espaço),
     símbolo(")"),
   ),
-  ([, , args]) => (escopo, função) => função(escopo, ...args.map(arg => arg[0](escopo))),
+  ([, , args]) => (escopo, função) => {
+    // console.log(`chamada_função: typeof função is ${typeof função}`);
+    // console.log(`chamada_função: args are:`, args);
+    // console.log(`chamada_função: escopo is:`, escopo);
+    return função(escopo, ...args.map(arg => arg[0](escopo)));
+  },
 );
 
 const parênteses = transformar(
@@ -452,22 +457,28 @@ const _0 = transformar(
     opcional(ignorar_comentários),
     expressão,
   ),
-  async ([, importações, carregamentos, , atribuições, , valor]) => {
-    return valor(atribuições.reduce((escopo, [[nome, , , , valor]]) => {
-      return {
-        ...escopo,
-        [nome]: valor(escopo),
-      };
-    }, Object.fromEntries(await Promise.all([
-      ...importações.map(async importação => {
-        const [[nome, , , , endereço]] = importação;
-        return [nome, await _0(await (await fetch(endereço)).text())[0]]
-      }),
-      ...carregamentos.map(async carregamento => {
-        const [[nome, , , , endereço]] = carregamento;
-        return [nome, await (await fetch(endereço)).text()]
-      }),
-    ]))))
+  ([, importaçõesDetectadas, carregamentosDetectados, , atribuições, , valor]) => {
+    const importações = importaçõesDetectadas.map(importação => {
+      const [[name, , , , address]] = importação;
+      return { name, address };
+    });
+
+    const carregamentos = carregamentosDetectados.map(carregamento => {
+      const [[name, , , , address]] = carregamento;
+      return { name, address };
+    });
+
+    const execute = preparedScope => {
+      const escopoInicial = atribuições.reduce((escopo, [[nome, , , , valorAtribuição]]) => {
+        return {
+          ...escopo,
+          [nome]: valorAtribuição(escopo),
+        };
+      }, preparedScope);
+      return valor(escopoInicial);
+    };
+
+    return [importações, carregamentos, execute];
   },
 );
 

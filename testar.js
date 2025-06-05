@@ -113,14 +113,51 @@ async function runTests(testCasesToRun, allTestCases) {
     // console.log(`Code:\n${tc.code}`); // Optional: print code for every test
 
     try {
-      const executionResult = await _0(tc.code);
-      let actualValue;
-      if (Array.isArray(executionResult)) {
-        actualValue = executionResult[0];
-      } else {
-        console.warn("\nWarning: _0 did not return an array for test case:", tc);
-        actualValue = executionResult;
+      const output_0 = _0(tc.code);
+      if (!output_0 || output_0[0] === null) {
+        throw new Error(`_0 failed to parse the code: "${tc.code.substring(0, 50)}..."`);
       }
+      const [importações, carregamentos, executeFn] = output_0[0];
+      // console.log(`Initial imports for "${tc.code.substring(0,20).replace(/\n/g, "\\n")}...":`, JSON.stringify(importações));
+      // console.log(`Initial loads for "${tc.code.substring(0,20).replace(/\n/g, "\\n")}...":`, JSON.stringify(carregamentos));
+
+      async function buildScopeRecursively(currentImports, currentLoads, basePathForResolution) {
+        const scope = {};
+
+        // Process imports
+        for (const imp of currentImports) {
+          const importPath = path.resolve(basePathForResolution, imp.address);
+          const importContent = fs.readFileSync(importPath, 'utf-8');
+          const output_nested_0 = _0(importContent);
+          if (!output_nested_0 || output_nested_0[0] === null) {
+            throw new Error(`_0 failed to parse imported code from "${imp.address}": "${importContent.substring(0,50)}..."`);
+          }
+          const [nestedImports, nestedLoads, nestedExecuteFn] = output_nested_0[0];
+
+          let nestedScopeResult = await buildScopeRecursively(nestedImports, nestedLoads, path.dirname(importPath));
+          let importedValue = nestedExecuteFn(nestedScopeResult);
+
+          // Await if the execution of the imported module returns a Promise
+          if (importedValue && typeof importedValue.then === 'function') {
+            importedValue = await importedValue;
+          }
+          // Unlike the main script evaluation, we do NOT automatically call a function returned by an import.
+          // The imported value is taken as is. If it's a function, it's stored as a function.
+          scope[imp.name] = importedValue;
+        }
+
+        // Process loads
+        for (const load of currentLoads) {
+          const loadPath = path.resolve(basePathForResolution, load.address);
+          const loadContent = fs.readFileSync(loadPath, 'utf-8');
+          scope[load.name] = loadContent;
+        }
+        return scope;
+      }
+
+      const initialBasePath = path.dirname(EXAMPLES_FILE);
+      const preparedScope = await buildScopeRecursively(importações, carregamentos, initialBasePath);
+      let actualValue = executeFn(preparedScope);
 
       if (actualValue && typeof actualValue.then === 'function') {
         actualValue = await actualValue;
