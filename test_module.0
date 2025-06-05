@@ -1,0 +1,13 @@
+// test_module.0 - A sample module for 0_cli.js
+
+(cli_args, stdin_text) => [
+  // Exit Code:
+  0,
+
+  // Stdout Content:
+  // Return a simple string, and we'll verify args/stdin presence by a successful run.
+  // More complex manipulation can be tested if basic execution works.
+  "Test Module Executed Successfully.
+Args and stdin were passed (not echoed here to keep it simple).
+"
+]
