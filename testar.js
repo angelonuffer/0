@@ -291,7 +291,11 @@ async function main() {
       return;
   }
 
-  await runTests(testsToExecute, allTestCases);
+  const { failedCount } = await runTests(testsToExecute, allTestCases);
+  if (failedCount > 0) {
+    console.log(`Exiting with code 1 due to ${failedCount} failed test(s).`);
+    process.exit(1);
+  }
 }
 
 main().catch(error => {
