@@ -228,7 +228,7 @@ Explicação: Primeiro, calcula-se `2 + 3`, que resulta em `5`. Em seguida, mult
 
 Explicação: Primeiro, calcula-se `6 / 2`, que resulta em `3`. Em seguida, subtrai-se de `10`, resultando em `7`.
 
-Esses exemplos mostram como a precedência dos operadores afeta o resultado das expressões e como os parênteses podem ser usados para controlar a ordem de execução.
+Esses exemplos showram como a precedência dos operadores afeta o resultado das expressões e como os parênteses podem ser usados para controlar a ordem de execução.
 
 ### Comparadores
 
