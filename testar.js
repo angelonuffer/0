@@ -113,11 +113,20 @@ async function runTests(testCasesToRun, allTestCases) {
     // console.log(`Code:\n${tc.code}`); // Optional: print code for every test
 
     try {
-      const output_0 = _0(tc.code);
-      if (!output_0 || output_0[0] === null) {
-        throw new Error(`_0 failed to parse the code: "${tc.code.substring(0, 50)}..."`);
+      const [status, ast, remainingCodeInTest] = _0(tc.code); // remainingCodeInTest is tc.code's remainder
+      if (status !== 0) {
+        // Error messages are not strictly needed here for PASS/FAIL,
+        // but useful for debugging the tests themselves.
+        // We can use a generic message or fetch from error_messages.json if we import it.
+        // For now, a generic message is fine as testar.js is about pass/fail.
+        throw new Error(`_0 failed to parse the code with status ${status}: "${tc.code.substring(0, 50)}..." Remaining: "${remainingCodeInTest}"`);
       }
-      const [importações, carregamentos, executeFn] = output_0[0];
+      // Check for unconsumed input, which should also be a test failure.
+      if (remainingCodeInTest && remainingCodeInTest.trim().length > 0) {
+          throw new Error(`_0 parsed successfully but left unconsumed input: "${remainingCodeInTest.substring(0,100)}..." for code "${tc.code.substring(0,50)}..."`);
+      }
+      // ast is output_0[1] (the value part of [status, value, remainder])
+      const [importações, carregamentos, executeFn] = ast;
       // console.log(`Initial imports for "${tc.code.substring(0,20).replace(/\n/g, "\\n")}...":`, JSON.stringify(importações));
       // console.log(`Initial loads for "${tc.code.substring(0,20).replace(/\n/g, "\\n")}...":`, JSON.stringify(carregamentos));
 
@@ -128,11 +137,17 @@ async function runTests(testCasesToRun, allTestCases) {
         for (const imp of currentImports) {
           const importPath = path.resolve(basePathForResolution, imp.address);
           const importContent = fs.readFileSync(importPath, 'utf-8');
-          const output_nested_0 = _0(importContent);
-          if (!output_nested_0 || output_nested_0[0] === null) {
-            throw new Error(`_0 failed to parse imported code from "${imp.address}": "${importContent.substring(0,50)}..."`);
+
+          const [nestedStatus, nestedAst, nestedRemainingCode] = _0(importContent);
+          if (nestedStatus !== 0) {
+            throw new Error(`_0 failed to parse imported code from "${imp.address}" with status ${nestedStatus}: "${importContent.substring(0,50)}..." Remaining: "${nestedRemainingCode}"`);
           }
-          const [nestedImports, nestedLoads, nestedExecuteFn] = output_nested_0[0];
+          // Check for unconsumed input in imported modules too.
+          if (nestedRemainingCode && nestedRemainingCode.trim().length > 0) {
+              throw new Error(`_0 parsed imported module "${imp.address}" successfully but left unconsumed input: "${nestedRemainingCode.substring(0,100)}..."`);
+          }
+          // nestedAst is output_nested_0[1]
+          const [nestedImports, nestedLoads, nestedExecuteFn] = nestedAst;
 
           let nestedScopeResult = await buildScopeRecursively(nestedImports, nestedLoads, path.dirname(importPath));
           let importedValue = nestedExecuteFn(nestedScopeResult);
