@@ -3,6 +3,7 @@
 import _0 from './0.js';
 import fs from 'fs';
 import path from 'path';
+import errorMessages from './error_messages.json' assert { type: 'json' };
 
 // buildScopeRecursively function remains the same
 async function buildScopeRecursively(currentImports, currentLoads, basePathForResolution, cliArgs, stdinContent) {
@@ -15,7 +16,7 @@ async function buildScopeRecursively(currentImports, currentLoads, basePathForRe
     try {
       scope[load.name] = fs.readFileSync(loadPath, 'utf-8');
     } catch (e) {
-      console.error(`Error loading file specified by @${load.name}: ${loadPath}`);
+      console.error(`${errorMessages["17"]} @${load.name}: ${loadPath}`);
       console.error(e.message);
       process.exit(1);
     }
@@ -26,33 +27,39 @@ async function buildScopeRecursively(currentImports, currentLoads, basePathForRe
     try {
       importContent = fs.readFileSync(importPath, 'utf-8');
     } catch (e) {
-      console.error(`Error reading imported module file: ${importPath}`);
+      console.error(`${errorMessages["12"]}: ${importPath}`);
       console.error(e.message);
       process.exit(1);
     }
-    let nestedParsedOutput;
-    try {
-      nestedParsedOutput = _0(importContent);
-    } catch (e) {
-      console.error(`Error interpreting imported module ${importPath}:`);
-      console.error(e);
-      process.exit(1);
+
+    const [status, nestedAst, nestedRemainingCode] = _0(importContent);
+
+    if (status !== 0) {
+      const message = errorMessages[status] || `Unknown error code: ${status}`;
+      console.error(`Error parsing imported module ${importPath}: ${message}`);
+      if (nestedRemainingCode && nestedRemainingCode.trim().length > 0) { // If parser provides remaining code info
+          const errorPosition = importContent.length - nestedRemainingCode.length;
+          const lines = importContent.substring(0, errorPosition).split('\n');
+          const lineNum = lines.length;
+          const colNum = lines[lines.length - 1].length + 1;
+          console.error(`Error details: Unexpected input near line ${lineNum}, column ${colNum}: "${nestedRemainingCode.trim().split('\n')[0]}"`);
+      }
+      process.exit(1); // Or use a specific exit code for this, e.g., errorMessages[13] -> process.exit(13) if desired
     }
-    if (!nestedParsedOutput || nestedParsedOutput[0] === null) {
-      console.error(`Error parsing imported module ${importPath}: Interpreter returned null.`);
-      process.exit(1);
-    }
-    const [nestedAst, nestedRemainingCode] = nestedParsedOutput;
+
+    // const [nestedAst, nestedRemainingCode] = nestedParsedOutput; // Already destructured
     if (nestedRemainingCode && nestedRemainingCode.trim().length > 0) {
       const errorPosition = importContent.length - nestedRemainingCode.length;
       const lines = importContent.substring(0, errorPosition).split('\n');
       const lineNum = lines.length;
       const colNum = lines[lines.length - 1].length + 1;
-      console.error(`Syntax error in imported module ${importPath} at line ${lineNum}, column ${colNum}:`);
+      // Use error code 14 from json
+      const message = errorMessages["14"] || "Syntax error in imported module";
+      console.error(`${message} ${importPath} at line ${lineNum}, column ${colNum}:`);
       console.error(`Unexpected input: "${nestedRemainingCode.trim().split('\n')[0]}"`);
       process.exit(1);
     }
-    const [nestedImports, nestedLoads, nestedExecuteFn] = nestedAst;
+    const [nestedImports, nestedLoads, nestedExecuteFn] = nestedAst; // This is fine
     const nestedScope = await buildScopeRecursively(nestedImports, nestedLoads, path.dirname(importPath), cliArgs, stdinContent);
     let importedValue = nestedExecuteFn(nestedScope);
     if (importedValue && typeof importedValue.then === 'function') {
@@ -96,42 +103,41 @@ async function main() {
   try {
     moduleContent = fs.readFileSync(modulePath, 'utf-8');
   } catch (error) {
-    // No change to this error handling
-    console.error(`Error reading module file: ${modulePath}`);
+    console.error(`${errorMessages["10"]}: ${modulePath}`);
     console.error(error.message);
     process.exit(1);
   }
 
-  let parsedOutput;
-  try {
-    parsedOutput = _0(moduleContent);
-  } catch (e) {
-    // No change
-    console.error(`Error interpreting module ${modulePath}:`);
-    console.error(e);
+  const [status, ast, remainingCode] = _0(moduleContent);
+
+  if (status !== 0) {
+    // Use error code 11 from json as a fallback if specific status message not found
+    const message = errorMessages[status] || errorMessages["11"] || `Unknown error code: ${status}`;
+    console.error(`Error parsing module ${modulePath}: ${message}`);
+     if (remainingCode && remainingCode.trim().length > 0) { // If parser provides remaining code info
+        const errorPosition = moduleContent.length - remainingCode.length;
+        const lines = moduleContent.substring(0, errorPosition).split('\n');
+        const lineNum = lines.length;
+        const colNum = lines[lines.length - 1].length + 1;
+        console.error(`Error details: Unexpected input near line ${lineNum}, column ${colNum}: "${remainingCode.trim().split('\n')[0]}"`);
+    }
     process.exit(1);
   }
 
-  if (!parsedOutput || parsedOutput[0] === null) {
-    // No change
-    console.error(`Error parsing module ${modulePath}: Interpreter returned null.`);
-    process.exit(1);
-  }
-
-  const [ast, remainingCode] = parsedOutput;
-
+  // const [ast, remainingCode] = parsedOutput; // Already destructured
   if (remainingCode && remainingCode.trim().length > 0) {
-    // No change
     const errorPosition = moduleContent.length - remainingCode.length;
     const lines = moduleContent.substring(0, errorPosition).split('\n');
     const lineNum = lines.length;
     const colNum = lines[lines.length - 1].length + 1;
-    console.error(`Syntax error in module ${modulePath} at line ${lineNum}, column ${colNum}:`);
+    // Use error code 4 from json
+    const message = errorMessages["4"] || "Syntax error";
+    console.error(`${message} in module ${modulePath} at line ${lineNum}, column ${colNum}:`);
     console.error(`Unexpected input: "${remainingCode.trim().split('\n')[0]}"`);
     process.exit(1);
   }
 
-  const [imports, loads, executeFn] = ast;
+  const [imports, loads, executeFn] = ast; // This is fine
   let stdinContent;
   if (process.stdin.isTTY) {
     stdinContent = "";
@@ -145,15 +151,14 @@ async function main() {
   try {
     moduleMainFunction = executeFn(preparedScope);
   } catch (e) {
-    // No change
-    console.error(`Error during initial execution of module ${modulePath} (before returning main function):`);
+    // Error during initial execution (not syntax, but runtime within the script logic before main fn)
+    console.error(`${errorMessages["18"]} during initial execution of module ${modulePath} (before returning main function):`);
     console.error(e);
     process.exit(1);
   }
 
   if (typeof moduleMainFunction !== 'function') {
-    // No change
-    console.error(`Module ${modulePath} did not return a function. Expected a function, but got: ${typeof moduleMainFunction}`);
+    console.error(`${errorMessages["15"]}. Module: ${modulePath}. Expected a function, but got: ${typeof moduleMainFunction}`);
     process.exit(1);
   }
 
@@ -164,8 +169,8 @@ async function main() {
         result = await result;
     }
   } catch (e) {
-    // No change
-    console.error(`Error during execution of the main function from module ${modulePath}:`);
+    // Error during main function execution
+    console.error(`${errorMessages["18"]} during execution of the main function from module ${modulePath}:`);
     console.error(e);
     process.exit(1);
   }
@@ -173,20 +178,26 @@ async function main() {
   let exitCode, rawStdOutContent = ""; // Default stdout to empty
   if (Array.isArray(result) && result.length === 2) {
       [exitCode, rawStdOutContent] = result;
+      if (typeof exitCode !== 'number') {
+        console.error(`${errorMessages["16"]}. Module: ${modulePath}. Exit code is not a number: ${exitCode}`);
+        process.exit(1);
+      }
   } else if (typeof result === 'number') {
       exitCode = result;
       // rawStdOutContent remains ""
   } else {
-      console.error(`Module ${modulePath}'s main function did not return an exit code (number) or an [exitCode, stdOutContent] array.`);
+      console.error(`${errorMessages["16"]}. Module: ${modulePath}. Main function did not return an exit code (number) or an [exitCode, stdOutContent] array.`);
       console.error(`Received: ${JSON.stringify(result)}`);
       process.exit(1);
   }
 
-  // const [exitCode, rawStdOutContent] = result; // This line is replaced
+  // const [exitCode, rawStdOutContent] = result; // This line is replaced by the logic above
 
+  // This check is now partially handled above for the array case.
+  // If it was a direct number, it's fine.
+  // Redundant check if the above logic is complete.
   if (typeof exitCode !== 'number') {
-    // No change
-    console.error(`Module ${modulePath}'s main function returned an invalid exit code (not a number): ${exitCode}`);
+    console.error(`${errorMessages["16"]}. Module: ${modulePath}. Returned an invalid exit code structure or type: ${exitCode}`);
     process.exit(1);
   }
 
@@ -204,7 +215,7 @@ async function main() {
 main().catch(error => {
   // This catch block is for truly unexpected errors in the CLI script itself,
   // not for errors originating from the user's 0 module (those are handled earlier).
-  console.error("Unexpected critical error in 0_cli.js execution pipeline:");
+  console.error(`${errorMessages["18"]}:`);
   console.error(error);
   process.exit(1); // Default to 1 for unexpected CLI errors
 });
