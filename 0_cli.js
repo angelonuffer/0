@@ -132,7 +132,12 @@ async function main() {
   }
 
   const [imports, loads, executeFn] = ast;
-  const stdinContent = await readStdin();
+  let stdinContent;
+  if (process.stdin.isTTY) {
+    stdinContent = "";
+  } else {
+    stdinContent = await readStdin();
+  }
   const argvForScope = rawCliArgs;
   const preparedScope = await buildScopeRecursively(imports, loads, path.dirname(modulePath), argvForScope, stdinContent);
 
