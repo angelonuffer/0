@@ -37,12 +37,24 @@ async function buildScopeRecursively(currentImports, currentLoads, basePathForRe
     if (status !== 0) {
       const message = errorMessages[status] || `Unknown error code: ${status}`;
       console.error(`Error parsing imported module ${importPath}: ${message}`);
+      // Added section for nestedAst details
+      if (nestedAst !== null && nestedAst !== undefined) {
+        if (typeof nestedAst === 'object' && Object.keys(nestedAst).length > 0) {
+          try {
+            console.error("Parser diagnostic details: ", JSON.stringify(nestedAst));
+          } catch (e) {
+            console.error("Parser diagnostic details (not serializable): ", nestedAst);
+          }
+        } else if (typeof nestedAst === 'string' && nestedAst.trim().length > 0) {
+          console.error("Parser diagnostic details: ", nestedAst);
+        }
+      }
       if (nestedRemainingCode && nestedRemainingCode.trim().length > 0) { // If parser provides remaining code info
           const errorPosition = importContent.length - nestedRemainingCode.length;
           const lines = importContent.substring(0, errorPosition).split('\n');
           const lineNum = lines.length;
           const colNum = lines[lines.length - 1].length + 1;
-          console.error(`Error details: Unexpected input near line ${lineNum}, column ${colNum}: "${nestedRemainingCode.trim().split('\n')[0]}"`);
+          console.error(`Error location details: Unexpected input near line ${lineNum}, column ${colNum}: "${nestedRemainingCode.trim().split('\n')[0]}"`);
       }
       process.exit(1); // Or use a specific exit code for this, e.g., errorMessages[13] -> process.exit(13) if desired
     }
@@ -114,12 +126,24 @@ async function main() {
     // Use error code 11 from json as a fallback if specific status message not found
     const message = errorMessages[status] || errorMessages["11"] || `Unknown error code: ${status}`;
     console.error(`Error parsing module ${modulePath}: ${message}`);
+    // Added section for ast details
+    if (ast !== null && ast !== undefined) {
+      if (typeof ast === 'object' && Object.keys(ast).length > 0) {
+        try {
+          console.error("Parser diagnostic details: ", JSON.stringify(ast));
+        } catch (e) {
+          console.error("Parser diagnostic details (not serializable): ", ast);
+        }
+      } else if (typeof ast === 'string' && ast.trim().length > 0) {
+        console.error("Parser diagnostic details: ", ast);
+      }
+    }
      if (remainingCode && remainingCode.trim().length > 0) { // If parser provides remaining code info
         const errorPosition = moduleContent.length - remainingCode.length;
         const lines = moduleContent.substring(0, errorPosition).split('\n');
         const lineNum = lines.length;
         const colNum = lines[lines.length - 1].length + 1;
-        console.error(`Error details: Unexpected input near line ${lineNum}, column ${colNum}: "${remainingCode.trim().split('\n')[0]}"`);
+        console.error(`Error location details: Unexpected input near line ${lineNum}, column ${colNum}: "${remainingCode.trim().split('\n')[0]}"`);
     }
     process.exit(1);
   }
