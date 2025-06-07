@@ -1,17 +1,7 @@
-import error_messages from './error_messages.js';
-const createErrorObject = (status, details, input) => {
-  return {
-    status: status,
-    message: error_messages[status] || "Unknown error",
-    details: details,
-    input: input // The input string at the point of error
-  };
-};
-
 const alt = (...analisadores) => {
   if (analisadores.length === 0) {
     // Base case: no parsers left, so this 'alt' path fails to find a match.
-    return código => [3, createErrorObject(3, { message: "No alternative parsers succeeded." }, código), código];
+    return código => [3, null, código];
   }
   const analisadorPrincipal = analisadores[0];
   const analisadoresRestantes = analisadores.slice(1);
@@ -42,13 +32,13 @@ const seq = (...analisadores) => {
 
 const símbolo = (símbolo_esperado) => código => {
   if (código.startsWith(símbolo_esperado)) return [0, símbolo_esperado, código.slice(símbolo_esperado.length)];
-  return [2, createErrorObject(2, { expected: símbolo_esperado }, código), código]; // Error 2: Expected symbol not found
+  return [1, símbolo_esperado, código];
 };
 
 const regex = (expRegex) => código => {
   const valorMatch = código.match(expRegex);
   if (valorMatch && valorMatch.index === 0) return [0, valorMatch[0], código.slice(valorMatch[0].length)];
-  return [3, createErrorObject(3, { expectedPattern: expRegex.source }, código), código]; // Error 3: Expected pattern not found
+  return [2, expRegex.source, código];
 };
 
 const opcional = (analisador, valor_padrão) => código => {
@@ -168,7 +158,12 @@ const não = transformar(
 
 const valor_constante = transformar(
   nome, // nome (regex) returns [status, value, remainder]
-  v => escopo => escopo[v], // transformador called on success
+  v => escopo => {
+    if (! escopo.hasOwnProperty(v)) {
+      throw new Error(`Constante não definida: ${v}`);
+    }
+    return escopo[v]
+  }, // transformador called on success
 )
 
 // fatia needs to handle status from its internal expression calls
@@ -674,10 +669,24 @@ const _0 = código => {
     opcional(espaço), // Consume trailing spaces/comments after the main expression
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
+  // if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
   // valorSeq is [maybeSpace1, importaçõesDetectadas_val, carregamentosDetectadas_val, maybeSpace2, atribuições_val, maybeSpace3, valor_fn_expr]
   const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
+  const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+  const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+
+  return [statusSeq, [importações, carregamentos, escopo => {
+    return valor_fn_expr({
+      ...escopo,
+      ...atribuições_val.reduce((acc, [[nome_val, , , , valorAtribuição_fn]]) => {
+        return {
+          ...acc,
+          [nome_val]: valorAtribuição_fn(acc),
+        }
+      }, {}),
+    })
+  }], restoSeq]
 
   const transformador = ([imps_val, loads_val, assigns_val, final_expr_fn]) => {
     const importações = (imps_val !== null ? imps_val : []).map(importação_seq_item => {
