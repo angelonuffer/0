@@ -687,44 +687,6 @@ const _0 = código => {
       }, {}),
     })
   }], restoSeq]
-
-  const transformador = ([imps_val, loads_val, assigns_val, final_expr_fn]) => {
-    const importações = (imps_val !== null ? imps_val : []).map(importação_seq_item => {
-      // importação_seq_item is [IMPORT_BODY_VAL, ESPAÇO_VAL]
-      // IMPORT_BODY_VAL is from seq(nome, optEsp, "#", optEsp, endereço)
-      const [name_val, , , , address_val] = importação_seq_item[0]; // Get IMPORT_BODY_VAL
-      return { name: name_val, address: address_val };
-    });
-
-    const carregamentos = (loads_val !== null ? loads_val : []).map(carregamento_seq_item => {
-      // carregamento_seq_item is [LOAD_BODY_VAL, ESPAÇO_VAL]
-      const [name_val, , , , address_val] = carregamento_seq_item[0]; // Get LOAD_BODY_VAL
-      return { name: name_val, address: address_val };
-    });
-
-    const execute = preparedScope => {
-      const escopoInicial = (assigns_val !== null ? assigns_val : []).reduce((escopo, atrib_seq_item) => {
-        // atrib_seq_item is [CONST_BODY_VAL, ESPAÇO_VAL]
-        // CONST_BODY_VAL is from seq(nome, optEsp, "=", optEsp, expressão)
-        const [nome_val, , , , valorAtribuição_fn] = atrib_seq_item[0]; // Get CONST_BODY_VAL
-        return {
-          ...escopo,
-          [nome_val]: valorAtribuição_fn(escopo),
-        };
-      }, preparedScope);
-      return final_expr_fn(escopoInicial);
-    };
-    return [importações, carregamentos, execute];
-  };
-
-  // The 'transformar' equivalent for _0:
-  // The 'valorSeq' from seq is:
-  // [valOptEspaço1, valOptImportações, valOptCarregamentos, valOptEspaço2, valOptAtribuições, valOptEspaço3, valExpressão]
-  // We need to pass these to the transformador correctly.
-  // Note: importaçõesDetectadas_val, carregamentosDetectadas_val, atribuições_val, valor_fn_expr are already extracted above.
-  const transformedValue = transformador([importaçõesDetectadas_val, carregamentosDetectadas_val, atribuições_val, valor_fn_expr]);
-
-  return [0, transformedValue, restoSeq]; // Return status 0, the transformed value, and the remainder
 };
 
 export default _0
