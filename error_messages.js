@@ -1,4 +1,4 @@
-{
+export default {
   "0": "Success",
   "1": "Parser error: Generic failure",
   "2": "Parser error: Expected symbol not found",
@@ -12,5 +12,5 @@
   "15": "CLI error: Module did not return a function",
   "16": "CLI error: Module's main function returned an invalid exit code",
   "17": "CLI error: Error loading file specified by @",
-  "18": "CLI error: Critical error in CLI execution pipeline"
+  "18": "CLI error: Critical error in CLI execution pipeline",
 }

@@ -3,7 +3,7 @@
 import _0 from './0.js';
 import fs from 'fs';
 import path from 'path';
-import errorMessages from './error_messages.json' assert { type: 'json' };
+import errorMessages from './error_messages.js';
 
 // buildScopeRecursively function remains the same
 async function buildScopeRecursively(currentImports, currentLoads, basePathForResolution, cliArgs, stdinContent) {
