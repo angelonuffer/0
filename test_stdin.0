@@ -1,4 +1,0 @@
-(ARGV, STDIN) => [
-    0,
-    STDIN
-]

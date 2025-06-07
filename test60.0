@@ -1,1 +1,0 @@
-soma = a b => a + b\n\nsoma(3 7)
