@@ -1,8 +1,17 @@
+import error_messages from './error_messages.js';
+const createErrorObject = (status, details, input) => {
+  return {
+    status: status,
+    message: error_messages[status] || "Unknown error",
+    details: details,
+    input: input // The input string at the point of error
+  };
+};
+
 const alt = (...analisadores) => {
   if (analisadores.length === 0) {
     // Base case: no parsers left, so this 'alt' path fails to find a match.
-    // Return a non-zero status. Using 3: "Expected pattern not found (regex)" as a generic failure.
-    return código => [3, null, código];
+    return código => [3, createErrorObject(3, { message: "No alternative parsers succeeded." }, código), código];
   }
   const analisadorPrincipal = analisadores[0];
   const analisadoresRestantes = analisadores.slice(1);
@@ -24,22 +33,22 @@ const seq = (...analisadores) => {
   const próximo_seq = seq(...analisadores.slice(1));
   return código => {
     const [status1, valor1, resto1] = analisadores[0](código);
-    if (status1 !== 0) return [status1, null, código]; // Propagate error, original code
+    if (status1 !== 0) return [status1, valor1, código]; // Pass along the error object from valor1 and original 'código'
     const [status2, valor2, resto2] = próximo_seq(resto1);
-    if (status2 !== 0) return [status2, null, código]; // Propagate error, original code
+    if (status2 !== 0) return [status2, valor2, código]; // Propagate error, original code
     return [0, [valor1, ...valor2], resto2]; // Both succeed
   };
 }
 
 const símbolo = (símbolo_esperado) => código => {
   if (código.startsWith(símbolo_esperado)) return [0, símbolo_esperado, código.slice(símbolo_esperado.length)];
-  return [2, null, código]; // Error 2: Expected symbol not found
+  return [2, createErrorObject(2, { expected: símbolo_esperado }, código), código]; // Error 2: Expected symbol not found
 };
 
 const regex = (expRegex) => código => {
   const valorMatch = código.match(expRegex);
   if (valorMatch && valorMatch.index === 0) return [0, valorMatch[0], código.slice(valorMatch[0].length)];
-  return [3, null, código]; // Error 3: Expected pattern not found
+  return [3, createErrorObject(3, { expectedPattern: expRegex.source }, código), código]; // Error 3: Expected pattern not found
 };
 
 const opcional = (analisador, valor_padrão) => código => {
@@ -83,7 +92,7 @@ const vários = analisador => {
 
 const transformar = (analisador, transformador) => código => {
   const [status, valor, resto] = analisador(código);
-  if (status !== 0) return [status, null, código];
+  if (status !== 0) return [status, valor, código]; // valor is already the error object from analisador
   return [0, transformador(valor), resto];
 };
 
@@ -105,7 +114,7 @@ const operação = (termo, operadores) => {
       )), []),
     )(código);
 
-    if (status !== 0) return [status, null, código];
+    if (status !== 0) return [status, valor, código];
 
     const [primeiroTermo, operaçõesSequenciais] = valor;
 
@@ -168,21 +177,21 @@ const fatia = código => {
     símbolo("["),
     código_interno => { // Wrapper for expression call
       const [statusExp, valorExp, restoExp] = expressão(código_interno);
-      if (statusExp !== 0) return [statusExp, null, código_interno];
+      if (statusExp !== 0) return [statusExp, valorExp, código_interno];
       return [0, valorExp, restoExp];
     },
     opcional(seq(
       símbolo(":"),
       opcional(código_interno_opcional => { // Wrapper for optional expression call
         const [statusExpOpt, valorExpOpt, restoExpOpt] = expressão(código_interno_opcional);
-        if (statusExpOpt !== 0) return [statusExpOpt, null, código_interno_opcional]; // Propagate error
+        if (statusExpOpt !== 0) return [statusExpOpt, valorExpOpt, código_interno_opcional]; // Propagate error
         return [0, valorExpOpt, restoExpOpt];
       }),
     ), []), // Default for opcional if inner seq fails (or if opcional expression fails)
     símbolo("]"),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
   const [, i_fn, [faixa, j_fn_opcional],] = valorSeq;
   const transformador = (escopo, valor) => {
@@ -207,13 +216,13 @@ const expressão_modelo = código => {
     símbolo("${"),
     código_interno => { // Wrapper for expression call
       const [statusExp, valorExp, restoExp] = expressão(código_interno);
-      if (statusExp !== 0) return [statusExp, null, código_interno];
+      if (statusExp !== 0) return [statusExp, valorExp, código_interno];
       return [0, valorExp, restoExp];
     },
     símbolo("}"),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
   const [, valor_fn,] = valorSeq;
   return [0, escopo => valor_fn(escopo), restoSeq];
 };
@@ -231,9 +240,9 @@ const modelo = código => {
     símbolo("`"),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
-  const [, conteúdo_fns,] = valorSeq; // conteúdo_fns is an array of functions from vários(alt(...))
+  const [, conteúdo_fns,] = valorSeq; // conteúdo_fns is an array of functions from varios(alt(...))
   const transformador = escopo => conteúdo_fns.map(fn => {
     const valor2 = fn(escopo);
     if (typeof valor2 === "number") return String.fromCharCode(valor2);
@@ -258,7 +267,7 @@ const lista = código => {
           opcional(símbolo("..."), ""),
           código_interno => { // Wrapper for expression call
             const [statusExp, valorExp, restoExp] = expressão(código_interno);
-            if (statusExp !== 0) return [statusExp, null, código_interno];
+            if (statusExp !== 0) return [statusExp, valorExp, código_interno];
             return [0, valorExp, restoExp];
           },
           opcional(símbolo(",")),
@@ -269,7 +278,7 @@ const lista = código => {
     símbolo("]"),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
   const [, , valores_seq,] = valorSeq; // valores_seq is the array from vários(seq(...))
   const transformador = escopo => valores_seq ? valores_seq.flatMap(v_seq => {
@@ -296,7 +305,7 @@ const objeto = código => {
                 símbolo("["),
                 código_interno_key_expr => { // Wrapper for key expression
                   const [s, v, r] = expressão(código_interno_key_expr);
-                  if (s !== 0) return [s, null, código_interno_key_expr];
+                  if (s !== 0) return [s, v, código_interno_key_expr];
                   return [0, v, r];
                 },
                 símbolo("]"),
@@ -306,7 +315,7 @@ const objeto = código => {
             opcional(espaço),
             código_interno_val_expr => { // Wrapper for value expression
               const [s, v, r] = expressão(código_interno_val_expr);
-              if (s !== 0) return [s, null, código_interno_val_expr];
+              if (s !== 0) return [s, v, código_interno_val_expr];
               return [0, v, r];
             },
             opcional(símbolo(",")),
@@ -316,7 +325,7 @@ const objeto = código => {
             símbolo("..."),
             código_interno_spread_expr => { // Wrapper for spread expression
               const [s, v, r] = expressão(código_interno_spread_expr);
-              if (s !== 0) return [s, null, código_interno_spread_expr];
+              if (s !== 0) return [s, v, código_interno_spread_expr];
               return [0, v, r];
             },
             opcional(símbolo(",")),
@@ -328,7 +337,7 @@ const objeto = código => {
     símbolo("}"),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
   const [, , valores_vários,] = valorSeq; // valores_vários is array from vários(alt(...))
   const transformador = escopo => {
@@ -421,7 +430,7 @@ const chamada_função = código => {
         seq(
           código_interno_arg_expr => { // Wrapper for argument expression
             const [s, v, r] = expressão(código_interno_arg_expr);
-            if (s !== 0) return [s, null, código_interno_arg_expr];
+            if (s !== 0) return [s, v, código_interno_arg_expr];
             return [0, v, r];
           },
           opcional(espaço),
@@ -435,9 +444,9 @@ const chamada_função = código => {
     símbolo(")"),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
-  const [, , args_seq,] = valorSeq; // args_seq is array from vários(seq(expr_fn, ...))
+  const [, , args_seq,] = valorSeq; // args_seq is array from varios(seq(expr_fn, ...))
   const transformador = (escopo, função) => {
     return função(escopo, ...args_seq.map(arg_val_seq => arg_val_seq[0](escopo)));
   };
@@ -451,20 +460,20 @@ const parênteses = código => {
     opcional(espaço),
     opcional(código_decl => { // Wrapper for declarações_constantes
         const [s,v,r] = declarações_constantes(código_decl);
-        if (s !== 0) return [s, null, código_decl];
+        if (s !== 0) return [s, v, código_decl];
         return [0,v,r];
     }, []), // Default for opcional
     opcional(espaço),
     código_expr => { // Wrapper for expressão
         const [s,v,r] = expressão(código_expr);
-        if (s !== 0) return [s, null, código_expr];
+        if (s !== 0) return [s, v, código_expr];
         return [0,v,r];
     },
     opcional(espaço),
     símbolo(")"),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
   const [, , constantes_val, , valor_fn,] = valorSeq;
   // constantes_val is from opcional(declarações_constantes, [])
@@ -502,7 +511,7 @@ const termo1 = código => {
     ),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
   const [valor_fn, , operações_fns] = valorSeq;
   // valor_fn is from alt(valor_constante, parênteses)
@@ -576,7 +585,7 @@ const termo6 = código => {
       opcional(espaço),
       código_true_expr => { // Wrapper for true expression
         const [s,v,r] = expressão(código_true_expr);
-        if (s !== 0) return [s,null,código_true_expr];
+        if (s !== 0) return [s,v,código_true_expr];
         return [0,v,r];
       },
       opcional(espaço),
@@ -584,13 +593,13 @@ const termo6 = código => {
       opcional(espaço),
       código_false_expr => { // Wrapper for false expression
         const [s,v,r] = expressão(código_false_expr);
-        if (s !== 0) return [s,null,código_false_expr];
+        if (s !== 0) return [s,v,código_false_expr];
         return [0,v,r];
       },
     )),
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
   const [condição_fn, resto_opcional_val] = valorSeq;
   // resto_opcional_val is the result from opcional(seq(...))
@@ -622,7 +631,7 @@ const declarações_constantes = vários( // vários handles its own status (alw
       opcional(espaço),
       código_const_expr => { // Wrapper for const value expression
         const [s,v,r] = expressão(código_const_expr);
-        if (s !== 0) return [s,null,código_const_expr];
+        if (s !== 0) return [s,v,código_const_expr];
         return [0,v,r];
       },
     ),
@@ -665,7 +674,7 @@ const _0 = código => {
     opcional(espaço), // Consume trailing spaces/comments after the main expression
   )(código);
 
-  if (statusSeq !== 0) return [statusSeq, null, código];
+  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
   // valorSeq is [maybeSpace1, importaçõesDetectadas_val, carregamentosDetectadas_val, maybeSpace2, atribuições_val, maybeSpace3, valor_fn_expr]
   const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
