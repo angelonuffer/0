@@ -1,0 +1,6 @@
+uniteste # https://cdn.jsdelivr.net/gh/nuffem/uniteste.0@main/uniteste.0
+aritmética # testes/aritmética.0
+
+uniteste.principal([
+  aritmética
+])

@@ -3,9 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import mensagens_erro from './mensagens_erro.js';
 
-const importar = endereço => {
+const importar = async endereço => {
   const endereço_diretório = path.dirname(endereço);
-  const código = fs.readFileSync(endereço, 'utf-8');
+  const código = endereço.startsWith("https://") ? await (await fetch(endereço)).text() : fs.readFileSync(endereço, 'utf-8');
   const [status, [importações, carregamentos, função_executar], código_restante] = _0(código);
   if (status !== 0) {
     console.error(`${endereço}: ${mensagens_erro[status] || `Erro desconhecido de código: ${status}`}`)
@@ -22,11 +22,31 @@ const importar = endereço => {
     process.exit(1);
   }
   return função_executar({
-    ...Object.fromEntries(importações.map(([nome, endereço]) => [nome, importar(path.resolve(endereço_diretório, endereço))])),
-    ...Object.fromEntries(carregamentos.map(([nome, endereço]) => [nome, fs.readFileSync(path.resolve(endereço_diretório, endereço), 'utf-8')])),
+    ...(Object.fromEntries(
+      await Promise.all(
+        importações.map(async ([nome, endereço]) => [
+          nome,
+          await importar(
+            endereço.startsWith("https://")
+              ? endereço
+              : path.resolve(endereço_diretório, endereço)
+          )
+        ])
+      )
+    )),
+    ...Object.fromEntries(
+      await Promise.all(
+        carregamentos.map(async ([nome, endereço]) => [
+          nome,
+          endereço.startsWith("https://")
+            ? await (await fetch(endereço)).text()
+            : fs.readFileSync(path.resolve(endereço_diretório, endereço), 'utf-8')
+        ])
+      )
+    ),
   })
 }
 
-const [código_saída, saída] = importar(process.argv[2])
+const [código_saída, saída] = await importar(process.argv[2])
 console.log(saída);
 process.exit(código_saída);
