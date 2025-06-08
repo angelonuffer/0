@@ -134,17 +134,17 @@ async function runTests(testCasesToRun, allTestCases) {
         const scope = {};
 
         // Process imports
-        for (const imp of currentImports) {
-          const importPath = path.resolve(basePathForResolution, imp.address);
+        for (const imp of currentImports) { // imp is an array [name, address]
+          const importPath = path.resolve(basePathForResolution, imp[1]); // Use imp[1] for address
           const importContent = fs.readFileSync(importPath, 'utf-8');
 
           const [nestedStatus, nestedAst, nestedRemainingCode] = _0(importContent);
           if (nestedStatus !== 0) {
-            throw new Error(`_0 failed to parse imported code from "${imp.address}" with status ${nestedStatus}: "${importContent.substring(0,50)}..." Remaining: "${nestedRemainingCode}"`);
+            throw new Error(`_0 failed to parse imported code from "${imp[1]}" with status ${nestedStatus}: "${importContent.substring(0,50)}..." Remaining: "${nestedRemainingCode}"`);
           }
           // Check for unconsumed input in imported modules too.
           if (nestedRemainingCode && nestedRemainingCode.trim().length > 0) {
-              throw new Error(`_0 parsed imported module "${imp.address}" successfully but left unconsumed input: "${nestedRemainingCode.substring(0,100)}..."`);
+              throw new Error(`_0 parsed imported module "${imp[1]}" successfully but left unconsumed input: "${nestedRemainingCode.substring(0,100)}..."`);
           }
           // nestedAst is output_nested_0[1]
           const [nestedImports, nestedLoads, nestedExecuteFn] = nestedAst;
@@ -158,14 +158,14 @@ async function runTests(testCasesToRun, allTestCases) {
           }
           // Unlike the main script evaluation, we do NOT automatically call a function returned by an import.
           // The imported value is taken as is. If it's a function, it's stored as a function.
-          scope[imp.name] = importedValue;
+          scope[imp[0]] = importedValue; // Use imp[0] for name
         }
 
         // Process loads
-        for (const load of currentLoads) {
-          const loadPath = path.resolve(basePathForResolution, load.address);
+        for (const load of currentLoads) { // load is an array [name, address]
+          const loadPath = path.resolve(basePathForResolution, load[1]); // Use load[1] for address
           const loadContent = fs.readFileSync(loadPath, 'utf-8');
-          scope[load.name] = loadContent;
+          scope[load[0]] = loadContent; // Use load[0] for name
         }
         return scope;
       }
