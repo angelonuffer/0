@@ -3,9 +3,34 @@ import fs from 'fs';
 import path from 'path';
 import mensagens_erro from './mensagens_erro.js';
 
+const CACHE_PATH = path.resolve('cache.json');
+let cache = {};
+try {
+  cache = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf-8'));
+} catch {
+  cache = {};
+}
+
+const salvar_cache = () => {
+  fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, 2), 'utf-8');
+};
+
 const importar = async endereço => {
   const endereço_diretório = path.dirname(endereço);
-  const código = endereço.startsWith("https://") ? await (await fetch(endereço)).text() : fs.readFileSync(endereço, 'utf-8');
+  let código;
+
+  if (endereço.startsWith("https://")) {
+    if (cache[endereço]) {
+      código = cache[endereço];
+    } else {
+      código = await (await fetch(endereço)).text();
+      cache[endereço] = código;
+      salvar_cache();
+    }
+  } else {
+    código = fs.readFileSync(endereço, 'utf-8');
+  }
+
   const [status, [importações, carregamentos, função_executar], código_restante] = _0(código);
   if (status !== 0) {
     console.error(`${endereço}: ${mensagens_erro[status] || `Erro desconhecido de código: ${status}`}`)
@@ -38,9 +63,12 @@ const importar = async endereço => {
       await Promise.all(
         carregamentos.map(async ([nome, endereço]) => [
           nome,
-          endereço.startsWith("https://")
-            ? await (await fetch(endereço)).text()
-            : fs.readFileSync(path.resolve(endereço_diretório, endereço), 'utf-8')
+          cache[endereço.startsWith("https://") ? endereço : path.resolve(endereço_diretório, endereço)]
+            ?? (
+              endereço.startsWith("https://")
+                ? (cache[endereço] = await (await fetch(endereço)).text(), salvar_cache(), cache[endereço])
+                : fs.readFileSync(path.resolve(endereço_diretório, endereço), 'utf-8')
+            )
         ])
       )
     ),

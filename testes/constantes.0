@@ -1,0 +1,10 @@
+uniteste # https://cdn.jsdelivr.net/gh/nuffem/uniteste.0@main/uniteste.0
+
+uniteste.descrever("Constantes" [
+  uniteste.iguais((
+    a = 5
+    b = 8
+
+    a + b
+  ) 13)
+])

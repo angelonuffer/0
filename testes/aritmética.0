@@ -4,6 +4,10 @@ uniteste.descrever("Aritmética" [
   uniteste.descrever("Adição" [
     uniteste.iguais((42 + 5) 47)
   ])
+  uniteste.descrever("Subtração" [
+    uniteste.iguais((8 - 4) 4)
+    // uniteste.iguais((4 - 8), -4) // melhorar sintaxe para este teste
+  ])
   uniteste.descrever("Multiplicação" [
     uniteste.iguais((3 * 4) 12)
   ])

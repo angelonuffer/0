@@ -1,0 +1,7 @@
+uniteste # https://cdn.jsdelivr.net/gh/nuffem/uniteste.0@main/uniteste.0
+
+frase @ ./frase.txt
+
+uniteste.descrever("Carregamento" [
+  uniteste.iguais((frase) "É perigoso ir sozinho! Pegue isto.")
+])

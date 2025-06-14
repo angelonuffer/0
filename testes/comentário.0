@@ -1,0 +1,10 @@
+uniteste # https://cdn.jsdelivr.net/gh/nuffem/uniteste.0@main/uniteste.0
+
+uniteste.descrever("Comentário" [
+  uniteste.iguais((
+    // Este é um comentário explicando o código abaixo
+    soma = a b => a + b
+
+    soma(3 7)
+  ) 10)
+])

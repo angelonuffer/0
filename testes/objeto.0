@@ -1,0 +1,51 @@
+uniteste # https://cdn.jsdelivr.net/gh/nuffem/uniteste.0@main/uniteste.0
+
+uniteste.descrever("Objeto" [
+  uniteste.descrever("Atributos" [
+    uniteste.iguais((
+      jogo = {
+        título: "The Legend of Zelda"
+        gênero: "Aventura"
+      }
+
+      jogo["título"]
+    ) "The Legend of Zelda")
+    uniteste.iguais((
+      jogo = {
+        nome: "The Legend of Zelda"
+        gênero: "Aventura"
+      }
+
+      jogo.gênero
+    ) "Aventura")
+  ])
+  uniteste.descrever("Espalhamento" [
+    // incluir uniteste.objetos_iguais para o seguinte teste:
+    // uniteste.objetos_iguais((
+    //   jogo = {
+    //     nome: "The Legend of Zelda"
+    //     gênero: "Aventura"
+    //   }
+    // 
+    //   {
+    //     ...jogo
+    //     plataforma: "Nintendo"
+    //   }
+    // ) {
+    //   nome: "The Legend of Zelda"
+    //   gênero: "Aventura"
+    //   plataforma: "Nintendo"
+    // })
+  ])
+  uniteste.descrever("Propriedade calculada" [
+    uniteste.iguais((
+      chave = "personagem"
+
+      objeto = {
+        [chave]: "Mario"
+      }
+
+      objeto["personagem"]
+    ) "Mario")
+  ])
+])
