@@ -7,4 +7,12 @@ uniteste.descrever("Constantes" [
 
     a + b
   ) 13)
+  uniteste.iguais((
+    função1 = => x == 42
+    função2 = => (
+      x = 42
+      função1()
+    )
+    função2()
+  ) 0)
 ])
