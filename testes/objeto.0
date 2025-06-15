@@ -1,4 +1,4 @@
-uniteste # https://cdn.jsdelivr.net/gh/nuffem/uniteste.0@main/uniteste.0
+uniteste # https://raw.githubusercontent.com/Nuffem/uniteste.0/b4c24ea0c41a556564c080e241ec94a818988c0c/uniteste.0
 
 uniteste.descrever("Objeto" [
   uniteste.descrever("Atributos" [
