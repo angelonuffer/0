@@ -159,10 +159,16 @@ const não = transformar(
 const valor_constante = transformar(
   nome, // nome (regex) returns [status, value, remainder]
   v => escopo => {
-    if (! escopo.hasOwnProperty(v)) {
-      throw new Error(`Constante não definida: ${v}`);
+    let atualEscopo = escopo;
+    while (atualEscopo) {
+      if (atualEscopo.hasOwnProperty(v)) {
+        return atualEscopo[v];
+      }
+      atualEscopo = atualEscopo.__parent__;
     }
-    return escopo[v]
+    // If variable not found in any scope, return undefined instead of throwing an error.
+    // This allows expressions like 'x == 10' to evaluate to false if x is undefined.
+    return undefined;
   }, // transformador called on success
 )
 
@@ -434,12 +440,23 @@ const lambda = transformar(
       listaNomesParams = (paramsResultado || []).map(paramSeq => paramSeq[0]);
     }
 
-    return escopo => (escopo2, ...valoresArgs) => {
-      const escopoLambda = listaNomesParams.reduce((accEscopo, nomeArg, i) => {
-        accEscopo[nomeArg] = valoresArgs[i];
-        return accEscopo;
-      }, { ...escopo, ...escopo2 });
-      return corpoExprFunc(escopoLambda);
+    // The 'definition_scope' parameter here is the definition-time lexical scope.
+    return definition_scope => {
+      // This returned function is what gets stored as the value of the lambda.
+      // 'caller_context' is the scope/object from where the function is called (passed as 'escopo' by 'chamada_função').
+      // 'valoresArgs' are the arguments passed to the function.
+      return (caller_context, ...valoresArgs) => {
+        const fn_scope = { __parent__: definition_scope || null }; // Create new scope for function execution, linked to definition scope.
+        listaNomesParams.forEach((nomeArg, i) => {
+          fn_scope[nomeArg] = valoresArgs[i]; // Populate with arguments
+        });
+        // corpoExprFunc is the parsed body of the lambda. It expects a scope.
+        // We pass fn_scope, so any free variables in corpoExprFunc will be resolved
+        // against fn_scope (i.e., args) and then up the __parent__ chain to definition_scope.
+        // caller_context is not directly used for the lexical resolution of corpoExprFunc here,
+        // which aligns with lexical scoping principles (variables resolved where function is defined, not where it's called).
+        return corpoExprFunc(fn_scope);
+      };
     };
   }
 );
@@ -503,16 +520,28 @@ const parênteses = código => {
   // constantes_val is from opcional(declarações_constantes, [])
   // valor_fn is from expressão
 
-  const transformador = escopo => {
-    const escopoComConstantes = constantes_val.reduce( // constantes_val is an array of [[name, val_fn_const], maybeSpace]
-      (escopoAtual, decl_const_seq) => { // decl_const_seq from declarações_constantes is [[name, maybeSpace, "=", maybeSpace, expr_fn], maybeOuterSpace]
-        const [[nome_val, , , , valor_const_fn]] = decl_const_seq;
-        const novoValor = valor_const_fn(escopoAtual); // Evaluate const value in current scope
-        return { ...escopoAtual, [nome_val]: novoValor };
-      },
-      escopo
-    );
-    return valor_fn(escopoComConstantes);
+  const transformador = outer_scope_param => {
+    const escopoParenteses = { __parent__: outer_scope_param || null };
+    // constantes_val is from opcional(declarações_constantes, [])
+    // It's an array of items like: [[nome_val, maybeSpace1, "=", maybeSpace2, valorAtribuição_fn], maybeOuterSpace]
+    // So, the actual declaration is the first element of each item.
+    if (constantes_val && constantes_val.length > 0) {
+      // First pass: Add placeholders for constants defined in this parenthesized block
+      for (const decl_const_seq of constantes_val) {
+        // decl_const_seq itself is an array like [[ [nome, s1, '=', s2, expr_fn] ], s_outer]
+        // We need the inner array: [nome, s1, '=', s2, expr_fn]
+        const [declaration_details_array] = decl_const_seq;
+        const [nome_val, , , , /* valor_const_fn */] = declaration_details_array;
+        escopoParenteses[nome_val] = undefined; // Placeholder
+      }
+      // Second pass: Evaluate and assign actual values
+      for (const decl_const_seq of constantes_val) {
+        const [declaration_details_array] = decl_const_seq;
+        const [nome_val, , , , valor_const_fn] = declaration_details_array;
+        escopoParenteses[nome_val] = valor_const_fn(escopoParenteses);
+      }
+    }
+    return valor_fn(escopoParenteses);
   };
   return [0, transformador, restoSeq];
 };
@@ -705,9 +734,9 @@ const _0 = código => {
   const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
   const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-  return [statusSeq, [importações, carregamentos, escopo => {
+  return [statusSeq, [importações, carregamentos, outer_scope_param => {
     // Create a new scope, blockScope, that starts with the outer_scope (from imports, file loads, etc.).
-    const blockScope = { ...escopo };
+    const blockScope = { __parent__: outer_scope_param || null };
 
     // First pass: Iterate over all constant declarations (atribuições_val).
     // For each declaration `nome_val = ...`, add `nome_val` to `blockScope` with a placeholder value (e.g., undefined).
