@@ -695,18 +695,7 @@ const debug_command = transformar(
     const { valor_fn, str } = seq_result[2]; // Get the object from raw_expression_capture
     return (escopo) => {
       const valor_calculado = valor_fn(escopo);
-      if (typeof valor_calculado === 'string') {
-        console.log(`$ ${str} = "${valor_calculado}"`);
-      } else if (typeof valor_calculado === 'function') {
-        // Heuristic to identify user-defined lambdas
-        if (valor_calculado.length >= 0 && valor_calculado.toString().includes("caller_context")) {
-             console.log(`$ ${str} = <função>`);
-        } else {
-             console.log(`$ ${str} = ${String(valor_calculado)}`); // For native functions or others
-        }
-      } else {
-        console.log(`$ ${str} = ${valor_calculado}`);
-      }
+      console.log(`$ ${str} = ${JSON.stringify(valor_calculado)}`);
       return { type: 'debug', expression: str, value: valor_calculado }; // Return marker
     };
   }
