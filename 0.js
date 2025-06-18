@@ -286,6 +286,11 @@ const tamanho = transformar(
   () => (escopo, valor) => valor.length, // transformador called on success
 );
 
+const atributos_objeto = transformar(
+  símbolo("[*]"),
+  () => (escopo, objeto) => Object.keys(objeto),
+);
+
 // lista needs to handle status from internal expressão calls
 const lista = código => {
   const [statusSeq, valorSeq, restoSeq] = seq(
@@ -558,6 +563,7 @@ const termo1 = código => {
       alt( // alt handles status
         fatia,          // fatia handles status
         tamanho,        // tamanho (transformed símbolo) handles status
+        atributos_objeto, // atributos_objeto (transformed símbolo) handles status
         atributo,       // atributo (transformed seq) handles status
         chamada_função, // chamada_função handles status
       ),
