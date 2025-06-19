@@ -530,22 +530,33 @@ const parênteses = código => {
     // constantes_val is from opcional(declarações_constantes, [])
     // It's an array of items like: [[nome_val, maybeSpace1, "=", maybeSpace2, valorAtribuição_fn], maybeOuterSpace]
     // So, the actual declaration is the first element of each item.
+    // --- MODIFIED LOGIC ---
     if (constantes_val && constantes_val.length > 0) {
-      // First pass: Add placeholders for constants defined in this parenthesized block
-      for (const decl_const_seq of constantes_val) {
-        // decl_const_seq itself is an array like [[ [nome, s1, '=', s2, expr_fn] ], s_outer]
-        // We need the inner array: [nome, s1, '=', s2, expr_fn]
-        const [declaration_details_array] = decl_const_seq;
-        const [nome_val, , , , /* valor_const_fn */] = declaration_details_array;
-        escopoParenteses[nome_val] = undefined; // Placeholder
+      // First pass for placeholders for actual const declarations:
+      for (const item_seq of constantes_val) {
+        // item_seq is [ actual_item, maybeOuterSpace ]
+        // actual_item is either:
+        //   - for const declarations: [nome_val, maybeSpace1, "=", maybeSpace2, valorAtribuição_fn]
+        //   - for debug commands: debug_fn (a function)
+        const actual_item = item_seq[0];
+        if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+          const [nome_val] = actual_item;
+          escopoParenteses[nome_val] = undefined; // Placeholder
+        }
       }
-      // Second pass: Evaluate and assign actual values
-      for (const decl_const_seq of constantes_val) {
-        const [declaration_details_array] = decl_const_seq;
-        const [nome_val, , , , valor_const_fn] = declaration_details_array;
-        escopoParenteses[nome_val] = valor_const_fn(escopoParenteses);
+      // Second pass for evaluation and assignment/execution:
+      for (const item_seq of constantes_val) {
+        const actual_item = item_seq[0];
+        if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+          const [nome_val, , , , valor_const_fn] = actual_item;
+          escopoParenteses[nome_val] = valor_const_fn(escopoParenteses);
+        } else { // It's a debug command (a function)
+          const debug_fn = actual_item;
+          debug_fn(escopoParenteses); // Execute the debug command
+        }
       }
     }
+    // --- END OF MODIFIED LOGIC ---
     return valor_fn(escopoParenteses);
   };
   return [0, transformador, restoSeq];
