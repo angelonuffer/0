@@ -1,0 +1,26 @@
+uniteste # https://raw.githubusercontent.com/Nuffem/uniteste.0/b4c24ea0c41a556564c080e241ec94a818988c0c/uniteste.0
+importação # importação.0
+carregamento # carregamento.0
+aritmética # aritmética.0
+operadores_lógicos # operadores_lógicos.0
+comparadores # comparadores.0
+constantes # constantes.0
+texto # texto.0
+lista # lista.0
+objeto # objeto.0
+função # função.0
+comentário # comentário.0
+
+uniteste.principal([
+  importação
+  carregamento
+  aritmética
+  operadores_lógicos
+  comparadores
+  constantes
+  texto
+  lista
+  objeto
+  função
+  comentário
+])
