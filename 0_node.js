@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import mensagens_erro from './mensagens_erro.js';
 
-const CACHE_PATH = path.resolve('cache.json');
+const CACHE_PATH = path.resolve('0_cache.json');
 let cache = {};
 try {
   cache = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf-8'));
