@@ -1,4 +1,4 @@
-uniteste # https://raw.githubusercontent.com/Nuffem/uniteste.0/324580f755382ecdd40ef8e7719ad7f3d13edfce/uniteste.0
+uniteste # https://raw.githubusercontent.com/Nuffem/uniteste.0/9a0376c57880ebcdf86eb55ca69b6eeefeda1bb0/uniteste.0
 
 uniteste.descrever("Objeto" [
   uniteste.descrever("Atributos" [
@@ -20,22 +20,20 @@ uniteste.descrever("Objeto" [
     ) "Aventura")
   ])
   uniteste.descrever("Espalhamento" [
-    // incluir uniteste.objetos_iguais para o seguinte teste:
-    // uniteste.objetos_iguais((
-    //   jogo = {
-    //     nome: "The Legend of Zelda"
-    //     gênero: "Aventura"
-    //   }
-    // 
-    //   {
-    //     ...jogo
-    //     plataforma: "Nintendo"
-    //   }
-    // ) {
-    //   nome: "The Legend of Zelda"
-    //   gênero: "Aventura"
-    //   plataforma: "Nintendo"
-    // })
+    uniteste.objetos_iguais((
+      jogo = {
+        nome: "The Legend of Zelda"
+        gênero: "Aventura"
+      }
+      {
+        ...jogo
+        plataforma: "Nintendo"
+      }
+    ) {
+      nome: "The Legend of Zelda"
+      gênero: "Aventura"
+      plataforma: "Nintendo"
+    })
   ])
   uniteste.descrever("Propriedade calculada" [
     uniteste.iguais((
