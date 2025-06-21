@@ -776,14 +776,12 @@ const _0 = código => {
     opcional(espaço), // Consume trailing spaces/comments after the main expression
   )(código);
 
-  // if (statusSeq !== 0) return [statusSeq, valorSeq, código];
-
   // valorSeq is [maybeSpace1, importaçõesDetectadas_val, carregamentosDetectadas_val, maybeSpace2, atribuições_val, maybeSpace3, valor_fn_expr]
   const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
   const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
   const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-  return [statusSeq, [importações, carregamentos, outer_scope_param => {
+  return [[importações, carregamentos, outer_scope_param => {
     // Create a new scope, blockScope, that starts with the outer_scope (from imports, file loads, etc.).
     const blockScope = { __parent__: outer_scope_param || null };
 

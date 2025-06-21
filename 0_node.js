@@ -31,11 +31,7 @@ const importar = async endereço => {
     código = fs.readFileSync(endereço, 'utf-8');
   }
 
-  const [status, [importações, carregamentos, função_executar], código_restante] = _0(código);
-  if (status !== 0) {
-    console.error(`${endereço}: ${mensagens_erro[status] || `Erro desconhecido de código: ${status}`}`)
-    process.exit(1)
-  }
+  const [[importações, carregamentos, função_executar], código_restante] = _0(código);
   if (código_restante.length > 0) {
     const posição_erro = código.length - código_restante.length;
     const linhas = código.split('\n');
