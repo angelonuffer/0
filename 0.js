@@ -1,13 +1,7 @@
 const alt = (...analisadores) => {
   if (analisadores.length === 0) {
     // Base case: no parsers left, so this 'alt' path fails to find a match.
-    // Status codes:
-    // 0: Success
-    // 1: Symbol expected, not found (símbolo)
-    // 2: Regex expected, no match (regex)
-    // 3: Alt exhausted, no alternative matched (alt base case)
-    // 4: Syntax error - Extra unconsumed code at the end (NEW - used by _0)
-    return código => [3, { tipo: "alt_exaust_err", mensagem: "Nenhuma alternativa correspondeu" }, código];
+    return código => [3, null, código];
   }
   const analisadorPrincipal = analisadores[0];
   const analisadoresRestantes = analisadores.slice(1);
@@ -749,97 +743,87 @@ const declarações_constantes = vários(
 
 
 const _0 = código => {
-  const [status_interno, valor_interno_seq, resto_interno] = seq(
-    opcional(espaço),
-    opcional(vários(
-      seq(
-        seq(
-          nome,
+  const [statusSeq, valorSeq, restoSeq] = seq(
+    opcional(espaço), // opcional and espaço handle status
+    opcional(vários( // opcional and vários handle status
+      seq( // seq handles status
+        seq( // Inner seq for "name # address"
+          nome, // nome (regex) handles status
           opcional(espaço),
-          símbolo("#"),
+          símbolo("#"), // símbolo handles status
           opcional(espaço),
-          endereço,
+          endereço, // endereço (regex) handles status
         ),
-        espaço,
+        espaço, // espaço handles status
       ),
-    ), []), // importações
-    opcional(vários(
-      seq(
-        seq(
-          nome,
+    ), []), // Default for opcional (importações)
+    opcional(vários( // opcional and vários handle status
+      seq( // seq handles status
+        seq( // Inner seq for "name @ address"
+          nome, // nome (regex) handles status
           opcional(espaço),
-          símbolo("@"),
+          símbolo("@"), // símbolo handles status
           opcional(espaço),
-          endereço,
+          endereço, // endereço (regex) handles status
         ),
-        espaço,
+        espaço, // espaço handles status
       ),
-    ), []), // carregamentos
+    ), []), // Default for opcional (carregamentos)
     opcional(espaço),
-    opcional(declarações_constantes, []), // atribuições
+    opcional(declarações_constantes, []), // opcional and declarações_constantes (vários) handle status
     opcional(espaço),
-    expressão,
-    opcional(espaço), // Consome espaços/comentários finais
+    expressão, // expressão (operação) handles status
+    opcional(espaço), // Consume trailing spaces/comments after the main expression
   )(código);
 
-  if (status_interno !== 0) {
-    // Erro de sintaxe detectado por um dos parsers internos.
-    // valor_interno_seq contém o detalhe do erro (e.g., símbolo esperado)
-    // resto_interno contém o 'código' que foi passado para o parser que falhou.
-    return [status_interno, valor_interno_seq, resto_interno];
-  }
+  // valorSeq is [maybeSpace1, importaçõesDetectadas_val, carregamentosDetectadas_val, maybeSpace2, atribuições_val, maybeSpace3, valor_fn_expr]
+  const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
+  const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+  const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-  // Se status_interno === 0, o parse da estrutura principal foi bem sucedido.
-  // Agora, verificamos se todo o código foi consumido.
-  if (resto_interno.length > 0) {
-    // Código extra não consumido no final.
-    const STATUS_ERRO_CODIGO_EXTRA = 4; // Conforme definido no plano.
-    return [
-      STATUS_ERRO_CODIGO_EXTRA,
-      { tipo: "erro_sintaxe", mensagem: "Código extra não consumido no final da entrada.", esperado: "fim da entrada" },
-      resto_interno
-    ];
-  }
-
-  // Sucesso total: parse bem sucedido e todo o código consumido.
-  // Desestruturar valor_interno_seq para obter os componentes.
-  // valor_interno_seq é [maybeSpace1, importaçõesDetectadas_val, carregamentosDetectadas_val, maybeSpace2, atribuições_val, maybeSpace3, valor_fn_expr, maybeSpace4]
-  const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valor_interno_seq;
-
-  const importações = importaçõesDetectadas_val.map(([[nome_imp, , , , end_imp]]) => [nome_imp, end_imp]);
-  const carregamentos = carregamentosDetectadas_val.map(([[nome_carr, , , , end_carr]]) => [nome_carr, end_carr]);
-
-  const função_executar = outer_scope_param => {
+  return [[importações, carregamentos, outer_scope_param => {
+    // Create a new scope, blockScope, that starts with the outer_scope (from imports, file loads, etc.).
     const blockScope = { __parent__: outer_scope_param || null };
 
-    // Primeira passagem para placeholders (para permitir recursão e ordem de declaração flexível)
-    if (atribuições_val) { // atribuições_val pode ser o valor padrão [] de opcional
-      for (const atrib_ou_debug_item of atribuições_val) {
+    // First pass: Iterate over all constant declarations (atribuições_val).
+    // For each declaration `nome_val = ...`, add `nome_val` to `blockScope` with a placeholder value (e.g., undefined).
+    // This ensures that when the Right-Hand Side (RHS) of any assignment in this block is evaluated,
+    // the scope provided to it will already have all the names declared in this block.
+    // This is crucial for recursive functions, as the function's own name will be in the scope
+    // that its body captures.
+    // atribuições_val is an array of items where each item is:
+    // [ actual_item, maybeOuterSpace ]
+    // actual_item is either:
+    //   - for const declarations: [nome_val, maybeSpace1, "=", maybeSpace2, valorAtribuição_fn]
+    //   - for debug commands: debug_fn (a function)
+
+    // First pass for placeholders:
+    for (const atrib_ou_debug_item of atribuições_val) {
         const actual_item = atrib_ou_debug_item[0];
+        // Check if it's a const declaration (an array with specific structure)
         if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-          const [nome_val] = actual_item;
-          blockScope[nome_val] = undefined; // Placeholder
+            const [nome_val] = actual_item; // actual_item is [nome_val, s1, '=', s2, expr_fn]
+            blockScope[nome_val] = undefined;
         }
-      }
     }
 
-    // Segunda passagem para avaliação e atribuição/execução
-    if (atribuições_val) {
-      for (const atrib_ou_debug_item of atribuições_val) {
+    // Second pass for evaluation and assignment/execution:
+    for (const atrib_ou_debug_item of atribuições_val) {
         const actual_item = atrib_ou_debug_item[0];
+        // Check if it's a const declaration
         if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-          const [nome_val, , , , valorAtribuição_fn] = actual_item;
-          blockScope[nome_val] = valorAtribuição_fn(blockScope);
-        } else { // Comando de depuração
-          const debug_fn = actual_item;
-          debug_fn(blockScope);
+            const [nome_val, , , , valorAtribuição_fn] = actual_item;
+            blockScope[nome_val] = valorAtribuição_fn(blockScope);
+        } else { // It's a debug command (a function)
+            const debug_fn = actual_item;
+            debug_fn(blockScope); // Execute the debug command
         }
-      }
     }
+
+    // Finally, the main expression of the program (valor_fn_expr) is evaluated using this
+    // fully resolved `blockScope`.
     return valor_fn_expr(blockScope);
-  };
-
-  return [0, { importações, carregamentos, função_executar }, resto_interno]; // resto_interno aqui é ""
+  }], restoSeq]
 };
 
-export default _0;
+export default _0
