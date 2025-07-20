@@ -826,4 +826,73 @@ const _0 = código => {
   }], restoSeq]
 };
 
-export default _0
+const efeitos = Object.fromEntries([
+  "atribua_retorno_ao_estado",
+  "atribua_valor_ao_estado",
+  "delete_do_estado",
+  "saia",
+  "escreva",
+  "obtenha_argumentos",
+  "carregue_localmente",
+  "carregue_remotamente",
+].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
+
+const etapas = {
+  iniciar: () => [
+    efeitos.atribua_retorno_ao_estado("conteúdo_cache", efeitos.carregue_localmente("0_cache.json")),
+    efeitos.atribua_retorno_ao_estado("argumentos", efeitos.obtenha_argumentos()),
+    efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
+  ],
+  avaliar_cache: ({conteúdo_cache, argumentos: [endereço]}) => [
+    efeitos.atribua_valor_ao_estado("cache", JSON.parse(conteúdo_cache)),
+    efeitos.atribua_valor_ao_estado("módulos", {
+      [endereço]: {},
+    }),
+    efeitos.atribua_valor_ao_estado("conteúdos", {}),
+    efeitos.atribua_valor_ao_estado("endereço", endereço),
+    efeitos.atribua_retorno_ao_estado("conteúdo", efeitos.carregue_localmente(endereço)),
+    efeitos.delete_do_estado("conteúdo_cache"),
+    efeitos.delete_do_estado("argumentos"),
+    efeitos.atribua_valor_ao_estado("etapa", "avaliar_módulo"),
+  ],
+  avaliar_módulo: ({conteúdos, endereço, conteúdo}) => {
+    const [[importações, carregamentos, avaliar], resto] = _0(conteúdo)
+    const endereços_carregados = Object.keys(conteúdos).map(([nome, endereço]) => endereço)
+    const diretório = endereço.split('/').slice(0, -1).join('/')
+    const endereços_a_carregar_localmente = importações
+      .filter(([nome, endereço]) => ! endereços_carregados.includes(endereço) && ! endereço.startsWith("https://"))
+      .map(([nome, endereço]) => `${diretório}/${endereço}`)
+    if (endereços_a_carregar_localmente.length > 0) return [
+      efeitos.atribua_valor_ao_estado("endereços_a_carregar_localmente", endereços_a_carregar_localmente),
+      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
+    ]
+    if (resto.length > 0) {
+      const posição_erro = conteúdo.length - resto.length
+      const linhas = conteúdo.split('\n')
+      const linhas_antes = conteúdo.substring(0, posição_erro).split('\n');
+      const número_linha = linhas_antes.length
+      const número_coluna = linhas_antes.at(-1).length + 1
+      const linha = linhas[número_linha - 1]
+      const linha_com_erro = linha.substring(0, número_coluna - 1) +
+        `\x1b[41m${linha[número_coluna - 1]}\x1b[0m` +
+        linha.substring(número_coluna)
+      return [
+        efeitos.escreva(`Erro de sintaxe.`),
+        efeitos.escreva(endereço),
+        efeitos.escreva(`${número_linha}:${número_coluna}: ${linha_com_erro}`),
+        efeitos.saia(1),
+      ]
+    }
+    return [
+      efeitos.saia(0),
+    ]
+  },
+  carregar_conteúdos: ({endereços_a_carregar_localmente}) => {
+    console.log(endereços_a_carregar_localmente)
+    return [
+      efeitos.saia(0),
+    ]
+  }
+}
+
+export default estado => etapas[estado.etapa ?? "iniciar"](estado)
