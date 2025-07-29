@@ -22,4 +22,9 @@ const processe = async (i, ...argumentos) => await [
   async endereço => (await (await fetch(endereço)).text()),
 ][i](...argumentos)
 
-while (true) for (const efeito of _0(estado)) await processe(...efeito)
+const timeout = 5000;
+const start = Date.now();
+while (true) for (const efeito of _0(estado)) {
+  if (Date.now() - start > timeout) process.exit(1)
+  await processe(...efeito)
+}

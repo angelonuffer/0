@@ -844,32 +844,56 @@ const etapas = {
     efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
   ],
   avaliar_cache: ({conteúdo_cache, argumentos: [endereço]}) => [
-    efeitos.atribua_valor_ao_estado("cache", JSON.parse(conteúdo_cache)),
-    efeitos.atribua_valor_ao_estado("módulos", {
-      [endereço]: {},
+    efeitos.atribua_valor_ao_estado("conteúdos", {
+      "0_cache.json": JSON.parse(conteúdo_cache),
+      [endereço]: null,
     }),
-    efeitos.atribua_valor_ao_estado("conteúdos", {}),
-    efeitos.atribua_valor_ao_estado("endereço", endereço),
-    efeitos.atribua_retorno_ao_estado("conteúdo", efeitos.carregue_localmente(endereço)),
+    efeitos.atribua_valor_ao_estado("módulos", {
+      [endereço]: null,
+    }),
     efeitos.delete_do_estado("conteúdo_cache"),
     efeitos.delete_do_estado("argumentos"),
-    efeitos.atribua_valor_ao_estado("etapa", "avaliar_módulo"),
+    efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
   ],
-  avaliar_módulo: ({conteúdos, endereço, conteúdo}) => {
-    const [[importações, carregamentos, avaliar], resto] = _0(conteúdo)
-    const endereços_carregados = Object.keys(conteúdos).map(([nome, endereço]) => endereço)
-    const diretório = endereço.split('/').slice(0, -1).join('/')
-    const endereços_a_carregar_localmente = importações
-      .filter(([nome, endereço]) => ! endereços_carregados.includes(endereço) && ! endereço.startsWith("https://"))
-      .map(([nome, endereço]) => `${diretório}/${endereço}`)
-    if (endereços_a_carregar_localmente.length > 0) return [
-      efeitos.atribua_valor_ao_estado("endereços_a_carregar_localmente", endereços_a_carregar_localmente),
+  carregar_conteúdos: ({conteúdos}) => {
+    const [endereço] = Object.entries(conteúdos).find(([endereço, conteúdo]) => conteúdo === null) || []
+    if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "avaliar_módulos")]
+    if (conteúdos["0_cache.json"][endereço]) return [
+      efeitos.atribua_valor_ao_estado("endereço", endereço),
+      efeitos.atribua_valor_ao_estado("conteúdo", conteúdos["0_cache.json"][endereço]),
+      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdo"),
+    ]
+    return [
+      efeitos.atribua_valor_ao_estado("endereço", endereço),
+      efeitos.atribua_retorno_ao_estado("conteúdo",
+        endereço.startsWith("https://") ?
+        efeitos.carregue_remotamente(endereço) :
+        efeitos.carregue_localmente(endereço)
+      ),
+      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdo"),
+    ]
+  },
+  carregar_conteúdo: ({conteúdos, endereço, conteúdo}) => {
+    return [
+      efeitos.atribua_valor_ao_estado("conteúdos", {
+        ...conteúdos,
+        [endereço]: conteúdo,
+        "0_cache.json": {
+          ...conteúdos["0_cache.json"],
+          [endereço]: conteúdo,
+        },
+      }),
       efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
     ]
-    if (resto.length > 0) {
-      const posição_erro = conteúdo.length - resto.length
-      const linhas = conteúdo.split('\n')
-      const linhas_antes = conteúdo.substring(0, posição_erro).split('\n');
+  },
+  avaliar_módulos: ({módulos, conteúdos}) => {
+    const [endereço] = Object.entries(módulos).find(([endereço, módulo]) => módulo === null) || []
+    if (endereço === undefined) return [efeitos.saia(0)]
+    const módulo = _0(conteúdos[endereço])
+    if (módulo[1].length > 0) {
+      const posição_erro = conteúdos[endereço].length - módulo[1].length
+      const linhas = conteúdos[endereço].split('\n')
+      const linhas_antes = conteúdos[endereço].substring(0, posição_erro).split('\n');
       const número_linha = linhas_antes.length
       const número_coluna = linhas_antes.at(-1).length + 1
       const linha = linhas[número_linha - 1]
@@ -884,15 +908,18 @@ const etapas = {
       ]
     }
     return [
-      efeitos.saia(0),
+      efeitos.atribua_valor_ao_estado("conteúdos", {
+        ...Object.fromEntries(módulo[0][0].map(([nome, endereço]) => [endereço, null])),
+        ...conteúdos,
+      }),
+      efeitos.atribua_valor_ao_estado("módulos", {
+        ...Object.fromEntries(módulo[0][0].map(([nome, endereço]) => [endereço, null])),
+        ...módulos,
+        [endereço]: módulo[0],
+      }),
+      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
     ]
   },
-  carregar_conteúdos: ({endereços_a_carregar_localmente}) => {
-    console.log(endereços_a_carregar_localmente)
-    return [
-      efeitos.saia(0),
-    ]
-  }
 }
 
 export default estado => etapas[estado.etapa ?? "iniciar"](estado)
