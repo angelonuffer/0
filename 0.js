@@ -835,14 +835,28 @@ const efeitos = Object.fromEntries([
   "obtenha_argumentos",
   "carregue_localmente",
   "carregue_remotamente",
+  "verifique_existência",
+  "salve_localmente",
 ].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
 
 const etapas = {
   iniciar: () => [
-    efeitos.atribua_retorno_ao_estado("conteúdo_cache", efeitos.carregue_localmente("0_cache.json")),
     efeitos.atribua_retorno_ao_estado("argumentos", efeitos.obtenha_argumentos()),
-    efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
+    efeitos.atribua_retorno_ao_estado("cache_existe", efeitos.verifique_existência("0_cache.json")),
+    efeitos.atribua_valor_ao_estado("etapa", "carregar_cache"),
   ],
+  carregar_cache: ({cache_existe}) => {
+    if (cache_existe) {
+        return [
+            efeitos.atribua_retorno_ao_estado("conteúdo_cache", efeitos.carregue_localmente("0_cache.json")),
+            efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
+        ]
+    }
+    return [
+        efeitos.atribua_valor_ao_estado("conteúdo_cache", "{}"),
+        efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
+    ]
+  },
   avaliar_cache: ({conteúdo_cache, argumentos: [endereço]}) => [
     efeitos.atribua_valor_ao_estado("módulo_principal", endereço),
     efeitos.atribua_valor_ao_estado("conteúdos", {
@@ -906,6 +920,7 @@ const etapas = {
         efeitos.escreva(`Erro de sintaxe.`),
         efeitos.escreva(endereço),
         efeitos.escreva(`${número_linha}:${número_coluna}: ${linha_com_erro}`),
+        efeitos.salve_localmente("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2)),
         efeitos.saia(1),
       ]
     }
@@ -961,7 +976,10 @@ const etapas = {
     if (endereço === undefined) {
       const todos_avaliados = Object.keys(módulos).every(e => valores_módulos.hasOwnProperty(e));
       if (todos_avaliados) {
-        return [efeitos.atribua_valor_ao_estado("etapa", "executar_módulo_principal")]
+        return [
+          efeitos.salve_localmente("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2)),
+          efeitos.atribua_valor_ao_estado("etapa", "executar_módulo_principal")
+        ]
       } else {
         return [
           efeitos.escreva("Erro: Dependência circular detectada."),

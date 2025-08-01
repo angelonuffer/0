@@ -20,6 +20,10 @@ const processe = async (i, ...argumentos) => await [
   endereço => fs.readFileSync(endereço, "utf-8"),
   // carregue_remotamente
   async endereço => (await (await fetch(endereço)).text()),
+  // verifique_existência
+  endereço => fs.existsSync(endereço),
+  // salve_localmente
+  (endereço, conteúdo) => fs.writeFileSync(endereço, conteúdo),
 ][i](...argumentos)
 
 const timeout = 5000;
