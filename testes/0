@@ -11,7 +11,7 @@ objeto # objeto.0
 função # função.0
 comentário # comentário.0
 
-uniteste.principal([
+resultado = uniteste.principal([
   importação
   carregamento
   aritmética
@@ -24,3 +24,8 @@ uniteste.principal([
   função
   comentário
 ])
+
+estado => [
+  [4 resultado[1]]
+  [3 resultado[0]]
+]

@@ -961,7 +961,7 @@ const etapas = {
     if (endereço === undefined) {
       const todos_avaliados = Object.keys(módulos).every(e => valores_módulos.hasOwnProperty(e));
       if (todos_avaliados) {
-        return [efeitos.saia(0)];
+        return [efeitos.atribua_valor_ao_estado("etapa", "executar_módulo_principal")]
       } else {
         return [
           efeitos.escreva("Erro: Dependência circular detectada."),
@@ -990,6 +990,9 @@ const etapas = {
       }),
       efeitos.atribua_valor_ao_estado("etapa", "executar_módulos"),
     ];
+  },
+  executar_módulo_principal: estado => {
+    return estado.valores_módulos[estado.módulo_principal](estado)
   },
 }
 
