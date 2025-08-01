@@ -867,6 +867,7 @@ const etapas = {
       [endereço]: null,
     }),
     efeitos.atribua_valor_ao_estado("valores_módulos", {}),
+    efeitos.atribua_valor_ao_estado("módulo_principal_estado", {}),
     efeitos.delete_do_estado("conteúdo_cache"),
     efeitos.delete_do_estado("argumentos"),
     efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
@@ -1010,7 +1011,64 @@ const etapas = {
     ];
   },
   executar_módulo_principal: estado => {
-    return estado.valores_módulos[estado.módulo_principal](estado)
+    const efeitos_módulo = estado.valores_módulos[estado.módulo_principal](estado.módulo_principal_estado);
+    return [
+      efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", efeitos_módulo),
+      efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
+    ];
+  },
+  processar_efeito_sandboxed: estado => {
+    const { fila_efeitos_sandboxed, módulo_principal_estado } = estado;
+    if (fila_efeitos_sandboxed.length === 0) {
+      return [efeitos.atribua_valor_ao_estado("etapa", "finalizar_sandbox")];
+    }
+    const [efeito, ...resto_fila] = fila_efeitos_sandboxed;
+    const [tipo] = efeito;
+    if (tipo === 0) {
+      const [, nome, sub_efeito] = efeito;
+      return [
+        efeitos.atribua_valor_ao_estado("destino_retorno_sandboxed", nome),
+        efeitos.atribua_retorno_ao_estado("_temp_retorno_sandboxed", sub_efeito),
+        efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
+        efeitos.atribua_valor_ao_estado("etapa", "salvar_retorno_sandboxed"),
+      ];
+    } else if (tipo === 1) {
+      const [, nome, valor] = efeito;
+      return [
+        efeitos.atribua_valor_ao_estado("módulo_principal_estado", { ...módulo_principal_estado, [nome]: valor }),
+        efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
+        efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
+      ];
+    } else if (tipo === 2) {
+      const [, nome] = efeito;
+      const novo_estado = { ...módulo_principal_estado };
+      delete novo_estado[nome];
+      return [
+        efeitos.atribua_valor_ao_estado("módulo_principal_estado", novo_estado),
+        efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
+        efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
+      ];
+    }
+    return [
+        ...[efeito],
+        efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
+        efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
+    ]
+  },
+  salvar_retorno_sandboxed: estado => {
+    const { _temp_retorno_sandboxed, destino_retorno_sandboxed, módulo_principal_estado } = estado;
+    return [
+      efeitos.atribua_valor_ao_estado("módulo_principal_estado", { ...módulo_principal_estado, [destino_retorno_sandboxed]: _temp_retorno_sandboxed }),
+      efeitos.delete_do_estado("_temp_retorno_sandboxed"),
+      efeitos.delete_do_estado("destino_retorno_sandboxed"),
+      efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
+    ];
+  },
+  finalizar_sandbox: estado => {
+    return [
+      efeitos.delete_do_estado("fila_efeitos_sandboxed"),
+      efeitos.atribua_valor_ao_estado("etapa", "finalizado"),
+    ];
   },
 }
 
