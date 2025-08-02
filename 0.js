@@ -8,43 +8,44 @@ const símbolo = símbolo_esperado => ({
   }
 })
 
-const alternativa = (...analisadores) => {
-  if (analisadores.length === 0) {
-    // Base case: no parsers left, so this 'alt' path fails to find a match.
-    return código => [3, null, código];
-  }
-  const analisadorPrincipal = analisadores[0];
-  const analisadoresRestantes = analisadores.slice(1);
+const rodar_analisador = (analisador, código) => {
+  const resultado = typeof analisador === 'function'
+    ? analisador(código)
+    : analisador.avaliar(código)
 
-  return código => {
-    const [status, valor, resto] = analisadorPrincipal(código);
-    if (status === 0) { // Current parser succeeded
-      return [0, valor, resto];
-    }
-    // Current parser failed (status !== 0), try the rest.
-    return alternativa(...analisadoresRestantes)(código);
-  };
-};
+  if (Array.isArray(resultado)) return resultado
 
-const sequência = (...analisadores) => {
-  if (analisadores.length === 0) {
-    return código => [0, [], código]; // Success, an empty seq matches an empty sequence
-  }
-  const próxima_sequência = sequência(...analisadores.slice(1));
-  return código => {
-    const [status1, valor1, resto1] = typeof analisadores[0] === "function" ?
-      analisadores[0](código) :
-      (() => {
-        const {valor, resto} = analisadores[0].avaliar(código)
-        if (resto === código) return [1, valor, resto]
-        return [0, valor, resto]
-      })()
-    if (status1 !== 0) return [status1, valor1, código]; // Pass along the error object from valor1 and original 'código'
-    const [status2, valor2, resto2] = próxima_sequência(resto1);
-    if (status2 !== 0) return [status2, valor2, código]; // Propagate error, original code
-    return [0, [valor1, ...valor2], resto2]; // Both succeed
-  };
+  const { valor, resto } = resultado
+  return resto === código ? [1, valor, resto] : [0, valor, resto]
 }
+
+const alternativa = (...analisadores) => código => {
+  if (analisadores.length === 0) return [3, null, código]
+
+  const [status, valor, resto] = rodar_analisador(analisadores[0], código)
+
+  if (status === 0) return [0, valor, resto]
+
+  return alternativa(...analisadores.slice(1))(código)
+}
+
+const sequência = (...analisadores) => ({
+  avaliar: código => {
+    const valores = []
+    let resto = código
+
+    for (const analisador of analisadores) {
+      const [status, valor, novo_resto] = rodar_analisador(analisador, resto)
+
+      if (status !== 0) return { resto: código }
+
+      valores.push(valor)
+      resto = novo_resto
+    }
+
+    return { valor: valores, resto }
+  }
+})
 
 const regex = (expRegex) => código => {
   const valorMatch = código.match(expRegex);
@@ -53,61 +54,36 @@ const regex = (expRegex) => código => {
 };
 
 const opcional = (analisador, valor_padrão) => código => {
-  const [status, valor, resto] = typeof analisador === "function" ?
-    analisador(código) :
-    (() => {
-      const {valor, resto} = analisador.avaliar(código)
-      if (resto === código) return [1, valor, resto]
-      return [0, valor, resto]
-    })()
-  // If analyzer succeeded with a non-null value, use it.
-  if (status === 0 && valor !== null) return [0, valor, resto];
-  // If analyzer failed (status != 0) OR succeeded but with a null value (e.g. vários matching nothing),
-  // opcional succeeds by returning default value and original code for this opcional instance.
-  // The 'código' returned here is the original 'código' passed to 'opcional',
-  // because 'analisador' either failed on it or effectively returned it as 'resto'.
-  return [0, valor_padrão, código];
-};
+  const [status, valor, resto] = rodar_analisador(analisador, código)
 
-// Corrected 'vários'
-const vários = analisador => {
-  const analisador_recursivo = código_atual => {
-    // Try to parse one element
-    const [status_elemento, valor_elemento, resto_após_elemento] = analisador(código_atual);
+  if (status === 0 && valor !== null) return [0, valor, resto]
 
-    // If the element parser failed OR if it succeeded but consumed no input
-    if (status_elemento !== 0 || (status_elemento === 0 && resto_após_elemento === código_atual)) {
-      // Base case for recursion: analisador didn't match or didn't consume.
-      // 'vários' itself succeeds here, matching zero (more) elements.
-      return [0, null, código_atual]; // Return null for value, and original code for this attempt
-    }
+  return [0, valor_padrão, código]
+}
 
-    // Analisador matched one element AND consumed input. Try to match more.
-    const [status_resto_vários, valor_resto_vários, resto_final_vários] = analisador_recursivo(resto_após_elemento);
-    // status_resto_vários will always be 0 due to the base case [0, null, código_atual] of this recursive fn.
+const vários = analisador => código => {
+  const valores = []
+  let resto = código
 
-    if (valor_resto_vários === null) {
-      // Recursive call matched no further elements.
-      return [0, [valor_elemento], resto_após_elemento];
-    } else {
-      // Recursive call matched more elements.
-      return [0, [valor_elemento, ...valor_resto_vários], resto_final_vários];
-    }
-  };
-  return analisador_recursivo;
-};
+  while (true) {
+    const [status, valor, novo_resto] = rodar_analisador(analisador, resto)
+
+    if (status !== 0 || novo_resto === resto) break
+
+    valores.push(valor)
+    resto = novo_resto
+  }
+
+  return [0, valores, resto]
+}
 
 const transformar = (analisador, transformador) => código => {
-  const [status, valor, resto] = typeof analisador === "function" ?
-    analisador(código) :
-    (() => {
-      const {valor, resto} = analisador.avaliar(código)
-      if (resto === código) return [1, valor, resto]
-      return [0, valor, resto]
-    })()
-  if (status !== 0) return [status, valor, código]; // valor is already the error object from analisador
-  return [0, transformador(valor), resto];
-};
+  const [status, valor, resto] = rodar_analisador(analisador, código)
+
+  if (status !== 0) return [status, valor, código]
+
+  return [0, transformador(valor), resto]
+}
 
 const operador = (literal, funcao) => transformar(
   símbolo(literal), // Símbolo will return [status, value, remainder]
@@ -117,7 +93,7 @@ const operador = (literal, funcao) => transformar(
 const operação = (termo, operadores) => {
   // Manually handle the transformation to correctly propagate errors from term/operadores
   return código => {
-    const [status, valor, resto] = sequência(
+    const [status, valor, resto] = rodar_analisador(sequência(
       termo,
       opcional(vários(sequência(
         opcional(espaço),
@@ -125,7 +101,7 @@ const operação = (termo, operadores) => {
         opcional(espaço),
         termo,
       )), []),
-    )(código);
+    ), código);
 
     if (status !== 0) return [status, valor, código];
 
@@ -197,7 +173,7 @@ const valor_constante = transformar(
 
 // fatia needs to handle status from its internal expression calls
 const fatia = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     símbolo("["),
     código_interno => { // Wrapper for expression call
       const [statusExp, valorExp, restoExp] = expressão(código_interno);
@@ -213,7 +189,7 @@ const fatia = código => {
       }),
     ), []), // Default for opcional if inner seq fails (or if opcional expression fails)
     símbolo("]"),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
@@ -265,7 +241,7 @@ const conteúdo_modelo = transformar(regex(/[^`$]+/), v => () => v); // regex an
 
 // expressão_modelo needs to handle status from its internal expressão call
 const expressão_modelo = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     símbolo("${"),
     código_interno => { // Wrapper for expression call
       const [statusExp, valorExp, restoExp] = expressão(código_interno);
@@ -273,7 +249,7 @@ const expressão_modelo = código => {
       return [0, valorExp, restoExp];
     },
     símbolo("}"),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
   const [, valor_fn,] = valorSeq;
@@ -282,7 +258,7 @@ const expressão_modelo = código => {
 
 // modelo needs to handle status from its internal alt and vários calls
 const modelo = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     símbolo("`"),
     vários(
       alternativa(
@@ -291,7 +267,7 @@ const modelo = código => {
       ),
     ),
     símbolo("`"),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
@@ -316,7 +292,7 @@ const atributos_objeto = transformar(
 
 // lista needs to handle status from internal expressão calls
 const lista = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     símbolo("["),
     opcional(espaço),
     opcional(
@@ -334,7 +310,7 @@ const lista = código => {
       ),
     ),
     símbolo("]"),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
@@ -350,7 +326,7 @@ const lista = código => {
 
 // objeto needs to handle status from internal expressão calls
 const objeto = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     símbolo("{"),
     opcional(espaço),
     opcional(
@@ -393,7 +369,7 @@ const objeto = código => {
       ),
     ),
     símbolo("}"),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
@@ -491,7 +467,7 @@ const lambda = transformar(
 
 // chamada_função needs to handle status from internal expressão calls
 const chamada_função = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     símbolo("("),
     opcional(espaço),
     opcional(
@@ -511,7 +487,7 @@ const chamada_função = código => {
     ),
     opcional(espaço),
     símbolo(")"),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
@@ -524,7 +500,7 @@ const chamada_função = código => {
 
 // parênteses needs to handle status from internal declarações_constantes and expressão calls
 const parênteses = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     símbolo("("),
     opcional(espaço),
     opcional(código_decl => { // Wrapper for declarações_constantes
@@ -540,7 +516,7 @@ const parênteses = código => {
     },
     opcional(espaço),
     símbolo(")"),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
@@ -587,7 +563,7 @@ const parênteses = código => {
 
 // termo1 needs to handle status from its components
 const termo1 = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     alternativa( // alt handles status
       valor_constante, // valor_constante (transformed nome) handles status
       parênteses,    // parênteses handles status
@@ -602,7 +578,7 @@ const termo1 = código => {
         chamada_função, // chamada_função handles status
       ),
     ),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
@@ -670,7 +646,7 @@ const termo5 = operação( // operação handles status propagation
 
 // termo6 needs to handle status from internal expressão calls
 const termo6 = código => {
-  const [statusSeq, valorSeq, restoSeqOuter] = sequência(
+  const [statusSeq, valorSeq, restoSeqOuter] = rodar_analisador(sequência(
     termo5, // termo5 (operação) handles status
     opcional(sequência( // opcional and seq handle status
       opcional(espaço),
@@ -690,7 +666,7 @@ const termo6 = código => {
         return [0,v,r];
       },
     )),
-  )(código);
+  ), código);
 
   if (statusSeq !== 0) return [statusSeq, valorSeq, código];
 
@@ -766,7 +742,7 @@ const declarações_constantes = vários(
 
 
 const _0 = código => {
-  const [statusSeq, valorSeq, restoSeq] = sequência(
+  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
     opcional(espaço), // opcional and espaço handle status
     opcional(vários( // opcional and vários handle status
       sequência( // seq handles status
@@ -797,7 +773,7 @@ const _0 = código => {
     opcional(espaço),
     expressão, // expressão (operação) handles status
     opcional(espaço), // Consume trailing spaces/comments after the main expression
-  )(código);
+  ), código);
 
   // valorSeq is [maybeSpace1, importaçõesDetectadas_val, carregamentosDetectadas_val, maybeSpace2, atribuições_val, maybeSpace3, valor_fn_expr]
   const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
