@@ -29,12 +29,6 @@ const sequência = (...analisadores) => código => {
   return { valor: valores, resto }
 }
 
-const regex = expRegex => código => {
-  const valorMatch = código.match(expRegex);
-  if (valorMatch && valorMatch.index === 0) return { valor: valorMatch[0], resto: código.slice(valorMatch[0].length) };
-  return { resto: código };
-};
-
 const opcional = (analisador, valor_padrão) => código => {
   const { valor, resto } = analisador(código)
   if (resto !== código) return { valor, resto }
@@ -59,6 +53,23 @@ const transformar = (analisador, transformador) => código => {
   const { valor, resto } = analisador(código)
   if (resto === código) return { resto: código }
   return { valor: transformador(valor), resto }
+}
+
+const inversão = analisador => código => {
+  const {resto} = analisador(código)
+  if (resto === código) return {
+    valor: código[0],
+    resto: código.slice(1),
+  }
+  return { resto: código }
+}
+
+const faixa = (inicial, final) => código => {
+  if (código[0] < inicial || código[0] > final) return { resto: código }
+  return {
+    valor: código[0],
+    resto: código.slice(1),
+  }
 }
 
 const operador = (literal, funcao) => transformar(
@@ -98,20 +109,80 @@ const operação = (termo, operadores) => código => {
   return { valor: fn, resto };
 };
 
-const nome = regex(/[a-zA-ZÀ-ÿ_][a-zA-ZÀ-ÿ0-9_]*/);
+const espaço_em_branco = alternativa(
+  símbolo(" "),
+  símbolo("\n"),
+)
 
-const endereço = regex(/\S+/);
+const espaço = vários(
+  alternativa(
+    espaço_em_branco,
+    sequência(
+      símbolo("//"),
+      vários(
+        inversão(
+          símbolo("\n")
+        ),
+      ),
+      símbolo("\n"),
+    ),
+  ),
+)
 
-const um_espaço_ou_comentário = alternativa(
-  regex(/\s+/),
-  sequência(símbolo("//"), regex(/[^\n]*/), opcional(símbolo("\n")))
-);
+const número = transformar(
+  sequência(
+    faixa("0", "9"),
+    vários(
+      faixa("0", "9"),
+    ),
+  ),
+  v => () => parseInt(v.flat(Infinity).join("")),
+)
 
-const espaço = vários(um_espaço_ou_comentário);
+const letra = inversão(
+  alternativa(
+    espaço_em_branco,
+    faixa("!", "@"),
+    faixa("[", "^"),
+    símbolo("`"),
+    faixa("{", "~"),
+  ),
+)
 
-const número = transformar(regex(/\d+/), v => () => parseInt(v));
+const nome = transformar(
+  sequência(
+    letra,
+    vários(
+      alternativa(
+        letra,
+        faixa("0", "9"),
+      ),
+    ),
+  ),
+  v => v.flat(Infinity).join(""),
+)
 
-const texto = transformar(regex(/"([^"]*)"/), v => () => v.slice(1, -1));
+const endereço = transformar(
+  vários(
+    inversão(
+      espaço_em_branco,
+    ),
+  ),
+  v => v.join(""),
+)
+
+const texto = transformar(
+  sequência(
+    símbolo('"'),
+    vários(
+      inversão(
+        símbolo('"'),
+      ),
+    ),
+    símbolo('"'),
+  ),
+  v => () => v.flat(Infinity).join("").slice(1, -1)
+)
 
 const não = transformar(
   sequência(
@@ -191,7 +262,14 @@ const fatia = código => {
   return { valor: transformador, resto: restoSeq };
 };
 
-const conteúdo_modelo = transformar(regex(/[^`$]+/), v => () => v);
+const conteúdo_modelo = transformar(
+  inversão(
+    vários(
+      símbolo("`"),
+    )
+  ),
+  v => () => v,
+)
 
 const expressão_modelo = transformar(
   sequência(
