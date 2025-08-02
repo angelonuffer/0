@@ -891,14 +891,16 @@ const etapas = {
     ]
   },
   carregar_conteúdo: ({conteúdos, endereço, conteúdo}) => {
+    const novo_cache = {...conteúdos["0_cache.json"]};
+    if (endereço.startsWith("https://")) {
+        novo_cache[endereço] = conteúdo;
+    }
+
     return [
       efeitos.atribua_valor_ao_estado("conteúdos", {
         ...conteúdos,
         [endereço]: conteúdo,
-        "0_cache.json": {
-          ...conteúdos["0_cache.json"],
-          [endereço]: conteúdo,
-        },
+        "0_cache.json": novo_cache,
       }),
       efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
     ]
