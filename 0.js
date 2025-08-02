@@ -1,3 +1,13 @@
+const símbolo = símbolo_esperado => ({
+  avaliar: código => {
+    if (código.startsWith(símbolo_esperado)) return {
+      valor: símbolo_esperado,
+      resto: código.slice(símbolo_esperado.length),
+    }
+    return {resto: código}
+  }
+})
+
 const alt = (...analisadores) => {
   if (analisadores.length === 0) {
     // Base case: no parsers left, so this 'alt' path fails to find a match.
@@ -22,18 +32,19 @@ const seq = (...analisadores) => {
   }
   const próximo_seq = seq(...analisadores.slice(1));
   return código => {
-    const [status1, valor1, resto1] = analisadores[0](código);
+    const [status1, valor1, resto1] = typeof analisadores[0] === "function" ?
+      analisadores[0](código) :
+      (() => {
+        const {valor, resto} = analisadores[0].avaliar(código)
+        if (resto === código) return [1, valor, resto]
+        return [0, valor, resto]
+      })()
     if (status1 !== 0) return [status1, valor1, código]; // Pass along the error object from valor1 and original 'código'
     const [status2, valor2, resto2] = próximo_seq(resto1);
     if (status2 !== 0) return [status2, valor2, código]; // Propagate error, original code
     return [0, [valor1, ...valor2], resto2]; // Both succeed
   };
 }
-
-const símbolo = (símbolo_esperado) => código => {
-  if (código.startsWith(símbolo_esperado)) return [0, símbolo_esperado, código.slice(símbolo_esperado.length)];
-  return [1, símbolo_esperado, código];
-};
 
 const regex = (expRegex) => código => {
   const valorMatch = código.match(expRegex);
@@ -42,7 +53,13 @@ const regex = (expRegex) => código => {
 };
 
 const opcional = (analisador, valor_padrão) => código => {
-  const [status, valor, resto] = analisador(código);
+  const [status, valor, resto] = typeof analisador === "function" ?
+    analisador(código) :
+    (() => {
+      const {valor, resto} = analisador.avaliar(código)
+      if (resto === código) return [1, valor, resto]
+      return [0, valor, resto]
+    })()
   // If analyzer succeeded with a non-null value, use it.
   if (status === 0 && valor !== null) return [0, valor, resto];
   // If analyzer failed (status != 0) OR succeeded but with a null value (e.g. vários matching nothing),
@@ -81,7 +98,13 @@ const vários = analisador => {
 };
 
 const transformar = (analisador, transformador) => código => {
-  const [status, valor, resto] = analisador(código);
+  const [status, valor, resto] = typeof analisador === "function" ?
+    analisador(código) :
+    (() => {
+      const {valor, resto} = analisador.avaliar(código)
+      if (resto === código) return [1, valor, resto]
+      return [0, valor, resto]
+    })()
   if (status !== 0) return [status, valor, código]; // valor is already the error object from analisador
   return [0, transformador(valor), resto];
 };
