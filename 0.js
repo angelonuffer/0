@@ -1,44 +1,142 @@
+const sucesso = {
+  tipo: "sucesso",
+  analisar: código => ({ valor: null, resto: código, menor_resto: código }),
+};
+
 const símbolo = símbolo_esperado => ({
-  avaliar: código => {
+  tipo: "símbolo",
+  símbolo: símbolo_esperado,
+  analisar: código => {
     if (código.startsWith(símbolo_esperado)) return {
       valor: símbolo_esperado,
       resto: código.slice(símbolo_esperado.length),
     }
-    return {resto: código}
+    return { resto: código, menor_resto: código }
   }
 })
 
-const rodar_analisador = (analisador, código) => {
-  const resultado = typeof analisador === 'function'
-    ? analisador(código)
-    : analisador.avaliar(código)
+const alternativa = (...analisadores) => {
+  const getParserId = (parser) => {
+    if (!parser || typeof parser.tipo !== "string") return null;
 
-  if (Array.isArray(resultado)) return resultado
+    switch (parser.tipo) {
+      case "símbolo": return `símbolo_${parser.símbolo}`;
+      case "faixa": return `faixa_${parser.inicial}_${parser.final}`;
+      default: return null;
+    }
+  };
 
-  const { valor, resto } = resultado
-  return resto === código ? [1, valor, resto] : [0, valor, resto]
-}
+  const fatorar_prefixos = (analisadores) => {
+    let otimizou = true;
+    while (otimizou) {
+      otimizou = false;
+      const groups = new Map();
+      const others = [];
+      const newAnalisadores = [];
 
-const alternativa = (...analisadores) => código => {
-  if (analisadores.length === 0) return [3, null, código]
+      for (const p of analisadores) {
+        let prefixId = null;
+        if (p.tipo === "sequência" && p.analisadores.length > 0) {
+          prefixId = getParserId(p.analisadores[0]);
+        } else {
+          prefixId = getParserId(p);
+        }
 
-  const [status, valor, resto] = rodar_analisador(analisadores[0], código)
+        if (prefixId) {
+          if (!groups.has(prefixId)) groups.set(prefixId, []);
+          groups.get(prefixId).push(p);
+        } else {
+          others.push(p);
+        }
+      }
 
-  if (status === 0) return [0, valor, resto]
+      for (const [prefixId, groupParsers] of groups.entries()) {
+        if (groupParsers.length > 1) {
+          otimizou = true;
+          const prefix = groupParsers[0].tipo === "sequência" ? groupParsers[0].analisadores[0] : groupParsers[0];
 
-  return alternativa(...analisadores.slice(1))(código)
+          const suffixes = groupParsers.map(p => {
+            if (p.tipo === "sequência") {
+              const remaining = p.analisadores.slice(1);
+              if (remaining.length === 0) return sucesso;
+              if (remaining.length === 1) return remaining[0];
+              return sequência(...remaining);
+            }
+            return sucesso; // For simple parsers that are prefixes
+          });
+
+          newAnalisadores.push(sequência(prefix, alternativa(...suffixes)));
+        } else {
+          newAnalisadores.push(...groupParsers);
+        }
+      }
+      analisadores = [...newAnalisadores, ...others];
+    }
+    return analisadores;
+  };
+
+  const analisadoresFinais = fatorar_prefixos(analisadores);
+
+  return {
+    tipo: "alternativa",
+    analisadores: analisadoresFinais,
+    analisar: código => {
+      let menor_resto = código
+      for (const analisador of analisadoresFinais) {
+        const resultado = analisador.analisar(código)
+        if (resultado.resto !== código || resultado.hasOwnProperty("valor")) return resultado
+        if (resultado.menor_resto && resultado.menor_resto.length < menor_resto.length) {
+          menor_resto = resultado.menor_resto
+        }
+      }
+      return { resto: código, menor_resto }
+    }
+  };
 }
 
 const sequência = (...analisadores) => ({
-  avaliar: código => {
+  tipo: "sequência",
+  analisadores,
+  analisar: código => {
     const valores = []
     let resto = código
 
     for (const analisador of analisadores) {
-      const [status, valor, novo_resto] = rodar_analisador(analisador, resto)
+      const resultado = analisador.analisar(resto)
+      if (!resultado.hasOwnProperty("valor")) return {
+        resto: código,
+        menor_resto: resultado.menor_resto || resto,
+      }
 
-      if (status !== 0) return { resto: código }
+      valores.push(resultado.valor)
+      resto = resultado.resto
+    }
 
+    return { valor: valores, resto }
+  }
+})
+
+const opcional = (analisador, valor_padrão) => ({
+  tipo: "opcional",
+  analisador,
+  valor_padrão,
+  analisar: código => {
+    const resultado = analisador.analisar(código)
+    if (resultado.hasOwnProperty("valor")) return resultado
+    return { valor: valor_padrão, resto: código, menor_resto: resultado.menor_resto, erro: resultado.erro }
+  }
+})
+
+const vários = analisador => ({
+  tipo: "vários",
+  analisador,
+  analisar: código => {
+    const valores = []
+    let resto = código
+
+    while (true) {
+      const { valor, resto: novo_resto } = analisador.analisar(resto)
+      if (novo_resto === resto) break
       valores.push(valor)
       resto = novo_resto
     }
@@ -47,116 +145,164 @@ const sequência = (...analisadores) => ({
   }
 })
 
-const regex = (expRegex) => código => {
-  const valorMatch = código.match(expRegex);
-  if (valorMatch && valorMatch.index === 0) return [0, valorMatch[0], código.slice(valorMatch[0].length)];
-  return [2, expRegex.source, código];
-};
-
-const opcional = (analisador, valor_padrão) => código => {
-  const [status, valor, resto] = rodar_analisador(analisador, código)
-
-  if (status === 0 && valor !== null) return [0, valor, resto]
-
-  return [0, valor_padrão, código]
-}
-
-const vários = analisador => código => {
-  const valores = []
-  let resto = código
-
-  while (true) {
-    const [status, valor, novo_resto] = rodar_analisador(analisador, resto)
-
-    if (status !== 0 || novo_resto === resto) break
-
-    valores.push(valor)
-    resto = novo_resto
+const transformar = (analisador, transformador) => ({
+  tipo: "transformar",
+  analisador,
+  transformador,
+  analisar: código => {
+    const { valor, resto, menor_resto } = analisador.analisar(código)
+    if (resto === código) return { resto: código, menor_resto }
+    try {
+      return { valor: transformador(valor), resto, menor_resto }
+    } catch (erro) {
+      return { resto: código, menor_resto, erro }
+    }
   }
+})
 
-  return [0, valores, resto]
-}
+const inversão = analisador => ({
+  tipo: "inversão",
+  analisador,
+  analisar: código => {
+    const { resto, menor_resto } = analisador.analisar(código)
+    if (resto === código) return {
+      valor: código[0],
+      resto: código.slice(1),
+    }
+    return { resto: código, menor_resto }
+  }
+})
 
-const transformar = (analisador, transformador) => código => {
-  const [status, valor, resto] = rodar_analisador(analisador, código)
-
-  if (status !== 0) return [status, valor, código]
-
-  return [0, transformador(valor), resto]
-}
+const faixa = (inicial, final) => ({
+  tipo: "faixa",
+  inicial,
+  final,
+  analisar: código => {
+    if (código.length === 0 || código[0] < inicial || código[0] > final) return { resto: código, menor_resto: código }
+    return {
+      valor: código[0],
+      resto: código.slice(1),
+    }
+  }
+})
 
 const operador = (literal, funcao) => transformar(
-  símbolo(literal), // Símbolo will return [status, value, remainder]
-  () => funcao // Transformador only called on success of símbolo
+  símbolo(literal),
+  () => funcao
 );
 
-const operação = (termo, operadores) => {
-  // Manually handle the transformation to correctly propagate errors from term/operadores
-  return código => {
-    const [status, valor, resto] = rodar_analisador(sequência(
-      termo,
-      opcional(vários(sequência(
-        opcional(espaço),
-        operadores,
-        opcional(espaço),
-        termo,
-      )), []),
-    ), código);
+const operação = (termo, operadores) => transformar(
+  sequência(
+    termo,
+    vários(sequência(
+      opcional(espaço),
+      operadores,
+      opcional(espaço),
+      termo
+    ))
+  ),
+  v => {
+    const [primeiroTermo, operaçõesSequenciais] = v;
+    if (operaçõesSequenciais.length === 0) return primeiroTermo;
 
-    if (status !== 0) return [status, valor, código];
-
-    const [primeiroTermo, operaçõesSequenciais] = valor;
-
-    if (operaçõesSequenciais.length === 0) return [0, primeiroTermo, resto];
-
-    const fn = escopo =>
+    return escopo =>
       operaçõesSequenciais.reduce(
         (resultado, valSeq) => {
-          // valSeq is [maybeSpace1, opFunc, maybeSpace2, nextTermFunc]
-          // or if optional spaces are not present, it might be shorter.
-          // Assuming opcional returns default value (e.g. null or a specific marker) if space is not there.
-          // And assuming seq returns array of values.
-          // Let's get the operator and nextTerm more robustly.
-          // The structure from seq is [valMaybeSpace1, valOperador, valMaybeSpace2, valProximoTermo]
-          // where valMaybeSpace1 and valMaybeSpace2 could be the default from opcional (e.g. null).
-          const operador = valSeq[1]; // The actual operator function from 'operadores' parser
-          const próximoTermo = valSeq[3]; // The next term function
+          const operador = valSeq[1];
+          const próximoTermo = valSeq[3];
           return operador(resultado, próximoTermo(escopo));
         },
         primeiroTermo(escopo)
       );
-    return [0, fn, resto];
-  };
-};
-
-const nome = regex(/[a-zA-ZÀ-ÿ_][a-zA-ZÀ-ÿ0-9_]*/); // regex returns [status, value, remainder]
-
-const endereço = regex(/\S+/); // regex returns [status, value, remainder]
-
-// Matches one or more whitespace characters OR a single-line comment
-const um_espaço_ou_comentário = alternativa(
-  regex(/\s+/),
-  sequência(símbolo("//"), regex(/[^\n]*/), opcional(símbolo("\n")))
+  }
 );
 
-// Consumes multiple instances of whitespace blocks or comments
-const espaço = vários(um_espaço_ou_comentário); // vários and um_espaço_ou_comentário handle status
+const espaço_em_branco = alternativa(
+  símbolo(" "),
+  símbolo("\n"),
+)
 
-const número = transformar(regex(/\d+/), v => () => parseInt(v)); // regex and transformar handle status
+const espaço = vários(
+  alternativa(
+    espaço_em_branco,
+    sequência(
+      símbolo("//"),
+      vários(
+        inversão(
+          símbolo("\n")
+        ),
+      ),
+      símbolo("\n"),
+    ),
+  ),
+)
 
-const texto = transformar(regex(/"([^"]*)"/), v => () => v.slice(1, -1)); // regex and transformar handle status
+const número = transformar(
+  sequência(
+    faixa("0", "9"),
+    vários(
+      faixa("0", "9"),
+    ),
+  ),
+  v => () => parseInt(v.flat(Infinity).join("")),
+)
+
+const letra = inversão(
+  alternativa(
+    espaço_em_branco,
+    faixa("!", "@"),
+    faixa("[", "^"),
+    símbolo("`"),
+    faixa("{", "~"),
+  ),
+)
+
+const nome = transformar(
+  sequência(
+    letra,
+    vários(
+      alternativa(
+        letra,
+        faixa("0", "9"),
+      ),
+    ),
+  ),
+  v => v.flat(Infinity).join(""),
+)
+
+const endereço = transformar(
+  vários(
+    inversão(
+      espaço_em_branco,
+    ),
+  ),
+  v => v.join(""),
+)
+
+const texto = transformar(
+  sequência(
+    símbolo('"'),
+    vários(
+      inversão(
+        símbolo('"'),
+      ),
+    ),
+    símbolo('"'),
+  ),
+  v => () => v.flat(Infinity).join("").slice(1, -1)
+)
 
 const não = transformar(
   sequência(
-    símbolo("!"), // símbolo returns [status, value, remainder]
-    opcional(espaço), // opcional and espaço handle status
-    código => expressão(código), // expressão will return [status, value, remainder]
+    símbolo("!"),
+    opcional(espaço),
+    { analisar: código => expressão.analisar(código) },
   ),
-  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0, // transformador called on success
+  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
 )
 
 const valor_constante = transformar(
-  nome, // nome (regex) returns [status, value, remainder]
+  nome,
   v => escopo => {
     let atualEscopo = escopo;
     while (atualEscopo) {
@@ -165,124 +311,98 @@ const valor_constante = transformar(
       }
       atualEscopo = atualEscopo.__parent__;
     }
-    // If variable not found in any scope, return undefined instead of throwing an error.
-    // This allows expressions like 'x == 10' to evaluate to false if x is undefined.
     return undefined;
-  }, // transformador called on success
+  },
 )
 
-// fatia needs to handle status from its internal expression calls
-const fatia = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
+const fatia = transformar(
+  sequência(
     símbolo("["),
-    código_interno => { // Wrapper for expression call
-      const [statusExp, valorExp, restoExp] = expressão(código_interno);
-      if (statusExp !== 0) return [statusExp, valorExp, código_interno];
-      return [0, valorExp, restoExp];
-    },
+    { analisar: código => expressão.analisar(código) },
     opcional(sequência(
       símbolo(":"),
-      opcional(código_interno_opcional => { // Wrapper for optional expression call
-        const [statusExpOpt, valorExpOpt, restoExpOpt] = expressão(código_interno_opcional);
-        if (statusExpOpt !== 0) return [statusExpOpt, valorExpOpt, código_interno_opcional]; // Propagate error
-        return [0, valorExpOpt, restoExpOpt];
-      }),
-    ), []), // Default for opcional if inner seq fails (or if opcional expression fails)
+      opcional({ analisar: código => expressão.analisar(código) }),
+    )),
     símbolo("]"),
-  ), código);
+  ),
+  valorSeq => {
+    const [, i_fn, opcionalFaixa,] = valorSeq;
+    const faixa = opcionalFaixa ? opcionalFaixa[0] : undefined;
+    const j_fn_opcional = opcionalFaixa ? opcionalFaixa[1] : undefined;
 
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
+    return (escopo, valor) => {
+      const i = i_fn(escopo);
+      const j = j_fn_opcional ? j_fn_opcional(escopo) : undefined;
 
-  const [, i_fn, [faixa, j_fn_opcional],] = valorSeq;
-  const transformador = (escopo, valor) => {
-    const i = i_fn(escopo);
-    // j_fn_opcional could be the default from opcional (e.g. undefined or null) if its expression wasn't there or failed
-    // or it could be the actual function if expression succeeded.
-    const j = j_fn_opcional ? j_fn_opcional(escopo) : undefined;
-
-    // First, handle cases where valor should support slice or indexing
-    if (typeof valor === "string") {
-      if (faixa !== undefined || j !== undefined) { // Slice operation
-        return valor.slice(i, j); // j might be undefined for slice(i)
-      } else { // Index access
-        return valor.charCodeAt(i);
-      }
-    } else if (Array.isArray(valor)) {
-      if (faixa !== undefined || j !== undefined) { // Slice operation
-        return valor.slice(i, j); // j might be undefined for slice(i)
-      } else { // Index access
+      if (typeof valor === "string") {
+        if (faixa !== undefined || j !== undefined) {
+          return valor.slice(i, j);
+        } else {
+          return valor.charCodeAt(i);
+        }
+      } else if (Array.isArray(valor)) {
+        if (faixa !== undefined || j !== undefined) {
+          return valor.slice(i, j);
+        } else {
+          return valor[i];
+        }
+      } else if (typeof valor === 'object' && valor !== null) {
+        if (typeof i !== 'string' && typeof i !== 'number') {
+          throw new Error(`Runtime Error: Object key must be a string or number, got type ${typeof i} for key '${i}'.`);
+        }
+        if (faixa !== undefined || j !== undefined) {
+          throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
+        }
         return valor[i];
+      } else {
+        if (valor === null || valor === undefined) {
+          throw new Error(`Runtime Error: Cannot apply indexing/slicing to '${valor}'.`);
+        }
+        throw new Error(`Runtime Error: Cannot apply indexing/slicing to type '${typeof valor}' (value: ${String(valor).slice(0, 20)}).`);
       }
-    } else if (typeof valor === 'object' && valor !== null) {
-      // Object property access: valor[i] (where i is the key)
-      // Ensure 'i' (the key) is a string or number, which are typical for object keys in JS.
-      if (typeof i !== 'string' && typeof i !== 'number') {
-        throw new Error(`Runtime Error: Object key must be a string or number, got type ${typeof i} for key '${i}'.`);
-      }
-      // Ensure no slice syntax (e.g., obj["key":] or obj["key":"endKey"]) is used for objects
-      if (faixa !== undefined || j !== undefined) {
-        // Or, if faixa is present but j is not, it implies obj["key":] which is also not standard.
-        throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
-      }
-      return valor[i];
-    } else {
-      // valor is not a string, array, or object. Indexing or slicing is a type error.
-      // Also handles cases where valor might be null or undefined from a previous operation.
-      if (valor === null || valor === undefined) {
-        throw new Error(`Runtime Error: Cannot apply indexing/slicing to '${valor}'.`);
-      }
-      throw new Error(`Runtime Error: Cannot apply indexing/slicing to type '${typeof valor}' (value: ${String(valor).slice(0,20)}).`);
-    }
-  };
-  return [0, transformador, restoSeq];
-};
+    };
+  }
+);
 
-const conteúdo_modelo = transformar(regex(/[^`$]+/), v => () => v); // regex and transformar handle status
+const conteúdo_modelo = transformar(
+  inversão(
+    vários(
+      símbolo("`"),
+    )
+  ),
+  v => () => v,
+)
 
-// expressão_modelo needs to handle status from its internal expressão call
-const expressão_modelo = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
+const expressão_modelo = transformar(
+  sequência(
     símbolo("${"),
-    código_interno => { // Wrapper for expression call
-      const [statusExp, valorExp, restoExp] = expressão(código_interno);
-      if (statusExp !== 0) return [statusExp, valorExp, código_interno];
-      return [0, valorExp, restoExp];
-    },
+    { analisar: código => expressão.analisar(código) },
     símbolo("}"),
-  ), código);
+  ),
+  ([, valor_fn,]) => escopo => valor_fn(escopo)
+);
 
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
-  const [, valor_fn,] = valorSeq;
-  return [0, escopo => valor_fn(escopo), restoSeq];
-};
-
-// modelo needs to handle status from its internal alt and vários calls
-const modelo = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
+const modelo = transformar(
+  sequência(
     símbolo("`"),
     vários(
       alternativa(
-        expressão_modelo, // expressão_modelo now returns [status, val, rem]
-        conteúdo_modelo,  // conteúdo_modelo is a transformed regex, returns [status, val, rem]
-      ),
+        expressão_modelo,
+        conteúdo_modelo
+      )
     ),
-    símbolo("`"),
-  ), código);
-
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
-
-  const [, conteúdo_fns,] = valorSeq; // conteúdo_fns is an array of functions from varios(alt(...))
-  const transformador = escopo => conteúdo_fns.map(fn => {
+    símbolo("`")
+  ),
+  ([, conteúdo_fns,]) => escopo => conteúdo_fns.map(fn => {
     const valor2 = fn(escopo);
     if (typeof valor2 === "number") return String.fromCharCode(valor2);
     return valor2
-  }).join("");
-  return [0, transformador, restoSeq];
-}
+  }).join("")
+);
 
 const tamanho = transformar(
-  símbolo("[.]"), // símbolo returns [status, value, remainder]
-  () => (escopo, valor) => valor.length, // transformador called on success
+  símbolo("[.]"),
+  () => (escopo, valor) => valor.length,
 );
 
 const atributos_objeto = transformar(
@@ -290,125 +410,89 @@ const atributos_objeto = transformar(
   () => (escopo, objeto) => Object.keys(objeto),
 );
 
-// lista needs to handle status from internal expressão calls
-const lista = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
+const lista = transformar(
+  sequência(
     símbolo("["),
     opcional(espaço),
-    opcional(
-      vários(
-        sequência(
-          opcional(símbolo("..."), ""),
-          código_interno => { // Wrapper for expression call
-            const [statusExp, valorExp, restoExp] = expressão(código_interno);
-            if (statusExp !== 0) return [statusExp, valorExp, código_interno];
-            return [0, valorExp, restoExp];
-          },
-          opcional(símbolo(",")),
-          opcional(espaço),
-        )
-      ),
+    vários(
+      sequência(
+        opcional(símbolo("..."), ""),
+        { analisar: código => expressão.analisar(código) },
+        opcional(símbolo(",")),
+        opcional(espaço)
+      )
     ),
-    símbolo("]"),
-  ), código);
-
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
-
-  const [, , valores_seq,] = valorSeq; // valores_seq is the array from vários(seq(...))
-  const transformador = escopo => valores_seq ? valores_seq.flatMap(v_seq => {
-    // v_seq is [maybeEllipsis, expr_fn, maybeComma, maybeSpace]
+    símbolo("]")
+  ),
+  ([, , valores_seq,]) => escopo => valores_seq.flatMap(v_seq => {
     const isSpread = v_seq[0] === "...";
     const expr_fn = v_seq[1];
     return isSpread ? expr_fn(escopo) : [expr_fn(escopo)];
-  }) : [];
-  return [0, transformador, restoSeq];
-};
+  })
+);
 
-// objeto needs to handle status from internal expressão calls
-const objeto = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
+const objeto = transformar(
+  sequência(
     símbolo("{"),
     opcional(espaço),
-    opcional(
-      vários(
-        alternativa(
-          sequência( // Key-value pair
-            alternativa( // Key can be nome or [expression]
-              nome,
-              sequência(
-                símbolo("["),
-                código_interno_key_expr => { // Wrapper for key expression
-                  const [s, v, r] = expressão(código_interno_key_expr);
-                  if (s !== 0) return [s, v, código_interno_key_expr];
-                  return [0, v, r];
-                },
-                símbolo("]"),
-              )
-            ),
-            símbolo(":"),
-            opcional(espaço),
-            código_interno_val_expr => { // Wrapper for value expression
-              const [s, v, r] = expressão(código_interno_val_expr);
-              if (s !== 0) return [s, v, código_interno_val_expr];
-              return [0, v, r];
-            },
-            opcional(símbolo(",")),
-            opcional(espaço),
+    vários(
+      alternativa(
+        sequência( // Key-value pair
+          alternativa( // Key can be nome or [expression]
+            nome,
+            sequência(
+              símbolo("["),
+              { analisar: código => expressão.analisar(código) },
+              símbolo("]"),
+            )
           ),
-          sequência( // Spread syntax ...expression
-            símbolo("..."),
-            código_interno_spread_expr => { // Wrapper for spread expression
-              const [s, v, r] = expressão(código_interno_spread_expr);
-              if (s !== 0) return [s, v, código_interno_spread_expr];
-              return [0, v, r];
-            },
-            opcional(símbolo(",")),
-            opcional(espaço),
-          ),
+          símbolo(":"),
+          opcional(espaço),
+          { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
+          opcional(espaço),
+        ),
+        sequência( // Spread syntax ...expression
+          símbolo("..."),
+          { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
+          opcional(espaço),
         ),
       ),
     ),
     símbolo("}"),
-  ), código);
-
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
-
-  const [, , valores_vários,] = valorSeq; // valores_vários is array from vários(alt(...))
-  const transformador = escopo => {
+  ),
+  ([, , valores_vários,]) => escopo => {
     return valores_vários ? valores_vários.reduce((resultado, v_alt) => {
-      // v_alt is the result of one of the alt branches in vários
-      // It's either a sequence for key-value or a sequence for spread
-      const firstEl = v_alt[0]; // Can be key_alt_result or "..."
-      if (firstEl === "...") { // Spread: v_alt is ["...", expr_fn, maybeComma, maybeSpace]
+      const firstEl = v_alt[0];
+      if (firstEl === "...") {
         const spread_expr_fn = v_alt[1];
         return { ...resultado, ...spread_expr_fn(escopo) };
-      } else { // Key-value: v_alt is [key_alt_result, ":", maybeSpace1, val_expr_fn, maybeComma, maybeSpace2]
-        const key_alt_result = v_alt[0]; // This is from alt(nome, seq(...))
+      } else {
+        const key_alt_result = v_alt[0];
         const val_expr_fn = v_alt[3];
 
         let chave;
-        if (typeof key_alt_result === "string") { // It was a 'nome'
+        if (typeof key_alt_result === "string") {
           chave = key_alt_result;
-        } else { // It was a seq for [expression]: key_alt_result is ["[", key_expr_fn, "]"]
+        } else {
           const key_expr_fn = key_alt_result[1];
           chave = key_expr_fn(escopo);
         }
         return { ...resultado, [chave]: val_expr_fn(escopo) };
       }
     }, {}) : {};
-  };
-  return [0, transformador, restoSeq];
-};
+  }
+);
 
 const atributo = transformar(
   sequência(
-    símbolo("."), // símbolo returns [status, value, remainder]
-    nome,          // nome (regex) returns [status, value, remainder]
+    símbolo("."),
+    nome,
   ),
-  ([, atributoNome]) => (escopo, objeto) => objeto[atributoNome], // transformador called on success
+  ([, atributoNome]) => (escopo, objeto) => objeto[atributoNome],
 );
 
-// Helper for lambda parameters
 const params_lista_com_parenteses = sequência(
   símbolo("("),
   opcional(espaço),
@@ -417,7 +501,6 @@ const params_lista_com_parenteses = sequência(
   símbolo(")")
 );
 
-// Helper for naked parameters
 const params_lista_sem_parenteses = vários(sequência(nome, opcional(espaço)));
 
 const lambda = transformar(
@@ -429,180 +512,123 @@ const lambda = transformar(
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),
-    código => expressão(código)
+    { analisar: código => expressão.analisar(código) }
   ),
   (valorBrutoLambda) => {
     const [paramsResultado, , , , corpoExprFunc] = valorBrutoLambda;
 
     let listaNomesParams = [];
-    // Check if paramsResultado itself is an array and its first element is '(', indicating parenthesized list
     if (Array.isArray(paramsResultado) && paramsResultado[0] === '(') {
       if (paramsResultado[2]) {
         listaNomesParams = paramsResultado[2].map(paramSeq => paramSeq[0]);
       }
-    } else { // Matched params_lista_sem_parenteses (or it was null/empty from varios)
+    } else {
       listaNomesParams = (paramsResultado || []).map(paramSeq => paramSeq[0]);
     }
 
-    // The 'definition_scope' parameter here is the definition-time lexical scope.
     return definition_scope => {
-      // This returned function is what gets stored as the value of the lambda.
-      // 'caller_context' is the scope/object from where the function is called (passed as 'escopo' by 'chamada_função').
-      // 'valoresArgs' are the arguments passed to the function.
       return (caller_context, ...valoresArgs) => {
-        const fn_scope = { __parent__: definition_scope || null }; // Create new scope for function execution, linked to definition scope.
+        const fn_scope = { __parent__: definition_scope || null };
         listaNomesParams.forEach((nomeArg, i) => {
-          fn_scope[nomeArg] = valoresArgs[i]; // Populate with arguments
+          fn_scope[nomeArg] = valoresArgs[i];
         });
-        // corpoExprFunc is the parsed body of the lambda. It expects a scope.
-        // We pass fn_scope, so any free variables in corpoExprFunc will be resolved
-        // against fn_scope (i.e., args) and then up the __parent__ chain to definition_scope.
-        // caller_context is not directly used for the lexical resolution of corpoExprFunc here,
-        // which aligns with lexical scoping principles (variables resolved where function is defined, not where it's called).
         return corpoExprFunc(fn_scope);
       };
     };
   }
 );
 
-// chamada_função needs to handle status from internal expressão calls
-const chamada_função = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
+const chamada_função = transformar(
+  sequência(
     símbolo("("),
     opcional(espaço),
-    opcional(
-      vários(
-        sequência(
-          código_interno_arg_expr => { // Wrapper for argument expression
-            const [s, v, r] = expressão(código_interno_arg_expr);
-            if (s !== 0) return [s, v, código_interno_arg_expr];
-            return [0, v, r];
-          },
-          opcional(espaço),
-          opcional(símbolo(",")),
-          opcional(espaço),
-        )
-      ),
-      [] // Default for opcional (arguments)
+    vários(
+      sequência(
+        { analisar: código => expressão.analisar(código) },
+        opcional(espaço),
+        opcional(símbolo(",")),
+        opcional(espaço),
+      )
     ),
     opcional(espaço),
     símbolo(")"),
-  ), código);
-
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
-
-  const [, , args_seq,] = valorSeq; // args_seq is array from varios(seq(expr_fn, ...))
-  const transformador = (escopo, função) => {
+  ),
+  ([, , args_seq,]) => (escopo, função) => {
     return função(escopo, ...args_seq.map(arg_val_seq => arg_val_seq[0](escopo)));
-  };
-  return [0, transformador, restoSeq];
-};
+  }
+);
 
-// parênteses needs to handle status from internal declarações_constantes and expressão calls
-const parênteses = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
+const parênteses = transformar(
+  sequência(
     símbolo("("),
     opcional(espaço),
-    opcional(código_decl => { // Wrapper for declarações_constantes
-        const [s,v,r] = declarações_constantes(código_decl);
-        if (s !== 0) return [s, v, código_decl];
-        return [0,v,r];
-    }, []), // Default for opcional
+    opcional({ analisar: código => declarações_constantes.analisar(código) }, []),
     opcional(espaço),
-    código_expr => { // Wrapper for expressão
-        const [s,v,r] = expressão(código_expr);
-        if (s !== 0) return [s, v, código_expr];
-        return [0,v,r];
-    },
+    { analisar: código => expressão.analisar(código) },
     opcional(espaço),
     símbolo(")"),
-  ), código);
+  ),
+  valorSeq => {
+    const [, , constantes_val, , valor_fn,] = valorSeq;
 
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
-
-  const [, , constantes_val, , valor_fn,] = valorSeq;
-  // constantes_val is from opcional(declarações_constantes, [])
-  // valor_fn is from expressão
-
-  const transformador = outer_scope_param => {
-    const escopoParenteses = { __parent__: outer_scope_param || null };
-    // constantes_val is from opcional(declarações_constantes, [])
-    // It's an array of items like: [[nome_val, maybeSpace1, "=", maybeSpace2, valorAtribuição_fn], maybeOuterSpace]
-    // So, the actual declaration is the first element of each item.
-    // --- MODIFIED LOGIC ---
-    if (constantes_val && constantes_val.length > 0) {
-      // First pass for placeholders for actual const declarations:
-      for (const item_seq of constantes_val) {
-        // item_seq is [ actual_item, maybeOuterSpace ]
-        // actual_item is either:
-        //   - for const declarations: [nome_val, maybeSpace1, "=", maybeSpace2, valorAtribuição_fn]
-        //   - for debug commands: debug_fn (a function)
-        const actual_item = item_seq[0];
-        if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-          const [nome_val] = actual_item;
-          escopoParenteses[nome_val] = undefined; // Placeholder
+    return outer_scope_param => {
+      const escopoParenteses = { __parent__: outer_scope_param || null };
+      if (constantes_val && constantes_val.length > 0) {
+        for (const item_seq of constantes_val) {
+          const actual_item = item_seq[0];
+          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+            const [nome_val] = actual_item;
+            escopoParenteses[nome_val] = undefined;
+          }
+        }
+        for (const item_seq of constantes_val) {
+          const actual_item = item_seq[0];
+          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+            const [nome_val, , , , valor_const_fn] = actual_item;
+            escopoParenteses[nome_val] = valor_const_fn(escopoParenteses);
+          } else {
+            const debug_fn = actual_item;
+            debug_fn(escopoParenteses);
+          }
         }
       }
-      // Second pass for evaluation and assignment/execution:
-      for (const item_seq of constantes_val) {
-        const actual_item = item_seq[0];
-        if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-          const [nome_val, , , , valor_const_fn] = actual_item;
-          escopoParenteses[nome_val] = valor_const_fn(escopoParenteses);
-        } else { // It's a debug command (a function)
-          const debug_fn = actual_item;
-          debug_fn(escopoParenteses); // Execute the debug command
-        }
-      }
-    }
-    // --- END OF MODIFIED LOGIC ---
-    return valor_fn(escopoParenteses);
-  };
-  return [0, transformador, restoSeq];
-};
+      return valor_fn(escopoParenteses);
+    };
+  }
+);
 
-// termo1 needs to handle status from its components
-const termo1 = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
-    alternativa( // alt handles status
-      valor_constante, // valor_constante (transformed nome) handles status
-      parênteses,    // parênteses handles status
+const termo1 = transformar(
+  sequência(
+    alternativa(
+      valor_constante,
+      parênteses,
     ),
-    opcional(espaço), // opcional and espaço handle status
-    vários( // vários handles status
-      alternativa( // alt handles status
-        fatia,          // fatia handles status
-        tamanho,        // tamanho (transformed símbolo) handles status
-        atributos_objeto, // atributos_objeto (transformed símbolo) handles status
-        atributo,       // atributo (transformed seq) handles status
-        chamada_função, // chamada_função handles status
+    opcional(espaço),
+    vários(
+      alternativa(
+        fatia,
+        tamanho,
+        atributos_objeto,
+        atributo,
+        chamada_função,
       ),
     ),
-  ), código);
+  ),
+  valor => {
+    const [valor_fn, , operações_fns] = valor;
 
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
+    return escopo => {
+      if (operações_fns.length === 0) {
+        return valor_fn(escopo);
+      }
+      return operações_fns.reduce(
+        (resultado, operação_fn) => operação_fn(escopo, resultado),
+        valor_fn(escopo)
+      );
+    };
+  }
+);
 
-  const [valor_fn, , operações_fns] = valorSeq;
-  // valor_fn is from alt(valor_constante, parênteses)
-  // operações_fns could be null if vários(alt(...)) matches nothing.
-
-  const transformador = escopo => {
-    // If operações_fns is null (no accessors like .slice, .length after the primary term),
-    // then just return the value of the primary term.
-    if (!operações_fns) {
-      return valor_fn(escopo);
-    }
-    return operações_fns.reduce(
-      (resultado, operação_fn) => operação_fn(escopo, resultado),
-      valor_fn(escopo) // Initial value from valor_constante or parênteses
-    );
-  };
-  return [0, transformador, restoSeq];
-};
-
-// New termo2 with lambda prioritized
-// termo1, número, não, texto, modelo, lista, objeto, valor_constante, parênteses must be defined before this line.
-// lambda is now also defined before this line.
 const termo2 = alternativa(
   lambda,
   termo1,
@@ -612,30 +638,30 @@ const termo2 = alternativa(
   modelo,
   lista,
   objeto,
-  valor_constante, // valor_constante is often a component of termo1, keep for direct use
-  parênteses      // parênteses is often a component of termo1, keep for direct use
+  valor_constante,
+  parênteses
 );
 
-const termo3 = operação( // operação handles status propagation
-  termo2, // termo2 (alt) handles status
-  alternativa( // alt handles status
-    operador("*", (v1, v2) => v1 * v2), // operador (transformed símbolo) handles status
+const termo3 = operação(
+  termo2,
+  alternativa(
+    operador("*", (v1, v2) => v1 * v2),
     operador("/", (v1, v2) => v1 / v2),
   ),
 );
 
-const termo4 = operação( // operação handles status propagation
-  termo3, // termo3 (operação) handles status
-  alternativa( // alt handles status
-    operador("+", (v1, v2) => v1 + v2), // operador handles status
+const termo4 = operação(
+  termo3,
+  alternativa(
+    operador("+", (v1, v2) => v1 + v2),
     operador("-", (v1, v2) => v1 - v2),
   ),
 );
 
-const termo5 = operação( // operação handles status propagation
-  termo4, // termo4 (operação) handles status
-  alternativa( // alt handles status
-    operador(">=", (v1, v2) => v1 >= v2 ? 1 : 0), // operador handles status
+const termo5 = operação(
+  termo4,
+  alternativa(
+    operador(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
     operador("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
     operador(">", (v1, v2) => v1 > v2 ? 1 : 0),
     operador("<", (v1, v2) => v1 < v2 ? 1 : 0),
@@ -644,90 +670,71 @@ const termo5 = operação( // operação handles status propagation
   ),
 );
 
-// termo6 needs to handle status from internal expressão calls
-const termo6 = código => {
-  const [statusSeq, valorSeq, restoSeqOuter] = rodar_analisador(sequência(
-    termo5, // termo5 (operação) handles status
-    opcional(sequência( // opcional and seq handle status
+const termo6 = transformar(
+  sequência(
+    termo5,
+    opcional(sequência(
       opcional(espaço),
       símbolo("?"),
       opcional(espaço),
-      código_true_expr => { // Wrapper for true expression
-        const [s,v,r] = expressão(código_true_expr);
-        if (s !== 0) return [s,v,código_true_expr];
-        return [0,v,r];
-      },
+      { analisar: código => expressão.analisar(código) },
       opcional(espaço),
       símbolo(":"),
       opcional(espaço),
-      código_false_expr => { // Wrapper for false expression
-        const [s,v,r] = expressão(código_false_expr);
-        if (s !== 0) return [s,v,código_false_expr];
-        return [0,v,r];
-      },
-    )),
-  ), código);
+      { analisar: código => expressão.analisar(código) },
+    ), undefined)
+  ),
+  valor => {
+    const [condição_fn, resto_opcional_val] = valor;
 
-  if (statusSeq !== 0) return [statusSeq, valorSeq, código];
+    if (!resto_opcional_val) return condição_fn;
 
-  const [condição_fn, resto_opcional_val] = valorSeq;
-  // resto_opcional_val is the result from opcional(seq(...))
-  // If ternary exists, it's an array like [maybeSpace1, "?", maybeSpace2, true_fn, maybeSpace3, ":", maybeSpace4, false_fn]
-  // If not, it's the default value from opcional (e.g., null or undefined).
+    const [, , , valor_se_verdadeiro_fn, , , , valor_se_falso_fn] = resto_opcional_val;
+    return escopo => condição_fn(escopo) !== 0 ? valor_se_verdadeiro_fn(escopo) : valor_se_falso_fn(escopo);
+  }
+);
 
-  if (!resto_opcional_val) return [0, condição_fn, restoSeqOuter]; // No ternary part
-
-  const [, , , valor_se_verdadeiro_fn, , , , valor_se_falso_fn] = resto_opcional_val;
-  const transformador = escopo => condição_fn(escopo) !== 0 ? valor_se_verdadeiro_fn(escopo) : valor_se_falso_fn(escopo);
-  return [0, transformador, restoSeqOuter];
-};
-
-const expressão = operação( // operação handles status propagation
-  termo6, // termo6 handles status
-  alternativa( // alt handles status
-    operador("&", (v1, v2) => v1 !== 0 ? v2 : 0), // operador handles status
+const expressão = operação(
+  termo6,
+  alternativa(
+    operador("&", (v1, v2) => v1 !== 0 ? v2 : 0),
     operador("|", (v1, v2) => v1 !== 0 ? v1 : v2),
   ),
 );
 
 const raw_expression_capture = código => {
-    const [status_expr, valor_expr_fn, resto_expr] = expressão(código);
+  const { valor: valor_expr_fn, resto: resto_expr } = expressão.analisar(código);
 
-    if (status_expr !== 0) {
-        return [status_expr, valor_expr_fn, código]; // Propagate error
-    }
+  if (resto_expr === código) {
+    return { resto: código };
+  }
 
-    const expressão_str_capturada = código.substring(0, código.length - resto_expr.length);
-    return [0, { valor_fn: valor_expr_fn, str: expressão_str_capturada.trim() }, resto_expr];
+  const expressão_str_capturada = código.substring(0, código.length - resto_expr.length);
+  return { valor: { valor_fn: valor_expr_fn, str: expressão_str_capturada.trim() }, resto: resto_expr };
 };
 
 const debug_command = transformar(
   sequência(
     símbolo("$"),
     opcional(espaço),
-    raw_expression_capture
+    { analisar: raw_expression_capture }
   ),
-  (seq_result) => { // seq_result is [ "$", maybeSpaceValue, { valor_fn, str } ]
-    const { valor_fn, str } = seq_result[2]; // Get the object from raw_expression_capture
+  (seq_result) => {
+    const { valor_fn, str } = seq_result[2];
     return (escopo) => {
       const valor_calculado = valor_fn(escopo);
       console.log(`$ ${str} = ${JSON.stringify(valor_calculado)}`);
-      return { type: 'debug', expression: str, value: valor_calculado }; // Return marker
+      return { type: 'debug', expression: str, value: valor_calculado };
     };
   }
 );
 
-// declarações_constantes uses vários and seq, and internal expressão needs wrapping
 const const_declaration_seq = sequência(
   nome,
   opcional(espaço),
   símbolo("="),
   opcional(espaço),
-  código_const_expr => {
-    const [s,v,r] = expressão(código_const_expr);
-    if (s !== 0) return [s,v,código_const_expr];
-    return [0,v,r];
-  }
+  { analisar: código => expressão.analisar(código) }
 );
 
 const declarações_constantes = vários(
@@ -740,90 +747,75 @@ const declarações_constantes = vários(
   )
 );
 
-
-const _0 = código => {
-  const [statusSeq, valorSeq, restoSeq] = rodar_analisador(sequência(
-    opcional(espaço), // opcional and espaço handle status
-    opcional(vários( // opcional and vários handle status
-      sequência( // seq handles status
-        sequência( // Inner seq for "name # address"
-          nome, // nome (regex) handles status
-          opcional(espaço),
-          símbolo("#"), // símbolo handles status
-          opcional(espaço),
-          endereço, // endereço (regex) handles status
+const _0 = opcional(
+  transformar(
+    sequência(
+      opcional(espaço),
+      opcional(vários(
+        sequência(
+          sequência(
+            nome,
+            opcional(espaço),
+            símbolo("#"),
+            opcional(espaço),
+            endereço,
+          ),
+          espaço,
         ),
-        espaço, // espaço handles status
-      ),
-    ), []), // Default for opcional (importações)
-    opcional(vários( // opcional and vários handle status
-      sequência( // seq handles status
-        sequência( // Inner seq for "name @ address"
-          nome, // nome (regex) handles status
-          opcional(espaço),
-          símbolo("@"), // símbolo handles status
-          opcional(espaço),
-          endereço, // endereço (regex) handles status
+      ), []),
+      opcional(vários(
+        sequência(
+          sequência(
+            nome,
+            opcional(espaço),
+            símbolo("@"),
+            opcional(espaço),
+            endereço,
+          ),
+          espaço,
         ),
-        espaço, // espaço handles status
-      ),
-    ), []), // Default for opcional (carregamentos)
-    opcional(espaço),
-    opcional(declarações_constantes, []), // opcional and declarações_constantes (vários) handle status
-    opcional(espaço),
-    expressão, // expressão (operação) handles status
-    opcional(espaço), // Consume trailing spaces/comments after the main expression
-  ), código);
+      ), []),
+      opcional(espaço),
+      opcional(declarações_constantes, []),
+      opcional(espaço),
+      expressão,
+      opcional(espaço),
+    ),
+    valorSeq => {
+      const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
+      const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+      const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-  // valorSeq is [maybeSpace1, importaçõesDetectadas_val, carregamentosDetectadas_val, maybeSpace2, atribuições_val, maybeSpace3, valor_fn_expr]
-  const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
-  const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
-  const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+      const corpo = outer_scope_param => {
+        const blockScope = { __parent__: outer_scope_param || null };
 
-  return [[importações, carregamentos, outer_scope_param => {
-    // Create a new scope, blockScope, that starts with the outer_scope (from imports, file loads, etc.).
-    const blockScope = { __parent__: outer_scope_param || null };
-
-    // First pass: Iterate over all constant declarations (atribuições_val).
-    // For each declaration `nome_val = ...`, add `nome_val` to `blockScope` with a placeholder value (e.g., undefined).
-    // This ensures that when the Right-Hand Side (RHS) of any assignment in this block is evaluated,
-    // the scope provided to it will already have all the names declared in this block.
-    // This is crucial for recursive functions, as the function's own name will be in the scope
-    // that its body captures.
-    // atribuições_val is an array of items where each item is:
-    // [ actual_item, maybeOuterSpace ]
-    // actual_item is either:
-    //   - for const declarations: [nome_val, maybeSpace1, "=", maybeSpace2, valorAtribuição_fn]
-    //   - for debug commands: debug_fn (a function)
-
-    // First pass for placeholders:
-    for (const atrib_ou_debug_item of atribuições_val) {
-        const actual_item = atrib_ou_debug_item[0];
-        // Check if it's a const declaration (an array with specific structure)
-        if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-            const [nome_val] = actual_item; // actual_item is [nome_val, s1, '=', s2, expr_fn]
+        for (const atrib_ou_debug_item of atribuições_val) {
+          const actual_item = atrib_ou_debug_item[0];
+          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+            const [nome_val] = actual_item;
             blockScope[nome_val] = undefined;
+          }
         }
-    }
 
-    // Second pass for evaluation and assignment/execution:
-    for (const atrib_ou_debug_item of atribuições_val) {
-        const actual_item = atrib_ou_debug_item[0];
-        // Check if it's a const declaration
-        if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+        for (const atrib_ou_debug_item of atribuições_val) {
+          const actual_item = atrib_ou_debug_item[0];
+          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
             const [nome_val, , , , valorAtribuição_fn] = actual_item;
             blockScope[nome_val] = valorAtribuição_fn(blockScope);
-        } else { // It's a debug command (a function)
+          } else {
             const debug_fn = actual_item;
-            debug_fn(blockScope); // Execute the debug command
+            debug_fn(blockScope);
+          }
         }
-    }
 
-    // Finally, the main expression of the program (valor_fn_expr) is evaluated using this
-    // fully resolved `blockScope`.
-    return valor_fn_expr(blockScope);
-  }], restoSeq]
-};
+        return valor_fn_expr(blockScope);
+      };
+
+      return [importações, carregamentos, corpo];
+    }
+  ),
+  [[], [], () => { }]
+);
 
 const efeitos = Object.fromEntries([
   "atribua_retorno_ao_estado",
@@ -844,19 +836,19 @@ const etapas = {
     efeitos.atribua_retorno_ao_estado("cache_existe", efeitos.verifique_existência("0_cache.json")),
     efeitos.atribua_valor_ao_estado("etapa", "carregar_cache"),
   ],
-  carregar_cache: ({cache_existe}) => {
+  carregar_cache: ({ cache_existe }) => {
     if (cache_existe) {
-        return [
-            efeitos.atribua_retorno_ao_estado("conteúdo_cache", efeitos.carregue_localmente("0_cache.json")),
-            efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
-        ]
+      return [
+        efeitos.atribua_retorno_ao_estado("conteúdo_cache", efeitos.carregue_localmente("0_cache.json")),
+        efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
+      ]
     }
     return [
-        efeitos.atribua_valor_ao_estado("conteúdo_cache", "{}"),
-        efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
+      efeitos.atribua_valor_ao_estado("conteúdo_cache", "{}"),
+      efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
     ]
   },
-  avaliar_cache: ({conteúdo_cache, argumentos: [endereço]}) => [
+  avaliar_cache: ({ conteúdo_cache, argumentos: [endereço] }) => [
     efeitos.atribua_valor_ao_estado("módulo_principal", endereço),
     efeitos.atribua_valor_ao_estado("conteúdos", {
       "0_cache.json": JSON.parse(conteúdo_cache),
@@ -871,7 +863,7 @@ const etapas = {
     efeitos.delete_do_estado("argumentos"),
     efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
   ],
-  carregar_conteúdos: ({conteúdos}) => {
+  carregar_conteúdos: ({ conteúdos }) => {
     const [endereço] = Object.entries(conteúdos).find(([endereço, conteúdo]) => conteúdo === null) || []
     if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "avaliar_módulos")]
     if (conteúdos["0_cache.json"][endereço]) return [
@@ -883,16 +875,16 @@ const etapas = {
       efeitos.atribua_valor_ao_estado("endereço", endereço),
       efeitos.atribua_retorno_ao_estado("conteúdo",
         endereço.startsWith("https://") ?
-        efeitos.carregue_remotamente(endereço) :
-        efeitos.carregue_localmente(endereço)
+          efeitos.carregue_remotamente(endereço) :
+          efeitos.carregue_localmente(endereço)
       ),
       efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdo"),
     ]
   },
-  carregar_conteúdo: ({conteúdos, endereço, conteúdo}) => {
-    const novo_cache = {...conteúdos["0_cache.json"]};
+  carregar_conteúdo: ({ conteúdos, endereço, conteúdo }) => {
+    const novo_cache = { ...conteúdos["0_cache.json"] };
     if (endereço.startsWith("https://")) {
-        novo_cache[endereço] = conteúdo;
+      novo_cache[endereço] = conteúdo;
     }
 
     return [
@@ -904,20 +896,27 @@ const etapas = {
       efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
     ]
   },
-  avaliar_módulos: ({módulos, conteúdos}) => {
+  avaliar_módulos: ({ módulos, conteúdos }) => {
     const [endereço] = Object.entries(módulos).find(([endereço, módulo]) => módulo === null) || []
     if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "executar_módulos")]
-    const módulo_bruto = _0(conteúdos[endereço])
-    if (módulo_bruto[1].length > 0) {
-      const posição_erro = conteúdos[endereço].length - módulo_bruto[1].length
+    const módulo_bruto = _0.analisar(conteúdos[endereço])
+    if (módulo_bruto.erro || módulo_bruto.resto.length > 0) {
+      if (módulo_bruto.erro) {
+        return [
+          efeitos.escreva(`Erro: ${módulo_bruto.erro.message}`),
+          efeitos.escreva(módulo_bruto.erro.stack),
+          efeitos.saia(1),
+        ]
+      }
+      const posição_erro = conteúdos[endereço].length - (módulo_bruto.menor_resto?.length ?? 0)
       const linhas = conteúdos[endereço].split('\n')
       const linhas_antes = conteúdos[endereço].substring(0, posição_erro).split('\n');
       const número_linha = linhas_antes.length
       const número_coluna = linhas_antes.at(-1).length + 1
       const linha = linhas[número_linha - 1]
-      const linha_com_erro = linha.substring(0, número_coluna - 1) +
-        `\x1b[41m${linha[número_coluna - 1]}\x1b[0m` +
-        linha.substring(número_coluna)
+      const linha_com_erro = (linha?.substring(0, número_coluna - 1) ?? "") +
+        `\x1b[41m${linha?.[número_coluna - 1] ?? ""}\x1b[0m` +
+        (linha?.substring(número_coluna) ?? "")
       return [
         efeitos.escreva(`Erro de sintaxe.`),
         efeitos.escreva(endereço),
@@ -928,29 +927,29 @@ const etapas = {
     }
 
     const resolve_endereço = (base_module_path, rel_path) => {
-        if (rel_path.startsWith('https://')) {
-            return rel_path;
-        }
-        const base_dir = base_module_path.includes('/') ? base_module_path.substring(0, base_module_path.lastIndexOf('/') + 1) : '';
-        const base_url = 'file:///' + base_dir;
-        const resolved_url = new URL(rel_path, base_url);
-        return decodeURIComponent(resolved_url.pathname.substring(1));
+      if (rel_path.startsWith('https://')) {
+        return rel_path;
+      }
+      const base_dir = base_module_path.includes('/') ? base_module_path.substring(0, base_module_path.lastIndexOf('/') + 1) : '';
+      const base_url = 'file:///' + base_dir;
+      const resolved_url = new URL(rel_path, base_url);
+      return decodeURIComponent(resolved_url.pathname.substring(1));
     }
 
-    const [importações, carregamentos, corpo] = módulo_bruto[0];
+    const [importações, carregamentos, corpo] = módulo_bruto.valor;
     const resolved_importações = importações.map(([nome, end_rel]) => [nome, resolve_endereço(endereço, end_rel)]);
     const resolved_carregamentos = carregamentos.map(([nome, end_rel]) => [nome, resolve_endereço(endereço, end_rel)]);
 
     const novas_dependências_conteúdos = Object.fromEntries(
-        [...resolved_importações, ...resolved_carregamentos]
-            .filter(([, end]) => !conteúdos.hasOwnProperty(end))
-            .map(([, end]) => [end, null])
+      [...resolved_importações, ...resolved_carregamentos]
+        .filter(([, end]) => !conteúdos.hasOwnProperty(end))
+        .map(([, end]) => [end, null])
     );
 
     const novas_dependências_módulos = Object.fromEntries(
-        resolved_importações
-            .filter(([, end]) => !módulos.hasOwnProperty(end))
-            .map(([, end]) => [end, null])
+      resolved_importações
+        .filter(([, end]) => !módulos.hasOwnProperty(end))
+        .map(([, end]) => [end, null])
     );
 
     return [
@@ -966,7 +965,7 @@ const etapas = {
       efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
     ]
   },
-  executar_módulos: ({módulos, valores_módulos, conteúdos}) => {
+  executar_módulos: ({ módulos, valores_módulos, conteúdos }) => {
     const [endereço, módulo] = Object.entries(módulos).find(
       ([e, m]) =>
         m !== null &&
@@ -1051,9 +1050,9 @@ const etapas = {
       ];
     }
     return [
-        ...[efeito],
-        efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
-        efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
+      ...[efeito],
+      efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
+      efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
     ]
   },
   salvar_retorno_sandboxed: estado => {
