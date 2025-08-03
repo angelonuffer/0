@@ -1,6 +1,6 @@
 const sucesso = {
   tipo: "sucesso",
-  analisar: código => ({ valor: null, resto: código }),
+  analisar: código => ({ valor: null, resto: código, menor_resto: código }),
 };
 
 const símbolo = símbolo_esperado => ({
@@ -11,7 +11,7 @@ const símbolo = símbolo_esperado => ({
       valor: símbolo_esperado,
       resto: código.slice(símbolo_esperado.length),
     }
-    return { resto: código }
+    return { resto: código, menor_resto: código }
   }
 })
 
@@ -81,11 +81,15 @@ const alternativa = (...analisadores) => {
     tipo: "alternativa",
     analisadores: analisadoresFinais,
     analisar: código => {
+      let menor_resto = código
       for (const analisador of analisadoresFinais) {
         const resultado = analisador.analisar(código)
         if (resultado.resto !== código || resultado.hasOwnProperty("valor")) return resultado
+        if (resultado.menor_resto && resultado.menor_resto.length < menor_resto.length) {
+          menor_resto = resultado.menor_resto
+        }
       }
-      return { resto: código }
+      return { resto: código, menor_resto }
     }
   };
 }
@@ -99,7 +103,10 @@ const sequência = (...analisadores) => ({
 
     for (const analisador of analisadores) {
       const resultado = analisador.analisar(resto)
-      if (!resultado.hasOwnProperty("valor")) return { resto: código }
+      if (!resultado.hasOwnProperty("valor")) return {
+        resto: código,
+        menor_resto: resultado.menor_resto || resto,
+      }
 
       valores.push(resultado.valor)
       resto = resultado.resto
@@ -143,9 +150,13 @@ const transformar = (analisador, transformador) => ({
   analisador,
   transformador,
   analisar: código => {
-    const { valor, resto } = analisador.analisar(código)
-    if (resto === código) return { resto: código }
-    return { valor: transformador(valor), resto }
+    try {
+      const { valor, resto, menor_resto } = analisador.analisar(código)
+      if (resto === código) return { resto: código, menor_resto }
+      return { valor: transformador(valor), resto, menor_resto }
+    } catch (erro) {
+      return { resto: código, menor_resto }
+    }
   }
 })
 
@@ -153,12 +164,12 @@ const inversão = analisador => ({
   tipo: "inversão",
   analisador,
   analisar: código => {
-    const { resto } = analisador.analisar(código)
+    const { resto, menor_resto } = analisador.analisar(código)
     if (resto === código) return {
       valor: código[0],
       resto: código.slice(1),
     }
-    return { resto: código }
+    return { resto: código, menor_resto }
   }
 })
 
@@ -167,7 +178,7 @@ const faixa = (inicial, final) => ({
   inicial,
   final,
   analisar: código => {
-    if (código.length === 0 || código[0] < inicial || código[0] > final) return { resto: código }
+    if (código.length === 0 || código[0] < inicial || código[0] > final) return { resto: código, menor_resto: código }
     return {
       valor: código[0],
       resto: código.slice(1),
@@ -890,7 +901,7 @@ const etapas = {
     if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "executar_módulos")]
     const módulo_bruto = _0.analisar(conteúdos[endereço])
     if (módulo_bruto.resto.length > 0) {
-      const posição_erro = conteúdos[endereço].length - módulo_bruto.resto.length
+      const posição_erro = conteúdos[endereço].length - módulo_bruto.menor_resto.length
       const linhas = conteúdos[endereço].split('\n')
       const linhas_antes = conteúdos[endereço].substring(0, posição_erro).split('\n');
       const número_linha = linhas_antes.length
