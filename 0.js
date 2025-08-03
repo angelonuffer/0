@@ -77,8 +77,8 @@ const operador = (literal, funcao) => transformar(
   () => funcao
 );
 
-const operação = (termo, operadores) => código => {
-  const parser = sequência(
+const operação = (termo, operadores) => transformar(
+  sequência(
     termo,
     vários(sequência(
       opcional(espaço),
@@ -86,28 +86,22 @@ const operação = (termo, operadores) => código => {
       opcional(espaço),
       termo
     ))
-  );
+  ),
+  v => {
+    const [primeiroTermo, operaçõesSequenciais] = v;
+    if (operaçõesSequenciais.length === 0) return primeiroTermo;
 
-  const { valor, resto } = parser(código);
-
-  if (resto === código) return { resto: código };
-
-  const [primeiroTermo, operaçõesSequenciais] = valor;
-
-  if (operaçõesSequenciais.length === 0) return { valor: primeiroTermo, resto };
-
-  const fn = escopo =>
-    operaçõesSequenciais.reduce(
-      (resultado, valSeq) => {
-        const operador = valSeq[1];
-        const próximoTermo = valSeq[3];
-        return operador(resultado, próximoTermo(escopo));
-      },
-      primeiroTermo(escopo)
-    );
-
-  return { valor: fn, resto };
-};
+    return escopo =>
+      operaçõesSequenciais.reduce(
+        (resultado, valSeq) => {
+          const operador = valSeq[1];
+          const próximoTermo = valSeq[3];
+          return operador(resultado, próximoTermo(escopo));
+        },
+        primeiroTermo(escopo)
+      );
+  }
+);
 
 const espaço_em_branco = alternativa(
   símbolo(" "),
@@ -207,60 +201,54 @@ const valor_constante = transformar(
   },
 )
 
-const fatia = código => {
-  const expr_parser = código => expressão(código);
-
-  const parser = sequência(
+const fatia = transformar(
+  sequência(
     símbolo("["),
-    expr_parser,
+    código => expressão(código),
     opcional(sequência(
       símbolo(":"),
-      opcional(expr_parser),
+      opcional(código => expressão(código)),
     )),
     símbolo("]"),
-  );
+  ),
+  valorSeq => {
+    const [, i_fn, opcionalFaixa,] = valorSeq;
+    const faixa = opcionalFaixa ? opcionalFaixa[0] : undefined;
+    const j_fn_opcional = opcionalFaixa ? opcionalFaixa[1] : undefined;
 
-  const { valor: valorSeq, resto: restoSeq } = parser(código);
+    return (escopo, valor) => {
+      const i = i_fn(escopo);
+      const j = j_fn_opcional ? j_fn_opcional(escopo) : undefined;
 
-  if (restoSeq === código) return { resto: código };
-
-  const [, i_fn, opcionalFaixa,] = valorSeq;
-  const faixa = opcionalFaixa ? opcionalFaixa[0] : undefined;
-  const j_fn_opcional = opcionalFaixa ? opcionalFaixa[1] : undefined;
-
-  const transformador = (escopo, valor) => {
-    const i = i_fn(escopo);
-    const j = j_fn_opcional ? j_fn_opcional(escopo) : undefined;
-
-    if (typeof valor === "string") {
-      if (faixa !== undefined || j !== undefined) {
-        return valor.slice(i, j);
-      } else {
-        return valor.charCodeAt(i);
-      }
-    } else if (Array.isArray(valor)) {
-      if (faixa !== undefined || j !== undefined) {
-        return valor.slice(i, j);
-      } else {
+      if (typeof valor === "string") {
+        if (faixa !== undefined || j !== undefined) {
+          return valor.slice(i, j);
+        } else {
+          return valor.charCodeAt(i);
+        }
+      } else if (Array.isArray(valor)) {
+        if (faixa !== undefined || j !== undefined) {
+          return valor.slice(i, j);
+        } else {
+          return valor[i];
+        }
+      } else if (typeof valor === 'object' && valor !== null) {
+        if (typeof i !== 'string' && typeof i !== 'number') {
+          throw new Error(`Runtime Error: Object key must be a string or number, got type ${typeof i} for key '${i}'.`);
+        }
+        if (faixa !== undefined || j !== undefined) {
+          throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
+        }
         return valor[i];
+      } else {
+        if (valor === null || valor === undefined) {
+          throw new Error(`Runtime Error: Cannot apply indexing/slicing to '${valor}'.`);
+        }
+        throw new Error(`Runtime Error: Cannot apply indexing/slicing to type '${typeof valor}' (value: ${String(valor).slice(0, 20)}).`);
       }
-    } else if (typeof valor === 'object' && valor !== null) {
-      if (typeof i !== 'string' && typeof i !== 'number') {
-        throw new Error(`Runtime Error: Object key must be a string or number, got type ${typeof i} for key '${i}'.`);
-      }
-      if (faixa !== undefined || j !== undefined) {
-        throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
-      }
-      return valor[i];
-    } else {
-      if (valor === null || valor === undefined) {
-        throw new Error(`Runtime Error: Cannot apply indexing/slicing to '${valor}'.`);
-      }
-      throw new Error(`Runtime Error: Cannot apply indexing/slicing to type '${typeof valor}' (value: ${String(valor).slice(0, 20)}).`);
-    }
-  };
-  return { valor: transformador, resto: restoSeq };
-};
+    };
+  }
+);
 
 const conteúdo_modelo = transformar(
   inversão(
@@ -456,8 +444,8 @@ const chamada_função = transformar(
   }
 );
 
-const parênteses = código => {
-  const parser = sequência(
+const parênteses = transformar(
+  sequência(
     símbolo("("),
     opcional(espaço),
     opcional(código => declarações_constantes(código), []),
@@ -465,40 +453,38 @@ const parênteses = código => {
     código => expressão(código),
     opcional(espaço),
     símbolo(")"),
-  );
-  const { valor: valorSeq, resto } = parser(código);
-  if (resto === código) return { resto: código };
+  ),
+  valorSeq => {
+    const [, , constantes_val, , valor_fn,] = valorSeq;
 
-  const [, , constantes_val, , valor_fn,] = valorSeq;
-
-  const transformador = outer_scope_param => {
-    const escopoParenteses = { __parent__: outer_scope_param || null };
-    if (constantes_val && constantes_val.length > 0) {
-      for (const item_seq of constantes_val) {
-        const actual_item = item_seq[0];
-        if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-          const [nome_val] = actual_item;
-          escopoParenteses[nome_val] = undefined;
+    return outer_scope_param => {
+      const escopoParenteses = { __parent__: outer_scope_param || null };
+      if (constantes_val && constantes_val.length > 0) {
+        for (const item_seq of constantes_val) {
+          const actual_item = item_seq[0];
+          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+            const [nome_val] = actual_item;
+            escopoParenteses[nome_val] = undefined;
+          }
+        }
+        for (const item_seq of constantes_val) {
+          const actual_item = item_seq[0];
+          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+            const [nome_val, , , , valor_const_fn] = actual_item;
+            escopoParenteses[nome_val] = valor_const_fn(escopoParenteses);
+          } else {
+            const debug_fn = actual_item;
+            debug_fn(escopoParenteses);
+          }
         }
       }
-      for (const item_seq of constantes_val) {
-        const actual_item = item_seq[0];
-        if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-          const [nome_val, , , , valor_const_fn] = actual_item;
-          escopoParenteses[nome_val] = valor_const_fn(escopoParenteses);
-        } else {
-          const debug_fn = actual_item;
-          debug_fn(escopoParenteses);
-        }
-      }
-    }
-    return valor_fn(escopoParenteses);
-  };
-  return { valor: transformador, resto };
-};
+      return valor_fn(escopoParenteses);
+    };
+  }
+);
 
-const termo1 = código => {
-  const parser = sequência(
+const termo1 = transformar(
+  sequência(
     alternativa(
       valor_constante,
       parênteses,
@@ -513,24 +499,21 @@ const termo1 = código => {
         chamada_função,
       ),
     ),
-  );
+  ),
+  valor => {
+    const [valor_fn, , operações_fns] = valor;
 
-  const { valor, resto } = parser(código);
-  if (resto === código) return { resto: código };
-
-  const [valor_fn, , operações_fns] = valor;
-
-  const transformador = escopo => {
-    if (operações_fns.length === 0) {
-      return valor_fn(escopo);
-    }
-    return operações_fns.reduce(
-      (resultado, operação_fn) => operação_fn(escopo, resultado),
-      valor_fn(escopo)
-    );
-  };
-  return { valor: transformador, resto };
-};
+    return escopo => {
+      if (operações_fns.length === 0) {
+        return valor_fn(escopo);
+      }
+      return operações_fns.reduce(
+        (resultado, operação_fn) => operação_fn(escopo, resultado),
+        valor_fn(escopo)
+      );
+    };
+  }
+);
 
 const termo2 = alternativa(
   lambda,
@@ -573,8 +556,8 @@ const termo5 = operação(
   ),
 );
 
-const termo6 = código => {
-  const parser = sequência(
+const termo6 = transformar(
+  sequência(
     termo5,
     opcional(sequência(
       opcional(espaço),
@@ -586,18 +569,16 @@ const termo6 = código => {
       opcional(espaço),
       código => expressão(código),
     ), undefined)
-  );
-  const { valor, resto } = parser(código);
-  if (resto === código) return { resto: código };
+  ),
+  valor => {
+    const [condição_fn, resto_opcional_val] = valor;
 
-  const [condição_fn, resto_opcional_val] = valor;
+    if (!resto_opcional_val) return condição_fn;
 
-  if (!resto_opcional_val) return { valor: condição_fn, resto };
-
-  const [, , , valor_se_verdadeiro_fn, , , , valor_se_falso_fn] = resto_opcional_val;
-  const transformador = escopo => condição_fn(escopo) !== 0 ? valor_se_verdadeiro_fn(escopo) : valor_se_falso_fn(escopo);
-  return { valor: transformador, resto };
-};
+    const [, , , valor_se_verdadeiro_fn, , , , valor_se_falso_fn] = resto_opcional_val;
+    return escopo => condição_fn(escopo) !== 0 ? valor_se_verdadeiro_fn(escopo) : valor_se_falso_fn(escopo);
+  }
+);
 
 const expressão = operação(
   termo6,
@@ -652,77 +633,75 @@ const declarações_constantes = vários(
   )
 );
 
-const _0 = código => {
-  const parser = sequência(
-    opcional(espaço),
-    opcional(vários(
-      sequência(
+const _0 = opcional(
+  transformar(
+    sequência(
+      opcional(espaço),
+      opcional(vários(
         sequência(
-          nome,
-          opcional(espaço),
-          símbolo("#"),
-          opcional(espaço),
-          endereço,
+          sequência(
+            nome,
+            opcional(espaço),
+            símbolo("#"),
+            opcional(espaço),
+            endereço,
+          ),
+          espaço,
         ),
-        espaço,
-      ),
-    ), []),
-    opcional(vários(
-      sequência(
+      ), []),
+      opcional(vários(
         sequência(
-          nome,
-          opcional(espaço),
-          símbolo("@"),
-          opcional(espaço),
-          endereço,
+          sequência(
+            nome,
+            opcional(espaço),
+            símbolo("@"),
+            opcional(espaço),
+            endereço,
+          ),
+          espaço,
         ),
-        espaço,
-      ),
-    ), []),
-    opcional(espaço),
-    opcional(declarações_constantes, []),
-    opcional(espaço),
-    expressão,
-    opcional(espaço),
-  );
+      ), []),
+      opcional(espaço),
+      opcional(declarações_constantes, []),
+      opcional(espaço),
+      expressão,
+      opcional(espaço),
+    ),
+    valorSeq => {
+      const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
+      const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+      const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-  const { valor: valorSeq, resto: restoSeq } = parser(código);
+      const corpo = outer_scope_param => {
+        const blockScope = { __parent__: outer_scope_param || null };
 
-  if (valorSeq === undefined) {
-    return { valor: [[], [], () => { }], resto: código };
-  }
+        for (const atrib_ou_debug_item of atribuições_val) {
+          const actual_item = atrib_ou_debug_item[0];
+          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+            const [nome_val] = actual_item;
+            blockScope[nome_val] = undefined;
+          }
+        }
 
-  const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
-  const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
-  const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+        for (const atrib_ou_debug_item of atribuições_val) {
+          const actual_item = atrib_ou_debug_item[0];
+          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
+            const [nome_val, , , , valorAtribuição_fn] = actual_item;
+            blockScope[nome_val] = valorAtribuição_fn(blockScope);
+          } else {
+            const debug_fn = actual_item;
+            debug_fn(blockScope);
+          }
+        }
 
-  const corpo = outer_scope_param => {
-    const blockScope = { __parent__: outer_scope_param || null };
+        return valor_fn_expr(blockScope);
+      };
 
-    for (const atrib_ou_debug_item of atribuições_val) {
-      const actual_item = atrib_ou_debug_item[0];
-      if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-        const [nome_val] = actual_item;
-        blockScope[nome_val] = undefined;
-      }
+      return [importações, carregamentos, corpo];
     }
-
-    for (const atrib_ou_debug_item of atribuições_val) {
-      const actual_item = atrib_ou_debug_item[0];
-      if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-        const [nome_val, , , , valorAtribuição_fn] = actual_item;
-        blockScope[nome_val] = valorAtribuição_fn(blockScope);
-      } else {
-        const debug_fn = actual_item;
-        debug_fn(blockScope);
-      }
-    }
-
-    return valor_fn_expr(blockScope);
-  };
-
-  return { valor: [importações, carregamentos, corpo], resto: restoSeq };
-};
+  ),
+  [[], [], () => { }]
+);
 
 const efeitos = Object.fromEntries([
   "atribua_retorno_ao_estado",
