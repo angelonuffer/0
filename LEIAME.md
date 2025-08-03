@@ -13,6 +13,12 @@ Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor 
 ## Sintaxe
 A sintaxe é definida diretamente no interpretador [0.js](https://github.com/Nuffem/0/blob/main/0.js) e pode ser compreendida mais facilmente com o auxílio dos [exemplos](https://github.com/Nuffem/0/blob/main/exemplos.md).
 
+## Testes
+Para rodar os testes, execute o seguinte comando:
+```bash
+node 0_node.js testes/0
+```
+
 ## Licença
 
 [![CC0](https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Cc-zero.svg/26px-Cc-zero.svg.png) CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/deed.pt-br)
