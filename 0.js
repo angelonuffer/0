@@ -121,9 +121,9 @@ const opcional = (analisador, valor_padrão) => ({
   analisador,
   valor_padrão,
   analisar: código => {
-    const { valor, resto } = analisador.analisar(código)
-    if (resto !== código) return { valor, resto }
-    return { valor: valor_padrão, resto: código }
+    const resultado = analisador.analisar(código)
+    if (resultado.hasOwnProperty("valor")) return resultado
+    return { valor: valor_padrão, resto: código, menor_resto: resultado.menor_resto, erro: resultado.erro }
   }
 })
 
@@ -150,12 +150,12 @@ const transformar = (analisador, transformador) => ({
   analisador,
   transformador,
   analisar: código => {
+    const { valor, resto, menor_resto } = analisador.analisar(código)
+    if (resto === código) return { resto: código, menor_resto }
     try {
-      const { valor, resto, menor_resto } = analisador.analisar(código)
-      if (resto === código) return { resto: código, menor_resto }
       return { valor: transformador(valor), resto, menor_resto }
     } catch (erro) {
-      return { resto: código, menor_resto }
+      return { resto: código, menor_resto, erro }
     }
   }
 })
@@ -900,16 +900,23 @@ const etapas = {
     const [endereço] = Object.entries(módulos).find(([endereço, módulo]) => módulo === null) || []
     if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "executar_módulos")]
     const módulo_bruto = _0.analisar(conteúdos[endereço])
-    if (módulo_bruto.resto.length > 0) {
-      const posição_erro = conteúdos[endereço].length - módulo_bruto.menor_resto.length
+    if (módulo_bruto.erro || módulo_bruto.resto.length > 0) {
+      if (módulo_bruto.erro) {
+        return [
+          efeitos.escreva(`Erro: ${módulo_bruto.erro.message}`),
+          efeitos.escreva(módulo_bruto.erro.stack),
+          efeitos.saia(1),
+        ]
+      }
+      const posição_erro = conteúdos[endereço].length - (módulo_bruto.menor_resto?.length ?? 0)
       const linhas = conteúdos[endereço].split('\n')
       const linhas_antes = conteúdos[endereço].substring(0, posição_erro).split('\n');
       const número_linha = linhas_antes.length
       const número_coluna = linhas_antes.at(-1).length + 1
       const linha = linhas[número_linha - 1]
-      const linha_com_erro = linha.substring(0, número_coluna - 1) +
-        `\x1b[41m${linha[número_coluna - 1]}\x1b[0m` +
-        linha.substring(número_coluna)
+      const linha_com_erro = (linha?.substring(0, número_coluna - 1) ?? "") +
+        `\x1b[41m${linha?.[número_coluna - 1] ?? ""}\x1b[0m` +
+        (linha?.substring(número_coluna) ?? "")
       return [
         efeitos.escreva(`Erro de sintaxe.`),
         efeitos.escreva(endereço),
