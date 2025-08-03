@@ -1,76 +1,179 @@
-const símbolo = símbolo_esperado => código => {
-  if (código.startsWith(símbolo_esperado)) return {
-    valor: símbolo_esperado,
-    resto: código.slice(símbolo_esperado.length),
+const sucesso = {
+  tipo: "sucesso",
+  analisar: código => ({ valor: null, resto: código }),
+};
+
+const símbolo = símbolo_esperado => ({
+  tipo: "símbolo",
+  símbolo: símbolo_esperado,
+  analisar: código => {
+    if (código.startsWith(símbolo_esperado)) return {
+      valor: símbolo_esperado,
+      resto: código.slice(símbolo_esperado.length),
+    }
+    return { resto: código }
   }
-  return { resto: código }
-}
+})
 
-const alternativa = (...analisadores) => código => {
-  for (const analisador of analisadores) {
-    const resultado = analisador(código)
-    if (resultado.resto !== código || resultado.hasOwnProperty("valor")) return resultado
-  }
-  return { resto: código }
-}
+const alternativa = (...analisadores) => {
+  const getParserId = (parser) => {
+    if (!parser || typeof parser.tipo !== "string") return null;
 
-const sequência = (...analisadores) => código => {
-  const valores = []
-  let resto = código
+    switch (parser.tipo) {
+      case "símbolo": return `símbolo_${parser.símbolo}`;
+      case "faixa": return `faixa_${parser.inicial}_${parser.final}`;
+      default: return null;
+    }
+  };
 
-  for (const analisador of analisadores) {
-    const resultado = analisador(resto)
-    if (!resultado.hasOwnProperty("valor")) return { resto: código }
+  const fatorar_prefixos = (analisadores) => {
+    let otimizou = true;
+    while (otimizou) {
+      otimizou = false;
+      const groups = new Map();
+      const others = [];
+      const newAnalisadores = [];
 
-    valores.push(resultado.valor)
-    resto = resultado.resto
-  }
+      for (const p of analisadores) {
+        let prefixId = null;
+        if (p.tipo === "sequência" && p.analisadores.length > 0) {
+          prefixId = getParserId(p.analisadores[0]);
+        } else {
+          prefixId = getParserId(p);
+        }
 
-  return { valor: valores, resto }
-}
+        if (prefixId) {
+          if (!groups.has(prefixId)) groups.set(prefixId, []);
+          groups.get(prefixId).push(p);
+        } else {
+          others.push(p);
+        }
+      }
 
-const opcional = (analisador, valor_padrão) => código => {
-  const { valor, resto } = analisador(código)
-  if (resto !== código) return { valor, resto }
-  return { valor: valor_padrão, resto: código }
-}
+      for (const [prefixId, groupParsers] of groups.entries()) {
+        if (groupParsers.length > 1) {
+          otimizou = true;
+          const prefix = groupParsers[0].tipo === "sequência" ? groupParsers[0].analisadores[0] : groupParsers[0];
 
-const vários = analisador => código => {
-  const valores = []
-  let resto = código
+          const suffixes = groupParsers.map(p => {
+            if (p.tipo === "sequência") {
+              const remaining = p.analisadores.slice(1);
+              if (remaining.length === 0) return sucesso;
+              if (remaining.length === 1) return remaining[0];
+              return sequência(...remaining);
+            }
+            return sucesso; // For simple parsers that are prefixes
+          });
 
-  while (true) {
-    const { valor, resto: novo_resto } = analisador(resto)
-    if (novo_resto === resto) break
-    valores.push(valor)
-    resto = novo_resto
-  }
+          newAnalisadores.push(sequência(prefix, alternativa(...suffixes)));
+        } else {
+          newAnalisadores.push(...groupParsers);
+        }
+      }
+      analisadores = [...newAnalisadores, ...others];
+    }
+    return analisadores;
+  };
 
-  return { valor: valores, resto }
-}
+  const analisadoresFinais = fatorar_prefixos(analisadores);
 
-const transformar = (analisador, transformador) => código => {
-  const { valor, resto } = analisador(código)
-  if (resto === código) return { resto: código }
-  return { valor: transformador(valor), resto }
-}
-
-const inversão = analisador => código => {
-  const {resto} = analisador(código)
-  if (resto === código) return {
-    valor: código[0],
-    resto: código.slice(1),
-  }
-  return { resto: código }
-}
-
-const faixa = (inicial, final) => código => {
-  if (código[0] < inicial || código[0] > final) return { resto: código }
   return {
-    valor: código[0],
-    resto: código.slice(1),
-  }
+    tipo: "alternativa",
+    analisadores: analisadoresFinais,
+    analisar: código => {
+      for (const analisador of analisadoresFinais) {
+        const resultado = analisador.analisar(código)
+        if (resultado.resto !== código || resultado.hasOwnProperty("valor")) return resultado
+      }
+      return { resto: código }
+    }
+  };
 }
+
+const sequência = (...analisadores) => ({
+  tipo: "sequência",
+  analisadores,
+  analisar: código => {
+    const valores = []
+    let resto = código
+
+    for (const analisador of analisadores) {
+      const resultado = analisador.analisar(resto)
+      if (!resultado.hasOwnProperty("valor")) return { resto: código }
+
+      valores.push(resultado.valor)
+      resto = resultado.resto
+    }
+
+    return { valor: valores, resto }
+  }
+})
+
+const opcional = (analisador, valor_padrão) => ({
+  tipo: "opcional",
+  analisador,
+  valor_padrão,
+  analisar: código => {
+    const { valor, resto } = analisador.analisar(código)
+    if (resto !== código) return { valor, resto }
+    return { valor: valor_padrão, resto: código }
+  }
+})
+
+const vários = analisador => ({
+  tipo: "vários",
+  analisador,
+  analisar: código => {
+    const valores = []
+    let resto = código
+
+    while (true) {
+      const { valor, resto: novo_resto } = analisador.analisar(resto)
+      if (novo_resto === resto) break
+      valores.push(valor)
+      resto = novo_resto
+    }
+
+    return { valor: valores, resto }
+  }
+})
+
+const transformar = (analisador, transformador) => ({
+  tipo: "transformar",
+  analisador,
+  transformador,
+  analisar: código => {
+    const { valor, resto } = analisador.analisar(código)
+    if (resto === código) return { resto: código }
+    return { valor: transformador(valor), resto }
+  }
+})
+
+const inversão = analisador => ({
+  tipo: "inversão",
+  analisador,
+  analisar: código => {
+    const { resto } = analisador.analisar(código)
+    if (resto === código) return {
+      valor: código[0],
+      resto: código.slice(1),
+    }
+    return { resto: código }
+  }
+})
+
+const faixa = (inicial, final) => ({
+  tipo: "faixa",
+  inicial,
+  final,
+  analisar: código => {
+    if (código.length === 0 || código[0] < inicial || código[0] > final) return { resto: código }
+    return {
+      valor: código[0],
+      resto: código.slice(1),
+    }
+  }
+})
 
 const operador = (literal, funcao) => transformar(
   símbolo(literal),
@@ -182,7 +285,7 @@ const não = transformar(
   sequência(
     símbolo("!"),
     opcional(espaço),
-    código => expressão(código),
+    { analisar: código => expressão.analisar(código) },
   ),
   ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
 )
@@ -204,10 +307,10 @@ const valor_constante = transformar(
 const fatia = transformar(
   sequência(
     símbolo("["),
-    código => expressão(código),
+    { analisar: código => expressão.analisar(código) },
     opcional(sequência(
       símbolo(":"),
-      opcional(código => expressão(código)),
+      opcional({ analisar: código => expressão.analisar(código) }),
     )),
     símbolo("]"),
   ),
@@ -262,7 +365,7 @@ const conteúdo_modelo = transformar(
 const expressão_modelo = transformar(
   sequência(
     símbolo("${"),
-    código => expressão(código),
+    { analisar: código => expressão.analisar(código) },
     símbolo("}"),
   ),
   ([, valor_fn,]) => escopo => valor_fn(escopo)
@@ -303,7 +406,7 @@ const lista = transformar(
     vários(
       sequência(
         opcional(símbolo("..."), ""),
-        código => expressão(código),
+        { analisar: código => expressão.analisar(código) },
         opcional(símbolo(",")),
         opcional(espaço)
       )
@@ -328,19 +431,19 @@ const objeto = transformar(
             nome,
             sequência(
               símbolo("["),
-              código => expressão(código),
+              { analisar: código => expressão.analisar(código) },
               símbolo("]"),
             )
           ),
           símbolo(":"),
           opcional(espaço),
-          código => expressão(código),
+          { analisar: código => expressão.analisar(código) },
           opcional(símbolo(",")),
           opcional(espaço),
         ),
         sequência( // Spread syntax ...expression
           símbolo("..."),
-          código => expressão(código),
+          { analisar: código => expressão.analisar(código) },
           opcional(símbolo(",")),
           opcional(espaço),
         ),
@@ -398,7 +501,7 @@ const lambda = transformar(
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),
-    código => expressão(código)
+    { analisar: código => expressão.analisar(código) }
   ),
   (valorBrutoLambda) => {
     const [paramsResultado, , , , corpoExprFunc] = valorBrutoLambda;
@@ -430,7 +533,7 @@ const chamada_função = transformar(
     opcional(espaço),
     vários(
       sequência(
-        código => expressão(código),
+        { analisar: código => expressão.analisar(código) },
         opcional(espaço),
         opcional(símbolo(",")),
         opcional(espaço),
@@ -448,9 +551,9 @@ const parênteses = transformar(
   sequência(
     símbolo("("),
     opcional(espaço),
-    opcional(código => declarações_constantes(código), []),
+    opcional({ analisar: código => declarações_constantes.analisar(código) }, []),
     opcional(espaço),
-    código => expressão(código),
+    { analisar: código => expressão.analisar(código) },
     opcional(espaço),
     símbolo(")"),
   ),
@@ -563,11 +666,11 @@ const termo6 = transformar(
       opcional(espaço),
       símbolo("?"),
       opcional(espaço),
-      código => expressão(código),
+      { analisar: código => expressão.analisar(código) },
       opcional(espaço),
       símbolo(":"),
       opcional(espaço),
-      código => expressão(código),
+      { analisar: código => expressão.analisar(código) },
     ), undefined)
   ),
   valor => {
@@ -589,7 +692,7 @@ const expressão = operação(
 );
 
 const raw_expression_capture = código => {
-  const { valor: valor_expr_fn, resto: resto_expr } = expressão(código);
+  const { valor: valor_expr_fn, resto: resto_expr } = expressão.analisar(código);
 
   if (resto_expr === código) {
     return { resto: código };
@@ -603,7 +706,7 @@ const debug_command = transformar(
   sequência(
     símbolo("$"),
     opcional(espaço),
-    raw_expression_capture
+    { analisar: raw_expression_capture }
   ),
   (seq_result) => {
     const { valor_fn, str } = seq_result[2];
@@ -620,7 +723,7 @@ const const_declaration_seq = sequência(
   opcional(espaço),
   símbolo("="),
   opcional(espaço),
-  código => expressão(código)
+  { analisar: código => expressão.analisar(código) }
 );
 
 const declarações_constantes = vários(
@@ -785,7 +888,7 @@ const etapas = {
   avaliar_módulos: ({ módulos, conteúdos }) => {
     const [endereço] = Object.entries(módulos).find(([endereço, módulo]) => módulo === null) || []
     if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "executar_módulos")]
-    const módulo_bruto = _0(conteúdos[endereço])
+    const módulo_bruto = _0.analisar(conteúdos[endereço])
     if (módulo_bruto.resto.length > 0) {
       const posição_erro = conteúdos[endereço].length - módulo_bruto.resto.length
       const linhas = conteúdos[endereço].split('\n')
