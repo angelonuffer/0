@@ -1,4 +1,4 @@
-uniteste # https://raw.githubusercontent.com/Nuffem/uniteste.0/b4c24ea0c41a556564c080e241ec94a818988c0c/uniteste.0
+uniteste # https://cdn.jsdelivr.net/gh/Nuffem/uniteste@6c3fb64369b7e2023ba109ee238c7d69dd269531/uniteste.0
 importação # importação.0
 carregamento # carregamento.0
 aritmética # aritmética.0
@@ -11,7 +11,7 @@ objeto # objeto.0
 função # função.0
 comentário # comentário.0
 
-resultado = uniteste.principal([
+uniteste.descrever("0" [
   importação
   carregamento
   aritmética
@@ -24,8 +24,3 @@ resultado = uniteste.principal([
   função
   comentário
 ])
-
-estado => [
-  [4 resultado[1]]
-  [3 resultado[0]]
-]
