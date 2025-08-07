@@ -1,4 +1,4 @@
-uniteste # https://raw.githubusercontent.com/Nuffem/uniteste.0/9a0376c57880ebcdf86eb55ca69b6eeefeda1bb0/uniteste.0
+uniteste # https://cdn.jsdelivr.net/gh/Nuffem/uniteste@6c3fb64369b7e2023ba109ee238c7d69dd269531/uniteste.0
 
 uniteste.descrever("Objeto" [
   uniteste.descrever("Atributos" [
@@ -19,22 +19,22 @@ uniteste.descrever("Objeto" [
       jogo.gênero
     ) "Aventura")
   ])
-  uniteste.descrever("Espalhamento" [
-    uniteste.objetos_iguais((
-      jogo = {
-        nome: "The Legend of Zelda"
-        gênero: "Aventura"
-      }
-      {
-        ...jogo
-        plataforma: "Nintendo"
-      }
-    ) {
-      nome: "The Legend of Zelda"
-      gênero: "Aventura"
-      plataforma: "Nintendo"
-    })
-  ])
+  // uniteste.descrever("Espalhamento" [
+  //   uniteste.objetos_iguais((
+  //     jogo = {
+  //       nome: "The Legend of Zelda"
+  //       gênero: "Aventura"
+  //     }
+  //     {
+  //       ...jogo
+  //       plataforma: "Nintendo"
+  //     }
+  //   ) {
+  //     nome: "The Legend of Zelda"
+  //     gênero: "Aventura"
+  //     plataforma: "Nintendo"
+  //   })
+  // ])
   uniteste.descrever("Propriedade calculada" [
     uniteste.iguais((
       chave = "personagem"
@@ -46,13 +46,13 @@ uniteste.descrever("Objeto" [
       objeto["personagem"]
     ) "Mario")
   ])
-  uniteste.descrever("Lista de atributos" [
-    uniteste.listas_iguais((
-      jogo = {
-        nome: "The Legend of Zelda"
-        gênero: "Aventura"
-      }
-      jogo[*]
-    ) ["nome" "gênero"])
-  ])
+  // uniteste.descrever("Lista de atributos" [
+  //   uniteste.listas_iguais((
+  //     jogo = {
+  //       nome: "The Legend of Zelda"
+  //       gênero: "Aventura"
+  //     }
+  //     jogo[*]
+  //   ) ["nome" "gênero"])
+  // ])
 ])

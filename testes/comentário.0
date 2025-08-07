@@ -1,4 +1,4 @@
-uniteste # https://raw.githubusercontent.com/Nuffem/uniteste.0/b4c24ea0c41a556564c080e241ec94a818988c0c/uniteste.0
+uniteste # https://cdn.jsdelivr.net/gh/Nuffem/uniteste@6c3fb64369b7e2023ba109ee238c7d69dd269531/uniteste.0
 
 uniteste.descrever("Comentário" [
   uniteste.iguais((
