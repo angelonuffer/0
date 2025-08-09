@@ -10,6 +10,16 @@ O nome 0 foi escolhido por sua simplicidade e universalidade. O zero é um conce
 
 Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor do mundo, promovendo a eficiência e a clareza no desenvolvimento de software.
 
+## Instalação
+
+Para instalar a Linguagem 0, você pode usar o seguinte comando, que baixa e executa o script de instalação:
+
+```bash
+curl -sSL https://cdn.jsdelivr.net/gh/Nuffem/0@main/install.sh | bash
+```
+
+O script instala o interpretador e o adiciona ao seu PATH. Se o diretório `~/.local/bin` não estiver no seu PATH, o script fornecerá instruções sobre como adicioná-lo.
+
 ## Sintaxe
 A sintaxe é definida diretamente no interpretador [0.js](https://github.com/Nuffem/0/blob/main/0.js) e pode ser compreendida mais facilmente com o auxílio dos [exemplos](https://github.com/Nuffem/0/blob/main/exemplos.md).
 
