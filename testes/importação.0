@@ -1,4 +1,4 @@
-uniteste # https://cdn.jsdelivr.net/gh/Nuffem/uniteste@6c3fb64369b7e2023ba109ee238c7d69dd269531/uniteste.0
+uniteste # ../uniteste.0
 retorna_5 # ./retorna_5.0
 
 uniteste.descrever("Importação" [

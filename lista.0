@@ -1,0 +1,12 @@
+lista = {
+  mapear: lista2 mapeador =>
+    lista2[.] == 0 ? [] :
+    lista2[.] == 1 ? [mapeador(lista2[0])] :
+    [mapeador(lista2[0]) ...lista.mapear(lista2[1:] mapeador)]
+  juntar: lista2 delimitador =>
+    lista2[.] == 0 ? "" :
+    lista2[.] == 1 ? lista2[0] :
+    `${lista2[0]}${delimitador}${lista.juntar(lista2[1:] delimitador)}`
+}
+
+lista
