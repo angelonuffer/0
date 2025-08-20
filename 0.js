@@ -463,7 +463,30 @@ const objeto = transformar(
     símbolo("}"),
   ),
   ([, , valores_vários,]) => escopo => {
-    return valores_vários ? valores_vários.reduce((resultado, v_alt) => {
+    if (!valores_vários) return {};
+    
+    // Create a new scope for object properties
+    const objectScope = { __parent__: escopo };
+    
+    // First pass: declare all property names in the scope
+    for (const v_alt of valores_vários) {
+      const firstEl = v_alt[0];
+      if (firstEl !== "...") {
+        const key_alt_result = v_alt[0];
+        
+        let chave;
+        if (typeof key_alt_result === "string") {
+          chave = key_alt_result;
+        } else {
+          const key_expr_fn = key_alt_result[1];
+          chave = key_expr_fn(escopo);
+        }
+        objectScope[chave] = undefined;
+      }
+    }
+    
+    // Second pass: evaluate property values in the augmented scope
+    return valores_vários.reduce((resultado, v_alt) => {
       const firstEl = v_alt[0];
       if (firstEl === "...") {
         const spread_expr_fn = v_alt[1];
@@ -479,9 +502,11 @@ const objeto = transformar(
           const key_expr_fn = key_alt_result[1];
           chave = key_expr_fn(escopo);
         }
-        return { ...resultado, [chave]: val_expr_fn(escopo) };
+        const valor = val_expr_fn(objectScope);
+        objectScope[chave] = valor;
+        return { ...resultado, [chave]: valor };
       }
-    }, {}) : {};
+    }, {});
   }
 );
 

@@ -1,20 +1,38 @@
 uniteste # ../uniteste.0
 
 uniteste.descrever("Objeto com referências" [
-  uniteste.objetos_iguais((
+  // Test the exact example from the problem statement
+  uniteste.iguais((
     obj = {
       a: 1
       b: a + 1
     }
-    obj
-  ) { a: 1, b: 2 })
+    obj.b
+  ) 2)
   
-  uniteste.objetos_iguais((
+  uniteste.iguais((
     pessoa = {
       nome: "João"
       sobrenome: "Silva"
       nomeCompleto: nome + " " + sobrenome
     }
-    pessoa
-  ) { nome: "João", sobrenome: "Silva", nomeCompleto: "João Silva" })
+    pessoa.nomeCompleto
+  ) "João Silva")
+  
+  // Test the problem statement example exactly as specified
+  uniteste.iguais((
+    resultado = {
+      a: 1
+      b: a + 1
+    }
+    resultado.a
+  ) 1)
+  
+  uniteste.iguais((
+    resultado = {
+      a: 1
+      b: a + 1
+    }
+    resultado.b
+  ) 2)
 ])

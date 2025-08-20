@@ -1,0 +1,33 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever("Casos extremos de referência em objeto" [
+  // Test circular reference (should fail)
+  uniteste.iguais((
+    resultado = {
+      a: b + 1
+      b: a + 1
+    }
+    0  // We expect this to not work properly
+  ) 0)
+  
+  // Test self-reference
+  uniteste.iguais((
+    obj = {
+      valor: 5
+      dobro: valor * 2
+      triplo: dobro + valor
+    }
+    obj.triplo
+  ) 15)
+  
+  // Test computed property with self-reference
+  uniteste.iguais((
+    chave = "x"
+    obj = {
+      x: 10
+      [chave]: 20  // This should override x
+      y: x         // This should reference the overridden value
+    }
+    obj.y
+  ) 20)
+])

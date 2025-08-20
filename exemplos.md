@@ -389,6 +389,35 @@ objeto["personagem"]
 "Mario"
 ```
 
+### Referenciando propriedades do próprio objeto
+
+Propriedades podem referenciar outras propriedades definidas no mesmo objeto.
+
+```
+pessoa = {
+  nome: "João"
+  sobrenome: "Silva"
+  nomeCompleto: nome + " " + sobrenome
+}
+
+pessoa.nomeCompleto
+---
+"João Silva"
+```
+
+```
+calculos = {
+  base: 10
+  dobro: base * 2
+  triplo: base * 3
+  somaDobroTriplo: dobro + triplo
+}
+
+calculos.somaDobroTriplo
+---
+50
+```
+
 ## Função
 
 Funções encapsulam lógica reutilizável.
