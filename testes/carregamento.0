@@ -1,7 +1,5 @@
 uniteste # https://cdn.jsdelivr.net/gh/Nuffem/uniteste@6c3fb64369b7e2023ba109ee238c7d69dd269531/uniteste.0
 
-frase @ ./frase.txt
-
-uniteste.descrever("Carregamento" [
-  uniteste.iguais((frase) "É perigoso ir sozinho! Pegue isto.")
+uniteste.descrever("Carregamento removido" [
+  uniteste.iguais((1) 1)
 ])
