@@ -458,6 +458,11 @@ const objeto = transformar(
           opcional(símbolo(",")),
           opcional(espaço),
         ),
+        sequência( // Value-only (auto-indexed)
+          { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
+          opcional(espaço),
+        ),
       ),
     ),
     símbolo("}"),
@@ -467,11 +472,16 @@ const objeto = transformar(
     
     // Create a new scope for object properties
     const objectScope = { __parent__: escopo };
+    let autoIndex = 0; // For auto-indexing value-only entries
     
     // First pass: declare all property names in the scope
     for (const v_alt of valores_vários) {
       const firstEl = v_alt[0];
-      if (firstEl !== "...") {
+      if (firstEl === "...") {
+        // Spread syntax - skip for now
+        continue;
+      } else if (v_alt.length === 6 && v_alt[1] === ":") {
+        // Key-value pair: [key, ":", space, value, comma, space]
         const key_alt_result = v_alt[0];
         
         let chave;
@@ -482,16 +492,22 @@ const objeto = transformar(
           chave = key_expr_fn(escopo);
         }
         objectScope[chave] = undefined;
+      } else {
+        // Value-only entry: [value, comma, space]
+        objectScope[autoIndex] = undefined;
+        autoIndex++;
       }
     }
     
     // Second pass: evaluate property values in the augmented scope
+    autoIndex = 0; // Reset for second pass
     return valores_vários.reduce((resultado, v_alt) => {
       const firstEl = v_alt[0];
       if (firstEl === "...") {
         const spread_expr_fn = v_alt[1];
         return { ...resultado, ...spread_expr_fn(escopo) };
-      } else {
+      } else if (v_alt.length === 6 && v_alt[1] === ":") {
+        // Key-value pair
         const key_alt_result = v_alt[0];
         const val_expr_fn = v_alt[3];
 
@@ -502,6 +518,13 @@ const objeto = transformar(
           const key_expr_fn = key_alt_result[1];
           chave = key_expr_fn(escopo);
         }
+        const valor = val_expr_fn(objectScope);
+        objectScope[chave] = valor;
+        return { ...resultado, [chave]: valor };
+      } else {
+        // Value-only entry
+        const val_expr_fn = v_alt[0];
+        const chave = autoIndex++;
         const valor = val_expr_fn(objectScope);
         objectScope[chave] = valor;
         return { ...resultado, [chave]: valor };
