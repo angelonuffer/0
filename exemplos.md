@@ -32,21 +32,6 @@ retorna_5()
 
 Neste exemplo, o módulo `retorna_5.0` é importado, e sua função `retorna_5` é utilizada.
 
-## Carregando conteúdo de um arquivo
-
-Use `@` para carregar o conteúdo de um arquivo como texto.
-
-Exemplo:
-
-```
-frase @ ./frase.txt
-
-frase
----
-"É perigoso ir sozinho! Pegue isto."
-```
-
-Aqui, o conteúdo de `frase.txt` é carregado na constante `frase`.
 
 ## Tipo lógico
 

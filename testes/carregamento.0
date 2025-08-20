@@ -1,7 +1,5 @@
 uniteste # ../uniteste.0
 
-frase @ ./frase.txt
-
-uniteste.descrever("Carregamento" [
-  uniteste.iguais((frase) "É perigoso ir sozinho! Pegue isto.")
+uniteste.descrever("Carregamento removido" [
+  uniteste.iguais((1) 1)
 ])
