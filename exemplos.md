@@ -418,6 +418,77 @@ calculos.somaDobroTriplo
 50
 ```
 
+### Valores com índices automáticos
+
+Objetos podem conter valores sem chaves explícitas, que são automaticamente indexados numericamente.
+
+```
+cores = {
+  "vermelho"
+  "verde" 
+  "azul"
+}
+
+cores[0]
+---
+"vermelho"
+```
+
+```
+cores = {
+  "vermelho"
+  "verde"
+  "azul"
+}
+
+cores[1]
+---
+"verde"
+```
+
+### Misturando chaves explícitas e índices automáticos
+
+Pode-se combinar propriedades com chaves explícitas e valores com índices automáticos no mesmo objeto.
+
+```
+dados = {
+  nome: "João"
+  "primeiro_valor"
+  idade: 30
+  "segundo_valor"
+}
+
+dados["nome"]
+---
+"João"
+```
+
+```
+dados = {
+  nome: "João"
+  "primeiro_valor"
+  idade: 30
+  "segundo_valor"
+}
+
+dados[0]
+---
+"primeiro_valor"
+```
+
+```
+dados = {
+  nome: "João"
+  "primeiro_valor"
+  idade: 30
+  "segundo_valor"
+}
+
+dados[1]
+---
+"segundo_valor"
+```
+
 ## Função
 
 Funções encapsulam lógica reutilizável.

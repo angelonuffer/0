@@ -46,6 +46,77 @@ uniteste.descrever("Objeto" [
       objeto["personagem"]
     ) "Mario")
   ])
+  uniteste.descrever("Índices automáticos" [
+    uniteste.iguais((
+      cores = {
+        "vermelho"
+        "verde"
+        "azul"
+      }
+
+      cores[0]
+    ) "vermelho")
+    uniteste.iguais((
+      cores = {
+        "vermelho"
+        "verde"
+        "azul"
+      }
+
+      cores[1]
+    ) "verde")
+    uniteste.iguais((
+      cores = {
+        "vermelho"
+        "verde"
+        "azul"
+      }
+
+      cores[2]
+    ) "azul")
+  ])
+  uniteste.descrever("Mistura de chaves e índices" [
+    uniteste.iguais((
+      dados = {
+        nome: "João"
+        "primeiro_valor"
+        idade: 30
+        "segundo_valor"
+      }
+
+      dados["nome"]
+    ) "João")
+    uniteste.iguais((
+      dados = {
+        nome: "João"
+        "primeiro_valor"
+        idade: 30
+        "segundo_valor"
+      }
+
+      dados[0]
+    ) "primeiro_valor")
+    uniteste.iguais((
+      dados = {
+        nome: "João"
+        "primeiro_valor"
+        idade: 30
+        "segundo_valor"
+      }
+
+      dados["idade"]
+    ) 30)
+    uniteste.iguais((
+      dados = {
+        nome: "João"
+        "primeiro_valor"
+        idade: 30
+        "segundo_valor"
+      }
+
+      dados[1]
+    ) "segundo_valor")
+  ])
   // uniteste.descrever("Lista de atributos" [
   //   uniteste.listas_iguais((
   //     jogo = {
