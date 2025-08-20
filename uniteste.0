@@ -21,6 +21,14 @@ compara_listas = l1 l2 =>
   l1[0] != l2[0] ? 0 :
   compara_listas(l1[1:] l2[1:])
 
+compara_objetos = obj1 obj2 =>
+  obj1[*][.] != obj2[*][.] ? 0 :
+  obj1[*][.] == 0 ? 1 :
+  lista_reduzir(
+    lista.mapear(obj1[*], chave => obj1[chave] == obj2[chave] ? 1 : 0)
+    valor_1 valor_2 => valor_1 & valor_2
+  )
+
 uniteste = {
   descrever: título testes => () =>
     (
@@ -74,6 +82,18 @@ uniteste = {
       ] :
       [
         [4 `Esperava que [${lista.juntar(lista1, ", ")}] fosse igual a [${lista.juntar(lista2, ", ")}].`],
+        [4 "0/1 testes passaram."],
+        [3 1 0]
+      ],
+  objetos_iguais: objeto1 objeto2 => () =>
+    compara_objetos(objeto1 objeto2) ?
+      [
+        [4 "ok"],
+        [4 "1/1 testes passaram."],
+        [3 0 1]
+      ] :
+      [
+        [4 `Esperava que os objetos fossem iguais.`],
         [4 "0/1 testes passaram."],
         [3 1 0]
       ]

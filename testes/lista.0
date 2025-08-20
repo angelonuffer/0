@@ -7,14 +7,14 @@ uniteste.descrever("Lista" [
 
       jogos[0]
     ) "The Legend of Zelda")
-    // uniteste.listas_iguais((
-    //   séries = ["Stranger Things" "Breaking Bad" "Game of Thrones"]
-    //   séries[0:2]
-    // ) ["Stranger Things" "Breaking Bad"])
-    // uniteste.listas_iguais((
-    //   filmes = ["Star Wars" "O Senhor dos Anéis" "Matrix"]
-    //   [...filmes[0:2] "Jurassic Park"]
-    // ) ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"])
+    uniteste.listas_iguais((
+      séries = ["Stranger Things" "Breaking Bad" "Game of Thrones"]
+      séries[0:2]
+    ) ["Stranger Things" "Breaking Bad"])
+    uniteste.listas_iguais((
+      filmes = ["Star Wars" "O Senhor dos Anéis" "Matrix"]
+      [...filmes[0:2] "Jurassic Park"]
+    ) ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"])
   ])
   uniteste.descrever("Tamanho" [
     uniteste.iguais((
