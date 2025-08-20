@@ -1,6 +1,5 @@
 uniteste # ../uniteste.0
 importação # importação.0
-carregamento # carregamento.0
 aritmética # aritmética.0
 operadores_lógicos # operadores_lógicos.0
 comparadores # comparadores.0
@@ -13,7 +12,6 @@ comentário # comentário.0
 
 uniteste.descrever("0" [
   importação
-  carregamento
   aritmética
   operadores_lógicos
   comparadores
