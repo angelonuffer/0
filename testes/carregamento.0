@@ -1,5 +1,0 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever("Carregamento removido" [
-  uniteste.iguais((1) 1)
-])
