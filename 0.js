@@ -250,7 +250,7 @@ const número = transformar(
 const letra = inversão(
   alternativa(
     espaço_em_branco,
-    faixa("!", "@"),
+    faixa("!", "?"),
     faixa("[", "^"),
     símbolo("`"),
     faixa("{", "~"),
@@ -763,18 +763,7 @@ const _0 = opcional(
           espaço,
         ),
       ), []),
-      opcional(vários(
-        sequência(
-          sequência(
-            nome,
-            opcional(espaço),
-            símbolo("@"),
-            opcional(espaço),
-            endereço,
-          ),
-          espaço,
-        ),
-      ), []),
+
       opcional(espaço),
       opcional(declarações_constantes, []),
       opcional(espaço),
@@ -782,9 +771,8 @@ const _0 = opcional(
       opcional(espaço),
     ),
     valorSeq => {
-      const [, importaçõesDetectadas_val, carregamentosDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
+      const [, importaçõesDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
       const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
-      const carregamentos = carregamentosDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
       const corpo = outer_scope_param => {
         const blockScope = { __parent__: outer_scope_param || null };
@@ -811,7 +799,7 @@ const _0 = opcional(
         return valor_fn_expr(blockScope);
       };
 
-      return [importações, carregamentos, corpo];
+      return [importações, [], corpo];
     }
   ),
   [[], [], () => { }]
@@ -936,12 +924,11 @@ const etapas = {
       return decodeURIComponent(resolved_url.pathname.substring(1));
     }
 
-    const [importações, carregamentos, corpo] = módulo_bruto.valor;
+    const [importações, , corpo] = módulo_bruto.valor;
     const resolved_importações = importações.map(([nome, end_rel]) => [nome, resolve_endereço(endereço, end_rel)]);
-    const resolved_carregamentos = carregamentos.map(([nome, end_rel]) => [nome, resolve_endereço(endereço, end_rel)]);
 
     const novas_dependências_conteúdos = Object.fromEntries(
-      [...resolved_importações, ...resolved_carregamentos]
+      resolved_importações
         .filter(([, end]) => !conteúdos.hasOwnProperty(end))
         .map(([, end]) => [end, null])
     );
@@ -960,7 +947,7 @@ const etapas = {
       efeitos.atribua_valor_ao_estado("módulos", {
         ...módulos,
         ...novas_dependências_módulos,
-        [endereço]: [resolved_importações, resolved_carregamentos, corpo],
+        [endereço]: [resolved_importações, [], corpo],
       }),
       efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
     ]
@@ -970,8 +957,7 @@ const etapas = {
       ([e, m]) =>
         m !== null &&
         !valores_módulos.hasOwnProperty(e) &&
-        m[0].every(([, dep_end]) => valores_módulos.hasOwnProperty(dep_end)) &&
-        m[1].every(([, dep_end]) => conteúdos[dep_end] !== undefined)
+        m[0].every(([, dep_end]) => valores_módulos.hasOwnProperty(dep_end))
     ) || [];
 
     if (endereço === undefined) {
@@ -989,16 +975,13 @@ const etapas = {
       }
     }
 
-    const [importações, carregamentos, corpo] = módulo;
+    const [importações, , corpo] = módulo;
 
     const escopo_importações = Object.fromEntries(
       importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
     );
-    const escopo_carregamentos = Object.fromEntries(
-      carregamentos.map(([nome, end_conteúdo]) => [nome, conteúdos[end_conteúdo]])
-    );
 
-    const escopo = { ...escopo_importações, ...escopo_carregamentos };
+    const escopo = { ...escopo_importações };
 
     const valor = corpo(escopo);
 
