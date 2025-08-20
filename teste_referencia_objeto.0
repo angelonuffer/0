@@ -1,0 +1,20 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever("Objeto com referências" [
+  uniteste.objetos_iguais((
+    obj = {
+      a: 1
+      b: a + 1
+    }
+    obj
+  ) { a: 1, b: 2 })
+  
+  uniteste.objetos_iguais((
+    pessoa = {
+      nome: "João"
+      sobrenome: "Silva"
+      nomeCompleto: nome + " " + sobrenome
+    }
+    pessoa
+  ) { nome: "João", sobrenome: "Silva", nomeCompleto: "João Silva" })
+])
