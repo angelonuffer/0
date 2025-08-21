@@ -2,25 +2,25 @@ uniteste # ../uniteste.0
 
 uniteste.descrever(["Objeto", [
   uniteste.descrever(["Atributos", [
-    uniteste.iguais((
+    uniteste.iguais([(
       jogo = {
         título: "The Legend of Zelda"
         gênero: "Aventura"
       }
 
       jogo["título"]
-    ) "The Legend of Zelda")
-    uniteste.iguais((
+    ), "The Legend of Zelda"])
+    uniteste.iguais([(
       jogo = {
         nome: "The Legend of Zelda"
         gênero: "Aventura"
       }
 
       jogo.gênero
-    ) "Aventura")
-  ])
+    ), "Aventura"])
+  ]])
   uniteste.descrever(["Espalhamento", [
-    uniteste.objetos_iguais((
+    uniteste.objetos_iguais([(
       jogo = {
         nome: "The Legend of Zelda"
         gênero: "Aventura"
@@ -29,14 +29,14 @@ uniteste.descrever(["Objeto", [
         ...jogo
         plataforma: "Nintendo"
       }
-    ) {
+    ), {
       nome: "The Legend of Zelda"
       gênero: "Aventura"
       plataforma: "Nintendo"
-    })
-  ])
+    }])
+  ]])
   uniteste.descrever(["Propriedade calculada", [
-    uniteste.iguais((
+    uniteste.iguais([(
       chave = "personagem"
 
       objeto = {
@@ -44,10 +44,10 @@ uniteste.descrever(["Objeto", [
       }
 
       objeto["personagem"]
-    ) "Mario")
-  ])
+    ), "Mario"])
+  ]])
   uniteste.descrever(["Índices automáticos", [
-    uniteste.iguais((
+    uniteste.iguais([(
       cores = {
         "vermelho"
         "verde"
@@ -55,8 +55,8 @@ uniteste.descrever(["Objeto", [
       }
 
       cores[0]
-    ) "vermelho")
-    uniteste.iguais((
+    ), "vermelho"])
+    uniteste.iguais([(
       cores = {
         "vermelho"
         "verde"
@@ -64,8 +64,8 @@ uniteste.descrever(["Objeto", [
       }
 
       cores[1]
-    ) "verde")
-    uniteste.iguais((
+    ), "verde"])
+    uniteste.iguais([(
       cores = {
         "vermelho"
         "verde"
@@ -73,10 +73,10 @@ uniteste.descrever(["Objeto", [
       }
 
       cores[2]
-    ) "azul")
-  ])
+    ), "azul"])
+  ]])
   uniteste.descrever(["Mistura de chaves e índices", [
-    uniteste.iguais((
+    uniteste.iguais([(
       dados = {
         nome: "João"
         "primeiro_valor"
@@ -85,8 +85,8 @@ uniteste.descrever(["Objeto", [
       }
 
       dados["nome"]
-    ) "João")
-    uniteste.iguais((
+    ), "João"])
+    uniteste.iguais([(
       dados = {
         nome: "João"
         "primeiro_valor"
@@ -95,8 +95,8 @@ uniteste.descrever(["Objeto", [
       }
 
       dados[0]
-    ) "primeiro_valor")
-    uniteste.iguais((
+    ), "primeiro_valor"])
+    uniteste.iguais([(
       dados = {
         nome: "João"
         "primeiro_valor"
@@ -105,8 +105,8 @@ uniteste.descrever(["Objeto", [
       }
 
       dados["idade"]
-    ) 30)
-    uniteste.iguais((
+    ), 30])
+    uniteste.iguais([(
       dados = {
         nome: "João"
         "primeiro_valor"
@@ -115,15 +115,15 @@ uniteste.descrever(["Objeto", [
       }
 
       dados[1]
-    ) "segundo_valor")
-  ])
+    ), "segundo_valor"])
+  ]])
   uniteste.descrever(["Lista de atributos", [
-    uniteste.listas_iguais((
+    uniteste.listas_iguais([(
       jogo = {
         nome: "The Legend of Zelda"
         gênero: "Aventura"
       }
       jogo[*]
-    ) ["nome" "gênero"])
-  ])
-])
+    ), ["nome" "gênero"]])
+  ]])
+]])
