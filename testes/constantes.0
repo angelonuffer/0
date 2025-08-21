@@ -1,18 +1,19 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever("Constantes" [
-  uniteste.iguais((
-    a = 5
-    b = 8
-
-    a + b
-  ) 13)
-  uniteste.iguais((
-    função1 = => x == 42
-    função2 = => (
-      x = 42
-      função1()
-    )
-    função2()
-  ) 0)
-])
+uniteste.descrever(["Constantes", [
+  uniteste.iguais([
+    (
+      a = 5
+      b = 8
+      a + b
+    ), 13])
+  uniteste.iguais([
+    (
+      função1 = () => x == 42
+      função2 = () => (
+        x = 42
+        função1()
+      )
+      função2()
+    ), 0])
+]])

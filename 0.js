@@ -679,12 +679,12 @@ const atributo = transformar(
 const params_lista_com_parenteses = sequência(
   símbolo("("),
   opcional(espaço),
-  opcional(vários(sequência(nome, opcional(espaço), opcional(símbolo(",")), opcional(espaço))), []),
+  opcional(nome),
   opcional(espaço),
   símbolo(")")
 );
 
-const params_lista_sem_parenteses = vários(sequência(nome, opcional(espaço)));
+const params_lista_sem_parenteses = nome;
 
 const lambda = transformar(
   sequência(
@@ -700,21 +700,28 @@ const lambda = transformar(
   (valorBrutoLambda) => {
     const [paramsResultado, , , , corpoExprFunc] = valorBrutoLambda;
 
-    let listaNomesParams = [];
+    let nomeParam = null;
     if (Array.isArray(paramsResultado) && paramsResultado[0] === '(') {
-      if (paramsResultado[2]) {
-        listaNomesParams = paramsResultado[2].map(paramSeq => paramSeq[0]);
-      }
+      // Parentheses case: (param) or ()
+      nomeParam = paramsResultado[2] || null;
     } else {
-      listaNomesParams = (paramsResultado || []).map(paramSeq => paramSeq[0]);
+      // No parentheses case: param
+      nomeParam = paramsResultado;
     }
 
     return definition_scope => {
       return (caller_context, ...valoresArgs) => {
         const fn_scope = { __parent__: definition_scope || null };
-        listaNomesParams.forEach((nomeArg, i) => {
-          fn_scope[nomeArg] = valoresArgs[i];
-        });
+        if (nomeParam) {
+          // Function has a parameter
+          if (valoresArgs.length === 1) {
+            fn_scope[nomeParam] = valoresArgs[0];
+          } else {
+            // This case should not happen with the new syntax, but keeping for safety
+            fn_scope[nomeParam] = valoresArgs;
+          }
+        }
+        // If nomeParam is null, it's a zero-parameter function, so we don't assign anything
         return corpoExprFunc(fn_scope);
       };
     };
