@@ -34,7 +34,7 @@ uniteste = {
   descrever: args => () =>
     (
       mensagens = lista.mapear([
-        lista_planificar([
+        lista_planificar(
           lista.mapear([
             args[1],
             teste => (
@@ -42,7 +42,7 @@ uniteste = {
               resultado[0:resultado[.] - 2]
             )
           ])
-        ]),
+        ),
         mensagem => [4 `${args[0]} | ${mensagem[1]}`]
       ])
       passaram = lista_reduzir([
