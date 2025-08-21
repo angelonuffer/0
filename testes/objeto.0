@@ -19,22 +19,22 @@ uniteste.descrever("Objeto" [
       jogo.gênero
     ) "Aventura")
   ])
-  // uniteste.descrever("Espalhamento" [
-  //   uniteste.objetos_iguais((
-  //     jogo = {
-  //       nome: "The Legend of Zelda"
-  //       gênero: "Aventura"
-  //     }
-  //     {
-  //       ...jogo
-  //       plataforma: "Nintendo"
-  //     }
-  //   ) {
-  //     nome: "The Legend of Zelda"
-  //     gênero: "Aventura"
-  //     plataforma: "Nintendo"
-  //   })
-  // ])
+  uniteste.descrever("Espalhamento" [
+    uniteste.objetos_iguais((
+      jogo = {
+        nome: "The Legend of Zelda"
+        gênero: "Aventura"
+      }
+      {
+        ...jogo
+        plataforma: "Nintendo"
+      }
+    ) {
+      nome: "The Legend of Zelda"
+      gênero: "Aventura"
+      plataforma: "Nintendo"
+    })
+  ])
   uniteste.descrever("Propriedade calculada" [
     uniteste.iguais((
       chave = "personagem"
@@ -117,13 +117,13 @@ uniteste.descrever("Objeto" [
       dados[1]
     ) "segundo_valor")
   ])
-  // uniteste.descrever("Lista de atributos" [
-  //   uniteste.listas_iguais((
-  //     jogo = {
-  //       nome: "The Legend of Zelda"
-  //       gênero: "Aventura"
-  //     }
-  //     jogo[*]
-  //   ) ["nome" "gênero"])
-  // ])
+  uniteste.descrever("Lista de atributos" [
+    uniteste.listas_iguais((
+      jogo = {
+        nome: "The Legend of Zelda"
+        gênero: "Aventura"
+      }
+      jogo[*]
+    ) ["nome" "gênero"])
+  ])
 ])
