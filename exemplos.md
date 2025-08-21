@@ -123,6 +123,41 @@ Divide o primeiro número pelo segundo.
 4
 ```
 
+### Números negativos
+Números negativos são escritos com o sinal `-` diretamente antes do número.
+
+```
+-42
+---
+-42
+```
+
+Números negativos podem ser usados em operações aritméticas:
+```
+-5 + 3
+---
+-2
+```
+
+```
+10 + -7
+---
+3
+```
+
+```
+-3 * 4
+---
+-12
+```
+
+Quando usar números negativos em sequência, use parênteses para evitar ambiguidade com o operador de subtração:
+```
+(-5) + (-3)
+---
+-8
+```
+
 ### Precedência de operadores aritméticos
 Multiplicação (`*`) e divisão (`/`) têm precedência sobre adição (`+`) e subtração (`-`). Use parênteses `()` para alterar a ordem da avaliação.
 
