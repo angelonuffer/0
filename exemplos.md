@@ -622,101 +622,101 @@ quadrado(5)
 25
 ```
 
-Funções podem receber mais de um parâmetro para realizar operações mais complexas.
+Funções que precisam de múltiplos valores recebem uma lista como parâmetro para realizar operações mais complexas.
 
 ### Soma de dois números
 
-Esta função recebe dois números como parâmetros e retorna a soma deles.
+Esta função recebe uma lista com dois números como parâmetro e retorna a soma deles.
 
 ```
-soma = a b => a + b
+soma = args => args[0] + args[1]
 
-soma(3 7)
+soma([3, 7])
 ---
 10
 ```
 
 ### Verificar se um número está dentro de um intervalo
 
-Esta função verifica se um número está dentro de um intervalo definido por dois valores (mínimo e máximo).
+Esta função verifica se um número está dentro de um intervalo definido por dois valores (mínimo e máximo). Ela recebe uma lista com três valores: o número a verificar, o valor mínimo e o valor máximo.
 
 ```
-dentro_intervalo = n mín máx => n >= mín & n <= máx
+dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
 
-dentro_intervalo(5 1 10)
+dentro_intervalo([5, 1, 10])
 ---
 1
 ```
 
 ```
-dentro_intervalo = n mín máx => n >= mín & n <= máx
+dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
 
-dentro_intervalo(15 1 10)
+dentro_intervalo([15, 1, 10])
 ---
 0
 ```
 
 ### Concatenar dois textos
 
-Esta função recebe dois textos e os combina em uma única string.
+Esta função recebe uma lista com dois textos e os combina em uma única string.
 
 ```
-nome_completo = personagem universo => `${personagem} de ${universo}`
+nome_completo = args => `${args[0]} de ${args[1]}`
 
-nome_completo("Geralt" "The Witcher")
+nome_completo(["Geralt", "The Witcher"])
 ---
 "Geralt de The Witcher"
 ```
 
 ### Calcular a área de um retângulo
 
-Esta função calcula a área de um retângulo, dado sua largura e altura.
+Esta função calcula a área de um retângulo, recebendo uma lista com largura e altura.
 
 ```
-área_retangulo = largura altura => largura * altura
+área_retangulo = args => args[0] * args[1]
 
-área_retangulo(5 10)
+área_retangulo([5, 10])
 ---
 50
 ```
 
 ### Calcular a área de um triângulo
 
-Esta função calcula a área de um triângulo com base na base e na altura fornecidas.
+Esta função calcula a área de um triângulo com base na base e na altura fornecidas em uma lista.
 
 ```
-área_triangulo = base altura => (
+área_triangulo = args => (
   divisor = 2
-  área = (base * altura) / divisor
+  área = (args[0] * args[1]) / divisor
   área
 )
 
-área_triangulo(10 8)
+área_triangulo([10, 8])
 ---
 40
 ```
 
 ### Encontrar o maior de dois números
 
-Esta função retorna o maior valor entre dois números fornecidos.
+Esta função retorna o maior valor entre dois números fornecidos em uma lista.
 
 ```
-maior = a b => a > b ? a : b
+maior = args => args[0] > args[1] ? args[0] : args[1]
 
-maior(8 3)
+maior([8, 3])
 ---
 8
 ```
 
 ```
-maior = a b => a > b ? a : b
+maior = args => args[0] > args[1] ? args[0] : args[1]
 
-maior(2 9)
+maior([2, 9])
 ---
 9
 ```
 
-Esses exemplos mostram como funções com múltiplos parâmetros podem ser usadas para resolver problemas variados de forma simples e eficiente.
+Esses exemplos mostram como funções com múltiplos parâmetros recebem uma lista com os argumentos e podem ser usadas para resolver problemas variados de forma simples e eficiente.
 
 ## Funções dentro de listas
 
@@ -744,9 +744,9 @@ Exemplo:
 
 ```
 // Este é um comentário explicando o código abaixo
-soma = a b => a + b
+soma = args => args[0] + args[1]
 
-soma(3 7)
+soma([3, 7])
 ---
 10
 ```
