@@ -1,0 +1,13 @@
+lista_reduzir = args =>
+  args[0][.] == 1 ?
+    args[0][0] :
+  args[0][.] == 2 ?
+    args[1]([args[0][0], args[0][1]]) :
+  lista_reduzir([
+    [args[1]([args[0][0], args[0][1]])
+    ...args[0][2:]]
+    args[1]
+  ])
+
+result = lista_reduzir([[1, 2, 3], args => args[0] + args[1]])
+[]

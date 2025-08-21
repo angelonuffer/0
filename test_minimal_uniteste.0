@@ -1,0 +1,16 @@
+uniteste = {
+  iguais: args => () =>
+    args[0] == args[1] ?
+      [
+        [4 "ok"]
+        [4 "1/1 testes passaram."]
+        [3 0 1]
+      ] :
+      [
+        [4 `Esperava que ${"" + args[0]} fosse igual a ${"" + args[1]}.`]
+        [4 "0/1 testes passaram."]
+        [3 1 0]
+      ]
+}
+
+uniteste
