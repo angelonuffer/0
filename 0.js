@@ -744,7 +744,12 @@ const chamada_função = transformar(
     símbolo(")"),
   ),
   ([, , args_seq,]) => (escopo, função) => {
-    return função(escopo, ...args_seq.map(arg_val_seq => arg_val_seq[0](escopo)));
+    const args = args_seq.map(arg_val_seq => arg_val_seq[0](escopo));
+    if (args.length <= 1) {
+      return função(escopo, ...args);
+    } else {
+      return função(escopo, args);
+    }
   }
 );
 
