@@ -12,7 +12,7 @@ função # função.0
 comentário # comentário.0
 referência_objeto # referência_objeto.0
 
-uniteste.descrever("0" [
+uniteste.descrever(["0" [
   importação
   aritmética
   operadores_lógicos
@@ -25,4 +25,4 @@ uniteste.descrever("0" [
   função
   comentário
   referência_objeto
-])
+]])
