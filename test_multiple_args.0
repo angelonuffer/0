@@ -1,0 +1,5 @@
+// Test that single argument works
+(
+  soma = args => args[0] + args[1]
+  soma([3, 7])
+)

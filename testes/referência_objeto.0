@@ -1,19 +1,21 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever("Referências de propriedades em objeto" [
-  uniteste.iguais((
-    exemplo = {
-      a: 1
-      b: a + 1
-    }
-    exemplo.a
-  ) 1)
+uniteste.descrever(["Referências de propriedades em objeto", [
+  uniteste.iguais([
+    (
+      exemplo = {
+        a: 1
+        b: a + 1
+      }
+      exemplo.a
+    ), 1])
   
-  uniteste.iguais((
-    exemplo = {
-      a: 1
-      b: a + 1
-    }
-    exemplo.b
-  ) 2)
-])
+  uniteste.iguais([
+    (
+      exemplo = {
+        a: 1
+        b: a + 1
+      }
+      exemplo.b
+    ), 2])
+]])

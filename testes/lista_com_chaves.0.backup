@@ -1,7 +1,7 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever(["Lista com chaves", [
-  uniteste.iguais([(
+uniteste.descrever("Lista com chaves" [
+  uniteste.iguais((
     lista_com_chaves = [
       nome: "João"
       "valor_sem_chave"
@@ -10,9 +10,9 @@ uniteste.descrever(["Lista com chaves", [
     ]
     
     lista_com_chaves["nome"]
-  ), "João"])
+  ) "João")
   
-  uniteste.iguais([(
+  uniteste.iguais((
     lista_com_chaves = [
       nome: "João"
       "valor_sem_chave"
@@ -21,9 +21,9 @@ uniteste.descrever(["Lista com chaves", [
     ]
     
     lista_com_chaves[0]
-  ), "valor_sem_chave"])
+  ) "valor_sem_chave")
   
-  uniteste.iguais([(
+  uniteste.iguais((
     lista_com_chaves = [
       nome: "João"
       "valor_sem_chave"
@@ -32,9 +32,9 @@ uniteste.descrever(["Lista com chaves", [
     ]
     
     lista_com_chaves["idade"]
-  ), 30])
+  ) 30)
   
-  uniteste.listas_iguais([(
+  uniteste.listas_iguais((
     lista_com_chaves = [
       nome: "João"
       "primeiro_valor"
@@ -43,10 +43,10 @@ uniteste.descrever(["Lista com chaves", [
     ]
     
     lista_com_chaves[0:2]
-  ), ["primeiro_valor" "segundo_valor"]])
+  ) ["primeiro_valor" "segundo_valor"])
 
-  uniteste.descrever(["Notação de ponto", [
-    uniteste.iguais([(
+  uniteste.descrever("Notação de ponto" [
+    uniteste.iguais((
       lista_com_chaves = [
         nome: "João"
         "valor_sem_chave"
@@ -55,9 +55,9 @@ uniteste.descrever(["Lista com chaves", [
       ]
       
       lista_com_chaves.nome
-    ), "João"])
+    ) "João")
     
-    uniteste.iguais([(
+    uniteste.iguais((
       lista_com_chaves = [
         nome: "João"
         "valor_sem_chave"
@@ -66,6 +66,6 @@ uniteste.descrever(["Lista com chaves", [
       ]
       
       lista_com_chaves.idade
-    ), 30])
-  ]])
-]])
+    ) 30)
+  ])
+])

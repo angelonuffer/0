@@ -1,0 +1,11 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever(["Lista", [
+  uniteste.descrever(["Fatiamento", [
+    uniteste.iguais([
+      (
+        jogos = ["The Legend of Zelda" "Super Mario Bros." "Minecraft"]
+        jogos[0]
+      ), "The Legend of Zelda"])
+  ]])
+]])
