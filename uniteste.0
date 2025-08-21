@@ -42,14 +42,14 @@ uniteste = {
               resultado[0:resultado[.] - 2]
             )
           ])
-        ])
+        ]),
         mensagem => [4 `${args[0]} | ${mensagem[1]}`]
       ])
       passaram = lista_reduzir([
         lista.mapear([args[1], teste => (
           resultado = teste()
           resultado[resultado[.] - 1][2]
-        )])
+        )]),
         pair => pair[0] + pair[1]
       ])
       [

@@ -1,0 +1,6 @@
+uniteste # uniteste.0
+
+uniteste.descrever("Simple Test" [
+  uniteste.iguais(1 1)
+  uniteste.iguais(2 2)  
+])()
