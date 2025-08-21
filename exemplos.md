@@ -329,6 +329,62 @@ bandas[.]
 3
 ```
 
+### Chaves opcionais em listas
+Listas podem conter itens com chaves explícitas além de valores com índices automáticos.
+
+Exemplo:
+```
+dados = [
+  nome: "João"
+  "valor_sem_chave"
+  idade: 30
+  "outro_valor_sem_chave"
+]
+
+dados["nome"]
+---
+"João"
+```
+
+```
+dados = [
+  nome: "João"
+  "valor_sem_chave"
+  idade: 30
+  "outro_valor_sem_chave"
+]
+
+dados[0]
+---
+"valor_sem_chave"
+```
+
+```
+dados = [
+  nome: "João"
+  "valor_sem_chave"
+  idade: 30
+  "outro_valor_sem_chave"
+]
+
+dados["idade"]
+---
+30
+```
+
+```
+dados = [
+  nome: "João"
+  "primeiro_valor"
+  idade: 30
+  "segundo_valor"
+]
+
+dados[0:2]
+---
+["primeiro_valor","segundo_valor"]
+```
+
 ## Tipo objeto
 
 Objetos armazenam pares de chave-valor.

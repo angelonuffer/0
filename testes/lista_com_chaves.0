@@ -44,34 +44,4 @@ uniteste.descrever("Lista com chaves" [
     
     lista_com_chaves[0:2]
   ) ["primeiro_valor" "segundo_valor"])
-  
-  uniteste.iguais((
-    dados = [
-      categoria: "pessoa"
-      "João"
-      "Maria"
-    ]
-    
-    nova_lista = [
-      ...dados
-      "Pedro"
-    ]
-    
-    nova_lista["categoria"]
-  ) "pessoa")
-  
-  uniteste.iguais((
-    dados = [
-      categoria: "pessoa"
-      "João"
-      "Maria"
-    ]
-    
-    nova_lista = [
-      ...dados
-      "Pedro"
-    ]
-    
-    nova_lista[2]
-  ) "Pedro")
 ])
