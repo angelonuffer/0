@@ -1,0 +1,9 @@
+uniteste # ./uniteste.0
+
+uniteste.descrever("Current Multi Param" [
+  uniteste.iguais((
+    soma = a b => a + b
+    $soma(3 7)
+    soma(3 7)
+  ) 10)
+])

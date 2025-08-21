@@ -1,6 +1,6 @@
 uniteste # ./uniteste.0
 
-uniteste.descrever("Test Single" [
+uniteste.descrever("Single Param Test" [
   uniteste.iguais((
     quadrado = x => x * x
     quadrado(5)
