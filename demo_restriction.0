@@ -1,0 +1,25 @@
+// Test file to demonstrate the argument restriction
+// This file shows both working and failing examples
+
+// 1. WORKS: Zero arguments
+hello = () => "Hello World"
+result1 = hello()
+
+// 2. WORKS: Single argument (number)  
+quadrado = x => x * x
+result2 = quadrado(5)
+
+// 3. WORKS: Single argument (array)
+soma = args => args[0] + args[1] 
+result3 = soma([3, 7])
+
+// 4. FAILS: Multiple arguments (uncomment to see syntax error)
+// result4 = soma(3, 7)  // This will cause: "Erro de sintaxe"
+
+// Return results as an effect
+() => [
+  [4, `Zero args: ${result1}`]
+  [4, `Single arg (number): ${result2}`] 
+  [4, `Single arg (array): ${result3}`]
+  [4, "Multiple args: BLOCKED by syntax restriction"]
+]

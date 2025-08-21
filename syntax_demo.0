@@ -1,0 +1,19 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever(["Syntax Restriction Demo", [
+  uniteste.iguais([
+    (
+      soma = args => args[0] + args[1]
+      soma([3, 7])  // Single argument (array) - WORKS
+    ), 10])
+  uniteste.iguais([
+    (
+      quadrado = x => x * x
+      quadrado(5)   // Single argument (number) - WORKS  
+    ), 25])
+  uniteste.iguais([
+    (
+      hello = () => "test"
+      hello()       // Zero arguments - WORKS
+    ), "test"])
+]])
