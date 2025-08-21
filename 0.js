@@ -732,19 +732,22 @@ const chamada_função = transformar(
   sequência(
     símbolo("("),
     opcional(espaço),
-    vários(
+    opcional(
       sequência(
         { analisar: código => expressão.analisar(código) },
-        opcional(espaço),
-        opcional(símbolo(",")),
         opcional(espaço),
       )
     ),
     opcional(espaço),
     símbolo(")"),
   ),
-  ([, , args_seq,]) => (escopo, função) => {
-    return função(escopo, ...args_seq.map(arg_val_seq => arg_val_seq[0](escopo)));
+  ([, , arg_seq_optional,]) => (escopo, função) => {
+    if (arg_seq_optional) {
+      const arg_value = arg_seq_optional[0](escopo);
+      return função(escopo, arg_value);
+    } else {
+      return função(escopo);
+    }
   }
 );
 

@@ -1,0 +1,7 @@
+// Simple test file to see if single argument works
+(
+  soma = args => args[0] + args[1]
+  
+  // This should work fine
+  soma([3, 7])
+)
