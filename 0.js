@@ -247,6 +247,17 @@ const número = transformar(
   v => () => parseInt(v.flat(Infinity).join("")),
 )
 
+const número_negativo = transformar(
+  sequência(
+    símbolo("-"),
+    faixa("0", "9"),
+    vários(
+      faixa("0", "9"),
+    ),
+  ),
+  v => () => -parseInt(v.slice(1).flat(Infinity).join("")),
+)
+
 const letra = inversão(
   alternativa(
     espaço_em_branco,
@@ -804,6 +815,7 @@ const termo1 = transformar(
 const termo2 = alternativa(
   lambda,
   termo1,
+  número_negativo,
   número,
   não,
   texto,
