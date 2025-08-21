@@ -1,6 +1,6 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever(["Lista com chaves", [
+uniteste.descrever("Lista com chaves" [
   uniteste.iguais((
     lista_com_chaves = [
       nome: "João"
@@ -45,7 +45,7 @@ uniteste.descrever(["Lista com chaves", [
     lista_com_chaves[0:2]
   ) ["primeiro_valor" "segundo_valor"])
 
-  uniteste.descrever(["Notação de ponto", [
+  uniteste.descrever("Notação de ponto" [
     uniteste.iguais((
       lista_com_chaves = [
         nome: "João"
