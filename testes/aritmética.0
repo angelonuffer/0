@@ -9,6 +9,12 @@ uniteste.descrever("Aritmética" [
     uniteste.iguais((-3 + 8) 5)
     uniteste.iguais((10 + -2) 8)
   ])
+  uniteste.descrever("Casos extremos de números negativos" [
+    uniteste.iguais(-0 0)
+    uniteste.iguais((-1 * -1) 1)
+    uniteste.iguais((-10 >= -5) 0)
+    uniteste.iguais((-5 == -5) 1)
+  ])
   uniteste.descrever("Subtração" [
     uniteste.iguais((8 - 4) 4)
   ])
