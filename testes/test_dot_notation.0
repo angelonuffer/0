@@ -1,0 +1,25 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever("Lista com chaves - dot notation" [
+  uniteste.iguais((
+    lista_com_chaves = [
+      nome: "João"
+      "valor_sem_chave"
+      idade: 30
+      "outro_valor_sem_chave"
+    ]
+    
+    lista_com_chaves.nome
+  ) "João")
+  
+  uniteste.iguais((
+    lista_com_chaves = [
+      nome: "João"
+      "valor_sem_chave"
+      idade: 30
+      "outro_valor_sem_chave"
+    ]
+    
+    lista_com_chaves.idade
+  ) 30)
+])
