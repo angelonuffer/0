@@ -351,7 +351,17 @@ const fatia = transformar(
           throw new Error(`Runtime Error: Object key must be a string or number, got type ${typeof i} for key '${i}'.`);
         }
         if (faixa !== undefined || j !== undefined) {
-          throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
+          // Check if this is a list object (has length property and numeric indices)
+          if (typeof valor.length === 'number') {
+            // Convert list object to array for slicing
+            const arr = [];
+            for (let idx = 0; idx < valor.length; idx++) {
+              arr[idx] = valor[idx];
+            }
+            return arr.slice(i, j);
+          } else {
+            throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
+          }
         }
         return valor[i];
       } else {
@@ -415,20 +425,134 @@ const lista = transformar(
     símbolo("["),
     opcional(espaço),
     vários(
-      sequência(
-        opcional(símbolo("..."), ""),
-        { analisar: código => expressão.analisar(código) },
-        opcional(símbolo(",")),
-        opcional(espaço)
-      )
+      alternativa(
+        sequência( // Key-value pair
+          alternativa( // Key can be nome or [expression]
+            nome,
+            sequência(
+              símbolo("["),
+              { analisar: código => expressão.analisar(código) },
+              símbolo("]"),
+            )
+          ),
+          símbolo(":"),
+          opcional(espaço),
+          { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
+          opcional(espaço),
+        ),
+        sequência( // Spread syntax ...expression
+          símbolo("..."),
+          { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
+          opcional(espaço),
+        ),
+        sequência( // Value-only (auto-indexed)
+          { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
+          opcional(espaço),
+        ),
+      ),
     ),
     símbolo("]")
   ),
-  ([, , valores_seq,]) => escopo => valores_seq.flatMap(v_seq => {
-    const isSpread = v_seq[0] === "...";
-    const expr_fn = v_seq[1];
-    return isSpread ? expr_fn(escopo) : [expr_fn(escopo)];
-  })
+  ([, , valores_vários,]) => escopo => {
+    if (!valores_vários) return [];
+    
+    // Check if we have any key-value pairs
+    const hasKeyValuePairs = valores_vários.some(v_alt => 
+      v_alt.length === 6 && v_alt[1] === ":"
+    );
+    
+    if (!hasKeyValuePairs) {
+      // Use the original array-based implementation for simple lists
+      return valores_vários.flatMap(v_seq => {
+        const isSpread = v_seq[0] === "...";
+        const expr_fn = isSpread ? v_seq[1] : v_seq[0];
+        return isSpread ? expr_fn(escopo) : [expr_fn(escopo)];
+      });
+    }
+    
+    // Use object-based implementation for lists with keys
+    const listScope = { __parent__: escopo };
+    let autoIndex = 0;
+    
+    // First pass: declare all property names in the scope
+    for (const v_alt of valores_vários) {
+      const firstEl = v_alt[0];
+      if (firstEl === "...") {
+        continue;
+      } else if (v_alt.length === 6 && v_alt[1] === ":") {
+        const key_alt_result = v_alt[0];
+        let chave;
+        if (typeof key_alt_result === "string") {
+          chave = key_alt_result;
+        } else {
+          const key_expr_fn = key_alt_result[1];
+          chave = key_expr_fn(escopo);
+        }
+        listScope[chave] = undefined;
+      } else {
+        listScope[autoIndex] = undefined;
+        autoIndex++;
+      }
+    }
+    
+    // Second pass: evaluate property values
+    autoIndex = 0;
+    const resultado = valores_vários.reduce((resultado, v_alt) => {
+      const firstEl = v_alt[0];
+      if (firstEl === "...") {
+        const spread_expr_fn = v_alt[1];
+        const spreadValue = spread_expr_fn(escopo);
+        if (Array.isArray(spreadValue)) {
+          spreadValue.forEach(valor => {
+            resultado[autoIndex] = valor;
+            autoIndex++;
+          });
+        } else if (typeof spreadValue === 'object' && spreadValue !== null && typeof spreadValue.length === 'number') {
+          // For list objects, copy indexed items and named properties
+          for (let idx = 0; idx < spreadValue.length; idx++) {
+            resultado[autoIndex] = spreadValue[idx];
+            autoIndex++;
+          }
+          // Copy named properties (not numeric indices or length)
+          for (const key in spreadValue) {
+            if (key !== 'length' && !/^\d+$/.test(key)) {
+              resultado[key] = spreadValue[key];
+            }
+          }
+        } else if (typeof spreadValue === 'object' && spreadValue !== null) {
+          Object.assign(resultado, spreadValue);
+        }
+        return resultado;
+      } else if (v_alt.length === 6 && v_alt[1] === ":") {
+        const key_alt_result = v_alt[0];
+        const val_expr_fn = v_alt[3];
+        let chave;
+        if (typeof key_alt_result === "string") {
+          chave = key_alt_result;
+        } else {
+          const key_expr_fn = key_alt_result[1];
+          chave = key_expr_fn(escopo);
+        }
+        const valor = val_expr_fn(listScope);
+        listScope[chave] = valor;
+        resultado[chave] = valor;
+        return resultado;
+      } else {
+        const val_expr_fn = v_alt[0];
+        const valor = val_expr_fn(listScope);
+        listScope[autoIndex] = valor;
+        resultado[autoIndex] = valor;
+        autoIndex++;
+        return resultado;
+      }
+    }, {});
+
+    resultado.length = autoIndex;
+    return resultado;
+  }
 );
 
 const objeto = transformar(
