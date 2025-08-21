@@ -1,7 +1,0 @@
-// Test the syntax error with multiple arguments
-(
-  soma = args => args[0] + args[1]
-  
-  // This should cause a syntax error
-  soma(3, 7)
-)
