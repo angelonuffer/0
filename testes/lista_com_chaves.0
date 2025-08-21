@@ -1,0 +1,77 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever("Lista com chaves" [
+  uniteste.iguais((
+    lista_com_chaves = [
+      nome: "João"
+      "valor_sem_chave"
+      idade: 30
+      "outro_valor_sem_chave"
+    ]
+    
+    lista_com_chaves["nome"]
+  ) "João")
+  
+  uniteste.iguais((
+    lista_com_chaves = [
+      nome: "João"
+      "valor_sem_chave"
+      idade: 30
+      "outro_valor_sem_chave"
+    ]
+    
+    lista_com_chaves[0]
+  ) "valor_sem_chave")
+  
+  uniteste.iguais((
+    lista_com_chaves = [
+      nome: "João"
+      "valor_sem_chave"
+      idade: 30
+      "outro_valor_sem_chave"
+    ]
+    
+    lista_com_chaves["idade"]
+  ) 30)
+  
+  uniteste.listas_iguais((
+    lista_com_chaves = [
+      nome: "João"
+      "primeiro_valor"
+      idade: 30
+      "segundo_valor"
+    ]
+    
+    lista_com_chaves[0:2]
+  ) ["primeiro_valor" "segundo_valor"])
+  
+  uniteste.iguais((
+    dados = [
+      categoria: "pessoa"
+      "João"
+      "Maria"
+    ]
+    
+    nova_lista = [
+      ...dados
+      "Pedro"
+    ]
+    
+    nova_lista["categoria"]
+  ) "pessoa")
+  
+  uniteste.iguais((
+    dados = [
+      categoria: "pessoa"
+      "João"
+      "Maria"
+    ]
+    
+    nova_lista = [
+      ...dados
+      "Pedro"
+    ]
+    
+    nova_lista[2]
+  ) "Pedro")
+])

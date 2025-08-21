@@ -1,0 +1,15 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever("Debug spread 2" [
+  uniteste.iguais((
+    dados = [
+      categoria: "pessoa"
+      "João"
+      "Maria"
+    ]
+    
+    nova_lista = [...dados]
+    
+    nova_lista["categoria"]
+  ) "pessoa")
+])
