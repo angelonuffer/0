@@ -50,7 +50,7 @@ uniteste = {
           resultado = teste()
           resultado[resultado[.] - 1][2]
         )])
-        args => args[0] + args[1]
+        pair => pair[0] + pair[1]
       ])
       [
         ...mensagens

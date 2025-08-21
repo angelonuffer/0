@@ -1,9 +1,0 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever(["Test Single", [
-  uniteste.iguais([
-    (
-      quadrado = x => x * x
-      quadrado(5)
-    ), 25])
-]])

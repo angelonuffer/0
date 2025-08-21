@@ -1,3 +1,0 @@
-// Simple test
-f = x => x + 1
-result = f(5)

@@ -1,9 +1,0 @@
-uniteste # ./uniteste.0
-
-uniteste.descrever("Debug" [
-  uniteste.iguais((
-    soma = a b => a + b
-    $soma(3 7)
-    10
-  ) 10)
-])

@@ -1,3 +1,5 @@
+lista # lista.0
+
 lista_reduzir = args =>
   args[0][.] == 1 ?
     args[0][0] :
@@ -9,5 +11,5 @@ lista_reduzir = args =>
     args[1]
   ])
 
-result = lista_reduzir([[1, 2, 3], args => args[0] + args[1]])
-[]
+resultado = lista_reduzir([[1, 2, 3], par => par[0] + par[1]])
+resultado

@@ -1,8 +1,0 @@
-uniteste # ./uniteste.0
-
-uniteste.descrever("Target Multi Param" [
-  uniteste.iguais((
-    soma = args => args[0] + args[1]
-    soma([3, 7])
-  ) 10)
-])
