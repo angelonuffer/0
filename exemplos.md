@@ -385,6 +385,36 @@ dados[0:2]
 ["primeiro_valor","segundo_valor"]
 ```
 
+### Acessando chaves com notação de ponto
+Além da notação de colchetes, você pode acessar itens com chaves usando a notação de ponto.
+
+Exemplo:
+```
+dados = [
+  nome: "João"
+  "valor_sem_chave"
+  idade: 30
+  "outro_valor_sem_chave"
+]
+
+dados.nome
+---
+"João"
+```
+
+```
+dados = [
+  nome: "João"
+  "valor_sem_chave"
+  idade: 30
+  "outro_valor_sem_chave"
+]
+
+dados.idade
+---
+30
+```
+
 ## Tipo objeto
 
 Objetos armazenam pares de chave-valor.
