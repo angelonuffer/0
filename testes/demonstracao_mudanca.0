@@ -17,9 +17,9 @@ objeto_com_virgulas = {
 }
 
 // ❌ NÃO FUNCIONAM - sintaxe com vírgulas em listas
-// [1, 2, 3]        <- Erro de sintaxe
-// ["a", "b", "c"]  <- Erro de sintaxe  
-// [nome: "João", "valor", idade: 30]  <- Erro de sintaxe
+// [1 2 3]        <- Erro de sintaxe
+// ["a" "b" "c"]  <- Erro de sintaxe  
+// [nome: "João" "valor" idade: 30]  <- Erro de sintaxe
 
 // Retorna uma lista válida para testar
 lista_valida1

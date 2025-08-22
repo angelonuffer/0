@@ -5,6 +5,6 @@ uniteste.descrever(["Comentário", [
     (
       // Este é um comentário explicando o código abaixo
       soma = args => args[0] + args[1]
-      soma([3, 7])
+      soma([3 7])
     ), 10])
 ]])

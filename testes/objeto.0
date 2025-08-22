@@ -17,9 +17,9 @@ uniteste.descrever(["Objeto", [
       }
 
       jogo.gênero
-    ), "Aventura"])
+    ) "Aventura"])
   ]])
-  uniteste.descrever(["Espalhamento", [
+  uniteste.descrever(["Espalhamento" [
     uniteste.objetos_iguais([(
       jogo = {
         nome: "The Legend of Zelda"
@@ -29,7 +29,7 @@ uniteste.descrever(["Objeto", [
         ...jogo
         plataforma: "Nintendo"
       }
-    ), {
+    ) {
       nome: "The Legend of Zelda"
       gênero: "Aventura"
       plataforma: "Nintendo"

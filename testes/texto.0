@@ -45,12 +45,12 @@ uniteste.descrever(["Texto", [
         caractere[0]
       ), 65])
   ]])
-  uniteste.descrever(["Converter de número", [
+  uniteste.descrever(["Converter de número" [
     uniteste.iguais([
       (
         codigo = 65
 
         `${codigo}`
-      ), "A"])
+      ) "A"])
   ]])
 ]])

@@ -1,12 +1,12 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever(["Lista", [
-  uniteste.descrever(["Fatiamento", [
+uniteste.descrever(["Lista" [
+  uniteste.descrever(["Fatiamento" [
     uniteste.iguais([
       (
         jogos = ["The Legend of Zelda" "Super Mario Bros." "Minecraft"]
         jogos[0]
-      ), "The Legend of Zelda"])
+      ) "The Legend of Zelda"])
     uniteste.listas_iguais([
       (
         séries = ["Stranger Things" "Breaking Bad" "Game of Thrones"]
@@ -18,11 +18,11 @@ uniteste.descrever(["Lista", [
         [...filmes[0:2] "Jurassic Park"]
       ), ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]])
   ]])
-  uniteste.descrever(["Tamanho", [
+  uniteste.descrever(["Tamanho" [
     uniteste.iguais([
       (
         bandas = ["The Beatles" "Queen" "Pink Floyd"]
         bandas[.]
-      ), 3])
+      ) 3])
   ]])
 ]])
