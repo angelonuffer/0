@@ -449,15 +449,18 @@ const lista = transformar(
           símbolo(":"),
           opcional(espaço),
           { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
           opcional(espaço),
         ),
         sequência( // Spread syntax ...expression
           símbolo("..."),
           { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
           opcional(espaço),
         ),
         sequência( // Value-only (auto-indexed)
           { analisar: código => expressão.analisar(código) },
+          opcional(símbolo(",")),
           opcional(espaço),
         ),
       ),
@@ -466,6 +469,13 @@ const lista = transformar(
   ),
   ([, , valores_vários,]) => escopo => {
     if (!valores_vários) return [];
+    
+    // Check for comma usage and reject it in lists
+    for (const v_alt of valores_vários) {
+      if (v_alt.includes(",")) {
+        throw new Error("Erro de sintaxe: vírgulas não são permitidas entre itens da lista");
+      }
+    }
     
     // Check if we have any key-value pairs
     const hasKeyValuePairs = valores_vários.some(v_alt => 
