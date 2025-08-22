@@ -1,0 +1,5 @@
+// Test just uniteste import
+uniteste # ../uniteste.0
+
+// Simple test
+42
