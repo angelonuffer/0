@@ -1,0 +1,4 @@
+// Test that space syntax works
+simple_list = [1 2 3]
+
+simple_list[0]

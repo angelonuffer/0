@@ -449,18 +449,15 @@ const lista = transformar(
           símbolo(":"),
           opcional(espaço),
           { analisar: código => expressão.analisar(código) },
-          opcional(símbolo(",")),
           opcional(espaço),
         ),
         sequência( // Spread syntax ...expression
           símbolo("..."),
           { analisar: código => expressão.analisar(código) },
-          opcional(símbolo(",")),
           opcional(espaço),
         ),
         sequência( // Value-only (auto-indexed)
           { analisar: código => expressão.analisar(código) },
-          opcional(símbolo(",")),
           opcional(espaço),
         ),
       ),

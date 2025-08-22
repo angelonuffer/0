@@ -1,0 +1,7 @@
+uniteste # ../uniteste.0
+
+// Test list with whitespace but no commas
+simple_list = ["a" "b" "c"]
+
+// This should work
+uniteste.iguais([simple_list[0] "a"])
