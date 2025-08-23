@@ -11,8 +11,8 @@ lista_valida3 = [
 
 // ✅ FUNCIONA - objetos ainda suportam vírgulas
 objeto_com_virgulas = {
-  nome: "João",
-  idade: 30,
+  nome: "João"
+  idade: 30
   ativo: 1
 }
 
