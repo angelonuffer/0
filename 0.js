@@ -734,6 +734,24 @@ const parênteses = transformar(
   }
 );
 
+const chamada_função_espaço = transformar(
+  sequência(
+    espaço,
+    alternativa(
+      número_negativo,
+      número,
+      texto,
+      modelo,
+      lista,
+      valor_constante
+    )
+  ),
+  ([, arg_fn]) => (escopo, função) => {
+    const arg_value = arg_fn(escopo);
+    return função(escopo, arg_value);
+  }
+);
+
 const termo1 = transformar(
   sequência(
     alternativa(
@@ -748,6 +766,7 @@ const termo1 = transformar(
         chaves,
         atributo,
         chamada_função,
+        chamada_função_espaço,
       ),
     ),
   ),
