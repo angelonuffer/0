@@ -779,6 +779,22 @@ const termo2 = alternativa(
   parênteses
 );
 
+// Space-separated function application as an operator
+const aplicação_espaço_operador = transformar(
+  sequência(
+    espaço,
+    alternativa(
+      número_negativo,
+      número,
+      texto
+    )
+  ),
+  ([, arg_fn]) => (escopo, função) => {
+    const arg_value = arg_fn(escopo);
+    return função(escopo, arg_value);
+  }
+);
+
 // Space-separated function application: identifier followed by argument (not in key-value context)
 const aplicação_espaço = transformar(
   sequência(
@@ -798,7 +814,6 @@ const aplicação_espaço = transformar(
 );
 
 const termo_com_aplicação = alternativa(
-  // aplicação_espaço,   // Temporarily disabled to debug conflicts
   lambda,
   termo1,
   número_negativo,

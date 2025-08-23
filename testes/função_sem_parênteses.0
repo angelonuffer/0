@@ -18,14 +18,18 @@ uniteste.descrever({"Função sem parênteses" {
     ) "Olá, Maria!"})
   uniteste.iguais({
     (
-      // Zero-argument functions still use parentheses
-      retorna_dez = () => 10
-      retorna_dez()
-    ) 10})
+      // Test function reference with parentheses
+      dobro = n => n * 2
+      referencia = (dobro)
+      // referencia should be the function itself, not a call
+      referencia 7
+    ) 14})
   uniteste.iguais({
     (
-      // Backward compatibility: old syntax still works
-      quadrado = x => x * x
-      quadrado(6)
-    ) 36})
+      // Test function in list context
+      triplo = x => x * 3
+      lista_com_funcao = { (triplo) 5 }
+      // Should contain the function and the number 5
+      lista_com_funcao[0] 8
+    ) 24})
 }})
