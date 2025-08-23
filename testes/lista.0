@@ -25,4 +25,16 @@ uniteste.descrever(["Lista" [
         bandas[.]
       ) 3])
   ]])
+  uniteste.descrever(["Lista de chaves" [
+    uniteste.listas_iguais([
+      (
+        lista_com_chaves = [
+          nome: "João"
+          "valor_sem_chave"
+          idade: 30
+          "outro_valor_sem_chave"
+        ]
+        lista_com_chaves[*]
+      ) ["nome" "0" "idade" "1"]])
+  ]])
 ]])
