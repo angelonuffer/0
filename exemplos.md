@@ -364,6 +364,32 @@ bandas[.]
 3
 ```
 
+### Obtendo as chaves da lista
+Use `[*]` para obter todas as chaves da lista.
+
+Para listas simples, retorna os índices como strings:
+```
+lista = ["item1" "item2" "item3"]
+
+lista[*]
+---
+["0","1","2"]
+```
+
+Para listas com chaves nomeadas, retorna apenas as chaves explícitas:
+```
+dados = [
+  nome: "João"
+  "valor_sem_chave"
+  idade: 30
+  "outro_valor_sem_chave"
+]
+
+dados[*]
+---
+["nome","idade"]
+```
+
 ### Chaves opcionais em listas
 Listas podem conter itens com chaves explícitas além de valores com índices automáticos.
 
