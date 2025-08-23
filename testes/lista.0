@@ -35,6 +35,11 @@ uniteste.descrever(["Lista" [
           "outro_valor_sem_chave"
         ]
         lista_com_chaves[*]
-      ) ["nome" "0" "idade" "1"]])
+      ) ["nome" "idade"]])
+    uniteste.listas_iguais([
+      (
+        lista_simples = ["item1" "item2" "item3"]
+        lista_simples[*]
+      ) ["0" "1" "2"]])
   ]])
 ]])
