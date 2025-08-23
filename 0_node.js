@@ -2,6 +2,12 @@ import _0 from "./0.js"
 import fs from "fs"
 
 const processe = async (i, ...argumentos) => await [
+  // deprecated_0 (old atribua_retorno_ao_estado) - should not be called
+  () => { throw new Error("State manipulation effect atribua_retorno_ao_estado is no longer supported"); },
+  // deprecated_1 (old atribua_valor_ao_estado) - should not be called  
+  () => { throw new Error("State manipulation effect atribua_valor_ao_estado is no longer supported"); },
+  // deprecated_2 (old delete_do_estado) - should not be called
+  () => { throw new Error("State manipulation effect delete_do_estado is no longer supported"); },
   // saia
   código => process.exit(código),
   // escreva
@@ -25,10 +31,14 @@ while (true) {
   if (Date.now() - start > timeout) process.exit(1)
   const [efeito, novo_estado] = _0(contexto);
   contexto[1] = novo_estado;
+  
   if (efeito) {
     const retorno = await processe(...efeito);
     contexto[0] = retorno;
   } else {
-    break;
+    // Continue with null return to allow state processing
+    contexto[0] = null;
+    // Add check for explicit termination
+    if (novo_estado.etapa === "finalizado") break;
   }
 }
