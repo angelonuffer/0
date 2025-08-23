@@ -695,6 +695,20 @@ const chamada_função = transformar(
   }
 );
 
+// Function reference: (identifier) returns the function object instead of calling it
+const referência_função = transformar(
+  sequência(
+    símbolo("("),
+    opcional(espaço),
+    valor_constante,
+    opcional(espaço),
+    símbolo(")"),
+  ),
+  ([, , fn_name, ,]) => escopo => {
+    return fn_name(escopo);  // Return the function object itself
+  }
+);
+
 const parênteses = transformar(
   sequência(
     símbolo("("),
@@ -823,6 +837,7 @@ const termo_com_aplicação = alternativa(
   modelo,
   lista,
   valor_constante,
+  referência_função,  // Function references
   parênteses
 );
 

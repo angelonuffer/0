@@ -1,4 +1,2 @@
-(
-  dobro = n => n * 2
-  dobro 5
-)
+dobro = n => n * 2
+(dobro)
