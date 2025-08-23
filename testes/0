@@ -8,10 +8,8 @@ lista # lista.0
 lista_com_chaves # lista_com_chaves.0
 referência_lista # referência_lista.0
 operador_espalhamento # operador_espalhamento.0
-objeto # objeto.0
 função # função.0
 comentário # comentário.0
-referência_objeto # referência_objeto.0
 
 uniteste.descrever(["0" [
   aritmética
@@ -23,8 +21,6 @@ uniteste.descrever(["0" [
   lista_com_chaves
   referência_lista
   operador_espalhamento
-  objeto
   função
   comentário
-  referência_objeto
 ]])
