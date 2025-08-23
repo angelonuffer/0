@@ -498,12 +498,27 @@ const lista = transformar(
     );
     
     if (!hasKeyValuePairs) {
-      // Use the original array-based implementation for simple lists
-      return valores_vários.flatMap(v_seq => {
-        const isSpread = v_seq[0] === "...";
-        const expr_fn = isSpread ? v_seq[1] : v_seq[0];
-        return isSpread ? expr_fn(escopo) : [expr_fn(escopo)];
+      // Check if any spread operations contain objects (runtime check)
+      const hasObjectSpreads = valores_vários.some(v_seq => {
+        if (v_seq[0] === "...") {
+          const expr_fn = v_seq[1];
+          const spreadValue = expr_fn(escopo);
+          return typeof spreadValue === 'object' && spreadValue !== null && !Array.isArray(spreadValue);
+        }
+        return false;
       });
+      
+      if (hasObjectSpreads) {
+        // Use object-based implementation
+        // (fall through to object implementation below)
+      } else {
+        // Use the original array-based implementation for simple lists
+        return valores_vários.flatMap(v_seq => {
+          const isSpread = v_seq[0] === "...";
+          const expr_fn = isSpread ? v_seq[1] : v_seq[0];
+          return isSpread ? expr_fn(escopo) : [expr_fn(escopo)];
+        });
+      }
     }
     
     // Use object-based implementation for lists with keys
