@@ -6,6 +6,7 @@ constantes # constantes.0
 texto # texto.0
 lista # lista.0
 lista_com_chaves # lista_com_chaves.0
+operador_espalhamento # operador_espalhamento.0
 objeto # objeto.0
 função # função.0
 comentário # comentário.0
@@ -19,6 +20,7 @@ uniteste.descrever(["0" [
   texto
   lista
   lista_com_chaves
+  operador_espalhamento
   objeto
   função
   comentário
