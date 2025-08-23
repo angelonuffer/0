@@ -11,7 +11,7 @@ operador_espalhamento # operador_espalhamento.0
 função # função.0
 comentário # comentário.0
 
-uniteste.descrever(["0" [
+uniteste.descrever({"0" {
   aritmética
   operadores_lógicos
   comparadores
@@ -23,4 +23,4 @@ uniteste.descrever(["0" [
   operador_espalhamento
   função
   comentário
-]])
+}})

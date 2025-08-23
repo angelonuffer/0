@@ -498,26 +498,18 @@ const lista = transformar(
     );
     
     if (!hasKeyValuePairs) {
-      // Check if any spread operations contain objects (runtime check)
-      const hasObjectSpreads = valores_vários.some(v_seq => {
-        if (v_seq[0] === "...") {
-          const expr_fn = v_seq[1];
-          const spreadValue = expr_fn(escopo);
-          return typeof spreadValue === 'object' && spreadValue !== null && !Array.isArray(spreadValue);
-        }
-        return false;
-      });
+      // Check if any spread operations exist - use object implementation for spreads
+      const hasSpreads = valores_vários.some(v_seq => v_seq[0] === "...");
       
-      if (hasObjectSpreads) {
-        // Use object-based implementation
-        // (fall through to object implementation below)
-      } else {
-        // Use the original array-based implementation for simple lists
-        return valores_vários.flatMap(v_seq => {
-          const isSpread = v_seq[0] === "...";
-          const expr_fn = isSpread ? v_seq[1] : v_seq[0];
-          return isSpread ? expr_fn(escopo) : [expr_fn(escopo)];
+      if (!hasSpreads) {
+        // Use the original array-based implementation for simple lists without spreads
+        return valores_vários.map(v_seq => {
+          const expr_fn = v_seq[0];
+          return expr_fn(escopo);
         });
+      } else {
+        // Use object-based implementation for lists with spreads to handle object spreads
+        // (fall through to object implementation below)
       }
     }
     
@@ -599,6 +591,21 @@ const lista = transformar(
     }, {});
 
     resultado.length = autoIndex;
+    
+    // Convert to real array if it only has numeric properties and length
+    const hasNamedProps = Object.keys(resultado).some(key => 
+      key !== 'length' && !/^\d+$/.test(key)
+    );
+    
+    if (!hasNamedProps) {
+      // Convert to real array
+      const realArray = [];
+      for (let i = 0; i < autoIndex; i++) {
+        realArray[i] = resultado[i];
+      }
+      return realArray;
+    }
+    
     return resultado;
   }
 );
