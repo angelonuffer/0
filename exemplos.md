@@ -325,7 +325,7 @@ Acesse elementos por índice ou um intervalo de índices.
 
 Exemplos:
 ```
-jogos = ["Zelda" "Mario" "Minecraft"]
+jogos = {"Zelda" "Mario" "Minecraft"}
 
 jogos[0] // Primeiro elemento
 ---
@@ -333,11 +333,11 @@ jogos[0] // Primeiro elemento
 ```
 
 ```
-series = ["Stranger Things" "Breaking Bad" "GoT"]
+series = {"Stranger Things" "Breaking Bad" "GoT"}
 
 series[0:2] // Do primeiro ao segundo elemento
 ---
-["Stranger Things","Breaking Bad"]
+{"Stranger Things","Breaking Bad"}
 ```
 
 ### Espalhando itens
@@ -345,11 +345,11 @@ Use `...` para incluir itens de uma lista em outra.
 
 Exemplo:
 ```
-filmes = ["Star Wars" "O Senhor dos Anéis" "Matrix"]
+filmes = {"Star Wars" "O Senhor dos Anéis" "Matrix"}
 
-[...filmes[0:2] "Jurassic Park"]
+{...filmes[0:2] "Jurassic Park"}
 ---
-["Star Wars","O Senhor dos Anéis","Jurassic Park"]
+{"Star Wars","O Senhor dos Anéis","Jurassic Park"}
 ```
 
 ### Obtendo o tamanho da lista
@@ -357,7 +357,7 @@ Use `[.]` para obter o número de itens.
 
 Exemplo:
 ```
-bandas = ["The Beatles" "Queen" "Pink Floyd"]
+bandas = {"The Beatles" "Queen" "Pink Floyd"}
 
 bandas[.]
 ---
@@ -369,25 +369,25 @@ Use `[*]` para obter todas as chaves da lista.
 
 Para listas simples, retorna os índices como strings:
 ```
-lista = ["item1" "item2" "item3"]
+lista = {"item1" "item2" "item3"}
 
 lista[*]
 ---
-["0","1","2"]
+{"0","1","2"}
 ```
 
 Para listas com chaves nomeadas, retorna apenas as chaves explícitas:
 ```
-dados = [
+dados = {
   nome: "João"
   "valor_sem_chave"
   idade: 30
   "outro_valor_sem_chave"
-]
+}
 
 dados[*]
 ---
-["nome","idade"]
+{"nome","idade"}
 ```
 
 ### Chaves opcionais em listas
@@ -395,12 +395,12 @@ Listas podem conter itens com chaves explícitas além de valores com índices a
 
 Exemplo:
 ```
-dados = [
+dados = {
   nome: "João"
   "valor_sem_chave"
   idade: 30
   "outro_valor_sem_chave"
-]
+}
 
 dados["nome"]
 ---
@@ -408,12 +408,12 @@ dados["nome"]
 ```
 
 ```
-dados = [
+dados = {
   nome: "João"
   "valor_sem_chave"
   idade: 30
   "outro_valor_sem_chave"
-]
+}
 
 dados[0]
 ---
@@ -421,12 +421,12 @@ dados[0]
 ```
 
 ```
-dados = [
+dados = {
   nome: "João"
   "valor_sem_chave"
   idade: 30
   "outro_valor_sem_chave"
-]
+}
 
 dados["idade"]
 ---
@@ -434,16 +434,16 @@ dados["idade"]
 ```
 
 ```
-dados = [
+dados = {
   nome: "João"
   "primeiro_valor"
   idade: 30
   "segundo_valor"
-]
+}
 
 dados[0:2]
 ---
-["primeiro_valor","segundo_valor"]
+{"primeiro_valor","segundo_valor"}
 ```
 
 ### Acessando chaves com notação de ponto
@@ -451,12 +451,12 @@ Além da notação de colchetes, você pode acessar itens com chaves usando a no
 
 Exemplo:
 ```
-dados = [
+dados = {
   nome: "João"
   "valor_sem_chave"
   idade: 30
   "outro_valor_sem_chave"
-]
+}
 
 dados.nome
 ---
@@ -464,12 +464,12 @@ dados.nome
 ```
 
 ```
-dados = [
+dados = {
   nome: "João"
   "valor_sem_chave"
   idade: 30
   "outro_valor_sem_chave"
-]
+}
 
 dados.idade
 ---
@@ -483,10 +483,10 @@ Propriedades calculadas permitem definir chaves dinamicamente em uma lista, com 
 ```
 chave = "nome"
 
-lista = [
+lista = {
   [chave]: "João"
   "valor_sem_chave"
-]
+}
 
 lista["nome"]
 ---
@@ -498,11 +498,11 @@ lista["nome"]
 Propriedades podem referenciar outras propriedades definidas na mesma lista.
 
 ```
-pessoa = [
+pessoa = {
   nome: "João"
   sobrenome: "Silva"
   nomeCompleto: nome + " " + sobrenome
-]
+}
 
 pessoa.nomeCompleto
 ---
@@ -510,12 +510,12 @@ pessoa.nomeCompleto
 ```
 
 ```
-calculos = [
+calculos = {
   base: 10
   dobro: base * 2
   triplo: base * 3
   somaDobroTriplo: dobro + triplo
-]
+}
 
 calculos.somaDobroTriplo
 ---
@@ -543,7 +543,7 @@ Esta função recebe uma lista com dois números como parâmetro e retorna a som
 ```
 soma = args => args[0] + args[1]
 
-soma([3, 7])
+soma({3, 7})
 ---
 10
 ```
@@ -555,7 +555,7 @@ Esta função verifica se um número está dentro de um intervalo definido por d
 ```
 dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
 
-dentro_intervalo([5, 1, 10])
+dentro_intervalo({5, 1, 10})
 ---
 1
 ```
@@ -563,7 +563,7 @@ dentro_intervalo([5, 1, 10])
 ```
 dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
 
-dentro_intervalo([15, 1, 10])
+dentro_intervalo({15, 1, 10})
 ---
 0
 ```
@@ -575,7 +575,7 @@ Esta função recebe uma lista com dois textos e os combina em uma única string
 ```
 nome_completo = args => `${args[0]} de ${args[1]}`
 
-nome_completo(["Geralt", "The Witcher"])
+nome_completo({"Geralt", "The Witcher"})
 ---
 "Geralt de The Witcher"
 ```
@@ -587,7 +587,7 @@ Esta função calcula a área de um retângulo, recebendo uma lista com largura 
 ```
 área_retangulo = args => args[0] * args[1]
 
-área_retangulo([5, 10])
+área_retangulo({5, 10})
 ---
 50
 ```
@@ -603,7 +603,7 @@ Esta função calcula a área de um triângulo com base na base e na altura forn
   área
 )
 
-área_triangulo([10, 8])
+área_triangulo({10, 8})
 ---
 40
 ```
@@ -615,7 +615,7 @@ Esta função retorna o maior valor entre dois números fornecidos em uma lista.
 ```
 maior = args => args[0] > args[1] ? args[0] : args[1]
 
-maior([8, 3])
+maior({8, 3})
 ---
 8
 ```
@@ -623,7 +623,7 @@ maior([8, 3])
 ```
 maior = args => args[0] > args[1] ? args[0] : args[1]
 
-maior([2, 9])
+maior({2, 9})
 ---
 9
 ```
@@ -635,11 +635,11 @@ Esses exemplos mostram como funções com múltiplos parâmetros recebem uma lis
 Na linguagem 0, é possível armazenar funções dentro de listas e chamá-las diretamente pelo índice. Isso permite criar coleções de comportamentos ou ações.
 
 ```
-iniciais = [
+iniciais = {
   () => "Bulbasaur"
   () => "Charmander"
   () => "Squirtle"
-]
+}
 
 iniciais[1]()
 ---
@@ -658,7 +658,7 @@ Exemplo:
 // Este é um comentário explicando o código abaixo
 soma = args => args[0] + args[1]
 
-soma([3, 7])
+soma({3, 7})
 ---
 10
 ```

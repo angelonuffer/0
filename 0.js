@@ -448,7 +448,7 @@ const chaves = transformar(
 
 const lista = transformar(
   sequência(
-    símbolo("["),
+    símbolo("{"),
     opcional(espaço),
     vários(
       alternativa(
@@ -480,7 +480,7 @@ const lista = transformar(
         ),
       ),
     ),
-    símbolo("]")
+    símbolo("}")
   ),
   ([, , valores_vários,]) => escopo => {
     if (!valores_vários) return [];
@@ -498,12 +498,19 @@ const lista = transformar(
     );
     
     if (!hasKeyValuePairs) {
-      // Use the original array-based implementation for simple lists
-      return valores_vários.flatMap(v_seq => {
-        const isSpread = v_seq[0] === "...";
-        const expr_fn = isSpread ? v_seq[1] : v_seq[0];
-        return isSpread ? expr_fn(escopo) : [expr_fn(escopo)];
-      });
+      // Check if any spread operations exist - use object implementation for spreads
+      const hasSpreads = valores_vários.some(v_seq => v_seq[0] === "...");
+      
+      if (!hasSpreads) {
+        // Use the original array-based implementation for simple lists without spreads
+        return valores_vários.map(v_seq => {
+          const expr_fn = v_seq[0];
+          return expr_fn(escopo);
+        });
+      } else {
+        // Use object-based implementation for lists with spreads to handle object spreads
+        // (fall through to object implementation below)
+      }
     }
     
     // Use object-based implementation for lists with keys
@@ -584,6 +591,21 @@ const lista = transformar(
     }, {});
 
     resultado.length = autoIndex;
+    
+    // Convert to real array if it only has numeric properties and length
+    const hasNamedProps = Object.keys(resultado).some(key => 
+      key !== 'length' && !/^\d+$/.test(key)
+    );
+    
+    if (!hasNamedProps) {
+      // Convert to real array
+      const realArray = [];
+      for (let i = 0; i < autoIndex; i++) {
+        realArray[i] = resultado[i];
+      }
+      return realArray;
+    }
+    
     return resultado;
   }
 );
