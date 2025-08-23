@@ -778,7 +778,7 @@ const termo1 = transformar(
         tamanho,
         chaves,
         atributo,
-        // chamada_função,  // Remove function calls with parentheses
+        // chamada_função removed - no more function calls with parentheses
       ),
     ),
   ),
@@ -858,8 +858,20 @@ const aplicação_espaço = transformar(
   }
 );
 
+// Test parser with more realistic pattern
+const teste_aplicação = transformar(
+  sequência(
+    símbolo("test_func"),
+    espaço,
+    número
+  ),
+  ([fn_name, , arg_fn]) => escopo => {
+    return () => 42;  // Return a function instead of a number
+  }
+);
+
 const termo_com_aplicação = alternativa(
-  // aplicação_espaço,   // Remove temporarily
+  aplicação_espaço,   // Add back at beginning
   lambda,
   termo1,
   número_negativo,

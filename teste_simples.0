@@ -1,4 +1,0 @@
-(
-dobro = n => n * 2
-dobro
-)

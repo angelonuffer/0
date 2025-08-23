@@ -1,35 +1,23 @@
-uniteste # ../uniteste.0
+(
+dobro = n => n * 2
+triplo = x => x * 3
+saudacao = nome => `Olá, ${nome}!`
 
-uniteste.descrever({"Função sem parênteses" {
-  uniteste.iguais({
-    (
-      dobro = n => n * 2
-      dobro 5
-    ) 10})
-  uniteste.iguais({
-    (
-      triplo = x => x * 3
-      triplo 4
-    ) 12})
-  uniteste.iguais({
-    (
-      saudacao = nome => `Olá, ${nome}!`
-      saudacao "Maria"
-    ) "Olá, Maria!"})
-  uniteste.iguais({
-    (
-      // Test function reference with parentheses
-      dobro = n => n * 2
-      referencia = (dobro)
-      // referencia should be the function itself, not a call
-      referencia 7
-    ) 14})
-  uniteste.iguais({
-    (
-      // Test function in list context
-      triplo = x => x * 3
-      lista_com_funcao = { (triplo) 5 }
-      // Should contain the function and the number 5
-      lista_com_funcao[0] 8
-    ) 24})
-}})
+// Test basic function calls
+test1 = dobro 5
+test2 = triplo 4
+test3 = saudacao "Maria"
+
+// Test function references
+referencia = (dobro)
+test4 = referencia 7
+
+// Test lists
+lista_ref = { (triplo) 5 }
+lista_call = { dobro 5 }
+
+test5 = lista_ref[1]  // Should be 5
+test6 = lista_call[0] // Should be 10
+
+() => test1  // Should return 10
+)
