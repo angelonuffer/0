@@ -734,24 +734,6 @@ const parênteses = transformar(
   }
 );
 
-const chamada_função_espaço = transformar(
-  sequência(
-    espaço,
-    alternativa(
-      número_negativo,
-      número,
-      texto,
-      modelo,
-      lista,
-      valor_constante
-    )
-  ),
-  ([, arg_fn]) => (escopo, função) => {
-    const arg_value = arg_fn(escopo);
-    return função(escopo, arg_value);
-  }
-);
-
 const termo1 = transformar(
   sequência(
     alternativa(
@@ -766,7 +748,6 @@ const termo1 = transformar(
         chaves,
         atributo,
         chamada_função,
-        chamada_função_espaço,
       ),
     ),
   ),
@@ -798,8 +779,40 @@ const termo2 = alternativa(
   parênteses
 );
 
+// Space-separated function application: identifier followed by argument
+const aplicação_espaço = transformar(
+  sequência(
+    valor_constante,
+    espaço,
+    alternativa(
+      número_negativo,
+      número,
+      texto
+    )
+  ),
+  ([fn_name, , arg_fn]) => escopo => {
+    const função = fn_name(escopo);
+    const arg_value = arg_fn(escopo);
+    return função(escopo, arg_value);
+  }
+);
+
+const termo_com_aplicação = alternativa(
+  aplicação_espaço,
+  lambda,
+  termo1,
+  número_negativo,
+  número,
+  não,
+  texto,
+  modelo,
+  lista,
+  valor_constante,
+  parênteses
+);
+
 const termo3 = operação(
-  termo2,
+  termo_com_aplicação,
   alternativa(
     operador("*", (v1, v2) => v1 * v2),
     operador("/", (v1, v2) => v1 / v2),
