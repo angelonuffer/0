@@ -57,6 +57,20 @@ uniteste.descrever(["Aritmética" [
       4
     ])
   ]])
+  uniteste.descrever(["Módulo" [
+    uniteste.iguais([
+      7 % 3
+      1
+    ])
+    uniteste.iguais([
+      10 % 4
+      2
+    ])
+    uniteste.iguais([
+      15 % 5
+      0
+    ])
+  ]])
   uniteste.descrever(["Expressão com precedência" [
     uniteste.iguais([
       2 + 3 * 4
@@ -77,6 +91,14 @@ uniteste.descrever(["Aritmética" [
     uniteste.iguais([
       10 - (6 / 2)
       7
+    ])
+    uniteste.iguais([
+      10 + 7 % 3
+      11
+    ])
+    uniteste.iguais([
+      15 % 4 * 2
+      6
     ])
   ]])
 ]])

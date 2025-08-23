@@ -848,6 +848,7 @@ const termo3 = operação(
   alternativa(
     operador("*", (v1, v2) => v1 * v2),
     operador("/", (v1, v2) => v1 / v2),
+    operador("%", (v1, v2) => v1 % v2),
   ),
 );
 

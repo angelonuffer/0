@@ -123,6 +123,20 @@ Divide o primeiro número pelo segundo.
 4
 ```
 
+#### Módulo (%)
+Retorna o resto da divisão entre dois números.
+```
+7 % 3
+---
+1
+```
+
+```
+10 % 4
+---
+2
+```
+
 ### Números negativos
 Números negativos são escritos com o sinal `-` diretamente antes do número.
 
@@ -159,7 +173,7 @@ Quando usar números negativos em sequência, use parênteses para evitar ambigu
 ```
 
 ### Precedência de operadores aritméticos
-Multiplicação (`*`) e divisão (`/`) têm precedência sobre adição (`+`) e subtração (`-`). Use parênteses `()` para alterar a ordem da avaliação.
+Multiplicação (`*`), divisão (`/`) e módulo (`%`) têm precedência sobre adição (`+`) e subtração (`-`). Use parênteses `()` para alterar a ordem da avaliação.
 
 Exemplos:
 ```
@@ -172,6 +186,12 @@ Exemplos:
 (2 + 3) * 4 // Parênteses alteram a ordem
 ---
 20
+```
+
+```
+10 + 7 % 3 // Equivalente a 10 + (7 % 3)
+---
+11
 ```
 
 ### Comparadores
