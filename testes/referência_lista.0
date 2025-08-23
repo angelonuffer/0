@@ -1,42 +1,42 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever(["Referências de propriedades em lista" [
-  uniteste.iguais([
+uniteste.descrever({"Referências de propriedades em lista" {
+  uniteste.iguais({
     (
-      exemplo = [
+      exemplo = {
         a: 1
         b: a + 1
-      ]
+      }
       exemplo.a
-    ) 1])
+    ) 1})
   
-  uniteste.iguais([
+  uniteste.iguais({
     (
-      exemplo = [
+      exemplo = {
         a: 1
         b: a + 1
-      ]
+      }
       exemplo.b
-    ) 2])
+    ) 2})
   
-  uniteste.iguais([
+  uniteste.iguais({
     (
-      pessoa = [
+      pessoa = {
         nome: "João"
         sobrenome: "Silva"
         nomeCompleto: nome + " " + sobrenome
-      ]
+      }
       pessoa.nomeCompleto
-    ) "João Silva"])
+    ) "João Silva"})
   
-  uniteste.iguais([
+  uniteste.iguais({
     (
-      calculos = [
+      calculos = {
         base: 10
         dobro: base * 2
         triplo: base * 3
         somaDobroTriplo: dobro + triplo
-      ]
+      }
       calculos.somaDobroTriplo
-    ) 50])
-]])
+    ) 50})
+}})

@@ -448,7 +448,7 @@ const chaves = transformar(
 
 const lista = transformar(
   sequência(
-    símbolo("["),
+    símbolo("{"),
     opcional(espaço),
     vários(
       alternativa(
@@ -480,7 +480,7 @@ const lista = transformar(
         ),
       ),
     ),
-    símbolo("]")
+    símbolo("}")
   ),
   ([, , valores_vários,]) => escopo => {
     if (!valores_vários) return [];
