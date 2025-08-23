@@ -493,6 +493,35 @@ lista["nome"]
 "João"
 ```
 
+### Referenciando propriedades da própria lista
+
+Propriedades podem referenciar outras propriedades definidas na mesma lista.
+
+```
+pessoa = [
+  nome: "João"
+  sobrenome: "Silva"
+  nomeCompleto: nome + " " + sobrenome
+]
+
+pessoa.nomeCompleto
+---
+"João Silva"
+```
+
+```
+calculos = [
+  base: 10
+  dobro: base * 2
+  triplo: base * 3
+  somaDobroTriplo: dobro + triplo
+]
+
+calculos.somaDobroTriplo
+---
+50
+```
+
 ## Tipo objeto
 
 Objetos armazenam pares de chave-valor.
