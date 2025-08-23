@@ -470,6 +470,13 @@ const lista = transformar(
   ([, , valores_vários,]) => escopo => {
     if (!valores_vários) return [];
     
+    // Check for comma usage and reject it in lists
+    for (const v_alt of valores_vários) {
+      if (v_alt.includes(",")) {
+        throw new Error("Erro de sintaxe: vírgulas não são permitidas entre itens da lista");
+      }
+    }
+    
     // Check if we have any key-value pairs
     const hasKeyValuePairs = valores_vários.some(v_alt => 
       v_alt.length === 6 && v_alt[1] === ":"

@@ -1,34 +1,34 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever(["Aritmética", [
-  uniteste.descrever(["Adição", [
-    uniteste.iguais([(42 + 5), 47])
+uniteste.descrever(["Aritmética" [
+  uniteste.descrever(["Adição" [
+    uniteste.iguais([(42 + 5) 47])
   ]])
-  uniteste.descrever(["Números negativos", [
-    uniteste.iguais([-5, (-5)])
-    uniteste.iguais([(-3 + 8), 5])
-    uniteste.iguais([(10 + -2), 8])
+  uniteste.descrever(["Números negativos" [
+    uniteste.iguais([-5 (-5)])
+    uniteste.iguais([(-3 + 8) 5])
+    uniteste.iguais([(10 + -2) 8])
   ]])
-  uniteste.descrever(["Casos extremos de números negativos", [
-    uniteste.iguais([-0, 0])
-    uniteste.iguais([(-1 * -1), 1])
-    uniteste.iguais([(-10 >= -5), 0])
-    uniteste.iguais([(-5 == -5), 1])
+  uniteste.descrever(["Casos extremos de números negativos" [
+    uniteste.iguais([-0 0])
+    uniteste.iguais([(-1 * -1) 1])
+    uniteste.iguais([(-10 >= -5) 0])
+    uniteste.iguais([(-5 == -5) 1])
   ]])
-  uniteste.descrever(["Subtração", [
-    uniteste.iguais([(8 - 4), 4])
+  uniteste.descrever(["Subtração" [
+    uniteste.iguais([(8 - 4) 4])
   ]])
-  uniteste.descrever(["Multiplicação", [
-    uniteste.iguais([(3 * 4), 12])
+  uniteste.descrever(["Multiplicação" [
+    uniteste.iguais([(3 * 4) 12])
   ]])
-  uniteste.descrever(["Divisão", [
-    uniteste.iguais([(8 / 2), 4])
+  uniteste.descrever(["Divisão" [
+    uniteste.iguais([(8 / 2) 4])
   ]])
-  uniteste.descrever(["Expressão com precedência", [
-    uniteste.iguais([(2 + 3 * 4), 14])
-    uniteste.iguais([(10 - 6 / 2), 7])
-    uniteste.iguais([(8 / 2 + 3 * 2), 10])
-    uniteste.iguais([((2 + 3) * 4), 20])
-    uniteste.iguais([(10 - (6 / 2)), 7])
+  uniteste.descrever(["Expressão com precedência" [
+    uniteste.iguais([(2 + 3 * 4) 14])
+    uniteste.iguais([(10 - 6 / 2) 7])
+    uniteste.iguais([(8 / 2 + 3 * 2) 10])
+    uniteste.iguais([((2 + 3) * 4) 20])
+    uniteste.iguais([(10 - (6 / 2)) 7])
   ]])
 ]])
