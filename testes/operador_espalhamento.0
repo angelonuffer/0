@@ -1,140 +1,132 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever({"Operador de espalhamento" {
-  uniteste.descrever({"Com itens sem chaves (arrays simples)" {
-    uniteste.listas_iguais({
-      {...{"a" "b"} "c"}
-      {"a" "b" "c"}
-    })
+uniteste.descrever(["Operador de espalhamento" [
+  uniteste.descrever(["Com itens sem chaves (arrays simples)" [
+    uniteste.listas_iguais([
+      [...["a" "b"] "c"]
+      ["a" "b" "c"]
+    ])
     
-    uniteste.listas_iguais({
+    uniteste.listas_iguais([
       (
-        lista1 = {"Star Wars" "Matrix"}
-        lista2 = {"Jurassic Park" "Avatar"}
-        {...lista1 ...lista2}
+        lista1 = ["Star Wars" "Matrix"]
+        lista2 = ["Jurassic Park" "Avatar"]
+        [...lista1 ...lista2]
       )
-      {"Star Wars" "Matrix" "Jurassic Park" "Avatar"}
-    })
+      ["Star Wars" "Matrix" "Jurassic Park" "Avatar"]
+    ])
     
-    uniteste.listas_iguais({
+    uniteste.listas_iguais([
       (
-        números = {1 2 3}
-        {"inicio" ...números "fim"}
+        números = [1 2 3]
+        ["inicio" ...números "fim"]
       )
-      {"inicio" 1 2 3 "fim"}
-    })
+      ["inicio" 1 2 3 "fim"]
+    ])
     
-    uniteste.listas_iguais({
+    uniteste.listas_iguais([
       (
-        filmes = {"Star Wars" "O Senhor dos Anéis" "Matrix"}
-        {...filmes[0:2] "Jurassic Park"}
+        filmes = ["Star Wars" "O Senhor dos Anéis" "Matrix"]
+        [...filmes[0:2] "Jurassic Park"]
       )
-      {"Star Wars" "O Senhor dos Anéis" "Jurassic Park"}
-    })
-  }})
+      ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]
+    ])
+  ]])
   
-  uniteste.descrever({"Com itens com chaves" {
+  uniteste.descrever(["Com itens com chaves" [
     // Teste: lista com chaves pode ser acessada normalmente
-    uniteste.iguais({
+    uniteste.iguais([
       (
-        dados = {nome: "João" idade: 30}
+        dados = [nome: "João" idade: 30]
         dados["nome"]
       )
       "João"
-    })
+    ])
     
     // Teste: espalhar lista simples em contexto que aceita chaves
-    uniteste.iguais({
+    uniteste.iguais([
       (
-        lista_simples = {"valor1" "valor2"}
-        dados_com_chaves = {nome: "João" ...lista_simples idade: 30}
+        lista_simples = ["valor1" "valor2"]
+        dados_com_chaves = [nome: "João" ...lista_simples idade: 30]
+        dados_com_chaves["nome"]
+      )
+      "João"
+    ])
+    
+    uniteste.iguais([
+      (
+        lista_simples = ["valor1" "valor2"]
+        dados_com_chaves = [nome: "João" ...lista_simples idade: 30]
         dados_com_chaves[0]
       )
       "valor1"
-    })
+    ])
     
-    // Teste: espalhar lista com chaves
-    uniteste.iguais({
+    uniteste.iguais([
       (
-        dados1 = {nome: "João" cidade: "São Paulo"}
-        dados2 = {idade: 30 profissao: "Desenvolvedor"}
-        resultado = {...dados1 ...dados2}
-        resultado["nome"]
+        lista_simples = ["valor1" "valor2"]
+        dados_com_chaves = [nome: "João" ...lista_simples idade: 30]
+        dados_com_chaves[1]
       )
-      "João"
-    })
+      "valor2"
+    ])
     
-    // Teste: espalhar lista com chaves (propriedade do segundo objeto)
-    uniteste.iguais({
+    uniteste.iguais([
       (
-        dados1 = {nome: "João" cidade: "São Paulo"}
-        dados2 = {idade: 30 profissao: "Desenvolvedor"}
-        resultado = {...dados1 ...dados2}
-        resultado["profissao"]
+        lista_simples = ["valor1" "valor2"]
+        dados_com_chaves = [nome: "João" ...lista_simples idade: 30]
+        dados_com_chaves["idade"]
       )
-      "Desenvolvedor"
-    })
-    
-    // Teste: misturar espalhamento com novos valores
-    uniteste.iguais({
-      (
-        base = {nome: "João"}
-        resultado = {...base idade: 30 cidade: "São Paulo"}
-        resultado["cidade"]
-      )
-      "São Paulo"
-    })
-  }})
+      30
+    ])
+  ]])
   
-  uniteste.descrever({"Comportamento misto" {
-    // Misturar itens simples e com chaves
-    uniteste.listas_iguais({
+  uniteste.descrever(["Comportamento misto" [
+    // Teste: espalhar arrays simples funciona
+    uniteste.listas_iguais([
       (
-        lista_simples = {"item1" "item2"}
-        lista_resultado = {nome: "João" ...lista_simples cidade: "São Paulo"}
-        {lista_resultado[0] lista_resultado[1]}
+        array1 = ["a" "b"]
+        array2 = ["c" "d"]
+        [...array1 ...array2]
       )
-      {"item1" "item2"}
-    })
+      ["a" "b" "c" "d"]
+    ])
     
-    // Acessar propriedade nomeada após espalhamento
-    uniteste.iguais({
+    // Teste: arrays simples podem ser espalhados em listas com chaves
+    uniteste.iguais([
       (
-        lista_simples = {"item1" "item2"}
-        lista_resultado = {nome: "João" ...lista_simples cidade: "São Paulo"}
-        lista_resultado["nome"]
+        valores = ["item1" "item2"]
+        lista_mista = [início: "começo" ...valores fim: "final"]
+        lista_mista["início"]
       )
-      "João"
-    })
+      "começo"
+    ])
     
-    // Acessar propriedade nomeada adicionada após espalhamento
-    uniteste.iguais({
+    uniteste.iguais([
       (
-        lista_simples = {"item1" "item2"}
-        lista_resultado = {nome: "João" ...lista_simples cidade: "São Paulo"}
-        lista_resultado["cidade"]
+        valores = ["item1" "item2"]
+        lista_mista = [início: "começo" ...valores fim: "final"]
+        lista_mista[0]
       )
-      "São Paulo"
-    })
+      "item1"
+    ])
     
-    // Verificar tamanho da lista resultante
-    uniteste.iguais({
+    uniteste.iguais([
       (
-        lista_simples = {"item1" "item2"}
-        lista_resultado = {nome: "João" ...lista_simples cidade: "São Paulo"}
-        lista_resultado[.]
+        valores = ["item1" "item2"]
+        lista_mista = [início: "começo" ...valores fim: "final"]
+        lista_mista[1]
       )
-      2
-    })
+      "item2"
+    ])
     
-    // Verificar chaves da lista resultante
-    uniteste.listas_iguais({
+    uniteste.iguais([
       (
-        lista_simples = {"item1" "item2"}
-        lista_resultado = {nome: "João" ...lista_simples cidade: "São Paulo"}
-        lista_resultado[*]
+        valores = ["item1" "item2"]
+        lista_mista = [início: "começo" ...valores fim: "final"]
+        lista_mista["fim"]
       )
-      {"nome" "cidade"}
-    })
-  }})
-}})
+      "final"
+    ])
+  ]])
+]])

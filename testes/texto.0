@@ -1,56 +1,56 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever({"Texto" {
-  uniteste.descrever({"Fatiamento" {
-    uniteste.iguais({
+uniteste.descrever(["Texto" [
+  uniteste.descrever(["Fatiamento" [
+    uniteste.iguais([
       (
         frase = "Que a força esteja com você."
 
         frase[0:1]
-      ) "Q"})
-    uniteste.iguais({
+      ) "Q"])
+    uniteste.iguais([
       (
         frase = "Que a força esteja com você."
 
         frase[0:11]
-      ) "Que a força"})
-    uniteste.iguais({
+      ) "Que a força"])
+    uniteste.iguais([
       (
         frase = "O destino de Hyrule está em suas mãos."
 
         frase[13:]
-      ) "Hyrule está em suas mãos."})
-  }})
-  uniteste.descrever({"Geração" {
-    uniteste.iguais({
+      ) "Hyrule está em suas mãos."])
+  ]])
+  uniteste.descrever(["Geração" [
+    uniteste.iguais([
       (
         frase = "O céu é azul."
 
         `${frase[0:7]} o limite.`
-      ) "O céu é o limite."})
-  }})
-  uniteste.descrever({"Tamanho" {
-    uniteste.iguais({
+      ) "O céu é o limite."])
+  ]])
+  uniteste.descrever(["Tamanho" [
+    uniteste.iguais([
       (
         frase = "O céu é o limite."
 
         frase[.]
-      ) 17})
-  }})
-  uniteste.descrever({"Converter para número" {
-    uniteste.iguais({
+      ) 17])
+  ]])
+  uniteste.descrever(["Converter para número" [
+    uniteste.iguais([
       (
         caractere = "A"
 
         caractere[0]
-      ) 65})
-  }})
-  uniteste.descrever({"Converter de número" {
-    uniteste.iguais({
+      ) 65])
+  ]])
+  uniteste.descrever(["Converter de número" [
+    uniteste.iguais([
       (
         codigo = 65
 
         `${codigo}`
-      ) "A"})
-  }})
-}})
+      ) "A"])
+  ]])
+]])
