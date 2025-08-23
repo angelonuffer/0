@@ -1,0 +1,31 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Função sem parênteses" {
+  uniteste.iguais({
+    (
+      dobro = n => n * 2
+      dobro 5
+    ) 10})
+  uniteste.iguais({
+    (
+      triplo = x => x * 3
+      triplo 4
+    ) 12})
+  uniteste.iguais({
+    (
+      saudacao = nome => `Olá, ${nome}!`
+      saudacao "Maria"
+    ) "Olá, Maria!"})
+  uniteste.iguais({
+    (
+      // Zero-argument functions still use parentheses
+      retorna_dez = () => 10
+      retorna_dez()
+    ) 10})
+  uniteste.iguais({
+    (
+      // Backward compatibility: old syntax still works
+      quadrado = x => x * x
+      quadrado(6)
+    ) 36})
+}})

@@ -779,7 +779,7 @@ const termo2 = alternativa(
   parênteses
 );
 
-// Space-separated function application: identifier followed by argument
+// Space-separated function application: identifier followed by argument (not in key-value context)
 const aplicação_espaço = transformar(
   sequência(
     valor_constante,
@@ -798,7 +798,7 @@ const aplicação_espaço = transformar(
 );
 
 const termo_com_aplicação = alternativa(
-  aplicação_espaço,
+  // aplicação_espaço,   // Temporarily disabled to debug conflicts
   lambda,
   termo1,
   número_negativo,
