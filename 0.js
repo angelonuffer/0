@@ -426,7 +426,7 @@ const tamanho = transformar(
   () => (escopo, valor) => valor.length,
 );
 
-const atributos_objeto = transformar(
+const chaves = transformar(
   símbolo("[*]"),
   () => (escopo, objeto) => {
     const keys = Object.keys(objeto);
@@ -588,107 +588,7 @@ const lista = transformar(
   }
 );
 
-const objeto = transformar(
-  sequência(
-    símbolo("{"),
-    opcional(espaço),
-    vários(
-      alternativa(
-        sequência( // Key-value pair
-          alternativa( // Key can be nome or [expression]
-            nome,
-            sequência(
-              símbolo("["),
-              { analisar: código => expressão.analisar(código) },
-              símbolo("]"),
-            )
-          ),
-          símbolo(":"),
-          opcional(espaço),
-          { analisar: código => expressão.analisar(código) },
-          opcional(símbolo(",")),
-          opcional(espaço),
-        ),
-        sequência( // Spread syntax ...expression
-          símbolo("..."),
-          { analisar: código => expressão.analisar(código) },
-          opcional(símbolo(",")),
-          opcional(espaço),
-        ),
-        sequência( // Value-only (auto-indexed)
-          { analisar: código => expressão.analisar(código) },
-          opcional(símbolo(",")),
-          opcional(espaço),
-        ),
-      ),
-    ),
-    símbolo("}"),
-  ),
-  ([, , valores_vários,]) => escopo => {
-    if (!valores_vários) return {};
-    
-    // Create a new scope for object properties
-    const objectScope = { __parent__: escopo };
-    let autoIndex = 0; // For auto-indexing value-only entries
-    
-    // First pass: declare all property names in the scope
-    for (const v_alt of valores_vários) {
-      const firstEl = v_alt[0];
-      if (firstEl === "...") {
-        // Spread syntax - skip for now
-        continue;
-      } else if (v_alt.length === 6 && v_alt[1] === ":") {
-        // Key-value pair: [key, ":", space, value, comma, space]
-        const key_alt_result = v_alt[0];
-        
-        let chave;
-        if (typeof key_alt_result === "string") {
-          chave = key_alt_result;
-        } else {
-          const key_expr_fn = key_alt_result[1];
-          chave = key_expr_fn(escopo);
-        }
-        objectScope[chave] = undefined;
-      } else {
-        // Value-only entry: [value, comma, space]
-        objectScope[autoIndex] = undefined;
-        autoIndex++;
-      }
-    }
-    
-    // Second pass: evaluate property values in the augmented scope
-    autoIndex = 0; // Reset for second pass
-    return valores_vários.reduce((resultado, v_alt) => {
-      const firstEl = v_alt[0];
-      if (firstEl === "...") {
-        const spread_expr_fn = v_alt[1];
-        return { ...resultado, ...spread_expr_fn(escopo) };
-      } else if (v_alt.length === 6 && v_alt[1] === ":") {
-        // Key-value pair
-        const key_alt_result = v_alt[0];
-        const val_expr_fn = v_alt[3];
 
-        let chave;
-        if (typeof key_alt_result === "string") {
-          chave = key_alt_result;
-        } else {
-          const key_expr_fn = key_alt_result[1];
-          chave = key_expr_fn(escopo);
-        }
-        const valor = val_expr_fn(objectScope);
-        objectScope[chave] = valor;
-        return { ...resultado, [chave]: valor };
-      } else {
-        // Value-only entry
-        const val_expr_fn = v_alt[0];
-        const chave = autoIndex++;
-        const valor = val_expr_fn(objectScope);
-        objectScope[chave] = valor;
-        return { ...resultado, [chave]: valor };
-      }
-    }, {});
-  }
-);
 
 const atributo = transformar(
   sequência(
@@ -823,7 +723,7 @@ const termo1 = transformar(
       alternativa(
         fatia,
         tamanho,
-        atributos_objeto,
+        chaves,
         atributo,
         chamada_função,
       ),
@@ -853,7 +753,6 @@ const termo2 = alternativa(
   texto,
   modelo,
   lista,
-  objeto,
   valor_constante,
   parênteses
 );
