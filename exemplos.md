@@ -450,6 +450,23 @@ dados.idade
 30
 ```
 
+### Propriedade calculada em lista
+
+Propriedades calculadas permitem definir chaves dinamicamente em uma lista, com base em expressões.
+
+```
+chave = "nome"
+
+lista = [
+  [chave]: "João"
+  "valor_sem_chave"
+]
+
+lista["nome"]
+---
+"João"
+```
+
 ## Tipo objeto
 
 Objetos armazenam pares de chave-valor.

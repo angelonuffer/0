@@ -68,4 +68,16 @@ uniteste.descrever(["Lista com chaves" [
       lista_com_chaves.idade
     ) 30])
   ]])
+  uniteste.descrever(["Propriedade calculada" [
+    uniteste.iguais([(
+      chave = "nome"
+      
+      lista_com_chaves = [
+        [chave]: "João"
+        "valor_sem_chave"
+      ]
+      
+      lista_com_chaves["nome"]
+    ) "João"])
+  ]])
 ]])
