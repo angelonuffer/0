@@ -943,11 +943,8 @@ const _0 = opcional(
 );
 
 const efeitos = Object.fromEntries([
-  "atribua_retorno_ao_estado",
-  "atribua_valor_ao_estado",
-  "delete_do_estado",
   "saia",
-  "escreva",
+  "escreva", 
   "obtenha_argumentos",
   "carregue_localmente",
   "carregue_remotamente",
@@ -956,55 +953,72 @@ const efeitos = Object.fromEntries([
 ].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
 
 const etapas = {
-  iniciar: () => [
-    efeitos.atribua_retorno_ao_estado("argumentos", efeitos.obtenha_argumentos()),
-    efeitos.atribua_retorno_ao_estado("cache_existe", efeitos.verifique_existência("0_cache.json")),
-    efeitos.atribua_valor_ao_estado("etapa", "carregar_cache"),
+  iniciar: (retorno, estado) => [
+    efeitos.obtenha_argumentos(),
+    { ...estado, etapa: "obter_argumentos" }
   ],
-  carregar_cache: ({ cache_existe }) => {
-    if (cache_existe) {
+  obter_argumentos: (retorno, estado) => [
+    efeitos.verifique_existência("0_cache.json"),
+    { ...estado, argumentos: retorno, etapa: "verificar_cache" }
+  ],
+  verificar_cache: (retorno, estado) => {
+    if (retorno) {
       return [
-        efeitos.atribua_retorno_ao_estado("conteúdo_cache", efeitos.carregue_localmente("0_cache.json")),
-        efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
-      ]
+        efeitos.carregue_localmente("0_cache.json"),
+        { ...estado, cache_existe: retorno, etapa: "carregar_cache" }
+      ];
     }
     return [
-      efeitos.atribua_valor_ao_estado("conteúdo_cache", "{}"),
-      efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
-    ]
+      null,
+      { ...estado, cache_existe: retorno, conteúdo_cache: "{}", etapa: "avaliar_cache" }
+    ];
   },
-  avaliar_cache: ({ conteúdo_cache, argumentos: [endereço] }) => [
-    efeitos.atribua_valor_ao_estado("módulo_principal", endereço),
-    efeitos.atribua_valor_ao_estado("conteúdos", {
-      "0_cache.json": JSON.parse(conteúdo_cache),
-      [endereço]: null,
-    }),
-    efeitos.atribua_valor_ao_estado("módulos", {
-      [endereço]: null,
-    }),
-    efeitos.atribua_valor_ao_estado("valores_módulos", {}),
-    efeitos.atribua_valor_ao_estado("módulo_principal_estado", {}),
-    efeitos.delete_do_estado("conteúdo_cache"),
-    efeitos.delete_do_estado("argumentos"),
-    efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
+  carregar_cache: (retorno, estado) => [
+    null,
+    { ...estado, conteúdo_cache: retorno, etapa: "avaliar_cache" }
   ],
-  carregar_conteúdos: ({ conteúdos }) => {
-    const [endereço] = Object.entries(conteúdos).find(([endereço, conteúdo]) => conteúdo === null) || []
-    if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "avaliar_módulos")]
-    if (conteúdos["0_cache.json"][endereço]) return [
-      efeitos.atribua_valor_ao_estado("endereço", endereço),
-      efeitos.atribua_valor_ao_estado("conteúdo", conteúdos["0_cache.json"][endereço]),
-      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdo"),
-    ]
+  avaliar_cache: (retorno, estado) => {
+    const [endereço] = estado.argumentos;
     return [
-      efeitos.atribua_valor_ao_estado("endereço", endereço),
-      efeitos.atribua_retorno_ao_estado("conteúdo",
-        endereço.startsWith("https://") ?
-          efeitos.carregue_remotamente(endereço) :
-          efeitos.carregue_localmente(endereço)
-      ),
-      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdo"),
-    ]
+      null,
+      {
+        ...estado,
+        módulo_principal: endereço,
+        conteúdos: {
+          "0_cache.json": JSON.parse(estado.conteúdo_cache),
+          [endereço]: null,
+        },
+        módulos: {
+          [endereço]: null,
+        },
+        valores_módulos: {},
+        módulo_principal_estado: {},
+        etapa: "carregar_conteúdos"
+      }
+    ];
+  },
+  carregar_conteúdos: (retorno, estado) => {
+    const [endereço] = Object.entries(estado.conteúdos).find(([endereço, conteúdo]) => conteúdo === null) || []
+    if (endereço === undefined) {
+      return [null, { ...estado, etapa: "avaliar_módulos" }];
+    }
+    if (estado.conteúdos["0_cache.json"][endereço]) {
+      return [
+        null,
+        {
+          ...estado,
+          endereço: endereço,
+          conteúdo: estado.conteúdos["0_cache.json"][endereço],
+          etapa: "carregar_conteúdo"
+        }
+      ];
+    }
+    return [
+      endereço.startsWith("https://") ?
+        efeitos.carregue_remotamente(endereço) :
+        efeitos.carregue_localmente(endereço),
+      { ...estado, endereço: endereço, etapa: "carregar_conteúdo" }
+    ];
   },
   carregar_conteúdo: ({ conteúdos, endereço, conteúdo }) => {
     const novo_cache = { ...conteúdos["0_cache.json"] };
@@ -1192,4 +1206,7 @@ const etapas = {
   },
 }
 
-export default estado => etapas[estado.etapa ?? "iniciar"](estado)
+export default ([retorno, estado]) => {
+  const etapa_atual = estado.etapa ?? "iniciar";
+  return etapas[etapa_atual](retorno, estado);
+}
