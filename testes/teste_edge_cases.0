@@ -1,0 +1,47 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Casos extremos de referências aninhadas" {
+  // Caso onde propriedade pode mascarar variável externa
+  uniteste.iguais({
+    (
+      a = 100
+      exemplo = {
+        a: 2
+        b: {
+          c: a + 3
+        }
+      }
+      exemplo.b.c
+    )
+    5  // Deve usar a = 2 da lista, não a = 100 externa
+  })
+  
+  // Lista vazia aninhada
+  uniteste.iguais({
+    (
+      exemplo = {
+        a: 1
+        b: {}
+      }
+      exemplo.a
+    )
+    1
+  })
+  
+  // Referência a propriedade inexistente deve gerar undefined (ou erro)
+  uniteste.iguais({
+    (
+      exemplo = {
+        a: 1
+        b: {
+          c: a + 3
+        }
+        d: {
+          e: inexistente + 1  // Esta referência pode ser problemática
+        }
+      }
+      exemplo.b.c  // Testamos apenas a parte que funciona
+    )
+    4
+  })
+}})

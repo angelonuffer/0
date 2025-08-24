@@ -522,6 +522,44 @@ calculos.somaDobroTriplo
 50
 ```
 
+### Referências aninhadas
+
+Propriedades aninhadas também podem referenciar propriedades do nível superior da lista.
+
+```
+configuracao = {
+  base: 10
+  processamento: {
+    etapa1: base * 2
+    etapa2: {
+      resultado: etapa1 + base
+    }
+  }
+}
+
+configuracao.processamento.etapa2.resultado
+---
+30
+```
+
+```
+geometria = {
+  x: 3
+  y: 4
+  calculos: {
+    quadrado_x: x * x
+    quadrado_y: y * y
+    hipotenusa: {
+      soma_quadrados: quadrado_x + quadrado_y
+    }
+  }
+}
+
+geometria.calculos.hipotenusa.soma_quadrados
+---
+25
+```
+
 ## Função
 
 Funções encapsulam lógica reutilizável.
