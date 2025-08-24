@@ -16,73 +16,12 @@ const símbolo = símbolo_esperado => ({
 })
 
 const alternativa = (...analisadores) => {
-  const getParserId = (parser) => {
-    if (!parser || typeof parser.tipo !== "string") return null;
-
-    switch (parser.tipo) {
-      case "símbolo": return `símbolo_${parser.símbolo}`;
-      case "faixa": return `faixa_${parser.inicial}_${parser.final}`;
-      default: return null;
-    }
-  };
-
-  const fatorar_prefixos = (analisadores) => {
-    let otimizou = true;
-    while (otimizou) {
-      otimizou = false;
-      const groups = new Map();
-      const others = [];
-      const newAnalisadores = [];
-
-      for (const p of analisadores) {
-        let prefixId = null;
-        if (p.tipo === "sequência" && p.analisadores.length > 0) {
-          prefixId = getParserId(p.analisadores[0]);
-        } else {
-          prefixId = getParserId(p);
-        }
-
-        if (prefixId) {
-          if (!groups.has(prefixId)) groups.set(prefixId, []);
-          groups.get(prefixId).push(p);
-        } else {
-          others.push(p);
-        }
-      }
-
-      for (const [prefixId, groupParsers] of groups.entries()) {
-        if (groupParsers.length > 1) {
-          otimizou = true;
-          const prefix = groupParsers[0].tipo === "sequência" ? groupParsers[0].analisadores[0] : groupParsers[0];
-
-          const suffixes = groupParsers.map(p => {
-            if (p.tipo === "sequência") {
-              const remaining = p.analisadores.slice(1);
-              if (remaining.length === 0) return sucesso;
-              if (remaining.length === 1) return remaining[0];
-              return sequência(...remaining);
-            }
-            return sucesso; // For simple parsers that are prefixes
-          });
-
-          newAnalisadores.push(sequência(prefix, alternativa(...suffixes)));
-        } else {
-          newAnalisadores.push(...groupParsers);
-        }
-      }
-      analisadores = [...newAnalisadores, ...others];
-    }
-    return analisadores;
-  };
-
-  const analisadoresFinais = fatorar_prefixos(analisadores);
-
   return {
     tipo: "alternativa",
-    analisadores: analisadoresFinais,
+    analisadores,
     analisar: código => {
       let menor_resto = código
-      for (const analisador of analisadoresFinais) {
+      for (const analisador of analisadores) {
         const resultado = analisador.analisar(código)
         if (resultado.resto !== código || resultado.hasOwnProperty("valor")) return resultado
         if (resultado.menor_resto && resultado.menor_resto.length < menor_resto.length) {
@@ -817,32 +756,7 @@ const expressão = operação(
   ),
 );
 
-const raw_expression_capture = código => {
-  const { valor: valor_expr_fn, resto: resto_expr } = expressão.analisar(código);
 
-  if (resto_expr === código) {
-    return { resto: código };
-  }
-
-  const expressão_str_capturada = código.substring(0, código.length - resto_expr.length);
-  return { valor: { valor_fn: valor_expr_fn, str: expressão_str_capturada.trim() }, resto: resto_expr };
-};
-
-const debug_command = transformar(
-  sequência(
-    símbolo("$"),
-    opcional(espaço),
-    { analisar: raw_expression_capture }
-  ),
-  (seq_result) => {
-    const { valor_fn, str } = seq_result[2];
-    return (escopo) => {
-      const valor_calculado = valor_fn(escopo);
-      console.log(`$ ${str} = ${JSON.stringify(valor_calculado)}`);
-      return { type: 'debug', expression: str, value: valor_calculado };
-    };
-  }
-);
 
 
 
