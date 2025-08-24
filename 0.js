@@ -739,6 +739,9 @@ const termo1 = transformar(
     alternativa(
       valor_constante,
       parênteses,
+      lista,
+      número,
+      texto,
     ),
     opcional(espaço),
     vários(
@@ -770,11 +773,8 @@ const termo2 = alternativa(
   lambda,
   termo1,
   número_negativo,
-  número,
   não,
-  texto,
   modelo,
-  lista,
   valor_constante,
   parênteses
 );
