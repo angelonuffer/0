@@ -947,7 +947,7 @@ const efeitos = Object.fromEntries([
   "escreva",
   "obtenha_argumentos",
   "carregue_localmente",
-  "carregue_remotamente", 
+  "carregue_remotamente",
   "verifique_existência",
   "salve_localmente",
 ].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
