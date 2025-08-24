@@ -1,7 +1,7 @@
 uniteste # ../uniteste.0
 
 uniteste.descrever({"String Division Test" {
-  uniteste.iguais({
+  uniteste.listas_iguais({
     "a b c" / " "
     {"a" "b" "c"}
   })
