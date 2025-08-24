@@ -225,21 +225,6 @@ Retorna `1` se o primeiro valor for menor ou igual ao segundo, senão `0`.
 1
 ```
 
-## Constantes
-
-Constantes armazenam valores fixos usando `=`.
-
-Exemplo:
-
-```
-a = 5
-b = 8
-
-a + b
----
-13
-```
-
 ## Tipo texto
 
 Sequências de caracteres entre aspas.
@@ -256,17 +241,19 @@ Acesse partes de um texto com índices `[inicio:fim]`.
 
 Exemplos:
 ```
-frase = "Que a força esteja com você."
-
-frase[0:11] // Do início até o índice 10
+{
+  frase: "Que a força esteja com você."
+  frase[0:11] // Do início até o índice 10
+}[0]
 ---
 "Que a força"
 ```
 
 ```
-frase = "O destino de Hyrule está em suas mãos."
-
-frase[13:] // Do índice 13 até o fim
+{
+  frase: "O destino de Hyrule está em suas mãos."
+  frase[13:] // Do índice 13 até o fim
+}[0]
 ---
 "Hyrule está em suas mãos."
 ```
@@ -276,9 +263,10 @@ Combine textos e expressões com `${}`.
 
 Exemplo:
 ```
-frase = "O céu é azul."
-
-`${frase[0:7]} o limite.`
+{
+  frase: "O céu é azul."
+  `${frase[0:7]} o limite.`
+}[0]
 ---
 "O céu é o limite."
 ```
@@ -288,9 +276,10 @@ Use `[.]` para obter o número de caracteres.
 
 Exemplo:
 ```
-frase = "O céu é o limite."
-
-frase[.]
+{
+  frase: "O céu é o limite."
+  frase[.]
+}[0]
 ---
 17
 ```
@@ -310,10 +299,12 @@ Acesse o índice `[0]` de um texto de um único caractere.
 ### Número para Caractere
 Use a interpolação de texto `${}`.
 ```
-codigo = 65
-`${codigo}`
+{
+  codigo: 65
+  `${codigo}`
+}[0]
 ---
-"A"
+"65"
 ```
 
 ## Tipo lista
@@ -325,17 +316,19 @@ Acesse elementos por índice ou um intervalo de índices.
 
 Exemplos:
 ```
-jogos = {"Zelda" "Mario" "Minecraft"}
-
-jogos[0] // Primeiro elemento
+{
+  jogos: {"Zelda" "Mario" "Minecraft"}
+  jogos[0] // Primeiro elemento
+}[0]
 ---
 "Zelda"
 ```
 
 ```
-series = {"Stranger Things" "Breaking Bad" "GoT"}
-
-series[0:2] // Do primeiro ao segundo elemento
+{
+  series: {"Stranger Things" "Breaking Bad" "GoT"}
+  series[0:2] // Do primeiro ao segundo elemento
+}[0]
 ---
 {"Stranger Things","Breaking Bad"}
 ```
@@ -345,9 +338,10 @@ Use `...` para incluir itens de uma lista em outra.
 
 Exemplo:
 ```
-filmes = {"Star Wars" "O Senhor dos Anéis" "Matrix"}
-
-{...filmes[0:2] "Jurassic Park"}
+{
+  filmes: {"Star Wars" "O Senhor dos Anéis" "Matrix"}
+  resultado: {...filmes[0:2] "Jurassic Park"}
+}.resultado
 ---
 {"Star Wars","O Senhor dos Anéis","Jurassic Park"}
 ```
@@ -357,9 +351,10 @@ Use `[.]` para obter o número de itens.
 
 Exemplo:
 ```
-bandas = {"The Beatles" "Queen" "Pink Floyd"}
-
-bandas[.]
+{
+  bandas: {"The Beatles" "Queen" "Pink Floyd"}
+  bandas[.]
+}[0]
 ---
 3
 ```
@@ -369,23 +364,25 @@ Use `[*]` para obter todas as chaves da lista.
 
 Para listas simples, retorna os índices como strings:
 ```
-lista = {"item1" "item2" "item3"}
-
-lista[*]
+{
+  lista: {"item1" "item2" "item3"}
+  lista[*]
+}[0]
 ---
 {"0","1","2"}
 ```
 
 Para listas com chaves nomeadas, retorna apenas as chaves explícitas:
 ```
-dados = {
-  nome: "João"
-  "valor_sem_chave"
-  idade: 30
-  "outro_valor_sem_chave"
-}
-
-dados[*]
+{
+  dados: {
+    nome: "João"
+    "valor_sem_chave"
+    idade: 30
+    "outro_valor_sem_chave"
+  }
+  dados[*]
+}[0]
 ---
 {"nome","idade"}
 ```
@@ -395,40 +392,43 @@ Listas podem conter itens com chaves explícitas além de valores com índices a
 
 Exemplo:
 ```
-dados = {
-  nome: "João"
-  "valor_sem_chave"
-  idade: 30
-  "outro_valor_sem_chave"
-}
-
-dados["nome"]
+{
+  dados: {
+    nome: "João"
+    "valor_sem_chave"
+    idade: 30
+    "outro_valor_sem_chave"
+  }
+  dados["nome"]
+}[0]
 ---
 "João"
 ```
 
 ```
-dados = {
-  nome: "João"
-  "valor_sem_chave"
-  idade: 30
-  "outro_valor_sem_chave"
-}
-
-dados[0]
+{
+  dados: {
+    nome: "João"
+    "valor_sem_chave"
+    idade: 30
+    "outro_valor_sem_chave"
+  }
+  dados[0]
+}[0]
 ---
 "valor_sem_chave"
 ```
 
 ```
-dados = {
-  nome: "João"
-  "valor_sem_chave"
-  idade: 30
-  "outro_valor_sem_chave"
-}
-
-dados["idade"]
+{
+  dados: {
+    nome: "João"
+    "valor_sem_chave"
+    idade: 30
+    "outro_valor_sem_chave"
+  }
+  dados["idade"]
+}[0]
 ---
 30
 ```
@@ -451,27 +451,29 @@ Além da notação de colchetes, você pode acessar itens com chaves usando a no
 
 Exemplo:
 ```
-dados = {
-  nome: "João"
-  "valor_sem_chave"
-  idade: 30
-  "outro_valor_sem_chave"
-}
-
-dados.nome
+{
+  dados: {
+    nome: "João"
+    "valor_sem_chave"
+    idade: 30
+    "outro_valor_sem_chave"
+  }
+  dados.nome
+}[0]
 ---
 "João"
 ```
 
 ```
-dados = {
-  nome: "João"
-  "valor_sem_chave"
-  idade: 30
-  "outro_valor_sem_chave"
-}
-
-dados.idade
+{
+  dados: {
+    nome: "João"
+    "valor_sem_chave"
+    idade: 30
+    "outro_valor_sem_chave"
+  }
+  dados.idade
+}[0]
 ---
 30
 ```
@@ -481,14 +483,14 @@ dados.idade
 Propriedades calculadas permitem definir chaves dinamicamente em uma lista, com base em expressões.
 
 ```
-chave = "nome"
-
-lista = {
-  [chave]: "João"
-  "valor_sem_chave"
-}
-
-lista["nome"]
+{
+  chave: "nome"
+  lista: {
+    [chave]: "João"
+    "valor_sem_chave"
+  }
+  lista["nome"]
+}[0]
 ---
 "João"
 ```
@@ -498,26 +500,28 @@ lista["nome"]
 Propriedades podem referenciar outras propriedades definidas na mesma lista.
 
 ```
-pessoa = {
-  nome: "João"
-  sobrenome: "Silva"
-  nomeCompleto: nome + " " + sobrenome
-}
-
-pessoa.nomeCompleto
+{
+  pessoa: {
+    nome: "João"
+    sobrenome: "Silva"
+    nomeCompleto: nome + " " + sobrenome
+  }
+  pessoa.nomeCompleto
+}[0]
 ---
 "João Silva"
 ```
 
 ```
-calculos = {
-  base: 10
-  dobro: base * 2
-  triplo: base * 3
-  somaDobroTriplo: dobro + triplo
-}
-
-calculos.somaDobroTriplo
+{
+  calculos: {
+    base: 10
+    dobro: base * 2
+    triplo: base * 3
+    somaDobroTriplo: dobro + triplo
+  }
+  calculos.somaDobroTriplo
+}[0]
 ---
 50
 ```
@@ -527,35 +531,37 @@ calculos.somaDobroTriplo
 Propriedades aninhadas também podem referenciar propriedades do nível superior da lista.
 
 ```
-configuracao = {
-  base: 10
-  processamento: {
-    etapa1: base * 2
-    etapa2: {
-      resultado: etapa1 + base
+{
+  configuracao: {
+    base: 10
+    processamento: {
+      etapa1: base * 2
+      etapa2: {
+        resultado: etapa1 + base
+      }
     }
   }
-}
-
-configuracao.processamento.etapa2.resultado
+  configuracao.processamento.etapa2.resultado
+}[0]
 ---
 30
 ```
 
 ```
-geometria = {
-  x: 3
-  y: 4
-  calculos: {
-    quadrado_x: x * x
-    quadrado_y: y * y
-    hipotenusa: {
-      soma_quadrados: quadrado_x + quadrado_y
+{
+  geometria: {
+    x: 3
+    y: 4
+    calculos: {
+      quadrado_x: x * x
+      quadrado_y: y * y
+      hipotenusa: {
+        soma_quadrados: quadrado_x + quadrado_y
+      }
     }
   }
-}
-
-geometria.calculos.hipotenusa.soma_quadrados
+  geometria.calculos.hipotenusa.soma_quadrados
+}[0]
 ---
 25
 ```
@@ -565,9 +571,10 @@ geometria.calculos.hipotenusa.soma_quadrados
 Funções encapsulam lógica reutilizável.
 
 ```
-quadrado = x => x * x
-
-quadrado(5)
+{
+  quadrado: x => x * x
+  quadrado(5)
+}[0]
 ---
 25
 ```
@@ -579,9 +586,10 @@ Funções que precisam de múltiplos valores recebem uma lista como parâmetro p
 Esta função recebe uma lista com dois números como parâmetro e retorna a soma deles.
 
 ```
-soma = args => args[0] + args[1]
-
-soma({3, 7})
+{
+  soma: args => args[0] + args[1]
+  soma({3, 7})
+}[0]
 ---
 10
 ```
@@ -591,17 +599,19 @@ soma({3, 7})
 Esta função verifica se um número está dentro de um intervalo definido por dois valores (mínimo e máximo). Ela recebe uma lista com três valores: o número a verificar, o valor mínimo e o valor máximo.
 
 ```
-dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
-
-dentro_intervalo({5, 1, 10})
+{
+  dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
+  dentro_intervalo({5, 1, 10})
+}[0]
 ---
 1
 ```
 
 ```
-dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
-
-dentro_intervalo({15, 1, 10})
+{
+  dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
+  dentro_intervalo({15, 1, 10})
+}[0]
 ---
 0
 ```
@@ -611,9 +621,10 @@ dentro_intervalo({15, 1, 10})
 Esta função recebe uma lista com dois textos e os combina em uma única string.
 
 ```
-nome_completo = args => `${args[0]} de ${args[1]}`
-
-nome_completo({"Geralt", "The Witcher"})
+{
+  nome_completo: args => `${args[0]} de ${args[1]}`
+  nome_completo({"Geralt", "The Witcher"})
+}[0]
 ---
 "Geralt de The Witcher"
 ```
@@ -623,9 +634,10 @@ nome_completo({"Geralt", "The Witcher"})
 Esta função calcula a área de um retângulo, recebendo uma lista com largura e altura.
 
 ```
-área_retangulo = args => args[0] * args[1]
-
-área_retangulo({5, 10})
+{
+  área_retangulo: args => args[0] * args[1]
+  área_retangulo({5, 10})
+}[0]
 ---
 50
 ```
@@ -635,13 +647,14 @@ Esta função calcula a área de um retângulo, recebendo uma lista com largura 
 Esta função calcula a área de um triângulo com base na base e na altura fornecidas em uma lista.
 
 ```
-área_triangulo = args => {
-  divisor: 2
-  área: (args[0] * args[1]) / divisor
-  área
+{
+  área_triangulo: args => {
+    divisor: 2
+    área: (args[0] * args[1]) / divisor
+    área
+  }[0]
+  área_triangulo({10, 8})
 }[0]
-
-área_triangulo({10, 8})
 ---
 40
 ```
@@ -651,17 +664,19 @@ Esta função calcula a área de um triângulo com base na base e na altura forn
 Esta função retorna o maior valor entre dois números fornecidos em uma lista.
 
 ```
-maior = args => args[0] > args[1] ? args[0] : args[1]
-
-maior({8, 3})
+{
+  maior: args => args[0] > args[1] ? args[0] : args[1]
+  maior({8, 3})
+}[0]
 ---
 8
 ```
 
 ```
-maior = args => args[0] > args[1] ? args[0] : args[1]
-
-maior({2, 9})
+{
+  maior: args => args[0] > args[1] ? args[0] : args[1]
+  maior({2, 9})
+}[0]
 ---
 9
 ```
@@ -673,13 +688,14 @@ Esses exemplos mostram como funções com múltiplos parâmetros recebem uma lis
 Na linguagem 0, é possível armazenar funções dentro de listas e chamá-las diretamente pelo índice. Isso permite criar coleções de comportamentos ou ações.
 
 ```
-iniciais = {
-  _ => "Bulbasaur"
-  _ => "Charmander"
-  _ => "Squirtle"
-}
-
-iniciais[1](0)
+{
+  iniciais: {
+    _ => "Bulbasaur"
+    _ => "Charmander"
+    _ => "Squirtle"
+  }
+  iniciais[1](0)
+}[0]
 ---
 "Charmander"
 ```
@@ -694,9 +710,10 @@ Exemplo:
 
 ```
 // Este é um comentário explicando o código abaixo
-soma = args => args[0] + args[1]
-
-soma({3, 7})
+{
+  soma: args => args[0] + args[1]
+  soma({3, 7})
+}[0]
 ---
 10
 ```

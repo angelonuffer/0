@@ -1,26 +1,26 @@
-lista = {
-  mapear: args =>
-    args[0][.] == 0 ? {} :
-    args[0][.] == 1 ? {args[1](args[0][0])} :
-    {args[1](args[0][0]) ...lista.mapear({args[0][1:] args[1]})}
-  juntar: args =>
-    args[0][.] == 0 ? "" :
-    args[0][.] == 1 ? args[0][0] :
-    `${args[0][0]}${args[1]}${lista.juntar({args[0][1:] args[1]})}`
-  reduzir: args =>
-    args[0][.] == 1 ?
-      args[0][0] :
-    args[0][.] == 2 ?
-      args[1]({args[0][0] args[0][1]}) :
-    lista.reduzir({
-      {args[1]({args[0][0] args[0][1]})
-      ...args[0][2:]}
-      args[1]
-    })
-  planificar: lista_original =>
-    lista_original[.] == 0 ?
-      {} :
-    {...lista_original[0] ...lista.planificar(lista_original[1:])}
-}
-
-lista
+{
+  lista: {
+    mapear: args =>
+      args[0][.] == 0 ? {} :
+      args[0][.] == 1 ? {args[1](args[0][0])} :
+      {args[1](args[0][0]) ...lista.mapear({args[0][1:] args[1]})}
+    juntar: args =>
+      args[0][.] == 0 ? "" :
+      args[0][.] == 1 ? args[0][0] :
+      `${args[0][0]}${args[1]}${lista.juntar({args[0][1:] args[1]})}`
+    reduzir: args =>
+      args[0][.] == 1 ?
+        args[0][0] :
+      args[0][.] == 2 ?
+        args[1]({args[0][0] args[0][1]}) :
+      lista.reduzir({
+        {args[1]({args[0][0] args[0][1]})
+        ...args[0][2:]}
+        args[1]
+      })
+    planificar: lista_original =>
+      lista_original[.] == 0 ?
+        {} :
+      {...lista_original[0] ...lista.planificar(lista_original[1:])}
+  }
+}.lista
