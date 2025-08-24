@@ -240,6 +240,33 @@ a + b
 13
 ```
 
+### Constantes em expressões
+
+Para usar constantes em expressões complexas, utilize propriedades de listas em vez de parênteses com declarações de constantes.
+
+Exemplo (usando propriedades de lista):
+
+```
+resultado = {
+  a: 2
+  valor: a + 3
+}.valor
+
+resultado
+---
+5
+```
+
+### Precedência com parênteses
+
+Os parênteses continuam sendo usados para definir precedência nas operações:
+
+```
+(2 + 3) * 4
+---
+20
+```
+
 ## Tipo texto
 
 Sequências de caracteres entre aspas.
@@ -636,9 +663,11 @@ Esta função calcula a área de um triângulo com base na base e na altura forn
 
 ```
 área_triangulo = args => (
-  divisor = 2
-  área = (args[0] * args[1]) / divisor
-  área
+  temp_calc = {
+    divisor: 2
+    área: (args[0] * args[1]) / divisor
+  }
+  temp_calc.área
 )
 
 área_triangulo({10, 8})

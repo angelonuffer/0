@@ -1,0 +1,4 @@
+// Demonstração da nova sintaxe
+// Parênteses somente para precedência de operações
+
+(2 + 3) * 4
