@@ -1,0 +1,8 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"String Division Test" {
+  uniteste.iguais({
+    "a b c" / " "
+    {"a" "b" "c"}
+  })
+}})
