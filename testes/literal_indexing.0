@@ -1,0 +1,20 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Acesso direto a literais de lista" {
+  uniteste.iguais({
+    { 2 3 }[0]
+    2
+  })
+  uniteste.iguais({
+    { 2 3 }[1]
+    3
+  })
+  uniteste.iguais({
+    { a: 4 b: a + 5 }.b
+    9
+  })
+  uniteste.iguais({
+    { a: 4 a + 5 }[0]
+    9
+  })
+}})
