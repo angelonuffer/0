@@ -25,7 +25,7 @@ Exemplo:
 ```
 retorna_5 # ./retorna_5.0
 
-retorna_5()
+retorna_5{}
 ---
 5
 ```
@@ -573,7 +573,7 @@ Funções encapsulam lógica reutilizável.
 ```
 {
   quadrado: x => x * x
-  quadrado(5)
+  quadrado{5}
 }[0]
 ---
 25
@@ -623,7 +623,7 @@ Esta função recebe uma lista com dois textos e os combina em uma única string
 ```
 {
   nome_completo: args => `${args[0]} de ${args[1]}`
-  nome_completo({"Geralt", "The Witcher"})
+  nome_completo{{"Geralt", "The Witcher"}}
 }[0]
 ---
 "Geralt de The Witcher"
@@ -636,7 +636,7 @@ Esta função calcula a área de um retângulo, recebendo uma lista com largura 
 ```
 {
   área_retangulo: args => args[0] * args[1]
-  área_retangulo({5, 10})
+  área_retangulo{{5, 10}}
 }[0]
 ---
 50
@@ -694,13 +694,13 @@ Na linguagem 0, é possível armazenar funções dentro de listas e chamá-las d
     _ => "Charmander"
     _ => "Squirtle"
   }
-  iniciais[1](0)
+  iniciais[1]{0}
 }[0]
 ---
 "Charmander"
 ```
 
-Neste exemplo, a lista `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar `(0)`, executamos essa função com um parâmetro qualquer (que é ignorado) e obtemos o resultado.
+Neste exemplo, a lista `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar `{0}`, executamos essa função com um parâmetro qualquer (que é ignorado) e obtemos o resultado.
 
 ## Comentários
 

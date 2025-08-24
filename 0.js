@@ -620,38 +620,16 @@ const atributo = transformar(
   ([, atributoNome]) => (escopo, objeto) => objeto[atributoNome],
 );
 
-const params_lista_com_parenteses = sequência(
-  símbolo("("),
-  opcional(espaço),
-  nome,
-  opcional(espaço),
-  símbolo(")")
-);
-
-const params_lista_sem_parenteses = nome;
-
 const lambda = transformar(
   sequência(
-    alternativa(
-      params_lista_com_parenteses,
-      params_lista_sem_parenteses
-    ),
+    opcional(nome),
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),
     { analisar: código => expressão.analisar(código) }
   ),
   (valorBrutoLambda) => {
-    const [paramsResultado, , , , corpoExprFunc] = valorBrutoLambda;
-
-    let nomeParam = null;
-    if (Array.isArray(paramsResultado) && paramsResultado[0] === '(') {
-      // Parentheses case: (param) or ()
-      nomeParam = paramsResultado[2] || null;
-    } else {
-      // No parentheses case: param
-      nomeParam = paramsResultado;
-    }
+    const [nomeParam, , , , corpoExprFunc] = valorBrutoLambda;
 
     return definition_scope => {
       return (caller_context, ...valoresArgs) => {
@@ -674,7 +652,7 @@ const lambda = transformar(
 
 const chamada_função = transformar(
   sequência(
-    símbolo("("),
+    símbolo("{"),
     opcional(espaço),
     opcional(
       sequência(
@@ -683,7 +661,7 @@ const chamada_função = transformar(
       )
     ),
     opcional(espaço),
-    símbolo(")"),
+    símbolo("}"),
   ),
   ([, , arg_seq_optional,]) => (escopo, função) => {
     if (arg_seq_optional) {
