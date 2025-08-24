@@ -2,81 +2,81 @@ uniteste # ../uniteste.0
 
 uniteste.descrever({"Função" {
   uniteste.iguais({
-    (
-      quadrado = x => x * x
+    {
+      quadrado: x => x * x
       quadrado(5)
-    )
+    }[0]
     25
   })
   uniteste.iguais({
-    (
-      soma = args => args[0] + args[1]
+    {
+      soma: args => args[0] + args[1]
       soma({3 7})
-    )
+    }[0]
     10
   })
   uniteste.iguais({
-    (
-      dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
+    {
+      dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
       dentro_intervalo({5 1 10})
-    )
+    }[0]
     1
   })
   uniteste.iguais({
-    (
-      dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
+    {
+      dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
       dentro_intervalo({15 1 10})
-    )
+    }[0]
     0
   })
   uniteste.iguais({
-    (
-      nome_completo = args => `${args[0]} de ${args[1]}`
+    {
+      nome_completo: args => `${args[0]} de ${args[1]}`
       nome_completo({"Geralt" "The Witcher"})
-    )
+    }[0]
     "Geralt de The Witcher"
   })
   uniteste.iguais({
-    (
-      área_retângulo = args => args[0] * args[1]
+    {
+      área_retângulo: args => args[0] * args[1]
       área_retângulo({5 10})
-    )
+    }[0]
     50
   })
   uniteste.iguais({
-    (
-      área_triângulo = args => (
-        divisor = 2
-        área = (args[0] * args[1]) / divisor
+    {
+      área_triângulo: args => {
+        divisor: 2
+        área: (args[0] * args[1]) / divisor
         área
-      )
+      }[0]
       área_triângulo({10 8})
-    )
+    }[0]
     40
   })
   uniteste.iguais({
-    (
-      maior = args => args[0] > args[1] ? args[0] : args[1]
+    {
+      maior: args => args[0] > args[1] ? args[0] : args[1]
       maior({8 3})
-    )
+    }[0]
     8
   })
   uniteste.iguais({
-    (
-      maior = args => args[0] > args[1] ? args[0] : args[1]
+    {
+      maior: args => args[0] > args[1] ? args[0] : args[1]
       maior({2 9})
-    )
+    }[0]
     9
   })
   uniteste.iguais({
-    (
-      iniciais = {
+    {
+      iniciais: {
         _ => "Bulbasaur"
         _ => "Charmander"
         _ => "Squirtle"
       }
       iniciais[1](0)
-    )
+    }[0]
     "Charmander"
   })
 }})

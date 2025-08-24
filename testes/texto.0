@@ -3,67 +3,67 @@ uniteste # ../uniteste.0
 uniteste.descrever({"Texto" {
   uniteste.descrever({"Fatiamento" {
     uniteste.iguais({
-      (
-        frase = "Que a força esteja com você."
+      {
+        frase: "Que a força esteja com você."
 
         frase[0:1]
-      )
+      }[0]
       "Q"
     })
     uniteste.iguais({
-      (
-        frase = "Que a força esteja com você."
+      {
+        frase: "Que a força esteja com você."
 
         frase[0:11]
-      )
+      }[0]
       "Que a força"
     })
     uniteste.iguais({
-      (
-        frase = "O destino de Hyrule está em suas mãos."
+      {
+        frase: "O destino de Hyrule está em suas mãos."
 
         frase[13:]
-      )
+      }[0]
       "Hyrule está em suas mãos."
     })
   }})
   uniteste.descrever({"Geração" {
     uniteste.iguais({
-      (
-        frase = "O céu é azul."
+      {
+        frase: "O céu é azul."
 
         `${frase[0:7]} o limite.`
-      )
+      }[0]
       "O céu é o limite."
     })
   }})
   uniteste.descrever({"Tamanho" {
     uniteste.iguais({
-      (
-        frase = "O céu é o limite."
+      {
+        frase: "O céu é o limite."
 
         frase[.]
-      )
+      }[0]
       17
     })
   }})
   uniteste.descrever({"Converter para número" {
     uniteste.iguais({
-      (
-        caractere = "A"
+      {
+        caractere: "A"
 
         caractere[0]
-      )
+      }[0]
       65
     })
   }})
   uniteste.descrever({"Converter de número" {
     uniteste.iguais({
-      (
-        codigo = 65
+      {
+        codigo: 65
 
         `${codigo}`
-      )
+      }[0]
       "A"
     })
   }})

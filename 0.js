@@ -699,37 +699,15 @@ const parênteses = transformar(
   sequência(
     símbolo("("),
     opcional(espaço),
-    opcional({ analisar: código => declarações_constantes.analisar(código) }, []),
-    opcional(espaço),
     { analisar: código => expressão.analisar(código) },
     opcional(espaço),
     símbolo(")"),
   ),
   valorSeq => {
-    const [, , constantes_val, , valor_fn,] = valorSeq;
+    const [, , valor_fn,] = valorSeq;
 
     return outer_scope_param => {
-      const escopoParenteses = { __parent__: outer_scope_param || null };
-      if (constantes_val && constantes_val.length > 0) {
-        for (const item_seq of constantes_val) {
-          const actual_item = item_seq[0];
-          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-            const [nome_val] = actual_item;
-            escopoParenteses[nome_val] = undefined;
-          }
-        }
-        for (const item_seq of constantes_val) {
-          const actual_item = item_seq[0];
-          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-            const [nome_val, , , , valor_const_fn] = actual_item;
-            escopoParenteses[nome_val] = valor_const_fn(escopoParenteses);
-          } else {
-            const debug_fn = actual_item;
-            debug_fn(escopoParenteses);
-          }
-        }
-      }
-      return valor_fn(escopoParenteses);
+      return valor_fn(outer_scope_param);
     };
   }
 );
