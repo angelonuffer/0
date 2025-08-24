@@ -943,9 +943,6 @@ const _0 = opcional(
 );
 
 const efeitos = Object.fromEntries([
-  "deprecated_0", // placeholder for old atribua_retorno_ao_estado
-  "deprecated_1", // placeholder for old atribua_valor_ao_estado  
-  "deprecated_2", // placeholder for old delete_do_estado
   "saia",
   "escreva",
   "obtenha_argumentos",
@@ -1206,19 +1203,6 @@ const etapas = {
     
     const [efeito, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
     const [tipo] = efeito;
-    
-    // Remove state manipulation effects as requested - types 0, 1, 2
-    if (tipo === 0 || tipo === 1 || tipo === 2) {
-      // Skip these effects and process the next one
-      return [
-        null,
-        {
-          ...estado,
-          efeitos_módulo_pendentes: resto_efeitos,
-          etapa: "processar_efeito_principal"
-        }
-      ];
-    }
     
     // Execute the effect and update state
     return [
