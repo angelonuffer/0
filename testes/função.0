@@ -71,11 +71,11 @@ uniteste.descrever({"Função" {
   uniteste.iguais({
     (
       iniciais = {
-        () => "Bulbasaur"
-        () => "Charmander"
-        () => "Squirtle"
+        _ => "Bulbasaur"
+        _ => "Charmander"
+        _ => "Squirtle"
       }
-      iniciais[1]()
+      iniciais[1](0)
     )
     "Charmander"
   })

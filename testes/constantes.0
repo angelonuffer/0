@@ -11,12 +11,12 @@ uniteste.descrever({"Constantes" {
   })
   uniteste.iguais({
     (
-      função1 = () => x == 42
-      função2 = () => (
+      função1 = _ => x == 42
+      função2 = _ => (
         x = 42
-        função1()
+        função1(0)
       )
-      função2()
+      função2(0)
     )
     0
   })

@@ -7,14 +7,14 @@ compara_listas = args =>
   compara_listas({args[0][1:] args[1][1:]})
 
 uniteste = {
-  descrever: args => () =>
+  descrever: args => _ =>
     (
       mensagens = lista.mapear({
         lista.planificar(
           lista.mapear({
             args[1]
             teste => (
-              resultado = teste()
+              resultado = teste(0)
               resultado[0:resultado[.] - 2]
             )
           })
@@ -23,7 +23,7 @@ uniteste = {
       })
       passaram = lista.reduzir({
         lista.mapear({args[1] teste => (
-          resultado = teste()
+          resultado = teste(0)
           resultado[resultado[.] - 1][2]
         )})
         pair => pair[0] + pair[1]
@@ -38,7 +38,7 @@ uniteste = {
         }
       }
     )
-  iguais: args => () =>
+  iguais: args => _ =>
     args[0] == args[1] ?
       {
         {1 "ok"}
@@ -50,7 +50,7 @@ uniteste = {
         {1 "0/1 testes passaram."}
         {0 1 0}
       }
-  listas_iguais: args => () =>
+  listas_iguais: args => _ =>
     compara_listas({args[0] args[1]}) ?
       {
         {1 "ok"}
