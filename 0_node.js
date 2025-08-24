@@ -29,10 +29,5 @@ while (true) {
   if (efeito) {
     const retorno = await processe(...efeito);
     contexto[0] = retorno;
-  } else {
-    // Continue with null return to allow state processing
-    contexto[0] = null;
-    // Add check for explicit termination
-    if (novo_estado.etapa === "finalizado") break;
   }
 }
