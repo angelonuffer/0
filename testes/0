@@ -10,6 +10,8 @@ referência_lista # referência_lista.0
 teste_aninhado # teste_aninhado.0
 teste_documentacao # teste_documentacao.0
 teste_edge_cases # teste_edge_cases.0
+literal_indexing # literal_indexing.0
+literal_indexing_additional # literal_indexing_additional.0
 operador_espalhamento # operador_espalhamento.0
 função # função.0
 comentário # comentário.0
@@ -26,6 +28,8 @@ uniteste.descrever({"0" {
   teste_aninhado
   teste_documentacao
   teste_edge_cases
+  literal_indexing
+  literal_indexing_additional
   operador_espalhamento
   função
   comentário
