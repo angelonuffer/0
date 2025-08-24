@@ -7,61 +7,115 @@ compara_listas = args =>
   compara_listas({args[0][1:] args[1][1:]})
 
 uniteste = {
-  descrever: args => () =>
-    (
-      mensagens = lista.mapear({
-        lista.planificar(
-          lista.mapear({
-            args[1]
-            teste => (
-              resultado = teste()
-              resultado[0:resultado[.] - 2]
+  descrever: args => ([retorno, estado]) =>
+    estado.processado ?
+      {null estado} :
+      estado.resultados_calculados ?
+        // Return effects one by one from pre-calculated results
+        estado.indice_efeito >= estado.resultado_final[.] ?
+          {null {processado: 1}} :
+          {
+            estado.resultado_final[estado.indice_efeito]
+            {
+              resultados_calculados: 1
+              resultado_final: estado.resultado_final
+              indice_efeito: estado.indice_efeito + 1
+            }
+          } :
+        (
+          // Calculate all results first (maintaining compatibility with existing tests)
+          mensagens = lista.mapear({
+            lista.planificar(
+              lista.mapear({
+                args[1]
+                teste => (
+                  resultado = teste()
+                  resultado[0:resultado[.] - 2]
+                )
+              })
             )
+            mensagem => {1 `${args[0]} | ${mensagem[1]}`}
           })
+          passaram = lista.reduzir({
+            lista.mapear({args[1] teste => (
+              resultado = teste()
+              resultado[resultado[.] - 1][2]
+            )})
+            pair => pair[0] + pair[1]
+          })
+          resultado_final = {
+            ...mensagens
+            {1 `${"" + passaram}/${"" + mensagens[.]} testes passaram.`}
+            {
+              0
+              passaram == mensagens[.] ? 0 : 1
+              passaram
+            }
+          }
+          // Return first effect and set up state for subsequent calls
+          {
+            resultado_final[0]
+            {
+              resultados_calculados: 1
+              resultado_final: resultado_final
+              indice_efeito: 1
+            }
+          }
         )
-        mensagem => {1 `${args[0]} | ${mensagem[1]}`}
-      })
-      passaram = lista.reduzir({
-        lista.mapear({args[1] teste => (
-          resultado = teste()
-          resultado[resultado[.] - 1][2]
-        )})
-        pair => pair[0] + pair[1]
-      })
-      {
-        ...mensagens
-        {1 `${"" + passaram}/${"" + mensagens[.]} testes passaram.`}
-        {
-          0
-          passaram == mensagens[.] ? 0 : 1
-          passaram
-        }
-      }
-    )
-  iguais: args => () =>
-    args[0] == args[1] ?
-      {
-        {1 "ok"}
-        {1 "1/1 testes passaram."}
-        {0 0 1}
-      } :
-      {
-        {1 `Esperava que ${"" + args[0]} fosse igual a ${"" + args[1]}.`}
-        {1 "0/1 testes passaram."}
-        {0 1 0}
-      }
-  listas_iguais: args => () =>
-    compara_listas({args[0] args[1]}) ?
-      {
-        {1 "ok"}
-        {1 "1/1 testes passaram."}
-        {0 0 1}
-      } :
-      {
-        {1 `Esperava que {${lista.juntar({args[0] ", "})}} fosse igual a {${lista.juntar({args[1] ", "})}}.`}
-        {1 "0/1 testes passaram."}
-        {0 1 0}
-      }
+  iguais: args => ([retorno, estado]) =>
+    estado.processado ?
+      {null estado} :
+      (
+        resultado = args[0] == args[1] ?
+          {
+            {1 "ok"}
+            {1 "1/1 testes passaram."}
+            {0 0 1}
+          } :
+          {
+            {1 `Esperava que ${"" + args[0]} fosse igual a ${"" + args[1]}.`}
+            {1 "0/1 testes passaram."}
+            {0 1 0}
+          }
+        estado.indice_efeito ?
+          estado.indice_efeito >= resultado[.] ?
+            {null {processado: 1}} :
+            {
+              resultado[estado.indice_efeito]
+              {indice_efeito: estado.indice_efeito + 1}
+            } :
+          {
+            resultado[0]
+            {indice_efeito: 1}
+          }
+      )
+  listas_iguais: args => ([retorno, estado]) =>
+    estado.processado ?
+      {null estado} :
+      (
+        resultado = compara_listas({args[0] args[1]}) ?
+          {
+            {1 "ok"}
+            {1 "1/1 testes passaram."}
+            {0 0 1}
+          } :
+          {
+            {1 `Esperava que {${lista.juntar({args[0] ", "})}} fosse igual a {${lista.juntar({args[1] ", "})}}.`}
+            {1 "0/1 testes passaram."}
+            {0 1 0}
+          }
+        estado.indice_efeito ?
+          estado.indice_efeito >= resultado[.] ?
+            {null {processado: 1}} :
+            {
+              resultado[estado.indice_efeito]
+              {indice_efeito: estado.indice_efeito + 1}
+            } :
+          {
+            resultado[0]
+            {indice_efeito: 1}
+          }
+      )
 }
 
 uniteste
