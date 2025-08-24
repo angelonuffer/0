@@ -22,14 +22,6 @@ compara_listas = args =>
   args[0][0] != args[1][0] ? 0 :
   compara_listas({args[0][1:] args[1][1:]})
 
-compara_objetos = args =>
-  args[0][*][.] != args[1][*][.] ? 0 :
-  args[0][*][.] == 0 ? 1 :
-  lista_reduzir({
-    lista.mapear({args[0][*] chave => args[0][chave] == args[1][chave] ? 1 : 0})
-    args => args[0] & args[1]
-  })
-
 uniteste = {
   descrever: args => () =>
     (
@@ -83,18 +75,6 @@ uniteste = {
       } :
       {
         {1 `Esperava que {${lista.juntar({args[0] ", "})}} fosse igual a {${lista.juntar({args[1] ", "})}}.`}
-        {1 "0/1 testes passaram."}
-        {0 1 0}
-      }
-  objetos_iguais: args => () =>
-    compara_listas({args[0] args[1]}) ?
-      {
-        {1 "ok"}
-        {1 "1/1 testes passaram."}
-        {0 0 1}
-      } :
-      {
-        {1 `Esperava que os objetos fossem iguais.`}
         {1 "0/1 testes passaram."}
         {0 1 0}
       }
