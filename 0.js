@@ -1117,7 +1117,7 @@ const etapas = {
     const resultado = módulo_principal_fn(contexto);
     
     // If no effect is returned, we're done
-    if (!resultado || !resultado.efeito) {
+    if (!resultado || !resultado.hasOwnProperty('efeito')) {
       return [null, { ...estado, etapa: "finalizado" }];
     }
     
