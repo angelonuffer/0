@@ -1,6 +1,7 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever({"Referências aninhadas em lista" {
+uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
+  // Caso básico do enunciado
   uniteste.iguais({
     (
       exemplo = {
@@ -14,6 +15,7 @@ uniteste.descrever({"Referências aninhadas em lista" {
     5
   })
   
+  // Múltiplos níveis de aninhamento
   uniteste.iguais({
     (
       exemplo_complexo = {
@@ -30,6 +32,7 @@ uniteste.descrever({"Referências aninhadas em lista" {
     15
   })
   
+  // Múltiplas referências no mesmo nível
   uniteste.iguais({
     (
       exemplo_múltiplas_refs = {
@@ -46,5 +49,60 @@ uniteste.descrever({"Referências aninhadas em lista" {
       exemplo_múltiplas_refs.c.nested.resultado
     )
     5
+  })
+  
+  // Referências cruzadas entre níveis
+  uniteste.iguais({
+    (
+      exemplo_cruzado = {
+        base: 10
+        nivel1: {
+          valor1: base + 5
+          nivel2: {
+            valor2: base * 2
+            valor3: valor1 + valor2
+          }
+        }
+      }
+      exemplo_cruzado.nivel1.nivel2.valor3
+    )
+    35
+  })
+  
+  // Referência a propriedade que também referencia outra
+  uniteste.iguais({
+    (
+      exemplo_cadeia = {
+        a: 1
+        b: a + 1
+        c: {
+          d: b + 1
+          e: {
+            f: d + 1
+          }
+        }
+      }
+      exemplo_cadeia.c.e.f
+    )
+    4
+  })
+  
+  // Teste com operações mais complexas
+  uniteste.iguais({
+    (
+      exemplo_operações = {
+        x: 3
+        y: 4
+        geometria: {
+          quadrado_x: x * x
+          quadrado_y: y * y
+          hipotenusa: {
+            quadrado_total: quadrado_x + quadrado_y
+          }
+        }
+      }
+      exemplo_operações.geometria.hipotenusa.quadrado_total
+    )
+    25
   })
 }})
