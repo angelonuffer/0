@@ -123,6 +123,13 @@ Divide o primeiro número pelo segundo.
 4
 ```
 
+Quando aplicado a textos, divide o texto usando o segundo operando como separador:
+```
+"a b c" / " "
+---
+{"a" "b" "c"}
+```
+
 ### Números negativos
 Números negativos são escritos com o sinal `-` diretamente antes do número.
 
@@ -282,6 +289,32 @@ Exemplo:
 }[0]
 ---
 17
+```
+
+### Dividindo o texto
+Use o operador `/` para dividir um texto em partes usando um separador.
+
+Exemplos:
+```
+"a b c" / " "
+---
+{"a" "b" "c"}
+```
+
+```
+"apple,banana,cherry" / ","
+---
+{"apple" "banana" "cherry"}
+```
+
+```
+{
+  frase: "João Silva Santos"
+  nomes: frase / " "
+  nomes[0] // Primeiro nome
+}[0]
+---
+"João"
 ```
 
 ## Conversão entre caractere e número

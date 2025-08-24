@@ -684,7 +684,14 @@ const termo3 = operação(
   termo2,
   alternativa(
     operador("*", (v1, v2) => v1 * v2),
-    operador("/", (v1, v2) => v1 / v2),
+    operador("/", (v1, v2) => {
+      // If both operands are strings, perform string split
+      if (typeof v1 === "string" && typeof v2 === "string") {
+        return v1.split(v2);
+      }
+      // Otherwise, perform numeric division
+      return v1 / v2;
+    }),
   ),
 );
 

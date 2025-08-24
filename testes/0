@@ -4,6 +4,10 @@ operadores_lógicos # operadores_lógicos.0
 comparadores # comparadores.0
 constantes # constantes.0
 texto # texto.0
+documentation_examples # documentation_examples.0
+edge_cases_division # edge_cases_division.0
+string_division_comprehensive # string_division_comprehensive.0
+test_string_division # test_string_division.0
 lista # lista.0
 lista_com_chaves # lista_com_chaves.0
 referência_lista # referência_lista.0
@@ -22,6 +26,10 @@ uniteste.descrever({"0" {
   comparadores
   constantes
   texto
+  documentation_examples
+  edge_cases_division
+  string_division_comprehensive
+  test_string_division
   lista
   lista_com_chaves
   referência_lista
