@@ -623,7 +623,7 @@ const atributo = transformar(
 const params_lista_com_parenteses = sequência(
   símbolo("("),
   opcional(espaço),
-  opcional(nome),
+  nome,
   opcional(espaço),
   símbolo(")")
 );

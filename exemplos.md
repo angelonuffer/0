@@ -636,17 +636,17 @@ Na linguagem 0, é possível armazenar funções dentro de listas e chamá-las d
 
 ```
 iniciais = {
-  () => "Bulbasaur"
-  () => "Charmander"
-  () => "Squirtle"
+  _ => "Bulbasaur"
+  _ => "Charmander"
+  _ => "Squirtle"
 }
 
-iniciais[1]()
+iniciais[1](0)
 ---
 "Charmander"
 ```
 
-Neste exemplo, a lista `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar `()`, executamos essa função e obtemos o resultado.
+Neste exemplo, a lista `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar `(0)`, executamos essa função com um parâmetro qualquer (que é ignorado) e obtemos o resultado.
 
 ## Comentários
 
