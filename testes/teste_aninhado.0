@@ -3,22 +3,22 @@ uniteste # ../uniteste.0
 uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
   // Caso básico do enunciado
   uniteste.iguais({
-    (
-      exemplo = {
+    {
+      exemplo: {
         a: 2
         b: {
           c: a + 3
         }
       }
       exemplo.b.c
-    )
+    }[0]
     5
   })
   
   // Múltiplos níveis de aninhamento
   uniteste.iguais({
-    (
-      exemplo_complexo = {
+    {
+      exemplo_complexo: {
         x: 5
         y: {
           z: x * 2
@@ -28,14 +28,14 @@ uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
         }
       }
       exemplo_complexo.y.w.v
-    )
+    }[0]
     15
   })
   
   // Múltiplas referências no mesmo nível
   uniteste.iguais({
-    (
-      exemplo_múltiplas_refs = {
+    {
+      exemplo_múltiplas_refs: {
         a: 1
         b: 2
         c: {
@@ -47,14 +47,14 @@ uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
         }
       }
       exemplo_múltiplas_refs.c.nested.resultado
-    )
+    }[0]
     5
   })
   
   // Referências cruzadas entre níveis
   uniteste.iguais({
-    (
-      exemplo_cruzado = {
+    {
+      exemplo_cruzado: {
         base: 10
         nivel1: {
           valor1: base + 5
@@ -65,14 +65,14 @@ uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
         }
       }
       exemplo_cruzado.nivel1.nivel2.valor3
-    )
+    }[0]
     35
   })
   
   // Referência a propriedade que também referencia outra
   uniteste.iguais({
-    (
-      exemplo_cadeia = {
+    {
+      exemplo_cadeia: {
         a: 1
         b: a + 1
         c: {
@@ -83,14 +83,14 @@ uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
         }
       }
       exemplo_cadeia.c.e.f
-    )
+    }[0]
     4
   })
   
   // Teste com operações mais complexas
   uniteste.iguais({
-    (
-      exemplo_operações = {
+    {
+      exemplo_operações: {
         x: 3
         y: 4
         geometria: {
@@ -102,7 +102,7 @@ uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
         }
       }
       exemplo_operações.geometria.hipotenusa.quadrado_total
-    )
+    }[0]
     25
   })
 }})

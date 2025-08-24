@@ -635,11 +635,11 @@ Esta função calcula a área de um retângulo, recebendo uma lista com largura 
 Esta função calcula a área de um triângulo com base na base e na altura fornecidas em uma lista.
 
 ```
-área_triangulo = args => (
-  divisor = 2
-  área = (args[0] * args[1]) / divisor
+área_triangulo = args => {
+  divisor: 2
+  área: (args[0] * args[1]) / divisor
   área
-)
+}[0]
 
 área_triangulo({10, 8})
 ---
