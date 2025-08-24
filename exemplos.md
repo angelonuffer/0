@@ -115,6 +115,13 @@ Multiplica dois números.
 12
 ```
 
+Quando aplicado a uma lista e um texto, junta os elementos da lista usando o texto como separador:
+```
+{"a" "b" "c"} * " "
+---
+"a b c"
+```
+
 #### Divisão (/)
 Divide o primeiro número pelo segundo.
 ```

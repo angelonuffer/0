@@ -683,7 +683,32 @@ const termo2 = alternativa(
 const termo3 = operação(
   termo2,
   alternativa(
-    operador("*", (v1, v2) => v1 * v2),
+    operador("*", (v1, v2) => {
+      // If one operand is a list and the other is a string, perform join
+      if (Array.isArray(v1) && typeof v2 === "string") {
+        return v1.join(v2);
+      }
+      if (typeof v1 === "string" && Array.isArray(v2)) {
+        return v2.join(v1);
+      }
+      // Check for list objects (with length property and numeric indices)
+      if (typeof v1 === "object" && v1 !== null && typeof v1.length === "number" && typeof v2 === "string") {
+        const arr = [];
+        for (let i = 0; i < v1.length; i++) {
+          arr.push(v1[i]);
+        }
+        return arr.join(v2);
+      }
+      if (typeof v1 === "string" && typeof v2 === "object" && v2 !== null && typeof v2.length === "number") {
+        const arr = [];
+        for (let i = 0; i < v2.length; i++) {
+          arr.push(v2[i]);
+        }
+        return arr.join(v1);
+      }
+      // Otherwise, perform numeric multiplication
+      return v1 * v2;
+    }),
     operador("/", (v1, v2) => {
       // If both operands are strings, perform string split
       if (typeof v1 === "string" && typeof v2 === "string") {
