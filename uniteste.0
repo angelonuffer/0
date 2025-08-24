@@ -1,21 +1,5 @@
 lista # lista.0
 
-lista_reduzir = args =>
-  args[0][.] == 1 ?
-    args[0][0] :
-  args[0][.] == 2 ?
-    args[1]({args[0][0] args[0][1]}) :
-  lista_reduzir({
-    {args[1]({args[0][0] args[0][1]})
-    ...args[0][2:]}
-    args[1]
-  })
-
-lista_planificar = lista_original =>
-  lista_original[.] == 0 ?
-    {} :
-  {...lista_original[0] ...lista_planificar(lista_original[1:])}
-
 compara_listas = args =>
   args[0][.] != args[1][.] ? 0 :
   args[0][.] == 0 ? 1 :
@@ -26,7 +10,7 @@ uniteste = {
   descrever: args => () =>
     (
       mensagens = lista.mapear({
-        lista_planificar(
+        lista.planificar(
           lista.mapear({
             args[1]
             teste => (
@@ -37,7 +21,7 @@ uniteste = {
         )
         mensagem => {1 `${args[0]} | ${mensagem[1]}`}
       })
-      passaram = lista_reduzir({
+      passaram = lista.reduzir({
         lista.mapear({args[1] teste => (
           resultado = teste()
           resultado[resultado[.] - 1][2]
