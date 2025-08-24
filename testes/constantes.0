@@ -1,12 +1,12 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever({"Constantes" {
+uniteste.descrever({"Constantes (usando propriedades de lista)" {
   uniteste.iguais({
     {
       a: 5
       b: 8
-      a + b
-    }[0]
+      resultado: a + b
+    }.resultado
     13
   })
   uniteste.iguais({
@@ -16,8 +16,8 @@ uniteste.descrever({"Constantes" {
         x: 42
         função1(0)
       }[0]
-      função2(0)
-    }[0]
+      resultado: função2(0)
+    }.resultado
     0
   })
 }})

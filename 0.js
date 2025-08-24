@@ -844,23 +844,7 @@ const debug_command = transformar(
   }
 );
 
-const const_declaration_seq = sequência(
-  nome,
-  opcional(espaço),
-  símbolo("="),
-  opcional(espaço),
-  { analisar: código => expressão.analisar(código) }
-);
 
-const declarações_constantes = vários(
-  sequência(
-    alternativa(
-      const_declaration_seq,
-      debug_command
-    ),
-    espaço
-  )
-);
 
 const _0 = opcional(
   transformar(
@@ -880,37 +864,15 @@ const _0 = opcional(
       ), []),
 
       opcional(espaço),
-      opcional(declarações_constantes, []),
-      opcional(espaço),
       expressão,
       opcional(espaço),
     ),
     valorSeq => {
-      const [, importaçõesDetectadas_val, , atribuições_val, , valor_fn_expr] = valorSeq;
+      const [, importaçõesDetectadas_val, , valor_fn_expr] = valorSeq;
       const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
       const corpo = outer_scope_param => {
         const blockScope = { __parent__: outer_scope_param || null };
-
-        for (const atrib_ou_debug_item of atribuições_val) {
-          const actual_item = atrib_ou_debug_item[0];
-          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-            const [nome_val] = actual_item;
-            blockScope[nome_val] = undefined;
-          }
-        }
-
-        for (const atrib_ou_debug_item of atribuições_val) {
-          const actual_item = atrib_ou_debug_item[0];
-          if (Array.isArray(actual_item) && actual_item.length === 5 && actual_item[2] === '=') {
-            const [nome_val, , , , valorAtribuição_fn] = actual_item;
-            blockScope[nome_val] = valorAtribuição_fn(blockScope);
-          } else {
-            const debug_fn = actual_item;
-            debug_fn(blockScope);
-          }
-        }
-
         return valor_fn_expr(blockScope);
       };
 
