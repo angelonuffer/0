@@ -5,32 +5,44 @@ uniteste.descrever({"Função" {
     (
       quadrado = x => x * x
       quadrado(5)
-    ) 25})
+    )
+    25
+  })
   uniteste.iguais({
     (
       soma = args => args[0] + args[1]
       soma({3 7})
-    ) 10})
+    )
+    10
+  })
   uniteste.iguais({
     (
       dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
       dentro_intervalo({5 1 10})
-    ) 1})
+    )
+    1
+  })
   uniteste.iguais({
     (
       dentro_intervalo = args => args[0] >= args[1] & args[0] <= args[2]
       dentro_intervalo({15 1 10})
-    ) 0})
+    )
+    0
+  })
   uniteste.iguais({
     (
       nome_completo = args => `${args[0]} de ${args[1]}`
       nome_completo({"Geralt" "The Witcher"})
-    ) "Geralt de The Witcher"})
+    )
+    "Geralt de The Witcher"
+  })
   uniteste.iguais({
     (
       área_retângulo = args => args[0] * args[1]
       área_retângulo({5 10})
-    ) 50})
+    )
+    50
+  })
   uniteste.iguais({
     (
       área_triângulo = args => (
@@ -39,17 +51,23 @@ uniteste.descrever({"Função" {
         área
       )
       área_triângulo({10 8})
-    ) 40})
+    )
+    40
+  })
   uniteste.iguais({
     (
       maior = args => args[0] > args[1] ? args[0] : args[1]
       maior({8 3})
-    ) 8})
+    )
+    8
+  })
   uniteste.iguais({
     (
       maior = args => args[0] > args[1] ? args[0] : args[1]
       maior({2 9})
-    ) 9})
+    )
+    9
+  })
   uniteste.iguais({
     (
       iniciais = {
@@ -58,5 +76,7 @@ uniteste.descrever({"Função" {
         () => "Squirtle"
       }
       iniciais[1]()
-    ) "Charmander"})
+    )
+    "Charmander"
+  })
 }})

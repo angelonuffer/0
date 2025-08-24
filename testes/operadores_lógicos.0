@@ -2,19 +2,49 @@ uniteste # ../uniteste.0
 
 uniteste.descrever({"Operadores lógicos" {
   uniteste.descrever({"E" {
-    uniteste.iguais({(0 & 0) 0})
-    uniteste.iguais({(0 & 1) 0})
-    uniteste.iguais({(1 & 0) 0})
-    uniteste.iguais({(1 & 2) 2})
+    uniteste.iguais({
+      0 & 0
+      0
+    })
+    uniteste.iguais({
+      0 & 1
+      0
+    })
+    uniteste.iguais({
+      1 & 0
+      0
+    })
+    uniteste.iguais({
+      1 & 2
+      2
+    })
   }})
   uniteste.descrever({"Ou" {
-    uniteste.iguais({(0 | 0) 0})
-    uniteste.iguais({(0 | 1) 1})
-    uniteste.iguais({(1 | 0) 1})
-    uniteste.iguais({(1 | 2) 1})
+    uniteste.iguais({
+      0 | 0
+      0
+    })
+    uniteste.iguais({
+      0 | 1
+      1
+    })
+    uniteste.iguais({
+      1 | 0
+      1
+    })
+    uniteste.iguais({
+      1 | 2
+      1
+    })
   }})
   uniteste.descrever({"Não" {
-    uniteste.iguais({(! 0) 1})
-    uniteste.iguais({(! 1) 0})
+    uniteste.iguais({
+      ! 0
+      1
+    })
+    uniteste.iguais({
+      ! 1
+      0
+    })
   }})
 }})
