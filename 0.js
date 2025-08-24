@@ -535,8 +535,6 @@ const lista = transformar(
   }
 );
 
-
-
 const atributo = transformar(
   sequência(
     símbolo("."),
