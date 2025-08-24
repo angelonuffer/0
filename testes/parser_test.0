@@ -1,0 +1,15 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Parser tests" {
+  uniteste.iguais({
+    (2 + 3) * 4
+    20
+  })
+  uniteste.iguais({
+    {
+      a: 2
+      result: a + 3
+    }.result
+    5
+  })
+}})
