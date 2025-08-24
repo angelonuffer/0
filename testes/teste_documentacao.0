@@ -3,8 +3,8 @@ uniteste # ../uniteste.0
 uniteste.descrever({"Exemplos da documentação" {
   // Primeiro exemplo da documentação
   uniteste.iguais({
-    (
-      configuracao = {
+    {
+      configuracao: {
         base: 10
         processamento: {
           etapa1: base * 2
@@ -14,14 +14,14 @@ uniteste.descrever({"Exemplos da documentação" {
         }
       }
       configuracao.processamento.etapa2.resultado
-    )
+    }[0]
     30
   })
   
   // Segundo exemplo da documentação
   uniteste.iguais({
-    (
-      geometria = {
+    {
+      geometria: {
         x: 3
         y: 4
         calculos: {
@@ -33,7 +33,7 @@ uniteste.descrever({"Exemplos da documentação" {
         }
       }
       geometria.calculos.hipotenusa.soma_quadrados
-    )
+    }[0]
     25
   })
 }})

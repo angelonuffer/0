@@ -1,8 +1,8 @@
 uniteste # ../uniteste.0
 
 uniteste.descrever({"Lista com chaves" {
-  uniteste.iguais({(
-    lista_com_chaves = {
+  uniteste.iguais({{
+    lista_com_chaves: {
       nome: "João"
       "valor_sem_chave"
       idade: 30
@@ -10,10 +10,10 @@ uniteste.descrever({"Lista com chaves" {
     }
     
     lista_com_chaves["nome"]
-  ) "João"})
+  }[0] "João"})
   
-  uniteste.iguais({(
-    lista_com_chaves = {
+  uniteste.iguais({{
+    lista_com_chaves: {
       nome: "João"
       "valor_sem_chave"
       idade: 30
@@ -21,10 +21,10 @@ uniteste.descrever({"Lista com chaves" {
     }
     
     lista_com_chaves[0]
-  ) "valor_sem_chave"})
+  }[0] "valor_sem_chave"})
   
-  uniteste.iguais({(
-    lista_com_chaves = {
+  uniteste.iguais({{
+    lista_com_chaves: {
       nome: "João"
       "valor_sem_chave"
       idade: 30
@@ -32,10 +32,10 @@ uniteste.descrever({"Lista com chaves" {
     }
     
     lista_com_chaves["idade"]
-  ) 30})
+  }[0] 30})
   
-  uniteste.listas_iguais({(
-    lista_com_chaves = {
+  uniteste.listas_iguais({{
+    lista_com_chaves: {
       nome: "João"
       "primeiro_valor"
       idade: 30
@@ -43,11 +43,11 @@ uniteste.descrever({"Lista com chaves" {
     }
     
     lista_com_chaves[0:2]
-  ) {"primeiro_valor" "segundo_valor"}})
+  }[0] {"primeiro_valor" "segundo_valor"}})
 
   uniteste.descrever({"Notação de ponto" {
-    uniteste.iguais({(
-      lista_com_chaves = {
+    uniteste.iguais({{
+      lista_com_chaves: {
         nome: "João"
         "valor_sem_chave"
         idade: 30
@@ -55,10 +55,10 @@ uniteste.descrever({"Lista com chaves" {
       }
       
       lista_com_chaves.nome
-    ) "João"})
+    }[0] "João"})
     
-    uniteste.iguais({(
-      lista_com_chaves = {
+    uniteste.iguais({{
+      lista_com_chaves: {
         nome: "João"
         "valor_sem_chave"
         idade: 30
@@ -66,18 +66,18 @@ uniteste.descrever({"Lista com chaves" {
       }
       
       lista_com_chaves.idade
-    ) 30})
+    }[0] 30})
   }})
   uniteste.descrever({"Propriedade calculada" {
-    uniteste.iguais({(
-      chave = "nome"
+    uniteste.iguais({{
+      chave: "nome"
       
-      lista_com_chaves = {
+      lista_com_chaves: {
         [chave]: "João"
         "valor_sem_chave"
       }
       
       lista_com_chaves["nome"]
-    ) "João"})
+    }[0] "João"})
   }})
 }})
