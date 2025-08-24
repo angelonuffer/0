@@ -994,12 +994,34 @@ const etapas = {
           { ...estado, etapa: "error_saia" }
         ];
       }
-      const posição_erro = estado.conteúdos[endereço].length - (módulo_bruto.menor_resto?.length ?? 0)
+      // Find the position of the syntax error
+      // The menor_resto contains the part that couldn't be parsed
+      // We want to find the first unexpected character within menor_resto
+      const posição_base = estado.conteúdos[endereço].length - (módulo_bruto.menor_resto?.length ?? 0)
+      
+      // Look for the first character in menor_resto that's not whitespace or a valid operator continuation
+      let offset_no_menor_resto = 0;
+      const menor_resto = módulo_bruto.menor_resto || "";
+      
+      // Skip operators and whitespace to find the actual problematic character
+      while (offset_no_menor_resto < menor_resto.length) {
+        const char = menor_resto[offset_no_menor_resto];
+        // Skip whitespace, +, -, *, /, =, etc. to find the real unexpected character
+        if (char.match(/[\s+\-*/=<>!&|]/)) {
+          offset_no_menor_resto++;
+        } else {
+          break;
+        }
+      }
+      
+      const posição_erro = posição_base + offset_no_menor_resto;
+      
       const linhas = estado.conteúdos[endereço].split('\n')
       const linhas_antes = estado.conteúdos[endereço].substring(0, posição_erro).split('\n');
       const número_linha = linhas_antes.length
       const número_coluna = linhas_antes.at(-1).length + 1
       const linha = linhas[número_linha - 1]
+      
       const linha_com_erro = (linha?.substring(0, número_coluna - 1) ?? "") +
         `\x1b[41m${linha?.[número_coluna - 1] ?? ""}\x1b[0m` +
         (linha?.substring(número_coluna) ?? "")
