@@ -1,0 +1,16 @@
+// Simple test - basic arithmetic precedence should work
+result1 = (2 + 3) * 4
+
+// Test that should equal 20
+check1 = result1 == 20 ? "PASS: Arithmetic precedence" : "FAIL: Arithmetic precedence"
+
+// Test conversion from old syntax to new syntax
+// Old: ( a = 2 a + 3 ) should become assignment to object then property access
+(
+  test_obj = {
+    a: 2
+    result: a + 3
+  }
+  result2 = test_obj.result
+  42  // module export
+)
