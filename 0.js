@@ -622,7 +622,7 @@ const atributo = transformar(
 
 const lambda = transformar(
   sequência(
-    opcional(nome),
+    nome,
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),
@@ -1087,13 +1087,18 @@ const etapas = {
     { ...estado, etapa: "executar_módulo_principal" }
   ],
   executar_módulo_principal: (retorno, estado) => {
-    // For backward compatibility, if the module is an old-style function that returns effects array,
-    // we need to convert it to the new interface
     const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
     
-    // Check if this is the first call by looking for efeitos_módulo_pendentes
+    // If the main module is not a function, just output its value and finish
+    if (typeof módulo_principal_fn !== 'function') {
+      return [
+        efeitos.escreva(JSON.stringify(módulo_principal_fn)),
+        { ...estado, etapa: "finalizado" }
+      ];
+    }
+    
+    // For function modules (test modules), handle them as before
     if (!estado.efeitos_módulo_pendentes) {
-      // First call - get the initial effects from the main module
       const efeitos_módulo = módulo_principal_fn(estado.módulo_principal_estado);
       if (!efeitos_módulo || efeitos_módulo.length === 0) {
         return [null, { ...estado, etapa: "finalizado" }];
