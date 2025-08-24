@@ -1109,48 +1109,25 @@ const etapas = {
     { ...estado, etapa: "executar_módulo_principal" }
   ],
   executar_módulo_principal: (retorno, estado) => {
-    // For backward compatibility, if the module is an old-style function that returns effects array,
-    // we need to convert it to the new interface
     const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
     
-    // Check if this is the first call by looking for efeitos_módulo_pendentes
-    if (!estado.efeitos_módulo_pendentes) {
-      // First call - get the initial effects from the main module
-      const efeitos_módulo = módulo_principal_fn(estado.módulo_principal_estado);
-      if (!efeitos_módulo || efeitos_módulo.length === 0) {
-        return [null, { ...estado, etapa: "finalizado" }];
-      }
-      return [
-        null,
-        {
-          ...estado,
-          efeitos_módulo_pendentes: efeitos_módulo,
-          etapa: "processar_efeito_principal"
-        }
-      ];
-    }
+    // Call the main module with context [retorno, estado.módulo_principal_estado]
+    // expecting it to return { efeito, estado }
+    const contexto = [retorno, estado.módulo_principal_estado];
+    const resultado = módulo_principal_fn(contexto);
     
-    // Continue processing if we have pending effects
-    return [
-      null,
-      { ...estado, etapa: "processar_efeito_principal" }
-    ];
-  },
-  processar_efeito_principal: (retorno, estado) => {
-    if (!estado.efeitos_módulo_pendentes || estado.efeitos_módulo_pendentes.length === 0) {
+    // If no effect is returned, we're done
+    if (!resultado || !resultado.efeito) {
       return [null, { ...estado, etapa: "finalizado" }];
     }
     
-    const [efeito, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
-    const [tipo] = efeito;
-    
-    // Execute the effect and update state
+    // Update the main module state and return the single effect
     return [
-      efeito,
+      resultado.efeito,
       {
         ...estado,
-        efeitos_módulo_pendentes: resto_efeitos,
-        etapa: "processar_efeito_principal"
+        módulo_principal_estado: resultado.estado,
+        etapa: "executar_módulo_principal"
       }
     ];
   },

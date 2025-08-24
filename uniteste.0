@@ -8,60 +8,151 @@ lista # lista.0
     compara_listas({args[0][1:] args[1][1:]})
 
   uniteste: {
-    descrever: args => _ =>
-      {
-        mensagens: lista.mapear({
-          lista.planificar(
-            lista.mapear({
-              args[1]
-              teste => {
-                resultado: teste(0)
-                resultado[0:resultado[.] - 2]
-              }[0]
-            })
-          )
-          mensagem => {1 `${args[0]} | ${mensagem[1]}`}
-        })
-        passaram: lista.reduzir({
-          lista.mapear({args[1] teste => {
-            resultado: teste(0)
-            resultado[resultado[.] - 1][2]
-          }[0]})
-          pair => pair[0] + pair[1]
-        })
+    descrever: args => contexto => {
+      mensagens: lista.mapear({
+        lista.planificar(
+          lista.mapear({
+            args[1]
+            teste => {
+              resultado: teste(contexto)
+              resultado[0:resultado[.] - 2]
+            }[0]
+          })
+        )
+        mensagem => {1 `${args[0]} | ${mensagem[1]}`}
+      })
+      passaram: lista.reduzir({
+        lista.mapear({args[1] teste => {
+          resultado: teste(contexto)
+          resultado[resultado[.] - 1][2]
+        }[0]})
+        pair => pair[0] + pair[1]
+      })
+      
+      // Get current index from context state, default to 0
+      estado_contexto: contexto[1] == null ? {} : contexto[1]
+      indice_atual: estado_contexto.indice_efeito == null ? 0 : estado_contexto.indice_efeito
+      
+      // All effects to process
+      todos_efeitos: {
+        ...mensagens
+        {1 `${"" + passaram}/${"" + mensagens[.]} testes passaram.`}
+      }
+      
+      // Check if we're done
+      indice_atual >= todos_efeitos[.] ?
         {
-          ...mensagens
-          {1 `${"" + passaram}/${"" + mensagens[.]} testes passaram.`}
-          {
-            0
-            passaram == mensagens[.] ? 0 : 1
-            passaram
+          efeito: null
+          estado: {
+            ...estado_contexto
+            resultado_final: {
+              0
+              passaram == mensagens[.] ? 0 : 1
+              passaram
+            }
+          }
+        } :
+        {
+          efeito: todos_efeitos[indice_atual]
+          estado: {
+            ...estado_contexto
+            indice_efeito: indice_atual + 1
           }
         }
-      }[0]
-    iguais: args => _ =>
+    }[0]
+    iguais: args => contexto => {
+      estado_contexto: contexto[1] == null ? {} : contexto[1]
+      indice_atual: estado_contexto.indice_efeito == null ? 0 : estado_contexto.indice_efeito
       args[0] == args[1] ?
-        {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
-        } :
-        {
-          {1 `Esperava que ${"" + args[0]} fosse igual a ${"" + args[1]}.`}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
-        }
-    listas_iguais: args => _ =>
+        indice_atual == 0 ?
+          {
+            efeito: {1 "ok"}
+            estado: {
+              ...estado_contexto
+              indice_efeito: 1
+            }
+          } :
+          indice_atual == 1 ?
+            {
+              efeito: {1 "1/1 testes passaram."}
+              estado: {
+                ...estado_contexto
+                indice_efeito: 2
+                resultado_final: {0 0 1}
+              }
+            } :
+            {
+              efeito: null
+              estado: estado_contexto
+            } :
+        indice_atual == 0 ?
+          {
+            efeito: {1 `Esperava que ${"" + args[0]} fosse igual a ${"" + args[1]}.`}
+            estado: {
+              ...estado_contexto
+              indice_efeito: 1
+            }
+          } :
+          indice_atual == 1 ?
+            {
+              efeito: {1 "0/1 testes passaram."}
+              estado: {
+                ...estado_contexto
+                indice_efeito: 2
+                resultado_final: {0 1 0}
+              }
+            } :
+            {
+              efeito: null
+              estado: estado_contexto
+            }
+    }[0]
+    listas_iguais: args => contexto => {
+      estado_contexto: contexto[1] == null ? {} : contexto[1]
+      indice_atual: estado_contexto.indice_efeito == null ? 0 : estado_contexto.indice_efeito
       compara_listas({args[0] args[1]}) ?
-        {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
-        } :
-        {
-          {1 `Esperava que {${lista.juntar({args[0] ", "})}} fosse igual a {${lista.juntar({args[1] ", "})}}.`}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
-        }
+        indice_atual == 0 ?
+          {
+            efeito: {1 "ok"}
+            estado: {
+              ...estado_contexto
+              indice_efeito: 1
+            }
+          } :
+          indice_atual == 1 ?
+            {
+              efeito: {1 "1/1 testes passaram."}
+              estado: {
+                ...estado_contexto
+                indice_efeito: 2
+                resultado_final: {0 0 1}
+              }
+            } :
+            {
+              efeito: null
+              estado: estado_contexto
+            } :
+        indice_atual == 0 ?
+          {
+            efeito: {1 `Esperava que {${lista.juntar({args[0] ", "})}} fosse igual a {${lista.juntar({args[1] ", "})}}.`}
+            estado: {
+              ...estado_contexto
+              indice_efeito: 1
+            }
+          } :
+          indice_atual == 1 ?
+            {
+              efeito: {1 "0/1 testes passaram."}
+              estado: {
+                ...estado_contexto
+                indice_efeito: 2
+                resultado_final: {0 1 0}
+              }
+            } :
+            {
+              efeito: null
+              estado: estado_contexto
+            }
+    }[0]
   }
 }.uniteste

@@ -26,6 +26,11 @@ while (true) {
   const [efeito, novo_estado] = _0(contexto);
   contexto[1] = novo_estado;
   
+  // Check if we've reached the finalizado state
+  if (novo_estado.etapa === "finalizado") {
+    process.exit(0);
+  }
+  
   if (efeito) {
     const retorno = await processe(...efeito);
     contexto[0] = retorno;
