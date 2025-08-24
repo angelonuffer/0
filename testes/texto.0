@@ -7,19 +7,25 @@ uniteste.descrever({"Texto" {
         frase = "Que a força esteja com você."
 
         frase[0:1]
-      ) "Q"})
+      )
+      "Q"
+    })
     uniteste.iguais({
       (
         frase = "Que a força esteja com você."
 
         frase[0:11]
-      ) "Que a força"})
+      )
+      "Que a força"
+    })
     uniteste.iguais({
       (
         frase = "O destino de Hyrule está em suas mãos."
 
         frase[13:]
-      ) "Hyrule está em suas mãos."})
+      )
+      "Hyrule está em suas mãos."
+    })
   }})
   uniteste.descrever({"Geração" {
     uniteste.iguais({
@@ -27,7 +33,9 @@ uniteste.descrever({"Texto" {
         frase = "O céu é azul."
 
         `${frase[0:7]} o limite.`
-      ) "O céu é o limite."})
+      )
+      "O céu é o limite."
+    })
   }})
   uniteste.descrever({"Tamanho" {
     uniteste.iguais({
@@ -35,7 +43,9 @@ uniteste.descrever({"Texto" {
         frase = "O céu é o limite."
 
         frase[.]
-      ) 17})
+      )
+      17
+    })
   }})
   uniteste.descrever({"Converter para número" {
     uniteste.iguais({
@@ -43,7 +53,9 @@ uniteste.descrever({"Texto" {
         caractere = "A"
 
         caractere[0]
-      ) 65})
+      )
+      65
+    })
   }})
   uniteste.descrever({"Converter de número" {
     uniteste.iguais({
@@ -51,6 +63,8 @@ uniteste.descrever({"Texto" {
         codigo = 65
 
         `${codigo}`
-      ) "A"})
+      )
+      "A"
+    })
   }})
 }})

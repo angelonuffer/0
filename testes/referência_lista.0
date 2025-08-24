@@ -8,7 +8,9 @@ uniteste.descrever({"Referências de propriedades em lista" {
         b: a + 1
       }
       exemplo.a
-    ) 1})
+    )
+    1
+  })
   
   uniteste.iguais({
     (
@@ -17,7 +19,9 @@ uniteste.descrever({"Referências de propriedades em lista" {
         b: a + 1
       }
       exemplo.b
-    ) 2})
+    )
+    2
+  })
   
   uniteste.iguais({
     (
@@ -27,7 +31,9 @@ uniteste.descrever({"Referências de propriedades em lista" {
         nomeCompleto: nome + " " + sobrenome
       }
       pessoa.nomeCompleto
-    ) "João Silva"})
+    )
+    "João Silva"
+  })
   
   uniteste.iguais({
     (
@@ -38,5 +44,7 @@ uniteste.descrever({"Referências de propriedades em lista" {
         somaDobroTriplo: dobro + triplo
       }
       calculos.somaDobroTriplo
-    ) 50})
+    )
+    50
+  })
 }})

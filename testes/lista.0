@@ -6,24 +6,32 @@ uniteste.descrever({"Lista" {
       (
         jogos = {"The Legend of Zelda" "Super Mario Bros." "Minecraft"}
         jogos[0]
-      ) "The Legend of Zelda"})
+      )
+      "The Legend of Zelda"
+    })
     uniteste.listas_iguais({
       (
         séries = {"Stranger Things" "Breaking Bad" "Game of Thrones"}
         séries[0:2]
-      ) {"Stranger Things" "Breaking Bad"}})
+      )
+      {"Stranger Things" "Breaking Bad"}
+    })
     uniteste.listas_iguais({
       (
         filmes = {"Star Wars" "O Senhor dos Anéis" "Matrix"}
         {...filmes[0:2] "Jurassic Park"}
-      ) {"Star Wars" "O Senhor dos Anéis" "Jurassic Park"}})
+      )
+      {"Star Wars" "O Senhor dos Anéis" "Jurassic Park"}
+    })
   }})
   uniteste.descrever({"Tamanho" {
     uniteste.iguais({
       (
         bandas = {"The Beatles" "Queen" "Pink Floyd"}
         bandas[.]
-      ) 3})
+      )
+      3
+    })
   }})
   uniteste.descrever({"Lista de chaves" {
     uniteste.listas_iguais({
@@ -35,11 +43,15 @@ uniteste.descrever({"Lista" {
           "outro_valor_sem_chave"
         }
         lista_com_chaves[*]
-      ) {"nome" "idade"}})
+      )
+      {"nome" "idade"}
+    })
     uniteste.listas_iguais({
       (
         lista_simples = {"item1" "item2" "item3"}
         lista_simples[*]
-      ) {"0" "1" "2"}})
+      )
+      {"0" "1" "2"}
+    })
   }})
 }})
