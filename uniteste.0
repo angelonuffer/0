@@ -7,11 +7,12 @@ compara_listas = args =>
   compara_listas({args[0][1:] args[1][1:]})
 
 uniteste = {
-  descrever: args => ([retorno, estado]) =>
+  descrever: args => contexto => (
+    retorno = contexto[0]
+    estado = contexto[1]
     estado.processado ?
       {null estado} :
       estado.resultados_calculados ?
-        // Return effects one by one from pre-calculated results
         estado.indice_efeito >= estado.resultado_final[.] ?
           {null {processado: 1}} :
           {
@@ -23,7 +24,6 @@ uniteste = {
             }
           } :
         (
-          // Calculate all results first (maintaining compatibility with existing tests)
           mensagens = lista.mapear({
             lista.planificar(
               lista.mapear({
@@ -52,7 +52,6 @@ uniteste = {
               passaram
             }
           }
-          // Return first effect and set up state for subsequent calls
           {
             resultado_final[0]
             {
@@ -62,7 +61,10 @@ uniteste = {
             }
           }
         )
-  iguais: args => ([retorno, estado]) =>
+  )
+  iguais: args => contexto => (
+    retorno = contexto[0]
+    estado = contexto[1]
     estado.processado ?
       {null estado} :
       (
@@ -89,7 +91,10 @@ uniteste = {
             {indice_efeito: 1}
           }
       )
-  listas_iguais: args => ([retorno, estado]) =>
+  )
+  listas_iguais: args => contexto => (
+    retorno = contexto[0]
+    estado = contexto[1]
     estado.processado ?
       {null estado} :
       (
@@ -116,6 +121,7 @@ uniteste = {
             {indice_efeito: 1}
           }
       )
+  )
 }
 
 uniteste

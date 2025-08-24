@@ -1153,6 +1153,11 @@ const etapas = {
 
     const valor = corpo(escopo);
 
+    // Check if this module has automaton style and store it in the state
+    // For now, use content-based detection as a simple approach
+    const módulo_conteúdo = estado.conteúdos[endereço];
+    const is_automaton_style = módulo_conteúdo.includes('__automaton_style = 1');
+
     return [
       null,
       {
@@ -1160,6 +1165,10 @@ const etapas = {
         valores_módulos: {
           ...estado.valores_módulos,
           [endereço]: valor
+        },
+        automaton_modules: {
+          ...estado.automaton_modules,
+          [endereço]: is_automaton_style
         },
         etapa: "executar_módulos"
       }
@@ -1173,10 +1182,13 @@ const etapas = {
     const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
     
     // Check if the module is an automaton (new style) or old style function
-    const is_automaton = estado.valores_módulos["__automaton_style"] || estado.automaton_style;
+    const is_automaton = estado.automaton_modules && estado.automaton_modules[estado.módulo_principal];
+    
     if (typeof módulo_principal_fn === 'function' && is_automaton) {
-      // New automaton style: call with [retorno, estado_módulo_principal]
-      const [efeito, novo_estado_módulo] = módulo_principal_fn([retorno, estado.estado_módulo_principal]);
+      // New automaton style: call with [retorno, estado_módulo_principal] and expect {efeito estado}
+      const result = módulo_principal_fn({}, [retorno, estado.estado_módulo_principal]);
+      const efeito = result[0];
+      const novo_estado_módulo = result[1];
       
       if (efeito === null) {
         return [null, { ...estado, etapa: "finalizado" }];
