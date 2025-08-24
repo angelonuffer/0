@@ -943,9 +943,6 @@ const _0 = opcional(
 );
 
 const efeitos = Object.fromEntries([
-  "atribua_retorno_ao_estado",
-  "atribua_valor_ao_estado",
-  "delete_do_estado",
   "saia",
   "escreva",
   "obtenha_argumentos",
@@ -956,86 +953,110 @@ const efeitos = Object.fromEntries([
 ].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
 
 const etapas = {
-  iniciar: () => [
-    efeitos.atribua_retorno_ao_estado("argumentos", efeitos.obtenha_argumentos()),
-    efeitos.atribua_retorno_ao_estado("cache_existe", efeitos.verifique_existência("0_cache.json")),
-    efeitos.atribua_valor_ao_estado("etapa", "carregar_cache"),
+  iniciar: (retorno, estado) => [
+    efeitos.obtenha_argumentos(),
+    { ...estado, etapa: "obter_argumentos" }
   ],
-  carregar_cache: ({ cache_existe }) => {
-    if (cache_existe) {
+  obter_argumentos: (retorno, estado) => [
+    efeitos.verifique_existência("0_cache.json"),
+    { ...estado, argumentos: retorno, etapa: "verificar_cache" }
+  ],
+  verificar_cache: (retorno, estado) => {
+    if (retorno) {
       return [
-        efeitos.atribua_retorno_ao_estado("conteúdo_cache", efeitos.carregue_localmente("0_cache.json")),
-        efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
-      ]
+        efeitos.carregue_localmente("0_cache.json"),
+        { ...estado, cache_existe: retorno, etapa: "carregar_cache" }
+      ];
     }
     return [
-      efeitos.atribua_valor_ao_estado("conteúdo_cache", "{}"),
-      efeitos.atribua_valor_ao_estado("etapa", "avaliar_cache"),
-    ]
+      null,
+      { ...estado, cache_existe: retorno, conteúdo_cache: "{}", etapa: "avaliar_cache" }
+    ];
   },
-  avaliar_cache: ({ conteúdo_cache, argumentos: [endereço] }) => [
-    efeitos.atribua_valor_ao_estado("módulo_principal", endereço),
-    efeitos.atribua_valor_ao_estado("conteúdos", {
-      "0_cache.json": JSON.parse(conteúdo_cache),
-      [endereço]: null,
-    }),
-    efeitos.atribua_valor_ao_estado("módulos", {
-      [endereço]: null,
-    }),
-    efeitos.atribua_valor_ao_estado("valores_módulos", {}),
-    efeitos.atribua_valor_ao_estado("módulo_principal_estado", {}),
-    efeitos.delete_do_estado("conteúdo_cache"),
-    efeitos.delete_do_estado("argumentos"),
-    efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
+  carregar_cache: (retorno, estado) => [
+    null,
+    { ...estado, conteúdo_cache: retorno, etapa: "avaliar_cache" }
   ],
-  carregar_conteúdos: ({ conteúdos }) => {
-    const [endereço] = Object.entries(conteúdos).find(([endereço, conteúdo]) => conteúdo === null) || []
-    if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "avaliar_módulos")]
-    if (conteúdos["0_cache.json"][endereço]) return [
-      efeitos.atribua_valor_ao_estado("endereço", endereço),
-      efeitos.atribua_valor_ao_estado("conteúdo", conteúdos["0_cache.json"][endereço]),
-      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdo"),
-    ]
+  avaliar_cache: (retorno, estado) => {
+    const [endereço] = estado.argumentos;
     return [
-      efeitos.atribua_valor_ao_estado("endereço", endereço),
-      efeitos.atribua_retorno_ao_estado("conteúdo",
-        endereço.startsWith("https://") ?
-          efeitos.carregue_remotamente(endereço) :
-          efeitos.carregue_localmente(endereço)
-      ),
-      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdo"),
-    ]
+      null,
+      {
+        ...estado,
+        módulo_principal: endereço,
+        conteúdos: {
+          "0_cache.json": JSON.parse(estado.conteúdo_cache),
+          [endereço]: null,
+        },
+        módulos: {
+          [endereço]: null,
+        },
+        valores_módulos: {},
+        módulo_principal_estado: {},
+        etapa: "carregar_conteúdos"
+      }
+    ];
   },
-  carregar_conteúdo: ({ conteúdos, endereço, conteúdo }) => {
-    const novo_cache = { ...conteúdos["0_cache.json"] };
+  carregar_conteúdos: (retorno, estado) => {
+    const [endereço] = Object.entries(estado.conteúdos).find(([endereço, conteúdo]) => conteúdo === null) || []
+    if (endereço === undefined) {
+      return [null, { ...estado, etapa: "avaliar_módulos" }];
+    }
+    if (estado.conteúdos["0_cache.json"][endereço]) {
+      return [
+        null,
+        {
+          ...estado,
+          endereço: endereço,
+          conteúdo: estado.conteúdos["0_cache.json"][endereço],
+          etapa: "carregar_conteúdo"
+        }
+      ];
+    }
+    return [
+      endereço.startsWith("https://") ?
+        efeitos.carregue_remotamente(endereço) :
+        efeitos.carregue_localmente(endereço),
+      { ...estado, endereço: endereço, etapa: "carregar_conteúdo" }
+    ];
+  },
+  carregar_conteúdo: (retorno, estado) => {
+    const conteúdo = retorno || estado.conteúdo;
+    const endereço = estado.endereço;
+    const novo_cache = { ...estado.conteúdos["0_cache.json"] };
     if (endereço.startsWith("https://")) {
       novo_cache[endereço] = conteúdo;
     }
 
     return [
-      efeitos.atribua_valor_ao_estado("conteúdos", {
-        ...conteúdos,
-        [endereço]: conteúdo,
-        "0_cache.json": novo_cache,
-      }),
-      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
-    ]
+      null,
+      {
+        ...estado,
+        conteúdos: {
+          ...estado.conteúdos,
+          [endereço]: conteúdo,
+          "0_cache.json": novo_cache,
+        },
+        etapa: "carregar_conteúdos"
+      }
+    ];
   },
-  avaliar_módulos: ({ módulos, conteúdos }) => {
-    const [endereço] = Object.entries(módulos).find(([endereço, módulo]) => módulo === null) || []
-    if (endereço === undefined) return [efeitos.atribua_valor_ao_estado("etapa", "executar_módulos")]
-    const módulo_bruto = _0.analisar(conteúdos[endereço])
+  avaliar_módulos: (retorno, estado) => {
+    const [endereço] = Object.entries(estado.módulos).find(([endereço, módulo]) => módulo === null) || []
+    if (endereço === undefined) {
+      return [null, { ...estado, etapa: "executar_módulos" }];
+    }
+    const módulo_bruto = _0.analisar(estado.conteúdos[endereço])
     if (módulo_bruto.erro || módulo_bruto.resto.length > 0) {
       if (módulo_bruto.erro) {
         return [
-          efeitos.escreva(`Erro: ${módulo_bruto.erro.message}`),
-          efeitos.escreva(módulo_bruto.erro.stack),
-          efeitos.saia(1),
-        ]
+          efeitos.escreva(`Erro: ${módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`),
+          { ...estado, etapa: "error_saia" }
+        ];
       }
-      const posição_erro = conteúdos[endereço].length - (módulo_bruto.menor_resto?.length ?? 0)
-      const linhas = conteúdos[endereço].split('\n')
-      const linhas_antes = conteúdos[endereço].substring(0, posição_erro).split('\n');
+      const posição_erro = estado.conteúdos[endereço].length - (módulo_bruto.menor_resto?.length ?? 0)
+      const linhas = estado.conteúdos[endereço].split('\n')
+      const linhas_antes = estado.conteúdos[endereço].substring(0, posição_erro).split('\n');
       const número_linha = linhas_antes.length
       const número_coluna = linhas_antes.at(-1).length + 1
       const linha = linhas[número_linha - 1]
@@ -1043,12 +1064,9 @@ const etapas = {
         `\x1b[41m${linha?.[número_coluna - 1] ?? ""}\x1b[0m` +
         (linha?.substring(número_coluna) ?? "")
       return [
-        efeitos.escreva(`Erro de sintaxe.`),
-        efeitos.escreva(endereço),
-        efeitos.escreva(`${número_linha}:${número_coluna}: ${linha_com_erro}`),
-        efeitos.salve_localmente("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2)),
-        efeitos.saia(1),
-      ]
+        efeitos.escreva(`Erro de sintaxe.\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`),
+        { ...estado, etapa: "error_salvar_cache" }
+      ];
     }
 
     const resolve_endereço = (base_module_path, rel_path) => {
@@ -1066,48 +1084,60 @@ const etapas = {
 
     const novas_dependências_conteúdos = Object.fromEntries(
       resolved_importações
-        .filter(([, end]) => !conteúdos.hasOwnProperty(end))
+        .filter(([, end]) => !estado.conteúdos.hasOwnProperty(end))
         .map(([, end]) => [end, null])
     );
 
     const novas_dependências_módulos = Object.fromEntries(
       resolved_importações
-        .filter(([, end]) => !módulos.hasOwnProperty(end))
+        .filter(([, end]) => !estado.módulos.hasOwnProperty(end))
         .map(([, end]) => [end, null])
     );
 
     return [
-      efeitos.atribua_valor_ao_estado("conteúdos", {
-        ...conteúdos,
-        ...novas_dependências_conteúdos,
-      }),
-      efeitos.atribua_valor_ao_estado("módulos", {
-        ...módulos,
-        ...novas_dependências_módulos,
-        [endereço]: [resolved_importações, [], corpo],
-      }),
-      efeitos.atribua_valor_ao_estado("etapa", "carregar_conteúdos"),
-    ]
+      null,
+      {
+        ...estado,
+        conteúdos: {
+          ...estado.conteúdos,
+          ...novas_dependências_conteúdos,
+        },
+        módulos: {
+          ...estado.módulos,
+          ...novas_dependências_módulos,
+          [endereço]: [resolved_importações, [], corpo],
+        },
+        etapa: "carregar_conteúdos"
+      }
+    ];
   },
-  executar_módulos: ({ módulos, valores_módulos, conteúdos }) => {
-    const [endereço, módulo] = Object.entries(módulos).find(
+  error_salvar_cache: (retorno, estado) => [
+    efeitos.salve_localmente("0_cache.json", JSON.stringify(estado.conteúdos["0_cache.json"], null, 2)),
+    { ...estado, etapa: "error_saia" }
+  ],
+  error_saia: (retorno, estado) => [
+    efeitos.saia(1),
+    estado
+  ],
+  executar_módulos: (retorno, estado) => {
+    const [endereço, módulo] = Object.entries(estado.módulos).find(
       ([e, m]) =>
         m !== null &&
-        !valores_módulos.hasOwnProperty(e) &&
-        m[0].every(([, dep_end]) => valores_módulos.hasOwnProperty(dep_end))
+        !estado.valores_módulos.hasOwnProperty(e) &&
+        m[0].every(([, dep_end]) => estado.valores_módulos.hasOwnProperty(dep_end))
     ) || [];
 
     if (endereço === undefined) {
-      const todos_avaliados = Object.keys(módulos).every(e => valores_módulos.hasOwnProperty(e));
+      const todos_avaliados = Object.keys(estado.módulos).every(e => estado.valores_módulos.hasOwnProperty(e));
       if (todos_avaliados) {
         return [
-          efeitos.salve_localmente("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2)),
-          efeitos.atribua_valor_ao_estado("etapa", "executar_módulo_principal")
-        ]
+          efeitos.salve_localmente("0_cache.json", JSON.stringify(estado.conteúdos["0_cache.json"], null, 2)),
+          { ...estado, etapa: "salvar_cache_completo" }
+        ];
       } else {
         return [
           efeitos.escreva("Erro: Dependência circular detectada."),
-          efeitos.saia(1),
+          { ...estado, etapa: "error_saia" }
         ];
       }
     }
@@ -1115,7 +1145,7 @@ const etapas = {
     const [importações, , corpo] = módulo;
 
     const escopo_importações = Object.fromEntries(
-      importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
+      importações.map(([nome, dep_end]) => [nome, estado.valores_módulos[dep_end]])
     );
 
     const escopo = { ...escopo_importações };
@@ -1123,73 +1153,74 @@ const etapas = {
     const valor = corpo(escopo);
 
     return [
-      efeitos.atribua_valor_ao_estado("valores_módulos", {
-        ...valores_módulos,
-        [endereço]: valor
-      }),
-      efeitos.atribua_valor_ao_estado("etapa", "executar_módulos"),
+      null,
+      {
+        ...estado,
+        valores_módulos: {
+          ...estado.valores_módulos,
+          [endereço]: valor
+        },
+        etapa: "executar_módulos"
+      }
     ];
   },
-  executar_módulo_principal: estado => {
-    const efeitos_módulo = estado.valores_módulos[estado.módulo_principal](estado.módulo_principal_estado);
-    return [
-      efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", efeitos_módulo),
-      efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
-    ];
-  },
-  processar_efeito_sandboxed: estado => {
-    const { fila_efeitos_sandboxed, módulo_principal_estado } = estado;
-    if (fila_efeitos_sandboxed.length === 0) {
-      return [efeitos.atribua_valor_ao_estado("etapa", "finalizar_sandbox")];
+  salvar_cache_completo: (retorno, estado) => [
+    null,
+    { ...estado, etapa: "executar_módulo_principal" }
+  ],
+  executar_módulo_principal: (retorno, estado) => {
+    // For backward compatibility, if the module is an old-style function that returns effects array,
+    // we need to convert it to the new interface
+    const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
+    
+    // Check if this is the first call by looking for efeitos_módulo_pendentes
+    if (!estado.efeitos_módulo_pendentes) {
+      // First call - get the initial effects from the main module
+      const efeitos_módulo = módulo_principal_fn(estado.módulo_principal_estado);
+      if (!efeitos_módulo || efeitos_módulo.length === 0) {
+        return [null, { ...estado, etapa: "finalizado" }];
+      }
+      return [
+        null,
+        {
+          ...estado,
+          efeitos_módulo_pendentes: efeitos_módulo,
+          etapa: "processar_efeito_principal"
+        }
+      ];
     }
-    const [efeito, ...resto_fila] = fila_efeitos_sandboxed;
+    
+    // Continue processing if we have pending effects
+    return [
+      null,
+      { ...estado, etapa: "processar_efeito_principal" }
+    ];
+  },
+  processar_efeito_principal: (retorno, estado) => {
+    if (!estado.efeitos_módulo_pendentes || estado.efeitos_módulo_pendentes.length === 0) {
+      return [null, { ...estado, etapa: "finalizado" }];
+    }
+    
+    const [efeito, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
     const [tipo] = efeito;
-    if (tipo === 0) {
-      const [, nome, sub_efeito] = efeito;
-      return [
-        efeitos.atribua_valor_ao_estado("destino_retorno_sandboxed", nome),
-        efeitos.atribua_retorno_ao_estado("_temp_retorno_sandboxed", sub_efeito),
-        efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
-        efeitos.atribua_valor_ao_estado("etapa", "salvar_retorno_sandboxed"),
-      ];
-    } else if (tipo === 1) {
-      const [, nome, valor] = efeito;
-      return [
-        efeitos.atribua_valor_ao_estado("módulo_principal_estado", { ...módulo_principal_estado, [nome]: valor }),
-        efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
-        efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
-      ];
-    } else if (tipo === 2) {
-      const [, nome] = efeito;
-      const novo_estado = { ...módulo_principal_estado };
-      delete novo_estado[nome];
-      return [
-        efeitos.atribua_valor_ao_estado("módulo_principal_estado", novo_estado),
-        efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
-        efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
-      ];
-    }
+    
+    // Execute the effect and update state
     return [
-      ...[efeito],
-      efeitos.atribua_valor_ao_estado("fila_efeitos_sandboxed", resto_fila),
-      efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
-    ]
-  },
-  salvar_retorno_sandboxed: estado => {
-    const { _temp_retorno_sandboxed, destino_retorno_sandboxed, módulo_principal_estado } = estado;
-    return [
-      efeitos.atribua_valor_ao_estado("módulo_principal_estado", { ...módulo_principal_estado, [destino_retorno_sandboxed]: _temp_retorno_sandboxed }),
-      efeitos.delete_do_estado("_temp_retorno_sandboxed"),
-      efeitos.delete_do_estado("destino_retorno_sandboxed"),
-      efeitos.atribua_valor_ao_estado("etapa", "processar_efeito_sandboxed"),
+      efeito,
+      {
+        ...estado,
+        efeitos_módulo_pendentes: resto_efeitos,
+        etapa: "processar_efeito_principal"
+      }
     ];
   },
-  finalizar_sandbox: estado => {
-    return [
-      efeitos.delete_do_estado("fila_efeitos_sandboxed"),
-      efeitos.atribua_valor_ao_estado("etapa", "finalizado"),
-    ];
-  },
+  finalizado: (retorno, estado) => [
+    null,
+    estado
+  ],
 }
 
-export default estado => etapas[estado.etapa ?? "iniciar"](estado)
+export default ([retorno, estado]) => {
+  const etapa_atual = estado.etapa ?? "iniciar";
+  return etapas[etapa_atual](retorno, estado);
+}

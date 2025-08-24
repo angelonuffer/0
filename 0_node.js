@@ -1,15 +1,7 @@
 import _0 from "./0.js"
 import fs from "fs"
 
-const estado = {}
-
 const processe = async (i, ...argumentos) => await [
-  // atribua_retorno_ao_estado
-  async (nome, efeito) => estado[nome] = await processe(...efeito),
-  // atribua_valor_ao_estado
-  (nome, valor) => estado[nome] = valor,
-  // delete_do_estado
-  nome => delete estado[nome],
   // saia
   código => process.exit(código),
   // escreva
@@ -28,7 +20,19 @@ const processe = async (i, ...argumentos) => await [
 
 const timeout = 5000;
 const start = Date.now();
-while (true) for (const efeito of _0(estado)) {
+let contexto = [null, {}];
+while (true) {
   if (Date.now() - start > timeout) process.exit(1)
-  await processe(...efeito)
+  const [efeito, novo_estado] = _0(contexto);
+  contexto[1] = novo_estado;
+  
+  if (efeito) {
+    const retorno = await processe(...efeito);
+    contexto[0] = retorno;
+  } else {
+    // Continue with null return to allow state processing
+    contexto[0] = null;
+    // Add check for explicit termination
+    if (novo_estado.etapa === "finalizado") break;
+  }
 }

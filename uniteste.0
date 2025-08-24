@@ -43,7 +43,7 @@ uniteste = {
             )
           })
         )
-        mensagem => {4 `${args[0]} | ${mensagem[1]}`}
+        mensagem => {1 `${args[0]} | ${mensagem[1]}`}
       })
       passaram = lista_reduzir({
         lista.mapear({args[1] teste => (
@@ -54,9 +54,9 @@ uniteste = {
       })
       {
         ...mensagens
-        {4 `${"" + passaram}/${"" + mensagens[.]} testes passaram.`}
+        {1 `${"" + passaram}/${"" + mensagens[.]} testes passaram.`}
         {
-          3
+          0
           passaram == mensagens[.] ? 0 : 1
           passaram
         }
@@ -65,38 +65,38 @@ uniteste = {
   iguais: args => () =>
     args[0] == args[1] ?
       {
-        {4 "ok"}
-        {4 "1/1 testes passaram."}
-        {3 0 1}
+        {1 "ok"}
+        {1 "1/1 testes passaram."}
+        {0 0 1}
       } :
       {
-        {4 `Esperava que ${"" + args[0]} fosse igual a ${"" + args[1]}.`}
-        {4 "0/1 testes passaram."}
-        {3 1 0}
+        {1 `Esperava que ${"" + args[0]} fosse igual a ${"" + args[1]}.`}
+        {1 "0/1 testes passaram."}
+        {0 1 0}
       }
   listas_iguais: args => () =>
     compara_listas({args[0] args[1]}) ?
       {
-        {4 "ok"}
-        {4 "1/1 testes passaram."}
-        {3 0 1}
+        {1 "ok"}
+        {1 "1/1 testes passaram."}
+        {0 0 1}
       } :
       {
-        {4 `Esperava que {${lista.juntar({args[0] ", "})}} fosse igual a {${lista.juntar({args[1] ", "})}}.`}
-        {4 "0/1 testes passaram."}
-        {3 1 0}
+        {1 `Esperava que {${lista.juntar({args[0] ", "})}} fosse igual a {${lista.juntar({args[1] ", "})}}.`}
+        {1 "0/1 testes passaram."}
+        {0 1 0}
       }
   objetos_iguais: args => () =>
     compara_listas({args[0] args[1]}) ?
       {
-        {4 "ok"}
-        {4 "1/1 testes passaram."}
-        {3 0 1}
+        {1 "ok"}
+        {1 "1/1 testes passaram."}
+        {0 0 1}
       } :
       {
-        {4 `Esperava que os objetos fossem iguais.`}
-        {4 "0/1 testes passaram."}
-        {3 1 0}
+        {1 `Esperava que os objetos fossem iguais.`}
+        {1 "0/1 testes passaram."}
+        {0 1 0}
       }
 }
 
