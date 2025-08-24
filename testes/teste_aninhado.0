@@ -1,0 +1,50 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Referências aninhadas em lista" {
+  uniteste.iguais({
+    (
+      exemplo = {
+        a: 2
+        b: {
+          c: a + 3
+        }
+      }
+      exemplo.b.c
+    )
+    5
+  })
+  
+  uniteste.iguais({
+    (
+      exemplo_complexo = {
+        x: 5
+        y: {
+          z: x * 2
+          w: {
+            v: z + x
+          }
+        }
+      }
+      exemplo_complexo.y.w.v
+    )
+    15
+  })
+  
+  uniteste.iguais({
+    (
+      exemplo_múltiplas_refs = {
+        a: 1
+        b: 2
+        c: {
+          soma: a + b
+          produto: a * b
+          nested: {
+            resultado: soma + produto
+          }
+        }
+      }
+      exemplo_múltiplas_refs.c.nested.resultado
+    )
+    5
+  })
+}})
