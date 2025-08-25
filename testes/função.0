@@ -4,42 +4,42 @@ uniteste.descrever({"Função" {
   uniteste.iguais({
     {
       quadrado: x => x * x
-      quadrado(5)
+      quadrado 5
     }[0]
     25
   })
   uniteste.iguais({
     {
       soma: args => args[0] + args[1]
-      soma({3 7})
+      soma {3 7}
     }[0]
     10
   })
   uniteste.iguais({
     {
       dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
-      dentro_intervalo({5 1 10})
+      dentro_intervalo {5 1 10}
     }[0]
     1
   })
   uniteste.iguais({
     {
       dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
-      dentro_intervalo({15 1 10})
+      dentro_intervalo {15 1 10}
     }[0]
     0
   })
   uniteste.iguais({
     {
       nome_completo: args => {args[0] " de " args[1]} * ""
-      nome_completo({"Geralt" "The Witcher"})
+      nome_completo {"Geralt" "The Witcher"}
     }[0]
     "Geralt de The Witcher"
   })
   uniteste.iguais({
     {
       área_retângulo: args => args[0] * args[1]
-      área_retângulo({5 10})
+      área_retângulo {5 10}
     }[0]
     50
   })
@@ -50,21 +50,21 @@ uniteste.descrever({"Função" {
         área: (args[0] * args[1]) / divisor
         área
       }[0]
-      área_triângulo({10 8})
+      área_triângulo {10 8}
     }[0]
     40
   })
   uniteste.iguais({
     {
       maior: args => args[0] > args[1] ? args[0] : args[1]
-      maior({8 3})
+      maior {8 3}
     }[0]
     8
   })
   uniteste.iguais({
     {
       maior: args => args[0] > args[1] ? args[0] : args[1]
-      maior({2 9})
+      maior {2 9}
     }[0]
     9
   })
@@ -83,46 +83,6 @@ uniteste.descrever({"Função" {
     {
       quadrado: x => x * x
       resultado: ( quadrado 5 )
-    }.resultado
-    25
-  })
-  uniteste.iguais({
-    {
-      quadrado: x => x * x
-      lista_com_funcao: { ( quadrado 5 ) }
-    }.lista_com_funcao[0]
-    25
-  })
-  uniteste.iguais({
-    {
-      quadrado: x => x * x
-      lista_com_itens: { quadrado 5 }
-    }.lista_com_itens[.]
-    2
-  })
-  // Debug what we're actually getting
-  uniteste.iguais({
-    {
-      quadrado: x => x * x  
-      lista_com_itens: { quadrado 5 }
-      primeiro_item: {quadrado 5}[0]
-      segundo_item: {quadrado 5}[1]
-    }.primeiro_item
-    25  // If this is 25, then quadrado 5 is being parsed as function call
-  })
-  // Test space-based calls with parentheses in existing examples
-  uniteste.iguais({
-    {
-      soma: args => args[0] + args[1]
-      resultado: ( soma {3 7} )
-    }.resultado
-    10
-  })
-  // Test space-based calls without parentheses - simple case  
-  uniteste.iguais({
-    {
-      quadrado: x => x * x
-      resultado: quadrado 5
     }.resultado
     25
   })

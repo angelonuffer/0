@@ -696,12 +696,17 @@ const chamada_função_termo = transformar(
 
 const termo2 = alternativa(
   lambda,
-  // Space-based function call - conservative version (try this first)
+  // Space-based function call - but only for specific contexts
   transformar(
     sequência(
       nome,
       espaço_em_branco,
-      termo1,  // Allow any termo1 as argument
+      alternativa(
+        número,
+        texto,
+        parênteses,
+        lista,
+      ),
     ),
     ([função_nome, , arg_fn]) => escopo => {
       // Resolve the function name
@@ -716,7 +721,6 @@ const termo2 = alternativa(
       }
       
       if (função === undefined) {
-        // Variable not found, this might not be a function call
         return undefined;
       }
       
@@ -724,8 +728,6 @@ const termo2 = alternativa(
         const arg_value = arg_fn(escopo);
         return função(escopo, arg_value);
       } else {
-        // Not a function, this shouldn't have matched as function call
-        // Return the function (variable) itself
         return função;
       }
     }
