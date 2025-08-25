@@ -79,4 +79,11 @@ uniteste.descrever({"Função" {
     }[0]
     "Charmander"
   })
+  uniteste.iguais({
+    {
+      quadrado: x => x * x
+      resultado: ( quadrado 5 )
+    }.resultado
+    25
+  })
 }})
