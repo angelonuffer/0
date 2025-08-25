@@ -696,6 +696,40 @@ const chamada_função_termo = transformar(
 
 const termo2 = alternativa(
   lambda,
+  // Space-based function call - conservative version (try this first)
+  transformar(
+    sequência(
+      nome,
+      espaço_em_branco,
+      termo1,  // Allow any termo1 as argument
+    ),
+    ([função_nome, , arg_fn]) => escopo => {
+      // Resolve the function name
+      let atualEscopo = escopo;
+      let função = undefined;
+      while (atualEscopo) {
+        if (atualEscopo.hasOwnProperty(função_nome)) {
+          função = atualEscopo[função_nome];
+          break;
+        }
+        atualEscopo = atualEscopo.__parent__;
+      }
+      
+      if (função === undefined) {
+        // Variable not found, this might not be a function call
+        return undefined;
+      }
+      
+      if (typeof função === 'function') {
+        const arg_value = arg_fn(escopo);
+        return função(escopo, arg_value);
+      } else {
+        // Not a function, this shouldn't have matched as function call
+        // Return the function (variable) itself
+        return função;
+      }
+    }
+  ),
   termo1,
   número_negativo,
   não,

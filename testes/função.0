@@ -86,4 +86,44 @@ uniteste.descrever({"Função" {
     }.resultado
     25
   })
+  uniteste.iguais({
+    {
+      quadrado: x => x * x
+      lista_com_funcao: { ( quadrado 5 ) }
+    }.lista_com_funcao[0]
+    25
+  })
+  uniteste.iguais({
+    {
+      quadrado: x => x * x
+      lista_com_itens: { quadrado 5 }
+    }.lista_com_itens[.]
+    2
+  })
+  // Debug what we're actually getting
+  uniteste.iguais({
+    {
+      quadrado: x => x * x  
+      lista_com_itens: { quadrado 5 }
+      primeiro_item: {quadrado 5}[0]
+      segundo_item: {quadrado 5}[1]
+    }.primeiro_item
+    25  // If this is 25, then quadrado 5 is being parsed as function call
+  })
+  // Test space-based calls with parentheses in existing examples
+  uniteste.iguais({
+    {
+      soma: args => args[0] + args[1]
+      resultado: ( soma {3 7} )
+    }.resultado
+    10
+  })
+  // Test space-based calls without parentheses - simple case  
+  uniteste.iguais({
+    {
+      quadrado: x => x * x
+      resultado: quadrado 5
+    }.resultado
+    25
+  })
 }})
