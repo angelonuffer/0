@@ -25,7 +25,7 @@ Exemplo:
 ```
 retorna_5 # ./retorna_5.0
 
-retorna_5()
+retorna_5 0
 ---
 5
 ```
@@ -613,7 +613,7 @@ Funções encapsulam lógica reutilizável.
 ```
 {
   quadrado: x => x * x
-  quadrado(5)
+  quadrado 5
 }[0]
 ---
 25
@@ -628,7 +628,7 @@ Esta função recebe uma lista com dois números como parâmetro e retorna a som
 ```
 {
   soma: args => args[0] + args[1]
-  soma({3, 7})
+  soma {3, 7}
 }[0]
 ---
 10
@@ -641,7 +641,7 @@ Esta função verifica se um número está dentro de um intervalo definido por d
 ```
 {
   dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
-  dentro_intervalo({5, 1, 10})
+  dentro_intervalo {5, 1, 10}
 }[0]
 ---
 1
@@ -650,7 +650,7 @@ Esta função verifica se um número está dentro de um intervalo definido por d
 ```
 {
   dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
-  dentro_intervalo({15, 1, 10})
+  dentro_intervalo {15, 1, 10}
 }[0]
 ---
 0
@@ -663,7 +663,7 @@ Esta função recebe uma lista com dois textos e os combina em uma única string
 ```
 {
   nome_completo: args => {args[0] " de " args[1]} * ""
-  nome_completo({"Geralt", "The Witcher"})
+  nome_completo {"Geralt", "The Witcher"}
 }[0]
 ---
 "Geralt de The Witcher"
@@ -676,7 +676,7 @@ Esta função calcula a área de um retângulo, recebendo uma lista com largura 
 ```
 {
   área_retangulo: args => args[0] * args[1]
-  área_retangulo({5, 10})
+  área_retangulo {5, 10}
 }[0]
 ---
 50
@@ -693,7 +693,7 @@ Esta função calcula a área de um triângulo com base na base e na altura forn
     área: (args[0] * args[1]) / divisor
     área
   }[0]
-  área_triangulo({10, 8})
+  área_triangulo {10, 8}
 }[0]
 ---
 40
@@ -706,7 +706,7 @@ Esta função retorna o maior valor entre dois números fornecidos em uma lista.
 ```
 {
   maior: args => args[0] > args[1] ? args[0] : args[1]
-  maior({8, 3})
+  maior {8, 3}
 }[0]
 ---
 8
@@ -715,7 +715,7 @@ Esta função retorna o maior valor entre dois números fornecidos em uma lista.
 ```
 {
   maior: args => args[0] > args[1] ? args[0] : args[1]
-  maior({2, 9})
+  maior {2, 9}
 }[0]
 ---
 9
@@ -734,13 +734,13 @@ Na linguagem 0, é possível armazenar funções dentro de listas e chamá-las d
     _ => "Charmander"
     _ => "Squirtle"
   }
-  iniciais[1](0)
+  iniciais[1] 0
 }[0]
 ---
 "Charmander"
 ```
 
-Neste exemplo, a lista `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar `(0)`, executamos essa função com um parâmetro qualquer (que é ignorado) e obtemos o resultado.
+Neste exemplo, a lista `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar ` 0`, executamos essa função com um parâmetro qualquer (que é ignorado) e obtemos o resultado.
 
 ## Comentários
 
