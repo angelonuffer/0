@@ -198,7 +198,6 @@ const letra = inversão(
     espaço_em_branco,
     faixa("!", "?"),
     faixa("[", "^"),
-    símbolo("`"),
     faixa("{", "~"),
   ),
 )
@@ -320,41 +319,7 @@ const fatia = transformar(
   }
 );
 
-const conteúdo_modelo = transformar(
-  inversão(
-    vários(
-      símbolo("`"),
-    )
-  ),
-  v => () => v,
-)
 
-const expressão_modelo = transformar(
-  sequência(
-    símbolo("${"),
-    { analisar: código => expressão.analisar(código) },
-    símbolo("}"),
-  ),
-  ([, valor_fn,]) => escopo => valor_fn(escopo)
-);
-
-const modelo = transformar(
-  sequência(
-    símbolo("`"),
-    vários(
-      alternativa(
-        expressão_modelo,
-        conteúdo_modelo
-      )
-    ),
-    símbolo("`")
-  ),
-  ([, conteúdo_fns,]) => escopo => conteúdo_fns.map(fn => {
-    const valor2 = fn(escopo);
-    if (typeof valor2 === "number") return String.fromCharCode(valor2);
-    return valor2
-  }).join("")
-);
 
 const tamanho = transformar(
   símbolo("[.]"),
@@ -675,7 +640,6 @@ const termo2 = alternativa(
   termo1,
   número_negativo,
   não,
-  modelo,
   valor_constante,
   parênteses
 );
@@ -686,9 +650,17 @@ const termo3 = operação(
     operador("*", (v1, v2) => {
       // If one operand is a list and the other is a string, perform join
       if (Array.isArray(v1) && typeof v2 === "string") {
+        // Special case: when joining with empty string, convert numbers to characters
+        if (v2 === "") {
+          return v1.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v2);
+        }
         return v1.join(v2);
       }
       if (typeof v1 === "string" && Array.isArray(v2)) {
+        // Special case: when joining with empty string, convert numbers to characters
+        if (v1 === "") {
+          return v2.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v1);
+        }
         return v2.join(v1);
       }
       // Check for list objects (with length property and numeric indices)
@@ -697,12 +669,20 @@ const termo3 = operação(
         for (let i = 0; i < v1.length; i++) {
           arr.push(v1[i]);
         }
+        // Special case: when joining with empty string, convert numbers to characters
+        if (v2 === "") {
+          return arr.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v2);
+        }
         return arr.join(v2);
       }
       if (typeof v1 === "string" && typeof v2 === "object" && v2 !== null && typeof v2.length === "number") {
         const arr = [];
         for (let i = 0; i < v2.length; i++) {
           arr.push(v2[i]);
+        }
+        // Special case: when joining with empty string, convert numbers to characters
+        if (v1 === "") {
+          return arr.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v1);
         }
         return arr.join(v1);
       }

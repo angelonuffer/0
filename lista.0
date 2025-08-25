@@ -7,7 +7,7 @@
     juntar: args =>
       args[0][.] == 0 ? "" :
       args[0][.] == 1 ? args[0][0] :
-      `${args[0][0]}${args[1]}${lista.juntar({args[0][1:] args[1]})}`
+      {args[0][0] args[1] lista.juntar({args[0][1:] args[1]})} * ""
     reduzir: args =>
       args[0][.] == 1 ?
         args[0][0] :
