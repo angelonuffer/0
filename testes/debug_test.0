@@ -1,0 +1,18 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Debug Test" {
+  uniteste.iguais({
+    {
+      test_func: _ => 99
+      test_func
+    }[0]
+    99
+  })
+  uniteste.iguais({
+    {
+      test_func: _ => 99
+      ( test_func )
+    }[0]
+    99
+  })
+}})

@@ -1,0 +1,12 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Constant Test" {
+  uniteste.iguais({
+    {
+      val: 42
+      result: (val)
+      result
+    }[0]
+    42
+  })
+}})

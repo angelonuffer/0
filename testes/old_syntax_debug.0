@@ -1,0 +1,11 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Old Syntax Debug" {
+  uniteste.iguais({
+    {
+      test_func: _ => 99
+      test_func()
+    }[0]
+    99
+  })
+}})

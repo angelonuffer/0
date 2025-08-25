@@ -1,0 +1,11 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Dummy Arg Test" {
+  uniteste.iguais({
+    {
+      zero: _ => 42
+      ( zero 0 )
+    }[0]
+    42
+  })
+}})

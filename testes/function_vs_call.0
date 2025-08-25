@@ -1,0 +1,11 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Function vs Call" {
+  uniteste.iguais({
+    {
+      const_val: 123
+      ( const_val )
+    }[0]
+    123
+  })
+}})

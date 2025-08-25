@@ -1,0 +1,18 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Zero Args Only" {
+  uniteste.iguais({
+    {
+      zero: _ => 42
+      zero()
+    }[0]
+    42
+  })
+  uniteste.iguais({
+    {
+      zero: _ => 42
+      ( zero )
+    }[0]
+    42
+  })
+}})

@@ -547,6 +547,39 @@ const lambda = transformar(
   }
 );
 
+// New Lisp-style function call syntax: ( function argument )
+const chamada_função_lisp = transformar(
+  sequência(
+    símbolo("("),
+    opcional(espaço),
+    { analisar: código => expressão.analisar(código) }, // function expression
+    opcional(
+      sequência(
+        espaço, // space between function and argument
+        { analisar: código => expressão.analisar(código) }, // argument expression
+      )
+    ),
+    opcional(espaço),
+    símbolo(")"),
+  ),
+  ([, , função_expr, arg_seq_optional,]) => (escopo) => {
+    const função = função_expr(escopo);
+    // Check if this is actually a function, if not, fall back to parentheses behavior
+    if (typeof função !== 'function') {
+      // Not a function, just return the value (like parentheses grouping)
+      return função;
+    }
+    // Functions in this language return a function that takes (caller_context, ...args)
+    if (arg_seq_optional) {
+      const arg_value = arg_seq_optional[1](escopo);
+      return função(escopo, arg_value);
+    } else {
+      // For zero-argument functions
+      return função(escopo);
+    }
+  }
+);
+
 const chamada_função = transformar(
   sequência(
     símbolo("("),
@@ -623,10 +656,11 @@ const termo1 = transformar(
 );
 
 const termo2 = alternativa(
+  chamada_função_lisp, // New Lisp-style function call syntax - place first for priority
   lambda,
-  termo1,
   número_negativo,
   não,
+  termo1, // Move termo1 after my parser to prevent its parênteses from taking precedence
   valor_constante,
   parênteses
 );
