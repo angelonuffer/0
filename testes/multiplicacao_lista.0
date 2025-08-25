@@ -1,0 +1,58 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Multiplicação de lista" {
+  uniteste.descrever({"Join básico" {
+    uniteste.iguais({
+      {"a" "b" "c"} * " "
+      "a b c"
+    })
+  }})
+  uniteste.descrever({"Join com vírgula" {
+    uniteste.iguais({
+      {"primeira" "segunda" "terceira"} * ", "
+      "primeira, segunda, terceira"
+    })
+  }})
+  uniteste.descrever({"Lista de números" {
+    uniteste.iguais({
+      {1 2 3} * "-"
+      "1-2-3"
+    })
+  }})
+  uniteste.descrever({"Join com string vazia" {
+    uniteste.iguais({
+      {"x" "y" "z"} * ""
+      "xyz"
+    })
+  }})
+  uniteste.descrever({"Lista vazia" {
+    uniteste.iguais({
+      {} * " "
+      ""
+    })
+  }})
+  uniteste.descrever({"Ordem inversa (string * lista)" {
+    uniteste.iguais({
+      " " * {"a" "b" "c"}
+      "a b c"
+    })
+  }})
+  uniteste.descrever({"Multiplicação numérica ainda funciona" {
+    uniteste.iguais({
+      3 * 4
+      12
+    })
+  }})
+  uniteste.descrever({"Lista de valores mistos" {
+    uniteste.iguais({
+      {"hello" 42 "world"} * " "
+      "hello 42 world"
+    })
+  }})
+  uniteste.descrever({"Lista com um elemento" {
+    uniteste.iguais({
+      {"único"} * ", "
+      "único"
+    })
+  }})
+}})
