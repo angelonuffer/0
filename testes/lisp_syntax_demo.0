@@ -1,0 +1,46 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Lisp-style Function Calls" {
+  // Core requirement: dobro(5) -> ( dobro 5 )
+  uniteste.iguais({
+    {
+      dobro: x => x * 2
+      ( dobro 5 )
+    }[0]
+    10
+  })
+  
+  // Spaces are optional
+  uniteste.iguais({
+    {
+      dobro: x => x * 2
+      (dobro 5)
+    }[0]
+    10
+  })
+  
+  // Multiple arguments
+  uniteste.iguais({
+    {
+      soma: args => args[0] + args[1]
+      ( soma {3 7} )
+    }[0]
+    10
+  })
+  
+  // Nested calls
+  uniteste.iguais({
+    {
+      dobro: x => x * 2
+      inc: x => x + 1
+      ( dobro ( inc 5 ) )
+    }[0]
+    12
+  })
+  
+  // Regular parentheses still work for grouping
+  uniteste.iguais({
+    (2 + 3) * 4
+    20
+  })
+}})
