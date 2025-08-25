@@ -31,7 +31,7 @@ uniteste.descrever({"Função" {
   })
   uniteste.iguais({
     {
-      nome_completo: args => `${args[0]} de ${args[1]}`
+      nome_completo: args => {args[0] " de " args[1]} * ""
       nome_completo({"Geralt" "The Witcher"})
     }[0]
     "Geralt de The Witcher"

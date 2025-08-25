@@ -20,7 +20,7 @@ lista # lista.0
               }[0]
             })
           )
-          mensagem => {1 `${args[0]} | ${mensagem[1]}`}
+          mensagem => {1 {args[0] " | " mensagem[1]} * ""}
         })
         passaram: lista.reduzir({
           lista.mapear({args[1] teste => {
@@ -31,7 +31,7 @@ lista # lista.0
         })
         {
           ...mensagens
-          {1 `${"" + passaram}/${"" + mensagens[.]} testes passaram.`}
+          {1 {"" + passaram "/" "" + mensagens[.] " testes passaram."} * ""}
           {
             0
             passaram == mensagens[.] ? 0 : 1
@@ -47,7 +47,7 @@ lista # lista.0
           {0 0 1}
         } :
         {
-          {1 `Esperava que ${"" + args[0]} fosse igual a ${"" + args[1]}.`}
+          {1 {"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * ""}
           {1 "0/1 testes passaram."}
           {0 1 0}
         }
@@ -59,7 +59,7 @@ lista # lista.0
           {0 0 1}
         } :
         {
-          {1 `Esperava que {${lista.juntar({args[0] ", "})}} fosse igual a {${lista.juntar({args[1] ", "})}}.`}
+          {1 {"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * ""}
           {1 "0/1 testes passaram."}
           {0 1 0}
         }

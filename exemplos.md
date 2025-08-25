@@ -273,13 +273,13 @@ Exemplos:
 ```
 
 ### Gerando novos textos
-Combine textos e expressões com `${}`.
+Combine textos e expressões usando multiplicação de listas.
 
 Exemplo:
 ```
 {
   frase: "O céu é azul."
-  `${frase[0:7]} o limite.`
+  {frase[0:7] " o limite."} * ""
 }[0]
 ---
 "O céu é o limite."
@@ -337,14 +337,14 @@ Acesse o índice `[0]` de um texto de um único caractere.
 ```
 
 ### Número para Caractere
-Use a interpolação de texto `${}`.
+Use multiplicação de lista com string vazia.
 ```
 {
   codigo: 65
-  `${codigo}`
+  {codigo} * ""
 }[0]
 ---
-"65"
+"A"
 ```
 
 ## Tipo lista
@@ -662,7 +662,7 @@ Esta função recebe uma lista com dois textos e os combina em uma única string
 
 ```
 {
-  nome_completo: args => `${args[0]} de ${args[1]}`
+  nome_completo: args => {args[0] " de " args[1]} * ""
   nome_completo({"Geralt", "The Witcher"})
 }[0]
 ---

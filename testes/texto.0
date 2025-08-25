@@ -32,7 +32,7 @@ uniteste.descrever({"Texto" {
       {
         frase: "O céu é azul."
 
-        `${frase[0:7]} o limite.`
+        {frase[0:7] " o limite."} * ""
       }[0]
       "O céu é o limite."
     })
@@ -62,7 +62,7 @@ uniteste.descrever({"Texto" {
       {
         codigo: 65
 
-        `${codigo}`
+        {codigo} * ""
       }[0]
       "A"
     })
