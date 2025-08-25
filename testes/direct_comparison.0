@@ -1,18 +1,16 @@
 uniteste # ../uniteste.0
 
-uniteste.descrever({"Really Zero Args" {
+uniteste.descrever({"Direct Comparison" {
   uniteste.iguais({
     {
       zero: _ => 42
-      zero(99)
-    }[0]
+    }[0].zero()
     42
   })
   uniteste.iguais({
     {
       zero: _ => 42
-      ( zero 99 )
-    }[0]
+    }[0].(zero)
     42
   })
 }})

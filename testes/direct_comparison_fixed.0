@@ -1,0 +1,11 @@
+uniteste # ../uniteste.0
+
+{
+  zero: _ => 42
+  old_call: zero()
+  new_call: (zero)
+  uniteste.descrever({"Direct Comparison" {
+    uniteste.iguais({old_call 42})
+    uniteste.iguais({new_call 42})
+  }})
+}

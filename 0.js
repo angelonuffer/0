@@ -574,8 +574,9 @@ const chamada_função_lisp = transformar(
       const arg_value = arg_seq_optional[1](escopo);
       return função(escopo, arg_value);
     } else {
-      // For zero-argument functions
-      return função(escopo);
+      // For zero-argument functions - exactly like the old chamada_função
+      const result = função(escopo);
+      return result;
     }
   }
 );
@@ -636,7 +637,7 @@ const termo1 = transformar(
         tamanho,
         chaves,
         atributo,
-        chamada_função,
+        chamada_função, // Keep for complex cases like array[index]()
       ),
     ),
   ),

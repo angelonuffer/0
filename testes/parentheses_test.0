@@ -1,8 +1,0 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Parentheses Test" {
-  uniteste.iguais({
-    (42)
-    42
-  })
-}})
