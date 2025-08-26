@@ -1,0 +1,33 @@
+uniteste # ../uniteste.0
+sistema # ../sistema.0
+
+uniteste.descrever({"Sistema" {
+  uniteste.iguais({
+    sistema.saia(0)
+    "Termina a execucao do programa"
+  })
+  uniteste.iguais({
+    sistema.escreva(0)
+    "Escreve uma mensagem na saida"
+  })
+  uniteste.iguais({
+    sistema.obtenha_argumentos(0)
+    "Obtem argumentos da linha de comando"
+  })
+  uniteste.iguais({
+    sistema.carregue_localmente(0)
+    "Carrega conteudo de arquivo local"
+  })
+  uniteste.iguais({
+    sistema.carregue_remotamente(0)
+    "Carrega conteudo via URL remota"
+  })
+  uniteste.iguais({
+    sistema.verifique_existencia(0)
+    "Verifica se arquivo existe"
+  })
+  uniteste.iguais({
+    sistema.salve_localmente(0)
+    "Salva conteudo em arquivo local"
+  })
+}})

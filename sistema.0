@@ -1,0 +1,9 @@
+{
+  saia: _ => "Termina a execucao do programa"
+  escreva: _ => "Escreve uma mensagem na saida"
+  obtenha_argumentos: _ => "Obtem argumentos da linha de comando"
+  carregue_localmente: _ => "Carrega conteudo de arquivo local"
+  carregue_remotamente: _ => "Carrega conteudo via URL remota"
+  verifique_existencia: _ => "Verifica se arquivo existe"
+  salve_localmente: _ => "Salva conteudo em arquivo local"
+}
