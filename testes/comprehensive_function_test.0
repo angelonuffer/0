@@ -1,0 +1,45 @@
+uniteste # ../uniteste.0
+
+uniteste.descrever({"Complete Function Call Parsing" {
+  // Test case 1: a(5) should be function call
+  uniteste.iguais({
+    {
+      a: x => x * 2
+      a(5)
+    }[0]
+    10
+  })
+  
+  // Test case 2: a (5) should be two separate items
+  uniteste.iguais({
+    {
+      a: x => x * 2
+      result: {a (5)}
+      result[.]
+    }[0]
+    2
+  })
+  
+  // Test case 3: a\n(5) should be two separate items
+  uniteste.iguais({
+    {
+      a: x => x * 2
+      result: {a
+      (5)}
+      result[.]
+    }[0]
+    2
+  })
+  
+  // Test case 4: Chained operations should still work
+  uniteste.iguais({
+    {
+      funcs: {
+        _ => x => x + 1
+        _ => x => x * 2
+      }
+      funcs[0]()(3)  // Should work: funcs[0] returns function, then () calls it, then (3) calls result
+    }[0]
+    4
+  })
+}})
