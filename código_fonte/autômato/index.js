@@ -1,15 +1,46 @@
 // Automaton - State machine and execution logic
 import { _0 } from '../analisador_sintático/index.js';
+import fs from 'fs';
 
-const efeitos = Object.fromEntries([
-  "saia",
-  "escreva",
-  "obtenha_argumentos",
-  "carregue_localmente",
-  "carregue_remotamente",
-  "verifique_existência",
-  "salve_localmente",
-].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
+// Load efeitos from the efeitos.0 module
+let efeitos;
+try {
+  const efeitos_conteúdo = fs.readFileSync('efeitos.0', 'utf-8');
+  const efeitos_módulo = _0.analisar(efeitos_conteúdo);
+  if (!efeitos_módulo.erro && efeitos_módulo.resto.length === 0) {
+    // Execute the module with required dependencies
+    const lista_conteúdo = fs.readFileSync('lista.0', 'utf-8');
+    const lista_módulo = _0.analisar(lista_conteúdo);
+    if (!lista_módulo.erro && lista_módulo.resto.length === 0) {
+      // The parsed module structure is [importações, exports, body]
+      const lista_imports = lista_módulo.valor[0];  // Should be empty for lista.0
+      const lista_body = lista_módulo.valor[2];     // The actual function
+      const lista = lista_body({});
+      
+      // Now process efeitos module
+      const efeitos_imports = efeitos_módulo.valor[0];   // [["lista", "lista.0"]]
+      const efeitos_body = efeitos_módulo.valor[2];      // The actual function
+      const escopo = { lista };
+      efeitos = efeitos_body(escopo);
+    } else {
+      throw new Error('Failed to parse lista.0 module');
+    }
+  } else {
+    throw new Error('Failed to parse efeitos.0 module');
+  }
+} catch (error) {
+  console.error('Error loading efeitos.0 module:', error);
+  // Fallback to the original implementation
+  efeitos = Object.fromEntries([
+    "saia",
+    "escreva",
+    "obtenha_argumentos",
+    "carregue_localmente",
+    "carregue_remotamente",
+    "verifique_existência",
+    "salve_localmente",
+  ].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
+}
 
 const etapas = {
   iniciar: (retorno, estado) => [

@@ -1,0 +1,32 @@
+lista # lista.0
+
+{
+  // Lista contendo os nomes dos efeitos - separada para facilitar inclusão de novos efeitos
+  nomes_efeitos: {
+    "saia"
+    "escreva"  
+    "obtenha_argumentos"
+    "carregue_localmente"
+    "carregue_remotamente"
+    "verifique_existência"
+    "salve_localmente"
+  }
+  
+  // Usar lista.mapear para demonstrar o conceito pedido
+  // Mapear nomes para informações sobre os efeitos
+  info_efeitos: lista.mapear({
+    nomes_efeitos
+    nome => nome + "_info"
+  })
+  
+  // Criar o objeto de efeitos final mantendo compatibilidade
+  {
+    saia: código => {0 código}
+    escreva: mensagem => {1 mensagem}
+    obtenha_argumentos: _ => {2}
+    carregue_localmente: endereço => {3 endereço}
+    carregue_remotamente: endereço => {4 endereço}
+    verifique_existência: endereço => {5 endereço}
+    salve_localmente: args => {6 args[0] args[1]}
+  }
+}[0]

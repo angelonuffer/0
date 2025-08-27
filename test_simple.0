@@ -1,0 +1,8 @@
+{
+  test_object: {
+    saia: argumentos => {0 ...argumentos}
+    escreva: argumentos => {1 ...argumentos}
+  }
+  test_call: test_object.saia({42})
+  test_call
+}[0]
