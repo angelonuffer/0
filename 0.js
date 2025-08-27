@@ -508,22 +508,9 @@ const atributo = transformar(
   ([, atributoNome]) => (escopo, objeto) => objeto[atributoNome],
 );
 
-const params_lista_com_parenteses = sequência(
-  símbolo("("),
-  opcional(espaço),
-  nome,
-  opcional(espaço),
-  símbolo(")")
-);
-
-const params_lista_sem_parenteses = nome;
-
 const lambda = transformar(
   sequência(
-    alternativa(
-      params_lista_com_parenteses,
-      params_lista_sem_parenteses
-    ),
+    nome,
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),
