@@ -2,7 +2,7 @@
 import { _0 } from '../analisador_sintático/index.js';
 import fs from 'fs';
 
-// Load efeitos from the efeitos.0 module
+// Load efeitos from the efeitos.0 module, with fallback to ensure compatibility
 let efeitos;
 try {
   const efeitos_conteúdo = fs.readFileSync('efeitos.0', 'utf-8');
@@ -13,15 +13,33 @@ try {
     const lista_módulo = _0.analisar(lista_conteúdo);
     if (!lista_módulo.erro && lista_módulo.resto.length === 0) {
       // The parsed module structure is [importações, exports, body]
-      const lista_imports = lista_módulo.valor[0];  // Should be empty for lista.0
       const lista_body = lista_módulo.valor[2];     // The actual function
       const lista = lista_body({});
       
       // Now process efeitos module
-      const efeitos_imports = efeitos_módulo.valor[0];   // [["lista", "lista.0"]]
       const efeitos_body = efeitos_módulo.valor[2];      // The actual function
       const escopo = { lista };
-      efeitos = efeitos_body(escopo);
+      const efeitos_0_lang = efeitos_body(escopo);
+      
+      // Wrap the 0-language functions to match JavaScript calling convention
+      efeitos = Object.fromEntries(
+        Object.entries(efeitos_0_lang).filter(([key]) => key !== 'length').map(([nome, func]) => [
+          nome,
+          // Create JavaScript-compatible wrapper functions
+          (...argumentos) => {
+            if (argumentos.length === 0) {
+              const índice = func();
+              return [índice];
+            } else if (argumentos.length === 1) {
+              const índice = func(argumentos[0]);
+              return [índice, argumentos[0]];
+            } else {
+              const índice = func(argumentos);
+              return [índice, ...argumentos];
+            }
+          }
+        ])
+      );
     } else {
       throw new Error('Failed to parse lista.0 module');
     }
@@ -29,7 +47,7 @@ try {
     throw new Error('Failed to parse efeitos.0 module');
   }
 } catch (error) {
-  console.error('Error loading efeitos.0 module:', error);
+  console.error('Error loading efeitos.0 module, using fallback:', error.message);
   // Fallback to the original implementation
   efeitos = Object.fromEntries([
     "saia",

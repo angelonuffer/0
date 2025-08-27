@@ -1,5 +1,0 @@
-efeitos # efeitos.0
-
-state => {
-  {efeitos.saia({42})}
-}

@@ -12,21 +12,25 @@ lista # lista.0
     "salve_localmente"
   }
   
-  // Usar lista.mapear para demonstrar o conceito pedido
-  // Mapear nomes para informações sobre os efeitos
-  info_efeitos: lista.mapear({
-    nomes_efeitos
-    nome => nome + "_info"
+  // Usar lista.mapear para gerar índices para cada nome de efeito  
+  indices_sequenciais: {0 1 2 3 4 5 6}
+  
+  // Usar lista.mapear para criar as funções de efeito
+  // Cada função retorna apenas o índice, deixando o JavaScript montar a lista completa
+  funcoes_efeitos: lista.mapear({
+    indices_sequenciais
+    índice => _ => índice
   })
   
-  // Criar o objeto de efeitos final mantendo compatibilidade
+  // Montar o objeto final com os nomes corretos
+  // Note: Esta parte ainda é manual devido às limitações da linguagem 0 para Object.fromEntries
   {
-    saia: código => {0 código}
-    escreva: mensagem => {1 mensagem}
-    obtenha_argumentos: _ => {2}
-    carregue_localmente: endereço => {3 endereço}
-    carregue_remotamente: endereço => {4 endereço}
-    verifique_existência: endereço => {5 endereço}
-    salve_localmente: args => {6 args[0] args[1]}
+    saia: funcoes_efeitos[0]
+    escreva: funcoes_efeitos[1]
+    obtenha_argumentos: funcoes_efeitos[2]
+    carregue_localmente: funcoes_efeitos[3]
+    carregue_remotamente: funcoes_efeitos[4]
+    verifique_existência: funcoes_efeitos[5]
+    salve_localmente: funcoes_efeitos[6]
   }
 }[0]
