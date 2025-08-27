@@ -29,6 +29,47 @@ const valor_constante = transformar(
   },
 )
 
+// Immediate function call - identifier directly followed by parentheses (no space)
+const chamada_função_imediata = transformar(
+  sequência(
+    nome,
+    símbolo("("),
+    opcional(espaço),
+    opcional(
+      sequência(
+        { analisar: código => expressão.analisar(código) },
+        opcional(espaço),
+      )
+    ),
+    opcional(espaço),
+    símbolo(")"),
+  ),
+  ([nome_var, , , arg_seq_optional, ,]) => escopo => {
+    // Get the function from the scope
+    let atualEscopo = escopo;
+    let função = undefined;
+    while (atualEscopo) {
+      if (atualEscopo.hasOwnProperty(nome_var)) {
+        função = atualEscopo[nome_var];
+        break;
+      }
+      atualEscopo = atualEscopo.__parent__;
+    }
+    
+    if (typeof função !== 'function') {
+      throw new Error(`${nome_var} is not a function`);
+    }
+    
+    // Call the function with argument if provided
+    if (arg_seq_optional) {
+      const arg_value = arg_seq_optional[0](escopo);
+      return função(escopo, arg_value);
+    } else {
+      return função(escopo);
+    }
+  }
+)
+
 const fatia = transformar(
   sequência(
     símbolo("["),
@@ -354,40 +395,70 @@ const parênteses = transformar(
   }
 );
 
-const termo1 = transformar(
-  sequência(
-    alternativa(
-      valor_constante,
-      parênteses,
-      lista,
-      número,
-      texto,
-    ),
-    opcional(espaço),
-    vários(
+const termo1 = alternativa(
+  chamada_função_imediata,  // Try immediate function call first
+  transformar(
+    sequência(
       alternativa(
-        fatia,
-        tamanho,
-        chaves,
-        atributo,
-        chamada_função,
+        valor_constante,
+        parênteses,
+        lista,
+        número,
+        texto,
       ),
+      alternativa(
+        // No space - allow all operations including function calls
+        vários(
+          alternativa(
+            fatia,
+            tamanho,
+            chaves,
+            atributo,
+            chamada_função,
+          ),
+        ),
+        // With space - only allow operations that are not function calls
+        sequência(
+          espaço,
+          vários(
+            alternativa(
+              fatia,
+              tamanho,
+              chaves,
+              atributo,
+              // Deliberately exclude chamada_função here
+            ),
+          ),
+        )
+      )
     ),
-  ),
-  valor => {
-    const [valor_fn, , operações_fns] = valor;
+    valor => {
+      const [valor_fn, operações_info] = valor;
 
-    return escopo => {
-      if (operações_fns.length === 0) {
-        return valor_fn(escopo);
-      }
-      return operações_fns.reduce(
-        (resultado, operação_fn) => operação_fn(escopo, resultado),
-        valor_fn(escopo)
-      );
-    };
-  }
-);
+      return escopo => {
+        let operações_fns;
+        if (Array.isArray(operações_info) && operações_info.length >= 2 && operações_info[0] === undefined) {
+          // This might be the "with space" case where we have [espaço, operations]
+          operações_fns = operações_info[1] || [];
+        } else if (Array.isArray(operações_info)) {
+          // This is likely the "no space" case where operações_info is directly the operations array
+          operações_fns = operações_info;
+        } else {
+          // Fallback
+          operações_fns = [];
+        }
+        
+        if (!Array.isArray(operações_fns) || operações_fns.length === 0) {
+          return valor_fn(escopo);
+        }
+        return operações_fns.reduce(
+          (resultado, operação_fn) => operação_fn(escopo, resultado),
+          valor_fn(escopo)
+        );
+      };
+    }
+  )
+)
 
 const termo2 = alternativa(
   lambda,
