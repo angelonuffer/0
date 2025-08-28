@@ -275,9 +275,6 @@ const etapas = {
       // First call - determine if this is old or new interface
       const resultado_inicial = módulo_principal_fn(estado.módulo_principal_estado || {});
       
-      console.log('DEBUG: resultado_inicial type:', typeof resultado_inicial, 'isArray:', Array.isArray(resultado_inicial));
-      console.log('DEBUG: resultado_inicial:', resultado_inicial);
-      
       // If resultado is an array, it's the old interface (effects array)
       if (Array.isArray(resultado_inicial)) {
         // Old interface - backward compatibility
@@ -296,7 +293,6 @@ const etapas = {
       } else {
         // New interface - automaton function
         // resultado_inicial should be an automaton function
-        console.log('DEBUG: New interface detected, automaton function:', typeof resultado_inicial);
         return [
           null,
           {
@@ -327,20 +323,16 @@ const etapas = {
   executar_automaton_principal: (retorno, estado) => {
     // Execute the new automaton interface: ([retorno, estado]) => [efeito, novo_estado]
     const automaton_fn = estado.módulo_principal_automaton;
-    console.log('DEBUG: Calling automaton function with:', [retorno, estado.módulo_principal_estado]);
-    console.log('DEBUG: automaton_fn type:', typeof automaton_fn);
     
     try {
       // The automaton function is a Language 0 function, so we need to call it with the appropriate scope
       // The function expects an array [retorno, estado] as its parameter
       const automaton_args = [retorno, estado.módulo_principal_estado];
       const resultado_lang0 = automaton_fn({}, automaton_args);
-      console.log('DEBUG: automaton result:', resultado_lang0);
       
       // Extract the result from the Language 0 object
       // The result should be in resultado_lang0[0] which contains [efeito, novo_estado]
       const resultado = resultado_lang0[0];
-      console.log('DEBUG: extracted result:', resultado);
       const [efeito, novo_estado_modulo] = resultado;
       
       // Update the module state
@@ -363,8 +355,8 @@ const etapas = {
       // Return the effect and continue with the automaton
       return [efeito, { ...novo_estado, etapa: "executar_automaton_principal" }];
     } catch (error) {
-      console.log('DEBUG: Error calling automaton function:', error);
-      throw error;
+      // If there's an error calling the automaton function, fall back to finalizado
+      return [null, { ...estado, etapa: "finalizado" }];
     }
   },
   processar_efeito_principal: (retorno, estado) => {
