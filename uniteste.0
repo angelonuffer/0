@@ -9,59 +9,178 @@ lista # lista.0
 
   uniteste: {
     descrever: args => _ =>
-      {
-        mensagens: lista.mapear({
-          lista.planificar(
-            lista.mapear({
-              args[1]
-              teste => {
-                resultado: teste(0)
-                resultado[0:resultado[.] - 2]
-              }[0]
-            })
-          )
-          mensagem => {1 {args[0] " | " mensagem[1]} * ""}
-        })
-        passaram: lista.reduzir({
-          lista.mapear({args[1] teste => {
-            resultado: teste(0)
-            resultado[resultado[.] - 1][2]
-          }[0]})
-          pair => pair[0] + pair[1]
-        })
+      // Return an automaton function that follows the new interface: ([retorno, estado]) => [efeito, novo_estado]  
+      automaton_args => {
+        // Extract retorno and estado from the array  
+        retorno: automaton_args[0]
+        estado: automaton_args[1]
+        // Initialize state - explicit check
+        etapa_inicial: { etapa: "iniciar" }
+        estado_atual: etapa_inicial
+        
+        estado_atual.etapa == "iniciar" ?
         {
-          ...mensagens
-          {1 {"" + passaram "/" "" + mensagens[.] " testes passaram."} * ""}
-          {
-            0
-            passaram == mensagens[.] ? 0 : 1
-            passaram
+          // Compute all the test results and messages first
+          mensagens: lista.mapear({
+            lista.planificar(
+              lista.mapear({
+                args[1]
+                teste => {
+                  resultado: teste(0)
+                  resultado[0:resultado[.] - 2]
+                }[0]
+              })
+            )
+            mensagem => {1 {args[0] " | " mensagem[1]} * ""}
+          })
+          
+          passaram: lista.reduzir({
+            lista.mapear({args[1] teste => {
+              resultado: teste(0)
+              resultado[resultado[.] - 1][2]
+            }[0]})
+            pair => pair[0] + pair[1]
+          })
+          
+          mensagem_final: {1 {"" + passaram "/" "" + mensagens[.] " testes passaram."} * ""}
+          codigo_saida: passaram == mensagens[.] ? 0 : 1
+          
+          // Prepare all effects to emit
+          todos_efeitos: {
+            ...mensagens
+            mensagem_final
           }
-        }
-      }[0]
+          
+          // Start emitting effects
+          todos_efeitos[.] > 0 ?
+            {
+              todos_efeitos[0]
+              {
+                etapa: "emitindo_mensagens"
+                todos_efeitos: todos_efeitos
+                indice_atual: 1
+                codigo_saida: codigo_saida
+                passaram: passaram
+              }
+            } :
+            {
+              {0 codigo_saida passaram}
+              { etapa: "finalizado" }
+            }
+        }[0] :
+        
+        // Emit remaining messages
+        estado_atual.etapa == "emitindo_mensagens" ?
+          estado_atual.indice_atual < estado_atual.todos_efeitos[.] ?
+            {
+              estado_atual.todos_efeitos[estado_atual.indice_atual]
+              {
+                ...estado_atual
+                indice_atual: estado_atual.indice_atual + 1
+              }
+            } :
+            {
+              {0 estado_atual.codigo_saida estado_atual.passaram}
+              { etapa: "finalizado" }
+            } :
+          {
+            null
+            { etapa: "finalizado" }
+          }
+      }
     iguais: args => _ =>
-      args[0] == args[1] ?
-        {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
-        } :
-        {
-          {1 {"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * ""}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
-        }
+      // Return an automaton function that follows the new interface: ([retorno, estado]) => [efeito, novo_estado]
+      automaton_args => {
+        retorno: automaton_args[0] 
+        estado: automaton_args[1]
+        estado_atual: estado != null ? estado : { etapa: "iniciar" }
+        
+        estado_atual.etapa == "iniciar" ?
+          args[0] == args[1] ?
+            {
+              {1 "ok"}
+              { 
+                etapa: "emitindo_resultado"
+                efeitos_restantes: {
+                  {1 "1/1 testes passaram."}
+                  {0 0 1}
+                }
+              }
+            } :
+            {
+              {1 {"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * ""}
+              {
+                etapa: "emitindo_resultado"
+                efeitos_restantes: {
+                  {1 "0/1 testes passaram."}
+                  {0 1 0}
+                }
+              }
+            } :
+        estado_atual.etapa == "emitindo_resultado" ?
+          estado_atual.efeitos_restantes[.] > 0 ?
+            {
+              estado_atual.efeitos_restantes[0]
+              {
+                ...estado_atual
+                efeitos_restantes: estado_atual.efeitos_restantes[1:]
+              }
+            } :
+            {
+              null
+              { etapa: "finalizado" }
+            } :
+          {
+            null
+            { etapa: "finalizado" }
+          }
+      }
     listas_iguais: args => _ =>
-      compara_listas({args[0] args[1]}) ?
-        {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
-        } :
-        {
-          {1 {"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * ""}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
-        }
+      // Return an automaton function that follows the new interface: ([retorno, estado]) => [efeito, novo_estado]
+      automaton_args => {
+        retorno: automaton_args[0]
+        estado: automaton_args[1] 
+        estado_atual: estado != null ? estado : { etapa: "iniciar" }
+        
+        estado_atual.etapa == "iniciar" ?
+          compara_listas({args[0] args[1]}) ?
+            {
+              {1 "ok"}
+              { 
+                etapa: "emitindo_resultado"
+                efeitos_restantes: {
+                  {1 "1/1 testes passaram."}
+                  {0 0 1}
+                }
+              }
+            } :
+            {
+              {1 {"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * ""}
+              {
+                etapa: "emitindo_resultado"
+                efeitos_restantes: {
+                  {1 "0/1 testes passaram."}
+                  {0 1 0}
+                }
+              }
+            } :
+        estado_atual.etapa == "emitindo_resultado" ?
+          estado_atual.efeitos_restantes[.] > 0 ?
+            {
+              estado_atual.efeitos_restantes[0]
+              {
+                ...estado_atual
+                efeitos_restantes: estado_atual.efeitos_restantes[1:]
+              }
+            } :
+            {
+              null
+              { etapa: "finalizado" }
+            } :
+          {
+            null
+            { etapa: "finalizado" }
+          }
+      }
   }
 }.uniteste
