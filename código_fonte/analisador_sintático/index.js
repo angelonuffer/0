@@ -161,8 +161,9 @@ const lista = transformar(
     vários(
       alternativa(
         sequência( // Key-value pair
-          alternativa( // Key can be nome or [expression]
+          alternativa( // Key can be nome, texto, or [expression]
             nome,
+            texto,
             sequência(
               símbolo("["),
               { analisar: código => expressão.analisar(código) },
@@ -225,6 +226,8 @@ const lista = transformar(
         let chave;
         if (typeof key_alt_result === "string") {
           chave = key_alt_result;
+        } else if (typeof key_alt_result === "function") {
+          chave = key_alt_result(escopo);
         } else {
           const key_expr_fn = key_alt_result[1];
           chave = key_expr_fn(escopo);
@@ -270,6 +273,8 @@ const lista = transformar(
         let chave;
         if (typeof key_alt_result === "string") {
           chave = key_alt_result;
+        } else if (typeof key_alt_result === "function") {
+          chave = key_alt_result(escopo);
         } else {
           const key_expr_fn = key_alt_result[1];
           chave = key_expr_fn(escopo);
