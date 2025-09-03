@@ -10,6 +10,7 @@ string_division_comprehensive # string_division_comprehensive.0
 test_string_division # test_string_division.0
 lista # lista.0
 lista_com_chaves # lista_com_chaves.0
+string_keys # string_keys.0
 referência_lista # referência_lista.0
 teste_aninhado # teste_aninhado.0
 teste_documentacao # teste_documentacao.0
@@ -33,6 +34,7 @@ uniteste.descrever({"0" {
   test_string_division
   lista
   lista_com_chaves
+  string_keys
   referência_lista
   teste_aninhado
   teste_documentacao
