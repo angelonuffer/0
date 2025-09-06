@@ -1,15 +1,15 @@
 // Automaton - State machine and execution logic
 import { _0 } from '../analisador_sintático/index.js';
 
-const efeitos = Object.fromEntries([
-  "saia",
-  "escreva",
-  "obtenha_argumentos",
-  "carregue_localmente",
-  "carregue_remotamente",
-  "verifique_existência",
-  "salve_localmente",
-].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
+const efeitos = {
+  "saia": (código) => `process.exit(${código})`,
+  "escreva": (mensagem) => `console.log(${JSON.stringify(mensagem)})`,
+  "obtenha_argumentos": () => `process.argv.slice(2)`,
+  "carregue_localmente": (endereço) => `fs.readFileSync(${JSON.stringify(endereço)}, "utf-8")`,
+  "carregue_remotamente": (endereço) => `(await (await fetch(${JSON.stringify(endereço)})).text())`,
+  "verifique_existência": (endereço) => `fs.existsSync(${JSON.stringify(endereço)})`,
+  "salve_localmente": (endereço, conteúdo) => `fs.writeFileSync(${JSON.stringify(endereço)}, ${JSON.stringify(conteúdo)})`,
+}
 
 const etapas = {
   iniciar: (retorno, estado) => [
@@ -300,8 +300,42 @@ const etapas = {
       return [null, { ...estado, etapa: "finalizado" }];
     }
     
-    const [efeito, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
-    const [tipo] = efeito;
+    const [efeito_original, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
+    
+    // Convert array effects to string effects for standardization
+    let efeito;
+    if (typeof efeito_original === 'string') {
+      efeito = efeito_original;
+    } else if (Array.isArray(efeito_original)) {
+      const [index, ...args] = efeito_original;
+      switch (index) {
+        case 0: // saia
+          efeito = `process.exit(${args[0]})`;
+          break;
+        case 1: // escreva  
+          efeito = `console.log(${JSON.stringify(args[0])})`;
+          break;
+        case 2: // obtenha_argumentos
+          efeito = `process.argv.slice(2)`;
+          break;
+        case 3: // carregue_localmente
+          efeito = `fs.readFileSync(${JSON.stringify(args[0])}, "utf-8")`;
+          break;
+        case 4: // carregue_remotamente
+          efeito = `(await (await fetch(${JSON.stringify(args[0])})).text())`;
+          break;
+        case 5: // verifique_existência
+          efeito = `fs.existsSync(${JSON.stringify(args[0])})`;
+          break;
+        case 6: // salve_localmente
+          efeito = `fs.writeFileSync(${JSON.stringify(args[0])}, ${JSON.stringify(args[1])})`;
+          break;
+        default:
+          throw new Error(`Unknown effect index: ${index}`);
+      }
+    } else {
+      efeito = efeito_original;
+    }
     
     // Execute the effect and update state
     return [
