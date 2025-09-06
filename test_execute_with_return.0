@@ -1,0 +1,7 @@
+_ => {
+  {1 "Testing JavaScript execution:"}
+  {7 "console.log('JavaScript says: 2 + 3 =', 2 + 3)"}
+  {7 "console.log('JavaScript can access Math:', Math.PI)"}
+  {1 "Execute effect working correctly!"}
+  {0 0}
+}

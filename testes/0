@@ -21,6 +21,7 @@ multiplicacao_lista # multiplicacao_lista.0
 operador_espalhamento # operador_espalhamento.0
 função # função.0
 comentário # comentário.0
+execute # execute.0
 
 uniteste.descrever({"0" {
   aritmética
@@ -45,4 +46,5 @@ uniteste.descrever({"0" {
   operador_espalhamento
   função
   comentário
+  execute
 }})

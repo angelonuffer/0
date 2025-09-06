@@ -1,0 +1,17 @@
+// Test various JavaScript execution scenarios
+
+_ => {
+  {1 "=== Testing Execute Effect ==="}
+  
+  // Test 1: Simple JavaScript console output
+  {7 "console.log('Hello from JavaScript!')"}
+  
+  // Test 2: JavaScript with side effects
+  {7 "console.log('Current time:', new Date().toISOString())"}
+  
+  // Test 3: JavaScript with Node.js modules  
+  {7 "console.log('Process PID:', process.pid)"}
+  
+  {1 "=== Execute Effect Tests Completed ==="}
+  {0 0}
+}

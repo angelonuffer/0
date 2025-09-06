@@ -9,6 +9,7 @@ const efeitos = Object.fromEntries([
   "carregue_remotamente",
   "verifique_existência",
   "salve_localmente",
+  "execute",
 ].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
 
 const etapas = {

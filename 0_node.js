@@ -16,6 +16,8 @@ const processe = async (i, ...argumentos) => await [
   endereço => fs.existsSync(endereço),
   // salve_localmente
   (endereço, conteúdo) => fs.writeFileSync(endereço, conteúdo),
+  // execute
+  código => eval(código),
 ][i](...argumentos)
 
 const timeout = 5000;
