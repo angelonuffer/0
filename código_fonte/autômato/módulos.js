@@ -166,14 +166,32 @@ const etapasMódulos = {
     // Check if this is the first call by looking for efeitos_módulo_pendentes
     if (!estado.efeitos_módulo_pendentes) {
       // First call - get the initial effects from the main module
-      const efeitos_módulo = módulo_principal_fn(estado.módulo_principal_estado);
+      const resultado = módulo_principal_fn(estado.módulo_principal_estado);
+      
+      // Handle both old format (just effects array) and new format ([effects, state])
+      let efeitos_módulo, novo_estado_principal;
+      if (Array.isArray(resultado) && resultado.length === 2 && 
+          Array.isArray(resultado[0])) {
+        // New format: [effects, state]
+        [efeitos_módulo, novo_estado_principal] = resultado;
+      } else {
+        // Old format: just effects array (backward compatibility)
+        efeitos_módulo = resultado;
+        novo_estado_principal = estado.módulo_principal_estado;
+      }
+      
       if (!efeitos_módulo || efeitos_módulo.length === 0) {
-        return [null, { ...estado, etapa: "finalizado" }];
+        return [null, { 
+          ...estado, 
+          módulo_principal_estado: novo_estado_principal,
+          etapa: "finalizado" 
+        }];
       }
       return [
         null,
         {
           ...estado,
+          módulo_principal_estado: novo_estado_principal,
           efeitos_módulo_pendentes: efeitos_módulo,
           etapa: "processar_efeito_principal"
         }
@@ -187,6 +205,60 @@ const etapasMódulos = {
     ];
   },
   processar_efeito_principal: (retorno, estado) => {
+    // Debug logging
+    if (retorno !== null && retorno !== undefined) {
+      console.log("processar_efeito_principal: received return value:", retorno);
+      const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
+      console.log("Main function length:", módulo_principal_fn.length);
+    }
+    
+    // If we have a return value from a previous effect, call the main module function
+    // to get new effects and state (only if it supports the new interface)
+    if (retorno !== null && retorno !== undefined) {
+      const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
+      
+      // Check if the main module function accepts a second parameter (new interface)
+      // by checking its length property
+      if (módulo_principal_fn.length >= 2) {
+        // New interface: function(state, return_value) => [effects, new_state]
+        const resultado = módulo_principal_fn(estado.módulo_principal_estado, retorno);
+        
+        // Handle both old format (just effects array) and new format ([effects, state])
+        let novos_efeitos, novo_estado_principal;
+        if (Array.isArray(resultado) && resultado.length === 2 && 
+            Array.isArray(resultado[0])) {
+          // New format: [effects, state]
+          [novos_efeitos, novo_estado_principal] = resultado;
+        } else {
+          // Old format: just effects array (backward compatibility)
+          novos_efeitos = resultado;
+          novo_estado_principal = estado.módulo_principal_estado;
+        }
+        
+        // If no new effects, we're done
+        if (!novos_efeitos || novos_efeitos.length === 0) {
+          return [null, { 
+            ...estado, 
+            módulo_principal_estado: novo_estado_principal,
+            etapa: "finalizado" 
+          }];
+        }
+        
+        // Set new effects and updated main module state
+        return [
+          null,
+          {
+            ...estado,
+            módulo_principal_estado: novo_estado_principal,
+            efeitos_módulo_pendentes: novos_efeitos,
+            etapa: "processar_efeito_principal"
+          }
+        ];
+      }
+      // If function doesn't support new interface, continue with old behavior
+    }
+    
+    // No return value or old interface - process the next pending effect
     if (!estado.efeitos_módulo_pendentes || estado.efeitos_módulo_pendentes.length === 0) {
       return [null, { ...estado, etapa: "finalizado" }];
     }
