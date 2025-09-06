@@ -1,33 +1,15 @@
 // Automaton - State machine and execution logic
 import { _0 } from '../analisador_sintático/index.js';
 
-const efeitos = {
-  saia: código => ["process.exit(", código, ")"].join(""),
-  escreva: mensagem => ["console.log('", mensagem, "')"].join(""),
-  obtenha_argumentos: () => "process.argv.slice(2)",
-  carregue_localmente: endereço => [
-    "import('fs').then(fs => fs.readFileSync('",
-    endereço,
-    "', 'utf-8'))",
-  ].join(""),
-  carregue_remotamente: endereço => [
-    "(await (await fetch('",
-    endereço,
-    "')).text())",
-  ].join(""),
-  verifique_existência: endereço => [
-    "import('fs').then(fs => fs.existsSync('",
-    endereço,
-    "'))",
-  ].join(""),
-  salve_localmente: (endereço, conteúdo) => [
-    "import('fs').then(fs => fs.writeFileSync('",
-    endereço,
-    "', '",
-    conteúdo,
-    "'))",
-  ].join(""),
-}
+const efeitos = Object.fromEntries([
+  "saia",
+  "escreva",
+  "obtenha_argumentos",
+  "carregue_localmente",
+  "carregue_remotamente",
+  "verifique_existência",
+  "salve_localmente",
+].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
 
 const etapas = {
   iniciar: (retorno, estado) => [
