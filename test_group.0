@@ -1,0 +1,8 @@
+uniteste # ./uniteste.0
+
+uniteste.descrever({"Test Single" {
+  uniteste.iguais({
+    2 + 2
+    4
+  })
+}})

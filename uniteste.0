@@ -27,25 +27,17 @@ efeitos # efeitos.0
       args[0] == args[1] ?
         {
           efeitos.escreva("ok")
-          efeitos.escreva("1/1 testes passaram.")
-          efeitos.saia(0)
         } :
         {
           efeitos.escreva({"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * "")
-          efeitos.escreva("0/1 testes passaram.")
-          efeitos.saia(1)
         }
     listas_iguais: args => _ =>
       compara_listas({args[0] args[1]}) ?
         {
           efeitos.escreva("ok")
-          efeitos.escreva("1/1 testes passaram.")
-          efeitos.saia(0)
         } :
         {
           efeitos.escreva({"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * "")
-          efeitos.escreva("0/1 testes passaram.")
-          efeitos.saia(1)
         }
   }
 }.uniteste
