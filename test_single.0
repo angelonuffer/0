@@ -1,0 +1,6 @@
+uniteste # ./uniteste.0
+
+uniteste.iguais({
+  2 + 2
+  4
+})
