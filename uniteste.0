@@ -17,9 +17,10 @@ efeitos # efeitos.0
             teste => teste(0)
           })
         )
+        final_count: args[1][.]
         {
           ...test_effects
-          efeitos.escreva({"" + args[1][.] "/" "" + args[1][.] " testes passaram."} * "")
+          efeitos.escreva({"" + final_count "/" "" + final_count " testes passaram."} * "")
           efeitos.saia(0)
         }
       }[0]
