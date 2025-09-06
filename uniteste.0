@@ -8,7 +8,8 @@ lista # lista.0
     compara_listas({args[0][1:] args[1][1:]})
 
   uniteste: {
-    descrever: args => _ =>
+    // Updated to support new interface: now accepts state parameter
+    descrever: args => estado =>
       {
         mensagens: lista.mapear({
           lista.planificar(

@@ -1,5 +1,0 @@
-// Simple test to check function parameter length
-args => {
-  {1 "Function test"}
-  {0 0}
-}

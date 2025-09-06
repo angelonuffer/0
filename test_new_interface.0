@@ -1,9 +1,0 @@
-// Test program for the new interface
-estado => {
-  efeitos: {
-    {1 "Testing new interface"}
-    {0 0}
-  }
-  novo_estado: "updated_state"
-  {efeitos novo_estado}
-}[0]

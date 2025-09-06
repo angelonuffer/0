@@ -205,13 +205,6 @@ const etapasMódulos = {
     ];
   },
   processar_efeito_principal: (retorno, estado) => {
-    // Debug logging
-    if (retorno !== null && retorno !== undefined) {
-      console.log("processar_efeito_principal: received return value:", retorno);
-      const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
-      console.log("Main function length:", módulo_principal_fn.length);
-    }
-    
     // If we have a return value from a previous effect, call the main module function
     // to get new effects and state (only if it supports the new interface)
     if (retorno !== null && retorno !== undefined) {
@@ -225,14 +218,30 @@ const etapasMódulos = {
         
         // Handle both old format (just effects array) and new format ([effects, state])
         let novos_efeitos, novo_estado_principal;
-        if (Array.isArray(resultado) && resultado.length === 2 && 
-            Array.isArray(resultado[0])) {
+        
+        // Convert Language 0 object structure to JavaScript array if needed
+        let resultado_array = resultado;
+        if (typeof resultado === 'object' && resultado.hasOwnProperty('0') && resultado.hasOwnProperty('length')) {
+          resultado_array = Array.from({length: resultado.length}, (_, i) => resultado[i]);
+        }
+        
+        if (Array.isArray(resultado_array) && resultado_array.length === 2) {
           // New format: [effects, state]
-          [novos_efeitos, novo_estado_principal] = resultado;
+          [novos_efeitos, novo_estado_principal] = resultado_array;
+          
+          // Convert effects to array if needed
+          if (novos_efeitos && typeof novos_efeitos === 'object' && novos_efeitos.hasOwnProperty('0') && novos_efeitos.hasOwnProperty('length')) {
+            novos_efeitos = Array.from({length: novos_efeitos.length}, (_, i) => novos_efeitos[i]);
+          }
         } else {
           // Old format: just effects array (backward compatibility)
-          novos_efeitos = resultado;
+          novos_efeitos = resultado_array;
           novo_estado_principal = estado.módulo_principal_estado;
+        }
+        
+        // Convert Language 0 object structure to JavaScript array if needed
+        if (novos_efeitos && typeof novos_efeitos === 'object' && novos_efeitos.hasOwnProperty('0') && novos_efeitos.hasOwnProperty('length')) {
+          novos_efeitos = Array.from({length: novos_efeitos.length}, (_, i) => novos_efeitos[i]);
         }
         
         // If no new effects, we're done
@@ -263,7 +272,14 @@ const etapasMódulos = {
       return [null, { ...estado, etapa: "finalizado" }];
     }
     
-    const [efeito_original, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
+    // Convert Language 0 object structure to JavaScript array if needed
+    let pendingEffects = estado.efeitos_módulo_pendentes;
+    if (typeof pendingEffects === 'object' && pendingEffects.hasOwnProperty('0') && pendingEffects.hasOwnProperty('length')) {
+      // Convert Language 0 object to JavaScript array
+      pendingEffects = Array.from({length: pendingEffects.length}, (_, i) => pendingEffects[i]);
+    }
+    
+    const [efeito_original, ...resto_efeitos] = pendingEffects;
     
     // Convert array effects to string effects for standardization
     let efeito;
