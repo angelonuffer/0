@@ -1,0 +1,5 @@
+{
+  escreva: mensagem => "console.log('" + mensagem + "')"
+  
+  saia: código => "process.exit(" + código + ")"
+}

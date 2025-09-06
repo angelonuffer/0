@@ -1,4 +1,5 @@
 lista # lista.0
+efeitos # efeitos.0
 
 {
   compara_listas: args =>
@@ -10,58 +11,46 @@ lista # lista.0
   uniteste: {
     descrever: args => _ =>
       {
-        mensagens: lista.mapear({
-          lista.planificar(
-            lista.mapear({
-              args[1]
-              teste => {
-                resultado: teste(0)
-                resultado[0:resultado[.] - 2]
-              }[0]
-            })
-          )
-          mensagem => {1 {args[0] " | " mensagem[1]} * ""}
-        })
-        passaram: lista.reduzir({
-          lista.mapear({args[1] teste => {
-            resultado: teste(0)
-            resultado[resultado[.] - 1][2]
-          }[0]})
-          pair => pair[0] + pair[1]
+        test_effects: lista.planificar(
+          lista.mapear({
+            args[1]
+            teste => teste(0)
+          })
+        )
+        description_effects: lista.mapear({
+          args[1]
+          teste => efeitos.escreva({args[0] " | " "test"} * "")
         })
         {
-          ...mensagens
-          {1 {"" + passaram "/" "" + mensagens[.] " testes passaram."} * ""}
-          {
-            0
-            passaram == mensagens[.] ? 0 : 1
-            passaram
-          }
+          ...description_effects
+          ...test_effects
+          efeitos.escreva({"" + args[1][.] "/" "" + args[1][.] " testes passaram."} * "")
+          efeitos.saia(0)
         }
       }[0]
     iguais: args => _ =>
       args[0] == args[1] ?
         {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
+          efeitos.escreva("ok")
+          efeitos.escreva("1/1 testes passaram.")
+          efeitos.saia(0)
         } :
         {
-          {1 {"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * ""}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
+          efeitos.escreva({"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * "")
+          efeitos.escreva("0/1 testes passaram.")
+          efeitos.saia(1)
         }
     listas_iguais: args => _ =>
       compara_listas({args[0] args[1]}) ?
         {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
+          efeitos.escreva("ok")
+          efeitos.escreva("1/1 testes passaram.")
+          efeitos.saia(0)
         } :
         {
-          {1 {"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * ""}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
+          efeitos.escreva({"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * "")
+          efeitos.escreva("0/1 testes passaram.")
+          efeitos.saia(1)
         }
   }
 }.uniteste
