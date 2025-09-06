@@ -27,7 +27,14 @@ while (true) {
   contexto[1] = novo_estado;
   
   if (efeito) {
-    const retorno = await processe(...efeito);
+    let retorno;
+    if (typeof efeito === 'string') {
+      // Generic string effect - execute with eval
+      retorno = await eval(efeito);
+    } else {
+      // Standard indexed effect
+      retorno = await processe(...efeito);
+    }
     contexto[0] = retorno;
   }
 }
