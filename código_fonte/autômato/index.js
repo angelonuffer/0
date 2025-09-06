@@ -11,6 +11,37 @@ const efeitos = Object.fromEntries([
   "salve_localmente",
 ].map((nome, i) => [nome, (...argumentos) => [i, ...argumentos]]))
 
+// Function to extract effects from a value returned by the main module
+const extrair_efeitos = (valor) => {
+  const efeitos_encontrados = [];
+  
+  const processar_valor = (v) => {
+    if (Array.isArray(v)) {
+      // Check if this is an effect (array starting with a number)
+      if (v.length > 0 && typeof v[0] === 'number' && v[0] >= 0 && v[0] <= 6) {
+        efeitos_encontrados.push(v);
+      } else {
+        // Process each element of the array
+        v.forEach(processar_valor);
+      }
+    } else if (typeof v === 'object' && v !== null) {
+      // Process each value in the object
+      Object.values(v).forEach(processar_valor);
+    }
+    // For primitive values, do nothing
+  };
+  
+  processar_valor(valor);
+  return efeitos_encontrados;
+};
+
+// Function to translate effects using the efeitos object
+const traduzir_efeito = (efeito_bruto) => {
+  // The effect is already in the correct format [index, ...args] 
+  // since extrair_efeitos extracts them directly as arrays
+  return efeito_bruto;
+};
+
 const etapas = {
   iniciar: (retorno, estado) => [
     efeitos.obtenha_argumentos(),
@@ -268,22 +299,24 @@ const etapas = {
     { ...estado, etapa: "executar_módulo_principal" }
   ],
   executar_módulo_principal: (retorno, estado) => {
-    // For backward compatibility, if the module is an old-style function that returns effects array,
-    // we need to convert it to the new interface
     const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
     
     // Check if this is the first call by looking for efeitos_módulo_pendentes
     if (!estado.efeitos_módulo_pendentes) {
-      // First call - get the initial effects from the main module
-      const efeitos_módulo = módulo_principal_fn(estado.módulo_principal_estado);
-      if (!efeitos_módulo || efeitos_módulo.length === 0) {
+      // First call - get the initial value from the main module
+      const resultado_módulo = módulo_principal_fn(estado.módulo_principal_estado);
+      
+      // Extract effects from the result
+      const efeitos_extraídos = extrair_efeitos(resultado_módulo);
+      
+      if (!efeitos_extraídos || efeitos_extraídos.length === 0) {
         return [null, { ...estado, etapa: "finalizado" }];
       }
       return [
         null,
         {
           ...estado,
-          efeitos_módulo_pendentes: efeitos_módulo,
+          efeitos_módulo_pendentes: efeitos_extraídos,
           etapa: "processar_efeito_principal"
         }
       ];
@@ -300,12 +333,13 @@ const etapas = {
       return [null, { ...estado, etapa: "finalizado" }];
     }
     
-    const [efeito, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
-    const [tipo] = efeito;
+    const [efeito_bruto, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
     
-    // Execute the effect and update state
+    // Translate the raw effect using the efeitos object
+    const efeito_traduzido = traduzir_efeito(efeito_bruto);
+    
     return [
-      efeito,
+      efeito_traduzido,
       {
         ...estado,
         efeitos_módulo_pendentes: resto_efeitos,
