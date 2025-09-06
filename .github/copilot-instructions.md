@@ -22,55 +22,16 @@ Always reference these instructions first and fallback to search or bash command
 - **Command**: `node 0_node.js <file.0>`
 - **Working directory**: MUST run from repository root directory for module imports to work
 - **Timing**: Individual programs run in ~0.06 seconds
-- **Exit behavior**: Programs must include `{0 0}` effect to exit cleanly, otherwise timeout after 5 seconds
-
-### Program Structure and Effect System
-Language 0 uses an effect-based execution model:
-```
-_ => {
-  {1 "Output message"}     // Output effect
-  {0 0}                    // Exit effect (required for clean exit)
-}
-```
-
-Multiple outputs:
-```
-_ => {
-  {1 "First message"}
-  {1 "Second message"} 
-  {0 0}
-}
-```
 
 ### Module System and Imports
 - **Import syntax**: `module_name # ./path/to/file.0`
 - **Path resolution**: Relative to current working directory
-- **Example**:
-```
-lista # lista.0
-
-_ => {
-  nums: {1 2 3}
-  {{1 "Numbers: " lista.juntar({nums ", "})} {0 0}}
-}
-```
-- **Important**: Run from repository root for built-in modules (lista.0, uniteste.0)
 
 ## Validation Scenarios
 
 ### Always Test These Scenarios After Changes
-1. **Run full test suite**: `node 0_node.js testes/0` - must pass all 145 tests
-2. **Test simple program execution**:
-   ```bash
-   echo '_ => {{1 "Hello World"} {0 0}}' > test.0
-   node 0_node.js test.0
-   ```
-3. **Test module imports**:
-   ```bash
-   echo -e 'lista # lista.0\n\n_ => {{1 "Module loaded"} {0 0}}' > test_import.0
-   node 0_node.js test_import.0
-   ```
-4. **Test syntax error handling**:
+1. **Run full test suite**: `node 0_node.js testes/0` - must pass all tests
+2. **Test syntax error handling**:
    ```bash
    echo 'invalid syntax' > test_error.0
    node 0_node.js test_error.0  # Should show syntax error
@@ -130,8 +91,6 @@ uniteste.descrever({"Test Group" {
 ### Error Patterns and Debugging
 - **Syntax errors**: Show file, line, column with context
 - **Module not found**: Check working directory and relative paths
-- **Effect system errors**: Ensure proper `{effect_type value}` format
-- **Timeout**: Programs without `{0 0}` exit effect timeout after 5 seconds
 
 ## Language-Specific Guidelines
 
@@ -146,7 +105,6 @@ uniteste.descrever({"Test Group" {
 - Arithmetic with precedence: `2 + 3 * 4` → `14`
 - List operations: Join, map, reduce functions in `lista.0`
 - String division: `"a,b,c" / ","` → `{"a" "b" "c"}`
-- Effect system: Output (`{1 "msg"}`), Exit (`{0 code}`)
 - Module imports and dependency resolution
 - Function definitions and calls
 
@@ -159,7 +117,6 @@ uniteste.descrever({"Test Group" {
 ## Critical Reminders
 - **ALWAYS run from repository root** for module imports to work correctly
 - **NO build process** - this is an interpreted language
-- **Effect system required** - programs need proper effect format to execute
 - **Test suite is comprehensive** - 145 tests cover all language features
 - **Fast execution** - Tests and programs run in milliseconds, not minutes
 - **Node.js 22 required** - Ensure correct version for compatibility
