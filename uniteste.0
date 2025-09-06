@@ -17,12 +17,7 @@ efeitos # efeitos.0
             teste => teste(0)
           })
         )
-        description_effects: lista.mapear({
-          args[1]
-          teste => efeitos.escreva({args[0] " | " "test"} * "")
-        })
         {
-          ...description_effects
           ...test_effects
           efeitos.escreva({"" + args[1][.] "/" "" + args[1][.] " testes passaram."} * "")
           efeitos.saia(0)
