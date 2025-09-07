@@ -15,7 +15,7 @@ const etapas = {
 }
 
 const processar = ([retorno, estado]) => {
-  const etapa_atual = estado.etapa ?? "iniciar";
+  const etapa_atual = estado?.etapa ?? "iniciar";
   return etapas[etapa_atual](retorno, estado);
 }
 
