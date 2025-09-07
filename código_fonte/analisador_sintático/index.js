@@ -2,7 +2,7 @@
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
 import { espaço, nome, endereço, número, número_negativo, texto } from '../analisador_léxico/index.js';
-import { avaliarSoma, avaliarSubtração, avaliarMultiplicação, avaliarDivisão, avaliarMaiorQue, avaliarMenorQue, avaliarMaiorOuIgual, avaliarMenorOuIgual, avaliarIgual, avaliarDiferente, avaliarE, avaliarOu, avaliarVariável, avaliarNegação, avaliarCondicional, avaliarTamanho, avaliarChaves } from '../analisador_semântico/index.js';
+import { avaliarSoma, avaliarSubtração, avaliarMultiplicação, avaliarDivisão, avaliarMaiorQue, avaliarMenorQue, avaliarMaiorOuIgual, avaliarMenorOuIgual, avaliarIgual, avaliarDiferente, avaliarE, avaliarOu, avaliarVariável, avaliarNegação, avaliarCondicional, avaliarTamanho, avaliarChaves, avaliarFatia, avaliarAtributo, avaliarParênteses } from '../analisador_semântico/index.js';
 
 // Forward declaration for recursive references
 let expressão;
@@ -74,50 +74,7 @@ const fatia = transformar(
   ),
   valorSeq => {
     const [, i_fn, opcionalFaixa,] = valorSeq;
-    const faixa = opcionalFaixa ? opcionalFaixa[0] : undefined;
-    const j_fn_opcional = opcionalFaixa ? opcionalFaixa[1] : undefined;
-
-    return (escopo, valor) => {
-      const i = i_fn(escopo);
-      const j = j_fn_opcional ? j_fn_opcional(escopo) : undefined;
-
-      if (typeof valor === "string") {
-        if (faixa !== undefined || j !== undefined) {
-          return valor.slice(i, j);
-        } else {
-          return valor.charCodeAt(i);
-        }
-      } else if (Array.isArray(valor)) {
-        if (faixa !== undefined || j !== undefined) {
-          return valor.slice(i, j);
-        } else {
-          return valor[i];
-        }
-      } else if (typeof valor === 'object' && valor !== null) {
-        if (typeof i !== 'string' && typeof i !== 'number') {
-          throw new Error(`Runtime Error: Object key must be a string or number, got type ${typeof i} for key '${i}'.`);
-        }
-        if (faixa !== undefined || j !== undefined) {
-          // Check if this is a list object (has length property and numeric indices)
-          if (typeof valor.length === 'number') {
-            // Convert list object to array for slicing
-            const arr = [];
-            for (let idx = 0; idx < valor.length; idx++) {
-              arr[idx] = valor[idx];
-            }
-            return arr.slice(i, j);
-          } else {
-            throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
-          }
-        }
-        return valor[i];
-      } else {
-        if (valor === null || valor === undefined) {
-          throw new Error(`Runtime Error: Cannot apply indexing/slicing to '${valor}'.`);
-        }
-        throw new Error(`Runtime Error: Cannot apply indexing/slicing to type '${typeof valor}' (value: ${String(valor).slice(0, 20)}).`);
-      }
-    };
+    return avaliarFatia(i_fn, opcionalFaixa);
   }
 );
 
@@ -295,7 +252,7 @@ const atributo = transformar(
     símbolo("."),
     nome,
   ),
-  ([, atributoNome]) => (escopo, objeto) => objeto[atributoNome],
+  ([, atributoNome]) => avaliarAtributo(atributoNome),
 );
 
 const lambda = transformar(
@@ -370,10 +327,7 @@ const parênteses = transformar(
   ),
   valorSeq => {
     const [, , valor_fn,] = valorSeq;
-
-    return outer_scope_param => {
-      return valor_fn(outer_scope_param);
-    };
+    return avaliarParênteses(valor_fn);
   }
 );
 

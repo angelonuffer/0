@@ -127,3 +127,56 @@ export const avaliarChaves = () => (escopo, objeto) => {
   // For regular objects, return all keys
   return keys;
 };
+
+// Slice and indexing operations
+export const avaliarFatia = (iFn, opcionalFaixa) => (escopo, valor) => {
+  const i = iFn(escopo);
+  const faixa = opcionalFaixa ? opcionalFaixa[0] : undefined;
+  const j_fn_opcional = opcionalFaixa ? opcionalFaixa[1] : undefined;
+  const j = j_fn_opcional ? j_fn_opcional(escopo) : undefined;
+
+  if (typeof valor === "string") {
+    if (faixa !== undefined || j !== undefined) {
+      return valor.slice(i, j);
+    } else {
+      return valor.charCodeAt(i);
+    }
+  } else if (Array.isArray(valor)) {
+    if (faixa !== undefined || j !== undefined) {
+      return valor.slice(i, j);
+    } else {
+      return valor[i];
+    }
+  } else if (typeof valor === 'object' && valor !== null) {
+    if (typeof i !== 'string' && typeof i !== 'number') {
+      throw new Error(`Runtime Error: Object key must be a string or number, got type ${typeof i} for key '${i}'.`);
+    }
+    if (faixa !== undefined || j !== undefined) {
+      // Check if this is a list object (has length property and numeric indices)
+      if (typeof valor.length === 'number') {
+        // Convert list object to array for slicing
+        const arr = [];
+        for (let idx = 0; idx < valor.length; idx++) {
+          arr[idx] = valor[idx];
+        }
+        return arr.slice(i, j);
+      } else {
+        throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
+      }
+    }
+    return valor[i];
+  } else {
+    if (valor === null || valor === undefined) {
+      throw new Error(`Runtime Error: Cannot apply indexing/slicing to '${valor}'.`);
+    }
+    throw new Error(`Runtime Error: Cannot apply indexing/slicing to type '${typeof valor}' (value: ${String(valor).slice(0, 20)}).`);
+  }
+};
+
+// Property access operation
+export const avaliarAtributo = (atributoNome) => (escopo, objeto) => objeto[atributoNome];
+
+// Parentheses operation (simple wrapper)
+export const avaliarParênteses = (valorFn) => (escopo) => {
+  return valorFn(escopo);
+};
