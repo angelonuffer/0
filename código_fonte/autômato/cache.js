@@ -33,7 +33,7 @@ const etapasCacheManagement = {
           [endereço]: null,
         },
         valores_módulos: {},
-        módulo_principal_estado: {},
+        módulo_principal_estado: [],
         etapa: "carregar_conteúdos"
       }
     ];

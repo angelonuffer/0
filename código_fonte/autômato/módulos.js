@@ -146,85 +146,72 @@ const etapasMódulos = {
     ];
   },
   executar_módulo_principal: (retorno, estado) => {
-    // For backward compatibility, if the module is an old-style function that returns effects array,
-    // we need to convert it to the new interface
+    // New interface: main module receives and returns context arrays like 0_node.js
     const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
     
-    // Check if this is the first call by looking for efeitos_módulo_pendentes
-    if (!estado.efeitos_módulo_pendentes) {
-      // First call - get the initial effects from the main module
-      const efeitos_módulo = módulo_principal_fn(estado.módulo_principal_estado);
-      if (!efeitos_módulo || efeitos_módulo.length === 0) {
-        return [null, { ...estado, etapa: "finalizado" }];
-      }
-      return [
-        null,
-        {
-          ...estado,
-          efeitos_módulo_pendentes: efeitos_módulo,
-          etapa: "processar_efeito_principal"
-        }
-      ];
-    }
+    // Create context array: [retorno, ...rest_of_state]
+    const contexto = [retorno, ...estado.módulo_principal_estado];
     
-    // Continue processing if we have pending effects
-    return [
-      null,
-      { ...estado, etapa: "processar_efeito_principal" }
-    ];
-  },
-  processar_efeito_principal: (retorno, estado) => {
-    if (!estado.efeitos_módulo_pendentes || estado.efeitos_módulo_pendentes.length === 0) {
+    // Call main module with context - it should return [efeito, ...novo_estado]
+    const resultado = módulo_principal_fn(contexto);
+    
+    if (!resultado || !Array.isArray(resultado)) {
       return [null, { ...estado, etapa: "finalizado" }];
     }
     
-    const [efeito_original, ...resto_efeitos] = estado.efeitos_módulo_pendentes;
+    const [efeito, ...novo_estado] = resultado;
     
-    // Convert array effects to string effects for standardization
-    let efeito;
-    if (typeof efeito_original === 'string') {
-      efeito = efeito_original;
-    } else if (Array.isArray(efeito_original)) {
-      const [index, ...args] = efeito_original;
-      switch (index) {
-        case 0: // saia
-          efeito = `process.exit(${args[0]})`;
-          break;
-        case 1: // escreva  
-          efeito = `console.log(${JSON.stringify(args[0])})`;
-          break;
-        case 2: // obtenha_argumentos
-          efeito = `process.argv.slice(2)`;
-          break;
-        case 3: // carregue_localmente
-          efeito = `fs.readFileSync(${JSON.stringify(args[0])}, "utf-8")`;
-          break;
-        case 4: // carregue_remotamente
-          efeito = `(await (await fetch(${JSON.stringify(args[0])})).text())`;
-          break;
-        case 5: // verifique_existência
-          efeito = `fs.existsSync(${JSON.stringify(args[0])})`;
-          break;
-        case 6: // salve_localmente
-          efeito = `fs.writeFileSync(${JSON.stringify(args[0])}, ${JSON.stringify(args[1])})`;
-          break;
-        default:
-          throw new Error(`Unknown effect index: ${index}`);
-      }
-    } else {
-      efeito = efeito_original;
+    // If no effect, we're done
+    if (!efeito) {
+      return [null, { ...estado, etapa: "finalizado" }];
     }
     
-    // Execute the effect and update state
+    // Convert array effects to string effects for execution
+    let efeito_string;
+    if (typeof efeito === 'string') {
+      efeito_string = efeito;
+    } else if (Array.isArray(efeito)) {
+      const [index, ...args] = efeito;
+      switch (index) {
+        case 0: // saia
+          efeito_string = `process.exit(${args[0]})`;
+          break;
+        case 1: // escreva  
+          efeito_string = `console.log(${JSON.stringify(args[0])})`;
+          break;
+        case 2: // obtenha_argumentos
+          efeito_string = `process.argv.slice(2)`;
+          break;
+        case 3: // carregue_localmente
+          efeito_string = `import('fs').then(fs => fs.readFileSync(${JSON.stringify(args[0])}, 'utf-8'))`;
+          break;
+        case 4: // carregue_remotamente
+          efeito_string = `(await (await fetch(${JSON.stringify(args[0])})).text())`;
+          break;
+        case 5: // verifique_existência
+          efeito_string = `import('fs').then(fs => fs.existsSync(${JSON.stringify(args[0])}))`;
+          break;
+        case 6: // salve_localmente
+          efeito_string = `import('fs').then(fs => fs.writeFileSync(${JSON.stringify(args[0])}, ${JSON.stringify(args[1])}))`;
+          break;
+        default:
+          efeito_string = efeito.toString();
+      }
+    } else {
+      efeito_string = efeito.toString();
+    }
+    
+    // Execute the effect and prepare for next iteration
     return [
-      efeito,
+      efeito_string,
       {
         ...estado,
-        efeitos_módulo_pendentes: resto_efeitos,
-        etapa: "processar_efeito_principal"
+        módulo_principal_estado: novo_estado,
+        etapa: "executar_módulo_principal"
       }
     ];
   },
+
 };
 
 export { etapasMódulos };
