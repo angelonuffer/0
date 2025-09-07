@@ -2,6 +2,7 @@
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
 import { espaço, nome, endereço, número, número_negativo, texto } from '../analisador_léxico/index.js';
+import { avaliarSoma, avaliarSubtração, avaliarMultiplicação, avaliarDivisão, avaliarMaiorQue, avaliarMenorQue, avaliarMaiorOuIgual, avaliarMenorOuIgual, avaliarIgual, avaliarDiferente, avaliarE, avaliarOu } from '../analisador_semântico/index.js';
 
 // Forward declaration for recursive references
 let expressão;
@@ -477,76 +478,28 @@ const termo2 = alternativa(
 const termo3 = operação(
   termo2,
   alternativa(
-    operador("*", (v1, v2) => {
-      // If one operand is a list and the other is a string, perform join
-      if (Array.isArray(v1) && typeof v2 === "string") {
-        // Special case: when joining with empty string, convert numbers to characters
-        if (v2 === "") {
-          return v1.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v2);
-        }
-        return v1.join(v2);
-      }
-      if (typeof v1 === "string" && Array.isArray(v2)) {
-        // Special case: when joining with empty string, convert numbers to characters
-        if (v1 === "") {
-          return v2.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v1);
-        }
-        return v2.join(v1);
-      }
-      // Check for list objects (with length property and numeric indices)
-      if (typeof v1 === "object" && v1 !== null && typeof v1.length === "number" && typeof v2 === "string") {
-        const arr = [];
-        for (let i = 0; i < v1.length; i++) {
-          arr.push(v1[i]);
-        }
-        // Special case: when joining with empty string, convert numbers to characters
-        if (v2 === "") {
-          return arr.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v2);
-        }
-        return arr.join(v2);
-      }
-      if (typeof v1 === "string" && typeof v2 === "object" && v2 !== null && typeof v2.length === "number") {
-        const arr = [];
-        for (let i = 0; i < v2.length; i++) {
-          arr.push(v2[i]);
-        }
-        // Special case: when joining with empty string, convert numbers to characters
-        if (v1 === "") {
-          return arr.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v1);
-        }
-        return arr.join(v1);
-      }
-      // Otherwise, perform numeric multiplication
-      return v1 * v2;
-    }),
-    operador("/", (v1, v2) => {
-      // If both operands are strings, perform string split
-      if (typeof v1 === "string" && typeof v2 === "string") {
-        return v1.split(v2);
-      }
-      // Otherwise, perform numeric division
-      return v1 / v2;
-    }),
+    operador("*", avaliarMultiplicação),
+    operador("/", avaliarDivisão),
   ),
 );
 
 const termo4 = operação(
   termo3,
   alternativa(
-    operador("+", (v1, v2) => v1 + v2),
-    operador("-", (v1, v2) => v1 - v2),
+    operador("+", avaliarSoma),
+    operador("-", avaliarSubtração),
   ),
 );
 
 const termo5 = operação(
   termo4,
   alternativa(
-    operador(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
-    operador("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
-    operador(">", (v1, v2) => v1 > v2 ? 1 : 0),
-    operador("<", (v1, v2) => v1 < v2 ? 1 : 0),
-    operador("==", (v1, v2) => v1 === v2 ? 1 : 0),
-    operador("!=", (v1, v2) => v1 !== v2 ? 1 : 0),
+    operador(">=", avaliarMaiorOuIgual),
+    operador("<=", avaliarMenorOuIgual),
+    operador(">", avaliarMaiorQue),
+    operador("<", avaliarMenorQue),
+    operador("==", avaliarIgual),
+    operador("!=", avaliarDiferente),
   ),
 );
 
@@ -578,8 +531,8 @@ const termo6 = transformar(
 expressão = operação(
   termo6,
   alternativa(
-    operador("&", (v1, v2) => v1 !== 0 ? v2 : 0),
-    operador("|", (v1, v2) => v1 !== 0 ? v1 : v2),
+    operador("&", avaliarE),
+    operador("|", avaliarOu),
   ),
 );
 
