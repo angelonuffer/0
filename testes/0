@@ -1,3 +1,4 @@
+sintaxe_erro # sintaxe_erro.0
 uniteste # ../uniteste.0
 aritmética # aritmética.0
 operadores_lógicos # operadores_lógicos.0
@@ -23,6 +24,7 @@ função # função.0
 comentário # comentário.0
 
 uniteste.descrever({"0" {
+  sintaxe_erro
   aritmética
   operadores_lógicos
   comparadores

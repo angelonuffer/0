@@ -17,13 +17,13 @@ const etapasMódulos = {
         ];
       }
       // Find the position of the syntax error
-      // The menor_resto contains the part that couldn't be parsed
-      const posição_base = estado.conteúdos[endereço].length - (módulo_bruto.menor_resto?.length ?? 0)
+      // Use menor_resto if available (complete parsing failure), otherwise use resto position
+      const unparsed_text = módulo_bruto.menor_resto || módulo_bruto.resto;
+      const posição_base = estado.conteúdos[endereço].length - unparsed_text.length;
       
-      // If menor_resto is undefined, the parser completely failed
-      // In this case, use the end of input minus 1 to point to the last character
-      if (!módulo_bruto.menor_resto) {
-        const posição_erro = Math.max(0, estado.conteúdos[endereço].length - 1);
+      // If no unparsed text available, the error is at the end of input
+      if (!unparsed_text || unparsed_text.length === 0) {
+        const posição_erro = estado.conteúdos[endereço].length;
         const linhas = estado.conteúdos[endereço].split('\n')
         const linhas_antes = estado.conteúdos[endereço].substring(0, posição_erro).split('\n');
         const número_linha = linhas_antes.length
@@ -39,22 +39,9 @@ const etapasMódulos = {
         ];
       }
       
-      // Look for the first character in menor_resto that's not whitespace or a valid operator continuation
-      let offset_no_menor_resto = 0;
-      const menor_resto = módulo_bruto.menor_resto || "";
-      
-      // Skip operators and whitespace to find the actual problematic character
-      while (offset_no_menor_resto < menor_resto.length) {
-        const char = menor_resto[offset_no_menor_resto];
-        // Skip whitespace, +, -, *, /, =, etc. to find the real unexpected character
-        if (char.match(/[\s+\-*/=<>!&|]/)) {
-          offset_no_menor_resto++;
-        } else {
-          break;
-        }
-      }
-      
-      const posição_erro = posição_base + offset_no_menor_resto;
+      // The error position is exactly where the parser stopped
+      // posição_base already points to the first character that couldn't be parsed
+      const posição_erro = posição_base;
       
       const linhas = estado.conteúdos[endereço].split('\n')
       const linhas_antes = estado.conteúdos[endereço].substring(0, posição_erro).split('\n');
