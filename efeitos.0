@@ -1,4 +1,5 @@
 {
-  escreva: mensagem => { "console.log('" mensagem "')" } * ""
-  saia: código => { "process.exit(" código ")" } * ""
+  escreva: mensagem => {1 mensagem}
+  saia: código => {0 código}
+  saia_com_contador: args => {0 args[0] args[1]}
 }

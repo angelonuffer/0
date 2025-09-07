@@ -1,4 +1,5 @@
 lista # lista.0
+efeitos # efeitos.0
 
 {
   compara_listas: args =>
@@ -20,7 +21,7 @@ lista # lista.0
               }[0]
             })
           )
-          mensagem => {1 {args[0] " | " mensagem[1]} * ""}
+          mensagem => efeitos.escreva({args[0] " | " mensagem[1]} * "")
         })
         passaram: lista.reduzir({
           lista.mapear({args[1] teste => {
@@ -31,37 +32,33 @@ lista # lista.0
         })
         {
           ...mensagens
-          {1 {"" + passaram "/" "" + mensagens[.] " testes passaram."} * ""}
-          {
-            0
-            passaram == mensagens[.] ? 0 : 1
-            passaram
-          }
+          efeitos.escreva({"" + passaram "/" "" + mensagens[.] " testes passaram."} * "")
+          efeitos.saia_com_contador({passaram == mensagens[.] ? 0 : 1 passaram})
         }
       }[0]
     iguais: args => _ =>
       args[0] == args[1] ?
         {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
+          efeitos.escreva("ok")
+          efeitos.escreva("1/1 testes passaram.")
+          efeitos.saia_com_contador({0 1})
         } :
         {
-          {1 {"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * ""}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
+          efeitos.escreva({"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * "")
+          efeitos.escreva("0/1 testes passaram.")
+          efeitos.saia_com_contador({1 0})
         }
     listas_iguais: args => _ =>
       compara_listas({args[0] args[1]}) ?
         {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
+          efeitos.escreva("ok")
+          efeitos.escreva("1/1 testes passaram.")
+          efeitos.saia_com_contador({0 1})
         } :
         {
-          {1 {"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * ""}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
+          efeitos.escreva({"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * "")
+          efeitos.escreva("0/1 testes passaram.")
+          efeitos.saia_com_contador({1 0})
         }
   }
 }.uniteste
