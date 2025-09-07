@@ -1,6 +1,5 @@
 // Syntax analyzer - Parsing expressions and language constructs
-import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
-import { operação } from '../combinadores/avançados.js';
+import { alternativa, sequência, opcional, vários, transformar, símbolo, operador, operação } from '../analisador_semântico/index.js';
 import { espaço, nome, endereço, número, número_negativo, texto } from '../analisador_léxico/index.js';
 
 // Forward declaration for recursive references
