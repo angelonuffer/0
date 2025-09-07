@@ -2,7 +2,6 @@
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
 import { espaço, nome, endereço, número, número_negativo, texto } from '../analisador_léxico/index.js';
-import { avaliarSoma, avaliarSubtração, avaliarMultiplicação, avaliarDivisão, avaliarMaiorQue, avaliarMenorQue, avaliarMaiorOuIgual, avaliarMenorOuIgual, avaliarIgual, avaliarDiferente, avaliarE, avaliarOu, avaliarVariável, avaliarNegação, avaliarCondicional, avaliarTamanho, avaliarChaves, avaliarFatia, avaliarAtributo, avaliarParênteses } from '../analisador_semântico/index.js';
 
 // Forward declaration for recursive references
 let expressão;
@@ -13,12 +12,21 @@ const não = transformar(
     opcional(espaço),
     { analisar: código => expressão.analisar(código) },
   ),
-  ([, , v]) => avaliarNegação(v),
+  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
 )
 
 const valor_constante = transformar(
   nome,
-  avaliarVariável,
+  v => escopo => {
+    let atualEscopo = escopo;
+    while (atualEscopo) {
+      if (atualEscopo.hasOwnProperty(v)) {
+        return atualEscopo[v];
+      }
+      atualEscopo = atualEscopo.__parent__;
+    }
+    return undefined;
+  },
 )
 
 // Immediate function call - identifier directly followed by parentheses (no space)
@@ -74,18 +82,76 @@ const fatia = transformar(
   ),
   valorSeq => {
     const [, i_fn, opcionalFaixa,] = valorSeq;
-    return avaliarFatia(i_fn, opcionalFaixa);
+    const faixa = opcionalFaixa ? opcionalFaixa[0] : undefined;
+    const j_fn_opcional = opcionalFaixa ? opcionalFaixa[1] : undefined;
+
+    return (escopo, valor) => {
+      const i = i_fn(escopo);
+      const j = j_fn_opcional ? j_fn_opcional(escopo) : undefined;
+
+      if (typeof valor === "string") {
+        if (faixa !== undefined || j !== undefined) {
+          return valor.slice(i, j);
+        } else {
+          return valor.charCodeAt(i);
+        }
+      } else if (Array.isArray(valor)) {
+        if (faixa !== undefined || j !== undefined) {
+          return valor.slice(i, j);
+        } else {
+          return valor[i];
+        }
+      } else if (typeof valor === 'object' && valor !== null) {
+        if (typeof i !== 'string' && typeof i !== 'number') {
+          throw new Error(`Runtime Error: Object key must be a string or number, got type ${typeof i} for key '${i}'.`);
+        }
+        if (faixa !== undefined || j !== undefined) {
+          // Check if this is a list object (has length property and numeric indices)
+          if (typeof valor.length === 'number') {
+            // Convert list object to array for slicing
+            const arr = [];
+            for (let idx = 0; idx < valor.length; idx++) {
+              arr[idx] = valor[idx];
+            }
+            return arr.slice(i, j);
+          } else {
+            throw new Error(`Runtime Error: Slicing syntax not supported for object property access using key '${i}'.`);
+          }
+        }
+        return valor[i];
+      } else {
+        if (valor === null || valor === undefined) {
+          throw new Error(`Runtime Error: Cannot apply indexing/slicing to '${valor}'.`);
+        }
+        throw new Error(`Runtime Error: Cannot apply indexing/slicing to type '${typeof valor}' (value: ${String(valor).slice(0, 20)}).`);
+      }
+    };
   }
 );
 
 const tamanho = transformar(
   símbolo("[.]"),
-  avaliarTamanho,
+  () => (escopo, valor) => valor.length,
 );
 
 const chaves = transformar(
   símbolo("[*]"),
-  avaliarChaves,
+  () => (escopo, objeto) => {
+    const keys = Object.keys(objeto);
+    
+    // For real arrays, return all indices as strings
+    if (Array.isArray(objeto)) {
+      return keys;
+    }
+    
+    // For list objects (objects with a length property), filter out numeric indices and length
+    if (typeof objeto.length === 'number') {
+      return keys.filter(key => key !== 'length' && !/^\d+$/.test(key));
+    }
+    
+    // For regular objects, return all keys
+    return keys;
+  },
 );
 
 const lista = transformar(
@@ -252,7 +318,7 @@ const atributo = transformar(
     símbolo("."),
     nome,
   ),
-  ([, atributoNome]) => avaliarAtributo(atributoNome),
+  ([, atributoNome]) => (escopo, objeto) => objeto[atributoNome],
 );
 
 const lambda = transformar(
@@ -327,7 +393,10 @@ const parênteses = transformar(
   ),
   valorSeq => {
     const [, , valor_fn,] = valorSeq;
-    return avaliarParênteses(valor_fn);
+
+    return outer_scope_param => {
+      return valor_fn(outer_scope_param);
+    };
   }
 );
 
@@ -408,28 +477,76 @@ const termo2 = alternativa(
 const termo3 = operação(
   termo2,
   alternativa(
-    operador("*", avaliarMultiplicação),
-    operador("/", avaliarDivisão),
+    operador("*", (v1, v2) => {
+      // If one operand is a list and the other is a string, perform join
+      if (Array.isArray(v1) && typeof v2 === "string") {
+        // Special case: when joining with empty string, convert numbers to characters
+        if (v2 === "") {
+          return v1.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v2);
+        }
+        return v1.join(v2);
+      }
+      if (typeof v1 === "string" && Array.isArray(v2)) {
+        // Special case: when joining with empty string, convert numbers to characters
+        if (v1 === "") {
+          return v2.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v1);
+        }
+        return v2.join(v1);
+      }
+      // Check for list objects (with length property and numeric indices)
+      if (typeof v1 === "object" && v1 !== null && typeof v1.length === "number" && typeof v2 === "string") {
+        const arr = [];
+        for (let i = 0; i < v1.length; i++) {
+          arr.push(v1[i]);
+        }
+        // Special case: when joining with empty string, convert numbers to characters
+        if (v2 === "") {
+          return arr.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v2);
+        }
+        return arr.join(v2);
+      }
+      if (typeof v1 === "string" && typeof v2 === "object" && v2 !== null && typeof v2.length === "number") {
+        const arr = [];
+        for (let i = 0; i < v2.length; i++) {
+          arr.push(v2[i]);
+        }
+        // Special case: when joining with empty string, convert numbers to characters
+        if (v1 === "") {
+          return arr.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v1);
+        }
+        return arr.join(v1);
+      }
+      // Otherwise, perform numeric multiplication
+      return v1 * v2;
+    }),
+    operador("/", (v1, v2) => {
+      // If both operands are strings, perform string split
+      if (typeof v1 === "string" && typeof v2 === "string") {
+        return v1.split(v2);
+      }
+      // Otherwise, perform numeric division
+      return v1 / v2;
+    }),
   ),
 );
 
 const termo4 = operação(
   termo3,
   alternativa(
-    operador("+", avaliarSoma),
-    operador("-", avaliarSubtração),
+    operador("+", (v1, v2) => v1 + v2),
+    operador("-", (v1, v2) => v1 - v2),
   ),
 );
 
 const termo5 = operação(
   termo4,
   alternativa(
-    operador(">=", avaliarMaiorOuIgual),
-    operador("<=", avaliarMenorOuIgual),
-    operador(">", avaliarMaiorQue),
-    operador("<", avaliarMenorQue),
-    operador("==", avaliarIgual),
-    operador("!=", avaliarDiferente),
+    operador(">=", (v1, v2) => v1 >= v2 ? 1 : 0),
+    operador("<=", (v1, v2) => v1 <= v2 ? 1 : 0),
+    operador(">", (v1, v2) => v1 > v2 ? 1 : 0),
+    operador("<", (v1, v2) => v1 < v2 ? 1 : 0),
+    operador("==", (v1, v2) => v1 === v2 ? 1 : 0),
+    operador("!=", (v1, v2) => v1 !== v2 ? 1 : 0),
   ),
 );
 
@@ -453,7 +570,7 @@ const termo6 = transformar(
     if (!resto_opcional_val) return condição_fn;
 
     const [, , , valor_se_verdadeiro_fn, , , , valor_se_falso_fn] = resto_opcional_val;
-    return avaliarCondicional(condição_fn, valor_se_verdadeiro_fn, valor_se_falso_fn);
+    return escopo => condição_fn(escopo) !== 0 ? valor_se_verdadeiro_fn(escopo) : valor_se_falso_fn(escopo);
   }
 );
 
@@ -461,8 +578,8 @@ const termo6 = transformar(
 expressão = operação(
   termo6,
   alternativa(
-    operador("&", avaliarE),
-    operador("|", avaliarOu),
+    operador("&", (v1, v2) => v1 !== 0 ? v2 : 0),
+    operador("|", (v1, v2) => v1 !== 0 ? v1 : v2),
   ),
 );
 

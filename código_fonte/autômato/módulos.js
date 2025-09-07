@@ -1,5 +1,5 @@
 // Module evaluation and execution step handlers
-import { _0 } from '../analisador_sintático/index.js';
+import { _0 } from '../analisador_semântico/index.js';
 import { efeitos } from './efeitos.js';
 
 const etapasMódulos = {
