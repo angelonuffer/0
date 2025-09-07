@@ -92,3 +92,38 @@ export const avaliarDiferente = (v1, v2) => v1 !== v2 ? 1 : 0;
 export const avaliarE = (v1, v2) => v1 !== 0 ? v2 : 0;
 
 export const avaliarOu = (v1, v2) => v1 !== 0 ? v1 : v2;
+
+// Variable operations
+export const avaliarVariável = (nomeVariável) => (escopo) => {
+  return buscarVariável(escopo, nomeVariável);
+};
+
+// Negation operation  
+export const avaliarNegação = (valorFn) => (escopo) => {
+  return valorFn(escopo) === 0 ? 1 : 0;
+};
+
+// Conditional operation (ternary operator)
+export const avaliarCondicional = (condiçãoFn, valorVerdadeiroFn, valorFalsoFn) => (escopo) => {
+  return condiçãoFn(escopo) !== 0 ? valorVerdadeiroFn(escopo) : valorFalsoFn(escopo);
+};
+
+// List operations
+export const avaliarTamanho = () => (escopo, valor) => valor.length;
+
+export const avaliarChaves = () => (escopo, objeto) => {
+  const keys = Object.keys(objeto);
+  
+  // For real arrays, return all indices as strings
+  if (Array.isArray(objeto)) {
+    return keys;
+  }
+  
+  // For list objects (objects with a length property), filter out numeric indices and length
+  if (typeof objeto.length === 'number') {
+    return keys.filter(key => key !== 'length' && !/^\d+$/.test(key));
+  }
+  
+  // For regular objects, return all keys
+  return keys;
+};

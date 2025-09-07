@@ -2,7 +2,7 @@
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
 import { espaço, nome, endereço, número, número_negativo, texto } from '../analisador_léxico/index.js';
-import { avaliarSoma, avaliarSubtração, avaliarMultiplicação, avaliarDivisão, avaliarMaiorQue, avaliarMenorQue, avaliarMaiorOuIgual, avaliarMenorOuIgual, avaliarIgual, avaliarDiferente, avaliarE, avaliarOu } from '../analisador_semântico/index.js';
+import { avaliarSoma, avaliarSubtração, avaliarMultiplicação, avaliarDivisão, avaliarMaiorQue, avaliarMenorQue, avaliarMaiorOuIgual, avaliarMenorOuIgual, avaliarIgual, avaliarDiferente, avaliarE, avaliarOu, avaliarVariável, avaliarNegação, avaliarCondicional, avaliarTamanho, avaliarChaves } from '../analisador_semântico/index.js';
 
 // Forward declaration for recursive references
 let expressão;
@@ -13,21 +13,12 @@ const não = transformar(
     opcional(espaço),
     { analisar: código => expressão.analisar(código) },
   ),
-  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
+  ([, , v]) => avaliarNegação(v),
 )
 
 const valor_constante = transformar(
   nome,
-  v => escopo => {
-    let atualEscopo = escopo;
-    while (atualEscopo) {
-      if (atualEscopo.hasOwnProperty(v)) {
-        return atualEscopo[v];
-      }
-      atualEscopo = atualEscopo.__parent__;
-    }
-    return undefined;
-  },
+  avaliarVariável,
 )
 
 // Immediate function call - identifier directly followed by parentheses (no space)
@@ -132,27 +123,12 @@ const fatia = transformar(
 
 const tamanho = transformar(
   símbolo("[.]"),
-  () => (escopo, valor) => valor.length,
+  avaliarTamanho,
 );
 
 const chaves = transformar(
   símbolo("[*]"),
-  () => (escopo, objeto) => {
-    const keys = Object.keys(objeto);
-    
-    // For real arrays, return all indices as strings
-    if (Array.isArray(objeto)) {
-      return keys;
-    }
-    
-    // For list objects (objects with a length property), filter out numeric indices and length
-    if (typeof objeto.length === 'number') {
-      return keys.filter(key => key !== 'length' && !/^\d+$/.test(key));
-    }
-    
-    // For regular objects, return all keys
-    return keys;
-  },
+  avaliarChaves,
 );
 
 const lista = transformar(
@@ -523,7 +499,7 @@ const termo6 = transformar(
     if (!resto_opcional_val) return condição_fn;
 
     const [, , , valor_se_verdadeiro_fn, , , , valor_se_falso_fn] = resto_opcional_val;
-    return escopo => condição_fn(escopo) !== 0 ? valor_se_verdadeiro_fn(escopo) : valor_se_falso_fn(escopo);
+    return avaliarCondicional(condição_fn, valor_se_verdadeiro_fn, valor_se_falso_fn);
   }
 );
 
