@@ -1,7 +1,15 @@
 lista # lista.0
 
 {
-  comandos => comandos
-  escreva: saída => {1 saída}
-  saia: código => {0 código}
+  comandos => comandos * ";"
+  escreva: saída => {
+    "console.log('"
+    saída
+    "')"
+  } * ""
+  saia: código => {
+    "process.exit("
+    "" + código
+    ")"
+  } * ""
 }
