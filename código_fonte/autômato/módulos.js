@@ -146,8 +146,7 @@ const etapasMódulos = {
     ];
   },
   executar_módulo_principal: (retorno, estado) => {
-    const módulo_principal_fn = estado.valores_módulos[estado.módulo_principal];
-    return [módulo_principal_fn("Node.js")]
+    return [estado.valores_módulos[estado.módulo_principal]]
   },
 };
 
