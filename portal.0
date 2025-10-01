@@ -1,0 +1,15 @@
+lista # lista.0
+
+{
+  comandos => comandos * ";"
+  escreva: saída => {
+    "console.log('"
+    saída
+    "')"
+  } * ""
+  saia: código => {
+    "process.exit("
+    "" + código
+    ")"
+  } * ""
+}

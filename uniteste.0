@@ -1,4 +1,5 @@
 lista # lista.0
+portal # portal.0
 
 {
   compara_listas: args =>
@@ -6,62 +7,74 @@ lista # lista.0
     args[0][.] == 0 ? 1 :
     args[0][0] != args[1][0] ? 0 :
     compara_listas({args[0][1:] args[1][1:]})
+  exibir: resultado =>
+    portal[0]({
+      ...lista.mapear({
+        resultado.mensagens
+        mensagem => portal.escreva(mensagem)
+      })
+      portal.escreva(resultado.passaram + "/" + resultado.mensagens[.] + " testes passaram.")
+      resultado.passaram == resultado.mensagens[.] ?
+        portal.saia(0)
+      :
+        portal.saia(1)
+    })
 
   uniteste: {
-    descrever: args => _ =>
-      {
-        mensagens: lista.mapear({
-          lista.planificar(
-            lista.mapear({
-              args[1]
-              teste => {
-                resultado: teste(0)
-                resultado[0:resultado[.] - 2]
-              }[0]
-            })
-          )
-          mensagem => {1 {args[0] " | " mensagem[1]} * ""}
-        })
+    descrever: args => destino => {
+      nome: args[0]
+      resultados: args[1]
+      resultado: {
         passaram: lista.reduzir({
-          lista.mapear({args[1] teste => {
-            resultado: teste(0)
-            resultado[resultado[.] - 1][2]
-          }[0]})
-          pair => pair[0] + pair[1]
+          lista.mapear({
+            resultados
+            resultado => (resultado("descrever")).passaram
+          })
+          args => args[0] + args[1]
         })
-        {
-          ...mensagens
-          {1 {"" + passaram "/" "" + mensagens[.] " testes passaram."} * ""}
-          {
-            0
-            passaram == mensagens[.] ? 0 : 1
-            passaram
-          }
+        mensagens: lista.planificar(lista.mapear({
+          resultados
+          resultado => lista.mapear({
+            (resultado("descrever")).mensagens
+            mensagem => {
+              nome
+              " | "
+              mensagem
+            } * ""
+          })
+        }))
+      }
+      destino == "descrever" ? resultado : exibir(resultado)
+    }[0]
+    iguais: args => destino => {
+      resultado: {
+        passaram: args[0] == args[1] ? 1 : 0
+        mensagens: {
+          passaram == 1 ? "ok" : {
+            "Esperava que "
+            "" + args[0]
+            " fosse igual a "
+            "" + args[1]
+            "."
+          } * ""
         }
-      }[0]
-    iguais: args => _ =>
-      args[0] == args[1] ?
-        {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
-        } :
-        {
-          {1 {"Esperava que " "" + args[0] " fosse igual a " "" + args[1] "."} * ""}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
+      }
+      destino == "descrever" ? resultado : exibir(resultado)
+    }[0]
+    listas_iguais: args => destino => {
+      resultado: {
+        passaram: compara_listas({args[0] args[1]}) ? 1 : 0
+        mensagens: {
+          passaram == 1 ? "ok" : {
+            "Esperava que {"
+            lista.juntar({args[0] ", "})
+            "} fosse igual a {"
+            lista.juntar({args[1] ", "})
+            "}."
+          } * ""
         }
-    listas_iguais: args => _ =>
-      compara_listas({args[0] args[1]}) ?
-        {
-          {1 "ok"}
-          {1 "1/1 testes passaram."}
-          {0 0 1}
-        } :
-        {
-          {1 {"Esperava que {" lista.juntar({args[0] ", "}) "} fosse igual a {" lista.juntar({args[1] ", "}) "}."} * ""}
-          {1 "0/1 testes passaram."}
-          {0 1 0}
-        }
+      }
+      destino == "descrever" ? resultado : exibir(resultado)
+    }[0]
   }
 }.uniteste
