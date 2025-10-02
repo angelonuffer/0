@@ -17,9 +17,9 @@ const efeitos = {
     ", 'utf-8'))",
   ].join(""),
   carregue_remotamente: endereço => [
-    "(await (await fetch(",
+    "fetch(",
     JSON.stringify(endereço),
-    ")).text())",
+    ").then(resposta => resposta.text())",
   ].join(""),
   verifique_existência: endereço => [
     "import('fs').then(fs => fs.existsSync(",
