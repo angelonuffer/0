@@ -1,5 +1,5 @@
 lista # lista.0
-portal # portal.0
+processo # processo.0
 
 {
   compara_listas: args =>
@@ -8,16 +8,16 @@ portal # portal.0
     args[0][0] != args[1][0] ? 0 :
     compara_listas({args[0][1:] args[1][1:]})
   exibir: resultado =>
-    portal[0]({
+    processo.nodejs({
       ...lista.mapear({
         resultado.mensagens
-        mensagem => portal.escreva(mensagem)
+        mensagem => processo.escreva(mensagem)
       })
-      portal.escreva(resultado.passaram + "/" + resultado.mensagens[.] + " testes passaram.")
+      processo.escreva(resultado.passaram + "/" + resultado.mensagens[.] + " testes passaram.")
       resultado.passaram == resultado.mensagens[.] ?
-        portal.saia(0)
+        processo.saia(0)
       :
-        portal.saia(1)
+        processo.saia(1)
     })
 
   uniteste: {
