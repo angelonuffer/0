@@ -1,7 +1,5 @@
-lista # lista.0
-
 {
-  comandos => comandos * ";"
+  nodejs: comandos => comandos * ";"
   escreva: saída => {
     "console.log('"
     saída
