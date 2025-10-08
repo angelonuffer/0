@@ -10,4 +10,4 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 22
-    - run: node 0_node.js testes/0
+    - run: node código/0_node.js testes/0

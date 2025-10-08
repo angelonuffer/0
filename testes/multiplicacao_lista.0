@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Multiplicação de lista" {
+uniteste => uniteste.descrever({"Multiplicação de lista" {
   uniteste.descrever({"Join básico" {
     uniteste.iguais({
       {"a" "b" "c"} * " "

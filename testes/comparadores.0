@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Comparadores" {
+uniteste => uniteste.descrever({"Comparadores" {
   uniteste.descrever({"Maior que (>)" {
     uniteste.iguais({
       2 > 8

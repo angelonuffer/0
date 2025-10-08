@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Casos adicionais de acesso direto a literais" {
+uniteste => uniteste.descrever({"Casos adicionais de acesso direto a literais" {
   // Test with nested list access
   uniteste.iguais({
     {{ 1 2 } { 3 4 }}[0][1]

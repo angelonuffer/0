@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Lista" {
+uniteste => uniteste.descrever({"Lista" {
   uniteste.descrever({"Fatiamento" {
     uniteste.iguais({
       {

@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Edge Cases" {
+uniteste => uniteste.descrever({"Edge Cases" {
   uniteste.descrever({"Mixed types should use numeric division" {
     uniteste.iguais({
       "10" / 2

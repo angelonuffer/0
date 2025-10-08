@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Erro de sintaxe - posição" {
+uniteste => uniteste.descrever({"Erro de sintaxe - posição" {
   uniteste.descrever({"Caractere inválido" {
     uniteste.iguais({1 1}) // Documentado: "2 + @ 3" deve reportar posição 1:7
   }})

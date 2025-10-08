@@ -1,5 +1,6 @@
+uniteste # https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@812acbb477e23b000fd11ca09625e32c6aac7d8d/código/0
+lista # https://cdn.jsdelivr.net/gh/angelonuffer/lista@671da186a1fdfe00b2fc29dee5d45a5512d0dde8/código/lista.0
 sintaxe_erro # sintaxe_erro.0
-uniteste # ../uniteste.0
 aritmética # aritmética.0
 operadores_lógicos # operadores_lógicos.0
 comparadores # comparadores.0
@@ -9,7 +10,7 @@ documentation_examples # documentation_examples.0
 edge_cases_division # edge_cases_division.0
 string_division_comprehensive # string_division_comprehensive.0
 test_string_division # test_string_division.0
-lista # lista.0
+teste_lista # lista.0
 lista_com_chaves # lista_com_chaves.0
 string_keys # string_keys.0
 referência_lista # referência_lista.0
@@ -23,28 +24,30 @@ operador_espalhamento # operador_espalhamento.0
 função # função.0
 comentário # comentário.0
 
-uniteste.descrever({"0" {
-  sintaxe_erro
-  aritmética
-  operadores_lógicos
-  comparadores
-  constantes
-  texto
-  documentation_examples
-  edge_cases_division
-  string_division_comprehensive
-  test_string_division
-  lista
-  lista_com_chaves
-  string_keys
-  referência_lista
-  teste_aninhado
-  teste_documentacao
-  teste_edge_cases
-  literal_indexing
-  literal_indexing_additional
-  multiplicacao_lista
-  operador_espalhamento
-  função
-  comentário
-}})(0)
+uniteste.descrever({"0"
+  lista.mapear({{
+    sintaxe_erro
+    aritmética
+    operadores_lógicos
+    comparadores
+    constantes
+    texto
+    documentation_examples
+    edge_cases_division
+    string_division_comprehensive
+    test_string_division
+    teste_lista
+    lista_com_chaves
+    string_keys
+    referência_lista
+    teste_aninhado
+    teste_documentacao
+    teste_edge_cases
+    literal_indexing
+    literal_indexing_additional
+    multiplicacao_lista
+    operador_espalhamento
+    função
+    comentário
+  } teste => teste(uniteste)})
+})(0)

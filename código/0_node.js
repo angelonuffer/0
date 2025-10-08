@@ -1,7 +1,7 @@
-import _0 from "./0.js"
+import { processar } from './autômato/index.js';
 
 let contexto = ["Node.js"]
 while (true) {
-  contexto = _0(contexto)
+  contexto = processar(contexto)
   contexto[0] = await eval(contexto[0])
 }

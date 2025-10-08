@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Referências de propriedades em lista" {
+uniteste => uniteste.descrever({"Referências de propriedades em lista" {
   uniteste.iguais({
     {
       exemplo: {
