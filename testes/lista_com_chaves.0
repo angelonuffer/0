@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Lista com chaves" {
+uniteste => uniteste.descrever({"Lista com chaves" {
   uniteste.iguais({{
     lista_com_chaves: {
       nome: "João"

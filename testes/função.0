@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Função" {
+uniteste => uniteste.descrever({"Função" {
   uniteste.iguais({
     {
       quadrado: x => x * x

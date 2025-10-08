@@ -1,6 +1,4 @@
-uniteste # ../uniteste.0
-
-uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
+uniteste => uniteste.descrever({"Referências aninhadas em lista - Teste Completo" {
   // Caso básico do enunciado
   uniteste.iguais({
     {
