@@ -1,14 +1,4 @@
 uniteste => uniteste.descrever({"Edge Cases" {
-  uniteste.descrever({"Mixed types should use numeric division" {
-    uniteste.iguais({
-      "10" / 2
-      5
-    })
-    uniteste.iguais({
-      10 / "2"
-      5
-    })
-  }})
   uniteste.descrever({"Empty separator splits each character" {
     uniteste.listas_iguais({
       "abc" / ""

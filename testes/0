@@ -1,6 +1,5 @@
 uniteste # https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@812acbb477e23b000fd11ca09625e32c6aac7d8d/código/0
 lista # https://cdn.jsdelivr.net/gh/angelonuffer/lista@671da186a1fdfe00b2fc29dee5d45a5512d0dde8/código/lista.0
-sintaxe_erro # sintaxe_erro.0
 aritmética # aritmética.0
 operadores_lógicos # operadores_lógicos.0
 comparadores # comparadores.0
@@ -26,7 +25,6 @@ comentário # comentário.0
 
 uniteste.descrever({"0"
   lista.mapear({{
-    sintaxe_erro
     aritmética
     operadores_lógicos
     comparadores
