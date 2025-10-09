@@ -191,8 +191,7 @@ try {
   // Save cache
   fs.writeFileSync("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2));
   
-  // Return the main module value
-  console.log(valores_módulos[módulo_principal]);
+  await eval(valores_módulos[módulo_principal])
   
 } catch (erro) {
   console.error(erro);
