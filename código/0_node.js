@@ -106,10 +106,17 @@ try {
     if (!pendente) break;
     
     const [endereço] = pendente;
-    const módulo_bruto = _0.analisar(conteúdos[endereço]);
+    const módulo_bruto = _0(conteúdos[endereço]);
     
-    if (módulo_bruto.erro) {
-      console.log(`Erro: ${módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
+    // Check if parsing failed
+    if (!módulo_bruto.sucesso) {
+      // If there's an error with stack trace, it's a transformer error
+      if (módulo_bruto.erro && módulo_bruto.erro.stack) {
+        console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
+      } else {
+        // Otherwise show syntax error
+        mostrar_erro_sintaxe(endereço, módulo_bruto);
+      }
       fs.writeFileSync("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2));
       process.exit(1);
     }

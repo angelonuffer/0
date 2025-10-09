@@ -10,7 +10,7 @@ const não = transformar(
   sequência(
     símbolo("!"),
     opcional(espaço),
-    { analisar: código => expressão.analisar(código) },
+    código => expressão(código),
   ),
   ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
 )
@@ -37,7 +37,7 @@ const chamada_função_imediata = transformar(
     opcional(espaço),
     opcional(
       sequência(
-        { analisar: código => expressão.analisar(código) },
+        código => expressão(código),
         opcional(espaço),
       )
     ),
@@ -73,10 +73,10 @@ const chamada_função_imediata = transformar(
 const fatia = transformar(
   sequência(
     símbolo("["),
-    { analisar: código => expressão.analisar(código) },
+    código => expressão(código),
     opcional(sequência(
       símbolo(":"),
-      opcional({ analisar: código => expressão.analisar(código) }),
+      opcional(código => expressão(código)),
     )),
     símbolo("]"),
   ),
@@ -166,22 +166,22 @@ const lista = transformar(
             texto,
             sequência(
               símbolo("["),
-              { analisar: código => expressão.analisar(código) },
+              código => expressão(código),
               símbolo("]"),
             )
           ),
           símbolo(":"),
           opcional(espaço),
-          { analisar: código => expressão.analisar(código) },
+          código => expressão(código),
           opcional(espaço),
         ),
         sequência( // Spread syntax ...expression
           símbolo("..."),
-          { analisar: código => expressão.analisar(código) },
+          código => expressão(código),
           opcional(espaço),
         ),
         sequência( // Value-only (auto-indexed)
-          { analisar: código => expressão.analisar(código) },
+          código => expressão(código),
           opcional(espaço),
         ),
       ),
@@ -327,7 +327,7 @@ const lambda = transformar(
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),
-    { analisar: código => expressão.analisar(código) }
+    código => expressão(código)
   ),
   (valorBrutoLambda) => {
     const [paramsResultado, , , , corpoExprFunc] = valorBrutoLambda;
@@ -366,7 +366,7 @@ const chamada_função = transformar(
     opcional(espaço),
     opcional(
       sequência(
-        { analisar: código => expressão.analisar(código) },
+        código => expressão(código),
         opcional(espaço),
       )
     ),
@@ -387,7 +387,7 @@ const parênteses = transformar(
   sequência(
     símbolo("("),
     opcional(espaço),
-    { analisar: código => expressão.analisar(código) },
+    código => expressão(código),
     opcional(espaço),
     símbolo(")"),
   ),
@@ -557,11 +557,11 @@ const termo6 = transformar(
       opcional(espaço),
       símbolo("?"),
       opcional(espaço),
-      { analisar: código => expressão.analisar(código) },
+      código => expressão(código),
       opcional(espaço),
       símbolo(":"),
       opcional(espaço),
-      { analisar: código => expressão.analisar(código) },
+      código => expressão(código),
     ), undefined)
   ),
   valor => {
