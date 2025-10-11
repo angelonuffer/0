@@ -72,7 +72,6 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
 
 // State for module loading and execution
 const conteúdos = {
-  "0_cache.json": cache,
   [módulo_principal]: await carregar_conteúdo(módulo_principal),
 };
 const módulos = {
@@ -98,13 +97,13 @@ try {
         // Otherwise show syntax error
         mostrar_erro_sintaxe(endereço, módulo_bruto);
       }
-      fs.writeFileSync("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2));
+      fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
       process.exit(1);
     }
     
     if (módulo_bruto.resto.length > 0) {
       mostrar_erro_sintaxe(endereço, módulo_bruto);
-      fs.writeFileSync("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2));
+      fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
       process.exit(1);
     }
     
