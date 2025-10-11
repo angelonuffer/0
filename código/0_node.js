@@ -1,25 +1,13 @@
 import { _0 } from './analisador_sintático/index.js';
 import fs from 'fs';
 
-// Get command line arguments
-const argumentos = process.argv.slice(2);
-const [módulo_principal] = argumentos;
+const módulo_principal = process.argv[2];
 
 // Check and load cache
 let cache = {};
 if (fs.existsSync("0_cache.json")) {
   cache = JSON.parse(fs.readFileSync("0_cache.json", 'utf-8'));
 }
-
-// State for module loading and execution
-const conteúdos = {
-  "0_cache.json": cache,
-  [módulo_principal]: null,
-};
-const módulos = {
-  [módulo_principal]: null,
-};
-const valores_módulos = {};
 
 // Helper function to resolve relative paths
 const resolve_endereço = (base_module_path, rel_path) => {
@@ -34,9 +22,13 @@ const resolve_endereço = (base_module_path, rel_path) => {
 
 // Helper function to load content (local or remote)
 const carregar_conteúdo = async (endereço) => {
+  if (cache[endereço]) {
+    return cache[endereço];
+  }
   if (endereço.startsWith("https://")) {
     const resposta = await fetch(endereço);
-    return await resposta.text();
+    cache[endereço] = await resposta.text();
+    return cache[endereço];
   } else {
     return fs.readFileSync(endereço, 'utf-8');
   }
@@ -78,28 +70,16 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
   console.log(`Erro de sintaxe.\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
 };
 
+// State for module loading and execution
+const conteúdos = {
+  [módulo_principal]: await carregar_conteúdo(módulo_principal),
+};
+const módulos = {
+  [módulo_principal]: null,
+};
+const valores_módulos = {};
+
 try {
-  // Step 1: Load all module contents
-  while (true) {
-    const pendente = Object.entries(conteúdos).find(([endereço, conteúdo]) => conteúdo === null);
-    if (!pendente) break;
-    
-    const [endereço] = pendente;
-    
-    // Check if content is in cache
-    if (conteúdos["0_cache.json"][endereço]) {
-      conteúdos[endereço] = conteúdos["0_cache.json"][endereço];
-    } else {
-      const conteúdo = await carregar_conteúdo(endereço);
-      conteúdos[endereço] = conteúdo;
-      
-      // Update cache for remote URLs
-      if (endereço.startsWith("https://")) {
-        conteúdos["0_cache.json"][endereço] = conteúdo;
-      }
-    }
-  }
-  
   // Step 2: Parse all modules and resolve dependencies
   while (true) {
     const pendente = Object.entries(módulos).find(([endereço, módulo]) => módulo === null);
@@ -117,13 +97,13 @@ try {
         // Otherwise show syntax error
         mostrar_erro_sintaxe(endereço, módulo_bruto);
       }
-      fs.writeFileSync("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2));
+      fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
       process.exit(1);
     }
     
     if (módulo_bruto.resto.length > 0) {
       mostrar_erro_sintaxe(endereço, módulo_bruto);
-      fs.writeFileSync("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2));
+      fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
       process.exit(1);
     }
     
@@ -149,16 +129,7 @@ try {
       
       const [end_pendente] = pendente_conteúdo;
       
-      if (conteúdos["0_cache.json"][end_pendente]) {
-        conteúdos[end_pendente] = conteúdos["0_cache.json"][end_pendente];
-      } else {
-        const conteúdo = await carregar_conteúdo(end_pendente);
-        conteúdos[end_pendente] = conteúdo;
-        
-        if (end_pendente.startsWith("https://")) {
-          conteúdos["0_cache.json"][end_pendente] = conteúdo;
-        }
-      }
+      conteúdos[pendente_conteúdo[0]] = await carregar_conteúdo(end_pendente);
     }
   }
   
@@ -196,7 +167,7 @@ try {
   }
   
   // Save cache
-  fs.writeFileSync("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2));
+  fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
   
   await eval(valores_módulos[módulo_principal])
   
