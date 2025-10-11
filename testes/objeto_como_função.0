@@ -1,0 +1,55 @@
+uniteste => uniteste.descrever({"Objeto como função" {
+  uniteste.descrever({"Array chamado como função" {
+    uniteste.iguais({
+      {
+        arr: {10 20 30}
+        arr(1)
+      }[0]
+      20
+    })
+    uniteste.iguais({
+      {
+        arr: {"a" "b" "c"}
+        arr(0)
+      }[0]
+      "a"
+    })
+  }})
+  
+  uniteste.descrever({"Objeto com chaves chamado como função" {
+    uniteste.iguais({
+      {
+        obj: {
+          nome: "João"
+          idade: 30
+        }
+        obj("nome")
+      }[0]
+      "João"
+    })
+    uniteste.iguais({
+      {
+        obj: {
+          x: 100
+          y: 200
+        }
+        obj("x")
+      }[0]
+      100
+    })
+  }})
+  
+  uniteste.descrever({"Objeto com funções chamado como função" {
+    uniteste.iguais({
+      {
+        fns: {
+          _ => "primeiro"
+          _ => "segundo"
+          _ => "terceiro"
+        }
+        fns(1)(0)
+      }[0]
+      "segundo"
+    })
+  }})
+}})

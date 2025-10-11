@@ -124,23 +124,16 @@ const getTermo3 = () => operação(
   getTermo2(),
   alternativa(
     operador("*", (v1, v2) => {
-      // If one operand is a list and the other is a string, perform join
-      if (Array.isArray(v1) && typeof v2 === "string") {
-        // Special case: when joining with empty string, convert numbers to characters
-        if (v2 === "") {
-          return v1.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v2);
-        }
-        return v1.join(v2);
-      }
-      if (typeof v1 === "string" && Array.isArray(v2)) {
-        // Special case: when joining with empty string, convert numbers to characters
-        if (v1 === "") {
-          return v2.map(item => typeof item === "number" ? String.fromCharCode(item) : item).join(v1);
-        }
-        return v2.join(v1);
-      }
-      // Check for list objects (with length property and numeric indices)
-      if (typeof v1 === "object" && v1 !== null && typeof v1.length === "number" && typeof v2 === "string") {
+      // Check for array-like (array, function with length, or object with length)
+      const isArrayLike1 = Array.isArray(v1) || 
+                          (typeof v1 === "function" && typeof v1.length === "number") ||
+                          (typeof v1 === "object" && v1 !== null && typeof v1.length === "number");
+      const isArrayLike2 = Array.isArray(v2) || 
+                          (typeof v2 === "function" && typeof v2.length === "number") ||
+                          (typeof v2 === "object" && v2 !== null && typeof v2.length === "number");
+      
+      // If one operand is array-like and the other is a string, perform join
+      if (isArrayLike1 && typeof v2 === "string") {
         const arr = [];
         for (let i = 0; i < v1.length; i++) {
           arr.push(v1[i]);
@@ -151,7 +144,7 @@ const getTermo3 = () => operação(
         }
         return arr.join(v2);
       }
-      if (typeof v1 === "string" && typeof v2 === "object" && v2 !== null && typeof v2.length === "number") {
+      if (typeof v1 === "string" && isArrayLike2) {
         const arr = [];
         for (let i = 0; i < v2.length; i++) {
           arr.push(v2[i]);

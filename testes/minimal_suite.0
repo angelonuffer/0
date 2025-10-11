@@ -1,0 +1,9 @@
+uniteste # https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@812acbb477e23b000fd11ca09625e32c6aac7d8d/código/0
+lista # https://cdn.jsdelivr.net/gh/angelonuffer/lista@671da186a1fdfe00b2fc29dee5d45a5512d0dde8/código/lista.0
+aritmética # aritmética.0
+
+uniteste.descrever({"Minimal"
+  lista.mapear({{
+    aritmética
+  } teste => teste(uniteste)})
+})(0)

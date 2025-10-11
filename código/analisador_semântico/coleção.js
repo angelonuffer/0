@@ -22,7 +22,7 @@ export const avaliarColeção = (ast, escopo) => {
         } else {
           return valor[índice];
         }
-      } else if (typeof valor === 'object' && valor !== null) {
+      } else if (typeof valor === 'function' || (typeof valor === 'object' && valor !== null)) {
         if (typeof índice !== 'string' && typeof índice !== 'number') {
           throw new Error(`Object key must be a string or number, got type ${typeof índice}`);
         }

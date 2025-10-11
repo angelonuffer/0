@@ -1,0 +1,17 @@
+uniteste # https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@812acbb477e23b000fd11ca09625e32c6aac7d8d/código/0
+lista # https://cdn.jsdelivr.net/gh/angelonuffer/lista@671da186a1fdfe00b2fc29dee5d45a5512d0dde8/código/lista.0
+aritmética # aritmética.0
+edge_cases_division # edge_cases_division.0
+string_division_comprehensive # string_division_comprehensive.0
+test_string_division # test_string_division.0
+teste_objeto # objeto.0
+
+uniteste.descrever({"Test"
+  lista.mapear({{
+    aritmética
+    edge_cases_division
+    string_division_comprehensive
+    test_string_division
+    teste_objeto
+  } teste => teste(uniteste)})
+})(0)

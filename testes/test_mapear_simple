@@ -1,0 +1,8 @@
+lista # https://cdn.jsdelivr.net/gh/angelonuffer/lista@671da186a1fdfe00b2fc29dee5d45a5512d0dde8/código/lista.0
+
+{
+  fn1: _ => 1
+  fn2: _ => 2
+  arr: {fn1 fn2}
+  lista.mapear({arr f => f(0)})
+}[0]

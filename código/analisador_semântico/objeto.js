@@ -32,13 +32,20 @@ export const avaliarObjeto = (ast, escopo) => {
     for (const item of ast.items) {
       if (item.tipo === 'espalhamento') {
         const spreadValue = avaliar(item.expressão, escopo);
-        if (Array.isArray(spreadValue)) {
-          for (const v of spreadValue) {
-            listScope[autoIndex++] = v;
+        // Check if it's array-like (has length and numeric indices)
+        const isArrayLike = (Array.isArray(spreadValue) || 
+                             (typeof spreadValue === 'function' && typeof spreadValue.length === 'number')) ||
+                            ((typeof spreadValue === 'object' && spreadValue !== null && typeof spreadValue.length === 'number'));
+        
+        if (isArrayLike) {
+          // Spread as array
+          for (let i = 0; i < spreadValue.length; i++) {
+            listScope[autoIndex++] = spreadValue[i];
           }
-        } else if (typeof spreadValue === 'object' && spreadValue !== null) {
+        } else if (typeof spreadValue === 'function' || (typeof spreadValue === 'object' && spreadValue !== null)) {
+          // Spread as object (named properties only)
           for (const key in spreadValue) {
-            if (key !== '__parent__' && key !== 'length') {
+            if (key !== '__parent__' && key !== 'length' && !/^\d+$/.test(key)) {
               listScope[key] = spreadValue[key];
             }
           }
@@ -65,7 +72,27 @@ export const avaliarObjeto = (ast, escopo) => {
       for (let i = 0; i < autoIndex; i++) {
         realArray[i] = listScope[i];
       }
-      return realArray;
+      // Make array callable by creating a function that also acts as an array
+      const fn = new Proxy((caller_context, key) => realArray[key], {
+        get(target, prop) {
+          return realArray[prop];
+        },
+        has(target, prop) {
+          return prop in realArray;
+        },
+        ownKeys(target) {
+          return Reflect.ownKeys(realArray);
+        },
+        getOwnPropertyDescriptor(target, prop) {
+          const desc = Object.getOwnPropertyDescriptor(realArray, prop);
+          if (desc) {
+            // Make all properties configurable to avoid proxy issues
+            desc.configurable = true;
+          }
+          return desc;
+        }
+      });
+      return fn;
     }
     
     // Create result object without __parent__
@@ -75,21 +102,68 @@ export const avaliarObjeto = (ast, escopo) => {
         result[key] = listScope[key];
       }
     }
-    return result;
+    // Make object callable by creating a function that also acts as an object
+    const fn = new Proxy((caller_context, key) => result[key], {
+      get(target, prop) {
+        return result[prop];
+      },
+      has(target, prop) {
+        return prop in result;
+      },
+      ownKeys(target) {
+        return Reflect.ownKeys(result);
+      },
+      getOwnPropertyDescriptor(target, prop) {
+        const desc = Object.getOwnPropertyDescriptor(result, prop);
+        if (desc) {
+          // Make all properties configurable to avoid proxy issues
+          desc.configurable = true;
+        }
+        return desc;
+      }
+    });
+    return fn;
   } else {
     // Simple array implementation
     const result = [];
     for (const item of ast.items) {
       if (item.tipo === 'espalhamento') {
         const spreadValue = avaliar(item.expressão, escopo);
-        if (Array.isArray(spreadValue)) {
-          result.push(...spreadValue);
+        // Check if it's array-like (has length and numeric indices)
+        const isArrayLike = Array.isArray(spreadValue) || 
+                           (typeof spreadValue === 'function' && typeof spreadValue.length === 'number') ||
+                           (typeof spreadValue === 'object' && spreadValue !== null && typeof spreadValue.length === 'number');
+        
+        if (isArrayLike) {
+          for (let i = 0; i < spreadValue.length; i++) {
+            result.push(spreadValue[i]);
+          }
         }
       } else {
         result.push(avaliar(item.valor, escopo));
       }
     }
-    return result;
+    // Make array callable by creating a function that also acts as an array
+    const fn = new Proxy((caller_context, key) => result[key], {
+      get(target, prop) {
+        return result[prop];
+      },
+      has(target, prop) {
+        return prop in result;
+      },
+      ownKeys(target) {
+        return Reflect.ownKeys(result);
+      },
+      getOwnPropertyDescriptor(target, prop) {
+        const desc = Object.getOwnPropertyDescriptor(result, prop);
+        if (desc) {
+          // Make all properties configurable to avoid proxy issues
+          desc.configurable = true;
+        }
+        return desc;
+      }
+    });
+    return fn;
   }
 };
 
