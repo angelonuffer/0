@@ -9,16 +9,6 @@ if (fs.existsSync("0_cache.json")) {
   cache = JSON.parse(fs.readFileSync("0_cache.json", 'utf-8'));
 }
 
-// State for module loading and execution
-const conteúdos = {
-  "0_cache.json": cache,
-  [módulo_principal]: null,
-};
-const módulos = {
-  [módulo_principal]: null,
-};
-const valores_módulos = {};
-
 // Helper function to resolve relative paths
 const resolve_endereço = (base_module_path, rel_path) => {
   if (rel_path.startsWith('https://')) {
@@ -80,9 +70,17 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
   console.log(`Erro de sintaxe.\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
 };
 
+// State for module loading and execution
+const conteúdos = {
+  "0_cache.json": cache,
+  [módulo_principal]: await carregar_conteúdo(módulo_principal),
+};
+const módulos = {
+  [módulo_principal]: null,
+};
+const valores_módulos = {};
+
 try {
-  conteúdos[módulo_principal] = await carregar_conteúdo(módulo_principal);
-  
   // Step 2: Parse all modules and resolve dependencies
   while (true) {
     const pendente = Object.entries(módulos).find(([endereço, módulo]) => módulo === null);
