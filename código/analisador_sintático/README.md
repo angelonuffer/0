@@ -40,6 +40,12 @@ Parser principal e construção de módulos:
 - `buildExpressão` - Constrói o parser de expressões completas
 - `_0` - Parser de módulos completos com importações
 
+### `importações.js`
+Parser de importações de módulos:
+- `importações` - Extrai importações do conteúdo de um módulo
+- Retorna lista de objetos com estrutura `{ nome, endereço }`
+- Usado pelo runtime para detectar dependências antes de parsear o módulo completo
+
 ### `index.js` (58 linhas)
 Módulo principal que integra todos os sub-módulos:
 - Importa todos os parsers dos sub-módulos
@@ -62,12 +68,17 @@ Essas dependências são resolvidas através de:
 
 ```javascript
 import { expressão, _0 } from './analisador_sintático/index.js';
+import { importações } from './analisador_sintático/importações.js';
 
 // Parser de expressões individuais
 const resultado = expressão("2 + 3 * 4");
 
 // Parser de módulos completos (com importações)
 const módulo = _0("módulo # ./outro.0\n\n2 + módulo");
+
+// Parser de importações apenas
+const importsResult = importações("módulo # ./outro.0\n\n2 + módulo");
+// importsResult.valor => [{ nome: "módulo", endereço: "./outro.0" }]
 ```
 
 ## Precedência de Operadores

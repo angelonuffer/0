@@ -1,4 +1,5 @@
 import { _0 } from './analisador_sintático/index.js';
+import { importações } from './analisador_sintático/importações.js';
 import fs from 'fs';
 
 const módulo_principal = process.argv[2];
@@ -86,6 +87,11 @@ try {
     if (!pendente) break;
     
     const [endereço] = pendente;
+    
+    // Extract imports using the import parser
+    const importações_resultado = importações(conteúdos[endereço]);
+    const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
+    
     const módulo_bruto = _0(conteúdos[endereço]);
     
     // Check if parsing failed
@@ -107,8 +113,8 @@ try {
       process.exit(1);
     }
     
-    const [importações, , corpo] = módulo_bruto.valor;
-    const resolved_importações = importações.map(([nome, end_rel]) => [nome, resolve_endereço(endereço, end_rel)]);
+    const [, , corpo] = módulo_bruto.valor;
+    const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
     
     // Add new dependencies
     for (const [, end] of resolved_importações) {
