@@ -29,7 +29,7 @@ uniteste => uniteste.descrever({"Multiplicação de objeto" {
       ""
     })
   }})
-  uniteste.descrever({"Ordem inversa (string * lista)" {
+  uniteste.descrever({"Ordem inversa (string * objeto)" {
     uniteste.iguais({
       " " * {"a" "b" "c"}
       "a b c"

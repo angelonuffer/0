@@ -115,7 +115,7 @@ Multiplica dois números.
 12
 ```
 
-Quando aplicado a uma lista e um texto, junta os elementos da lista usando o texto como separador:
+Quando aplicado a um objeto e um texto, junta os elementos do objeto usando o texto como separador:
 ```
 {"a" "b" "c"} * " "
 ---
@@ -273,7 +273,7 @@ Exemplos:
 ```
 
 ### Gerando novos textos
-Combine textos e expressões usando multiplicação de listas.
+Combine textos e expressões usando multiplicação de objetos.
 
 Exemplo:
 ```
@@ -337,7 +337,7 @@ Acesse o índice `[0]` de um texto de um único caractere.
 ```
 
 ### Número para Caractere
-Use multiplicação de lista com string vazia.
+Use multiplicação de objeto com string vazia.
 ```
 {
   codigo: 65
@@ -347,11 +347,11 @@ Use multiplicação de lista com string vazia.
 "A"
 ```
 
-## Tipo lista
+## Tipo objeto
 
 Armazena coleções ordenadas de valores.
 
-### Fatiando a lista
+### Fatiando o objeto
 Acesse elementos por índice ou um intervalo de índices.
 
 Exemplos:
@@ -374,7 +374,7 @@ Exemplos:
 ```
 
 ### Espalhando itens
-Use `...` para incluir itens de uma lista em outra.
+Use `...` para incluir itens de um objeto em outro.
 
 Exemplo:
 ```
@@ -386,7 +386,7 @@ Exemplo:
 {"Star Wars","O Senhor dos Anéis","Jurassic Park"}
 ```
 
-### Obtendo o tamanho da lista
+### Obtendo o tamanho do objeto
 Use `[.]` para obter o número de itens.
 
 Exemplo:
@@ -399,20 +399,20 @@ Exemplo:
 3
 ```
 
-### Obtendo as chaves da lista
-Use `[*]` para obter todas as chaves da lista.
+### Obtendo as chaves do objeto
+Use `[*]` para obter todas as chaves do objeto.
 
-Para listas simples, retorna os índices como strings:
+Para objetos simples, retorna os índices como strings:
 ```
 {
-  lista: {"item1" "item2" "item3"}
-  lista[*]
+  objeto: {"item1" "item2" "item3"}
+  objeto[*]
 }[0]
 ---
 {"0","1","2"}
 ```
 
-Para listas com chaves nomeadas, retorna apenas as chaves explícitas:
+Para objetos com chaves nomeadas, retorna apenas as chaves explícitas:
 ```
 {
   dados: {
@@ -427,7 +427,7 @@ Para listas com chaves nomeadas, retorna apenas as chaves explícitas:
 {"nome","idade"}
 ```
 
-### Chaves opcionais em listas
+### Chaves opcionais em objetos
 Listas podem conter itens com chaves explícitas além de valores com índices automáticos.
 
 Exemplo:
@@ -518,26 +518,26 @@ Exemplo:
 30
 ```
 
-### Propriedade calculada em lista
+### Propriedade calculada em objeto
 
-Propriedades calculadas permitem definir chaves dinamicamente em uma lista, com base em expressões.
+Propriedades calculadas permitem definir chaves dinamicamente em um objeto, com base em expressões.
 
 ```
 {
   chave: "nome"
-  lista: {
+  objeto: {
     [chave]: "João"
     "valor_sem_chave"
   }
-  lista["nome"]
+  objeto["nome"]
 }[0]
 ---
 "João"
 ```
 
-### Referenciando propriedades da própria lista
+### Referenciando propriedades do próprio objeto
 
-Propriedades podem referenciar outras propriedades definidas na mesma lista.
+Propriedades podem referenciar outras propriedades definidas no mesmo objeto.
 
 ```
 {
@@ -568,7 +568,7 @@ Propriedades podem referenciar outras propriedades definidas na mesma lista.
 
 ### Referências aninhadas
 
-Propriedades aninhadas também podem referenciar propriedades do nível superior da lista.
+Propriedades aninhadas também podem referenciar propriedades do nível superior do objeto.
 
 ```
 {
@@ -619,11 +619,11 @@ Funções encapsulam lógica reutilizável.
 25
 ```
 
-Funções que precisam de múltiplos valores recebem uma lista como parâmetro para realizar operações mais complexas.
+Funções que precisam de múltiplos valores recebem um objeto como parâmetro para realizar operações mais complexas.
 
 ### Soma de dois números
 
-Esta função recebe uma lista com dois números como parâmetro e retorna a soma deles.
+Esta função recebe um objeto com dois números como parâmetro e retorna a soma deles.
 
 ```
 {
@@ -636,7 +636,7 @@ Esta função recebe uma lista com dois números como parâmetro e retorna a som
 
 ### Verificar se um número está dentro de um intervalo
 
-Esta função verifica se um número está dentro de um intervalo definido por dois valores (mínimo e máximo). Ela recebe uma lista com três valores: o número a verificar, o valor mínimo e o valor máximo.
+Esta função verifica se um número está dentro de um intervalo definido por dois valores (mínimo e máximo). Ela recebe um objeto com três valores: o número a verificar, o valor mínimo e o valor máximo.
 
 ```
 {
@@ -658,7 +658,7 @@ Esta função verifica se um número está dentro de um intervalo definido por d
 
 ### Concatenar dois textos
 
-Esta função recebe uma lista com dois textos e os combina em uma única string.
+Esta função recebe um objeto com dois textos e os combina em uma única string.
 
 ```
 {
@@ -671,7 +671,7 @@ Esta função recebe uma lista com dois textos e os combina em uma única string
 
 ### Calcular a área de um retângulo
 
-Esta função calcula a área de um retângulo, recebendo uma lista com largura e altura.
+Esta função calcula a área de um retângulo, recebendo um objeto com largura e altura.
 
 ```
 {
@@ -684,7 +684,7 @@ Esta função calcula a área de um retângulo, recebendo uma lista com largura 
 
 ### Calcular a área de um triângulo
 
-Esta função calcula a área de um triângulo com base na base e na altura fornecidas em uma lista.
+Esta função calcula a área de um triângulo com base na base e na altura fornecidas em um objeto.
 
 ```
 {
@@ -701,7 +701,7 @@ Esta função calcula a área de um triângulo com base na base e na altura forn
 
 ### Encontrar o maior de dois números
 
-Esta função retorna o maior valor entre dois números fornecidos em uma lista.
+Esta função retorna o maior valor entre dois números fornecidos em um objeto.
 
 ```
 {
@@ -721,11 +721,11 @@ Esta função retorna o maior valor entre dois números fornecidos em uma lista.
 9
 ```
 
-Esses exemplos mostram como funções com múltiplos parâmetros recebem uma lista com os argumentos e podem ser usadas para resolver problemas variados de forma simples e eficiente.
+Esses exemplos mostram como funções com múltiplos parâmetros recebem um objeto com os argumentos e podem ser usadas para resolver problemas variados de forma simples e eficiente.
 
-## Funções dentro de listas
+## Funções dentro de objetos
 
-Na linguagem 0, é possível armazenar funções dentro de listas e chamá-las diretamente pelo índice. Isso permite criar coleções de comportamentos ou ações.
+Na linguagem 0, é possível armazenar funções dentro de objetos e chamá-las diretamente pelo índice. Isso permite criar coleções de comportamentos ou ações.
 
 ```
 {
@@ -740,7 +740,7 @@ Na linguagem 0, é possível armazenar funções dentro de listas e chamá-las d
 "Charmander"
 ```
 
-Neste exemplo, a lista `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar `(0)`, executamos essa função com um parâmetro qualquer (que é ignorado) e obtemos o resultado.
+Neste exemplo, o objeto `iniciais` contém três funções, cada uma retornando o nome de um Pokémon inicial da primeira geração. Ao acessar `iniciais[1]`, obtemos a função que retorna "Charmander". Ao adicionar `(0)`, executamos essa função com um parâmetro qualquer (que é ignorado) e obtemos o resultado.
 
 ## Comentários
 
