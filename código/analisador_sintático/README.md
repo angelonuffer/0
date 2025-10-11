@@ -12,12 +12,12 @@ Operações básicas e fundamentais:
 - `valor_constante` - Leitura de variáveis do escopo
 - `chamada_função_imediata` - Chamadas de função com sintaxe `nome(arg)`
 
-### `lista.js` (264 linhas)
-Operações relacionadas a listas e objetos:
+### `objeto.js` (264 linhas)
+Operações relacionadas a objetos:
 - `fatia` - Indexação e fatiamento (`[i]`, `[i:j]`)
 - `tamanho` - Obter tamanho (`[.]`)
 - `chaves` - Obter chaves de objeto (`[*]`)
-- `lista` - Parser de literais de lista/objeto (`{...}`)
+- `objeto` - Parser de literais de objeto (`{...}`)
 - `atributo` - Acesso a propriedades (`.prop`)
 
 ### `função.js` (92 linhas)
@@ -83,7 +83,7 @@ const importsResult = importações("módulo # ./outro.0\n\n2 + módulo");
 
 ## Precedência de Operadores
 
-1. Termos primários: literais, variáveis, parênteses, listas
+1. Termos primários: literais, variáveis, parênteses, objetos
 2. Operações de acesso: `.`, `[]`, `[:]`, `[.]`, `[*]`, `()`
 3. Multiplicação/Divisão: `*`, `/`
 4. Adição/Subtração: `+`, `-`

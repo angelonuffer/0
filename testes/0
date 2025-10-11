@@ -9,16 +9,16 @@ documentation_examples # documentation_examples.0
 edge_cases_division # edge_cases_division.0
 string_division_comprehensive # string_division_comprehensive.0
 test_string_division # test_string_division.0
-teste_lista # lista.0
-lista_com_chaves # lista_com_chaves.0
+teste_objeto # objeto.0
+objeto_com_chaves # objeto_com_chaves.0
 string_keys # string_keys.0
-referência_lista # referência_lista.0
+referência_objeto # referência_objeto.0
 teste_aninhado # teste_aninhado.0
 teste_documentacao # teste_documentacao.0
 teste_edge_cases # teste_edge_cases.0
 literal_indexing # literal_indexing.0
 literal_indexing_additional # literal_indexing_additional.0
-multiplicacao_lista # multiplicacao_lista.0
+multiplicacao_objeto # multiplicacao_objeto.0
 operador_espalhamento # operador_espalhamento.0
 função # função.0
 comentário # comentário.0
@@ -34,16 +34,16 @@ uniteste.descrever({"0"
     edge_cases_division
     string_division_comprehensive
     test_string_division
-    teste_lista
-    lista_com_chaves
+    teste_objeto
+    objeto_com_chaves
     string_keys
-    referência_lista
+    referência_objeto
     teste_aninhado
     teste_documentacao
     teste_edge_cases
     literal_indexing
     literal_indexing_additional
-    multiplicacao_lista
+    multiplicacao_objeto
     operador_espalhamento
     função
     comentário

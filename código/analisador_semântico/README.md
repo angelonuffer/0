@@ -26,9 +26,9 @@ Operações binárias, lógicas e condicionais:
 - `'operação_lógica'` - Avalia operadores lógicos (`&`, `|`) com curto-circuito
 - `'condicional'` - Avalia expressão ternária (`? :`)
 
-### `lista.js` (95 linhas)
-Construção e avaliação de listas/objetos:
-- `'lista'` - Cria arrays ou objetos
+### `objeto.js` (95 linhas)
+Construção e avaliação de objetos:
+- `'objeto'` - Cria arrays ou objetos
 - Suporta sintaxe de espalhamento (`...`)
 - Suporta pares chave-valor
 - Converte automaticamente para array real quando apropriado
@@ -99,7 +99,7 @@ const resultado = avaliar(ast, escopo); // 15
 - `'condicional'` - Operador ternário
 
 ### Coleções
-- `'lista'` - Array ou objeto literal
+- `'objeto'` - Array ou objeto literal
 - `'fatia'` - Indexação e fatiamento
 - `'tamanho'` - Comprimento
 - `'chaves'` - Chaves de objeto

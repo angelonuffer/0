@@ -11,7 +11,7 @@ uniteste => uniteste.descrever({"Casos extremos de referências aninhadas" {
       }
       exemplo.b.c
     }[0]
-    5  // Deve usar a = 2 da lista, não a = 100 externa
+    5  // Deve usar a = 2 do objeto, não a = 100 externa
   })
   
   // Lista vazia aninhada

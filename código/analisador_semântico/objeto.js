@@ -1,10 +1,10 @@
-// List construction and evaluation
+// Object construction and evaluation
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
 
-export const avaliarLista = (ast, escopo) => {
-  if (ast.tipo !== 'lista') {
+export const avaliarObjeto = (ast, escopo) => {
+  if (ast.tipo !== 'objeto') {
     return null; // Not handled by this module
   }
 

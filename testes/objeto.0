@@ -1,4 +1,4 @@
-uniteste => uniteste.descrever({"Lista" {
+uniteste => uniteste.descrever({"Objeto" {
   uniteste.descrever({"Fatiamento" {
     uniteste.iguais({
       {
@@ -31,23 +31,23 @@ uniteste => uniteste.descrever({"Lista" {
       3
     })
   }})
-  uniteste.descrever({"Lista de chaves" {
+  uniteste.descrever({"Objeto de chaves" {
     uniteste.listas_iguais({
       {
-        lista_com_chaves: {
+        objeto_com_chaves: {
           nome: "João"
           "valor_sem_chave"
           idade: 30
           "outro_valor_sem_chave"
         }
-        lista_com_chaves[*]
+        objeto_com_chaves[*]
       }[0]
       {"nome" "idade"}
     })
     uniteste.listas_iguais({
       {
-        lista_simples: {"item1" "item2" "item3"}
-        lista_simples[*]
+        objeto_simples: {"item1" "item2" "item3"}
+        objeto_simples[*]
       }[0]
       {"0" "1" "2"}
     })

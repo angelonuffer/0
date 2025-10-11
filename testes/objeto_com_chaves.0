@@ -1,81 +1,81 @@
-uniteste => uniteste.descrever({"Lista com chaves" {
+uniteste => uniteste.descrever({"Objeto com chaves" {
   uniteste.iguais({{
-    lista_com_chaves: {
+    objeto_com_chaves: {
       nome: "João"
       "valor_sem_chave"
       idade: 30
       "outro_valor_sem_chave"
     }
     
-    lista_com_chaves["nome"]
+    objeto_com_chaves["nome"]
   }[0] "João"})
   
   uniteste.iguais({{
-    lista_com_chaves: {
+    objeto_com_chaves: {
       nome: "João"
       "valor_sem_chave"
       idade: 30
       "outro_valor_sem_chave"
     }
     
-    lista_com_chaves[0]
+    objeto_com_chaves[0]
   }[0] "valor_sem_chave"})
   
   uniteste.iguais({{
-    lista_com_chaves: {
+    objeto_com_chaves: {
       nome: "João"
       "valor_sem_chave"
       idade: 30
       "outro_valor_sem_chave"
     }
     
-    lista_com_chaves["idade"]
+    objeto_com_chaves["idade"]
   }[0] 30})
   
   uniteste.listas_iguais({{
-    lista_com_chaves: {
+    objeto_com_chaves: {
       nome: "João"
       "primeiro_valor"
       idade: 30
       "segundo_valor"
     }
     
-    lista_com_chaves[0:2]
+    objeto_com_chaves[0:2]
   }[0] {"primeiro_valor" "segundo_valor"}})
 
   uniteste.descrever({"Notação de ponto" {
     uniteste.iguais({{
-      lista_com_chaves: {
+      objeto_com_chaves: {
         nome: "João"
         "valor_sem_chave"
         idade: 30
         "outro_valor_sem_chave"
       }
       
-      lista_com_chaves.nome
+      objeto_com_chaves.nome
     }[0] "João"})
     
     uniteste.iguais({{
-      lista_com_chaves: {
+      objeto_com_chaves: {
         nome: "João"
         "valor_sem_chave"
         idade: 30
         "outro_valor_sem_chave"
       }
       
-      lista_com_chaves.idade
+      objeto_com_chaves.idade
     }[0] 30})
   }})
   uniteste.descrever({"Propriedade calculada" {
     uniteste.iguais({{
       chave: "nome"
       
-      lista_com_chaves: {
+      objeto_com_chaves: {
         [chave]: "João"
         "valor_sem_chave"
       }
       
-      lista_com_chaves["nome"]
+      objeto_com_chaves["nome"]
     }[0] "João"})
   }})
 }})
