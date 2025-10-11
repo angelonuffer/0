@@ -1,4 +1,4 @@
-uniteste => uniteste.descrever({"Acesso direto a literais de lista" {
+uniteste => uniteste.descrever({"Acesso direto a literais de objeto" {
   uniteste.iguais({
     { 2 3 }[0]
     2

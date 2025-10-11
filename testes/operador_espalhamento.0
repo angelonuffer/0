@@ -7,9 +7,9 @@ uniteste => uniteste.descrever({"Operador de espalhamento" {
     
     uniteste.listas_iguais({
       {
-        lista1: {"Star Wars" "Matrix"}
-        lista2: {"Jurassic Park" "Avatar"}
-        {...lista1 ...lista2}
+        objeto1: {"Star Wars" "Matrix"}
+        objeto2: {"Jurassic Park" "Avatar"}
+        {...objeto1 ...objeto2}
       }[0]
       {"Star Wars" "Matrix" "Jurassic Park" "Avatar"}
     })
@@ -32,7 +32,7 @@ uniteste => uniteste.descrever({"Operador de espalhamento" {
   }})
   
   uniteste.descrever({"Com itens com chaves" {
-    // Teste: lista com chaves pode ser acessada normalmente
+    // Teste: objeto com chaves pode ser acessada normalmente
     uniteste.iguais({
       {
         dados: {nome: "João" idade: 30}
@@ -41,17 +41,17 @@ uniteste => uniteste.descrever({"Operador de espalhamento" {
       "João"
     })
     
-    // Teste: espalhar lista simples em contexto que aceita chaves
+    // Teste: espalhar objeto simples em contexto que aceita chaves
     uniteste.iguais({
       {
-        lista_simples: {"valor1" "valor2"}
-        dados_com_chaves: {nome: "João" ...lista_simples idade: 30}
+        objeto_simples: {"valor1" "valor2"}
+        dados_com_chaves: {nome: "João" ...objeto_simples idade: 30}
         dados_com_chaves[0]
       }[0]
       "valor1"
     })
     
-    // Teste: espalhar lista com chaves
+    // Teste: espalhar objeto com chaves
     uniteste.iguais({
       {
         dados1: {nome: "João" cidade: "São Paulo"}
@@ -62,7 +62,7 @@ uniteste => uniteste.descrever({"Operador de espalhamento" {
       "João"
     })
     
-    // Teste: espalhar lista com chaves (propriedade do segundo objeto)
+    // Teste: espalhar objeto com chaves (propriedade do segundo objeto)
     uniteste.iguais({
       {
         dados1: {nome: "João" cidade: "São Paulo"}
@@ -88,9 +88,9 @@ uniteste => uniteste.descrever({"Operador de espalhamento" {
     // Misturar itens simples e com chaves
     uniteste.listas_iguais({
       {
-        lista_simples: {"item1" "item2"}
-        lista_resultado: {nome: "João" ...lista_simples cidade: "São Paulo"}
-        {lista_resultado[0] lista_resultado[1]}
+        objeto_simples: {"item1" "item2"}
+        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
+        {objeto_resultado[0] objeto_resultado[1]}
       }[0]
       {"item1" "item2"}
     })
@@ -98,9 +98,9 @@ uniteste => uniteste.descrever({"Operador de espalhamento" {
     // Acessar propriedade nomeada após espalhamento
     uniteste.iguais({
       {
-        lista_simples: {"item1" "item2"}
-        lista_resultado: {nome: "João" ...lista_simples cidade: "São Paulo"}
-        lista_resultado["nome"]
+        objeto_simples: {"item1" "item2"}
+        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
+        objeto_resultado["nome"]
       }[0]
       "João"
     })
@@ -108,29 +108,29 @@ uniteste => uniteste.descrever({"Operador de espalhamento" {
     // Acessar propriedade nomeada adicionada após espalhamento
     uniteste.iguais({
       {
-        lista_simples: {"item1" "item2"}
-        lista_resultado: {nome: "João" ...lista_simples cidade: "São Paulo"}
-        lista_resultado["cidade"]
+        objeto_simples: {"item1" "item2"}
+        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
+        objeto_resultado["cidade"]
       }[0]
       "São Paulo"
     })
     
-    // Verificar tamanho da lista resultante
+    // Verificar tamanho do objeto resultante
     uniteste.iguais({
       {
-        lista_simples: {"item1" "item2"}
-        lista_resultado: {nome: "João" ...lista_simples cidade: "São Paulo"}
-        lista_resultado[.]
+        objeto_simples: {"item1" "item2"}
+        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
+        objeto_resultado[.]
       }[0]
       2
     })
     
-    // Verificar chaves da lista resultante
+    // Verificar chaves do objeto resultante
     uniteste.listas_iguais({
       {
-        lista_simples: {"item1" "item2"}
-        lista_resultado: {nome: "João" ...lista_simples cidade: "São Paulo"}
-        lista_resultado[*]
+        objeto_simples: {"item1" "item2"}
+        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
+        objeto_resultado[*]
       }[0]
       {"nome" "cidade"}
     })

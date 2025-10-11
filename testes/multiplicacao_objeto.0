@@ -1,4 +1,4 @@
-uniteste => uniteste.descrever({"Multiplicação de lista" {
+uniteste => uniteste.descrever({"Multiplicação de objeto" {
   uniteste.descrever({"Join básico" {
     uniteste.iguais({
       {"a" "b" "c"} * " "
@@ -11,7 +11,7 @@ uniteste => uniteste.descrever({"Multiplicação de lista" {
       "primeira, segunda, terceira"
     })
   }})
-  uniteste.descrever({"Lista de números" {
+  uniteste.descrever({"Objeto de números" {
     uniteste.iguais({
       {1 2 3} * "-"
       "1-2-3"
@@ -23,7 +23,7 @@ uniteste => uniteste.descrever({"Multiplicação de lista" {
       "xyz"
     })
   }})
-  uniteste.descrever({"Lista vazia" {
+  uniteste.descrever({"Objeto vazio" {
     uniteste.iguais({
       {} * " "
       ""
@@ -41,13 +41,13 @@ uniteste => uniteste.descrever({"Multiplicação de lista" {
       12
     })
   }})
-  uniteste.descrever({"Lista de valores mistos" {
+  uniteste.descrever({"Objeto de valores mistos" {
     uniteste.iguais({
       {"hello" 42 "world"} * " "
       "hello 42 world"
     })
   }})
-  uniteste.descrever({"Lista com um elemento" {
+  uniteste.descrever({"Objeto com um elemento" {
     uniteste.iguais({
       {"único"} * ", "
       "único"
