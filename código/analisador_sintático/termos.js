@@ -9,8 +9,8 @@ let expressão;
 // Import basic operations
 let não, valor_constante, chamada_função_imediata;
 
-// Import list operations
-let fatia, tamanho, chaves, lista, atributo;
+// Import object operations
+let fatia, tamanho, chaves, objeto, atributo;
 
 // Import function operations
 let lambda, chamada_função, parênteses;
@@ -23,7 +23,7 @@ const getTermo1 = () => alternativa(
       alternativa(
         valor_constante,
         parênteses,
-        lista,
+        objeto,
         número,
         texto,
       ),
@@ -234,7 +234,7 @@ const setDependências = (expr, deps) => {
   fatia = deps.fatia;
   tamanho = deps.tamanho;
   chaves = deps.chaves;
-  lista = deps.lista;
+  objeto = deps.objeto;
   atributo = deps.atributo;
   lambda = deps.lambda;
   chamada_função = deps.chamada_função;

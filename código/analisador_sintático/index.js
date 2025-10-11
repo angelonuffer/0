@@ -4,8 +4,8 @@
 // Import basic operations
 import { não, valor_constante, chamada_função_imediata, setExpressão as setExpressãoBásico } from './básico.js';
 
-// Import list operations
-import { fatia, tamanho, chaves, lista, atributo, setExpressão as setExpressãoLista } from './lista.js';
+// Import object operations
+import { fatia, tamanho, chaves, objeto, atributo, setExpressão as setExpressãoObjeto } from './objeto.js';
 
 // Import function operations
 import { lambda, chamada_função, parênteses, setExpressão as setExpressãoFunção } from './função.js';
@@ -24,7 +24,7 @@ setDependências(null, {
   fatia,
   tamanho,
   chaves,
-  lista,
+  objeto,
   atributo,
   lambda,
   chamada_função,
@@ -39,7 +39,7 @@ const expressão = buildExpressão();
 
 // Set expression references in modules that need it
 setExpressãoBásico(expressão);
-setExpressãoLista(expressão);
+setExpressãoObjeto(expressão);
 setExpressãoFunção(expressão);
 setExpressãoModule(expressão);
 setDependências(expressão, {
@@ -49,7 +49,7 @@ setDependências(expressão, {
   fatia,
   tamanho,
   chaves,
-  lista,
+  objeto,
   atributo,
   lambda,
   chamada_função,

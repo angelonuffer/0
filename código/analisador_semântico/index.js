@@ -7,7 +7,7 @@ export { criarEscopo, buscarVariável, definirVariável } from './escopo.js';
 // Import evaluation modules
 import { avaliarBásico, setAvaliar as setAvaliarBásico } from './básico.js';
 import { avaliarOperações, setAvaliar as setAvaliarOperações } from './operações.js';
-import { avaliarLista, setAvaliar as setAvaliarLista } from './lista.js';
+import { avaliarObjeto, setAvaliar as setAvaliarObjeto } from './objeto.js';
 import { avaliarColeção, setAvaliar as setAvaliarColeção } from './coleção.js';
 import { avaliarFunção, setAvaliar as setAvaliarFunção } from './função.js';
 
@@ -27,7 +27,7 @@ export const avaliar = (ast, escopo) => {
   result = avaliarOperações(ast, escopo);
   if (result !== null) return result;
   
-  result = avaliarLista(ast, escopo);
+  result = avaliarObjeto(ast, escopo);
   if (result !== null) return result;
   
   result = avaliarColeção(ast, escopo);
@@ -42,6 +42,6 @@ export const avaliar = (ast, escopo) => {
 // Wire up recursive references
 setAvaliarBásico(avaliar);
 setAvaliarOperações(avaliar);
-setAvaliarLista(avaliar);
+setAvaliarObjeto(avaliar);
 setAvaliarColeção(avaliar);
 setAvaliarFunção(avaliar);

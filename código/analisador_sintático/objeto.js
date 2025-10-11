@@ -1,4 +1,4 @@
-// List operations - fatia, tamanho, chaves, lista, atributo
+// Object operations - fatia, tamanho, chaves, objeto, atributo
 import { alternativa, sequência, opcional, vários, transformar, símbolo } from '../combinadores/index.js';
 import { espaço, nome, texto } from '../analisador_léxico/index.js';
 
@@ -43,7 +43,7 @@ const chaves = transformar(
   })
 );
 
-const lista = transformar(
+const objeto = transformar(
   sequência(
     símbolo("{"),
     opcional(espaço),
@@ -80,7 +80,7 @@ const lista = transformar(
   ([, , valores_vários,]) => {
     if (!valores_vários) {
       return {
-        tipo: 'lista',
+        tipo: 'objeto',
         items: [],
         usarObjeto: false
       };
@@ -126,7 +126,7 @@ const lista = transformar(
     });
     
     return {
-      tipo: 'lista',
+      tipo: 'objeto',
       items: items,
       usarObjeto: usarObjeto
     };
@@ -149,4 +149,4 @@ const setExpressão = (expr) => {
   expressão = expr;
 };
 
-export { fatia, tamanho, chaves, lista, atributo, setExpressão };
+export { fatia, tamanho, chaves, objeto, atributo, setExpressão };
