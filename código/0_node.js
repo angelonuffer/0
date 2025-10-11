@@ -32,9 +32,13 @@ const resolve_endereço = (base_module_path, rel_path) => {
 
 // Helper function to load content (local or remote)
 const carregar_conteúdo = async (endereço) => {
+  if (cache[endereço]) {
+    return cache[endereço];
+  }
   if (endereço.startsWith("https://")) {
     const resposta = await fetch(endereço);
-    return await resposta.text();
+    cache[endereço] = await resposta.text();
+    return cache[endereço];
   } else {
     return fs.readFileSync(endereço, 'utf-8');
   }
@@ -77,26 +81,7 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
 };
 
 try {
-  // Step 1: Load all module contents
-  while (true) {
-    const pendente = Object.entries(conteúdos).find(([endereço, conteúdo]) => conteúdo === null);
-    if (!pendente) break;
-    
-    const [endereço] = pendente;
-    
-    // Check if content is in cache
-    if (conteúdos["0_cache.json"][endereço]) {
-      conteúdos[endereço] = conteúdos["0_cache.json"][endereço];
-    } else {
-      const conteúdo = await carregar_conteúdo(endereço);
-      conteúdos[endereço] = conteúdo;
-      
-      // Update cache for remote URLs
-      if (endereço.startsWith("https://")) {
-        conteúdos["0_cache.json"][endereço] = conteúdo;
-      }
-    }
-  }
+  conteúdos[módulo_principal] = await carregar_conteúdo(módulo_principal);
   
   // Step 2: Parse all modules and resolve dependencies
   while (true) {
@@ -147,16 +132,7 @@ try {
       
       const [end_pendente] = pendente_conteúdo;
       
-      if (conteúdos["0_cache.json"][end_pendente]) {
-        conteúdos[end_pendente] = conteúdos["0_cache.json"][end_pendente];
-      } else {
-        const conteúdo = await carregar_conteúdo(end_pendente);
-        conteúdos[end_pendente] = conteúdo;
-        
-        if (end_pendente.startsWith("https://")) {
-          conteúdos["0_cache.json"][end_pendente] = conteúdo;
-        }
-      }
+      conteúdos[pendente_conteúdo[0]] = await carregar_conteúdo(end_pendente);
     }
   }
   
@@ -194,7 +170,7 @@ try {
   }
   
   // Save cache
-  fs.writeFileSync("0_cache.json", JSON.stringify(conteúdos["0_cache.json"], null, 2));
+  fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
   
   await eval(valores_módulos[módulo_principal])
   
