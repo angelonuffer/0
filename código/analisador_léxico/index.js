@@ -28,7 +28,10 @@ const número = transformar(
       faixa("0", "9"),
     ),
   ),
-  v => () => parseInt(v.flat(Infinity).join("")),
+  v => ({
+    tipo: 'número',
+    valor: parseInt(v.flat(Infinity).join(""))
+  })
 )
 
 const número_negativo = transformar(
@@ -39,7 +42,10 @@ const número_negativo = transformar(
       faixa("0", "9"),
     ),
   ),
-  v => () => -parseInt(v.slice(1).flat(Infinity).join("")),
+  v => ({
+    tipo: 'número',
+    valor: -parseInt(v.slice(1).flat(Infinity).join(""))
+  })
 )
 
 const letra = inversão(
@@ -83,7 +89,10 @@ const texto = transformar(
     ),
     símbolo('"'),
   ),
-  v => () => v.flat(Infinity).join("").slice(1, -1)
+  v => ({
+    tipo: 'texto',
+    valor: v.flat(Infinity).join("").slice(1, -1)
+  })
 )
 
 export {

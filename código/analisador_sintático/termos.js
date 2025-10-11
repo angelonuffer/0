@@ -54,29 +54,59 @@ const getTermo1 = () => alternativa(
       )
     ),
     valor => {
-      const [valor_fn, operações_info] = valor;
+      const [valorAst, operações_info] = valor;
 
-      return escopo => {
-        let operações_fns;
-        if (Array.isArray(operações_info) && operações_info.length >= 2 && operações_info[0] === undefined) {
-          // This might be the "with space" case where we have [espaço, operations]
-          operações_fns = operações_info[1] || [];
-        } else if (Array.isArray(operações_info)) {
-          // This is likely the "no space" case where operações_info is directly the operations array
-          operações_fns = operações_info;
-        } else {
-          // Fallback
-          operações_fns = [];
+      let operações;
+      if (Array.isArray(operações_info) && operações_info.length >= 2 && operações_info[0] === undefined) {
+        // This might be the "with space" case where we have [espaço, operations]
+        operações = operações_info[1] || [];
+      } else if (Array.isArray(operações_info)) {
+        // This is likely the "no space" case where operações_info is directly the operations array
+        operações = operações_info;
+      } else {
+        // Fallback
+        operações = [];
+      }
+      
+      if (!Array.isArray(operações) || operações.length === 0) {
+        return valorAst;
+      }
+      
+      // Chain operations by creating nested AST nodes
+      return operações.reduce((ast, operação) => {
+        if (operação.tipo === 'operação_fatia') {
+          return {
+            tipo: 'fatia',
+            valor: ast,
+            índice: operação.índice,
+            fim: operação.fim,
+            éFaixa: operação.éFaixa
+          };
+        } else if (operação.tipo === 'operação_tamanho') {
+          return {
+            tipo: 'tamanho',
+            valor: ast
+          };
+        } else if (operação.tipo === 'operação_chaves') {
+          return {
+            tipo: 'chaves',
+            valor: ast
+          };
+        } else if (operação.tipo === 'operação_atributo') {
+          return {
+            tipo: 'atributo',
+            objeto: ast,
+            nome: operação.nome
+          };
+        } else if (operação.tipo === 'operação_chamada_função') {
+          return {
+            tipo: 'chamada_função',
+            função: ast,
+            argumento: operação.argumento
+          };
         }
-        
-        if (!Array.isArray(operações_fns) || operações_fns.length === 0) {
-          return valor_fn(escopo);
-        }
-        return operações_fns.reduce(
-          (resultado, operação_fn) => operação_fn(escopo, resultado),
-          valor_fn(escopo)
-        );
-      };
+        return ast;
+      }, valorAst);
     }
   )
 );
@@ -181,12 +211,17 @@ const getTermo6 = () => transformar(
     ), undefined)
   ),
   valor => {
-    const [condição_fn, resto_opcional_val] = valor;
+    const [condição, resto_opcional_val] = valor;
 
-    if (!resto_opcional_val) return condição_fn;
+    if (!resto_opcional_val) return condição;
 
-    const [, , , valor_se_verdadeiro_fn, , , , valor_se_falso_fn] = resto_opcional_val;
-    return escopo => condição_fn(escopo) !== 0 ? valor_se_verdadeiro_fn(escopo) : valor_se_falso_fn(escopo);
+    const [, , , seVerdadeiro, , , , seFalso] = resto_opcional_val;
+    return {
+      tipo: 'condicional',
+      condição: condição,
+      seVerdadeiro: seVerdadeiro,
+      seFalso: seFalso
+    };
   }
 );
 

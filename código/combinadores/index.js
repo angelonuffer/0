@@ -151,7 +151,7 @@ const faixa = (inicial, final) => código => {
 
 const operador = (literal, funcao) => transformar(
   símbolo(literal),
-  () => funcao
+  () => ({ literal, funcao })
 );
 
 // operação is a higher-level combinator that depends on espaço
@@ -170,15 +170,19 @@ const createOperação = (espaço) => (termo, operadores) => transformar(
     const [primeiroTermo, operaçõesSequenciais] = v;
     if (operaçõesSequenciais.length === 0) return primeiroTermo;
 
-    return escopo =>
-      operaçõesSequenciais.reduce(
-        (resultado, valSeq) => {
-          const operador = valSeq[1];
-          const próximoTermo = valSeq[3];
-          return operador(resultado, próximoTermo(escopo));
-        },
-        primeiroTermo(escopo)
-      );
+    return operaçõesSequenciais.reduce(
+      (esquerda, valSeq) => {
+        const operador = valSeq[1];
+        const direita = valSeq[3];
+        return {
+          tipo: 'operação_binária',
+          esquerda: esquerda,
+          direita: direita,
+          operador: operador.funcao
+        };
+      },
+      primeiroTermo
+    );
   }
 );
 

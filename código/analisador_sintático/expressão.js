@@ -8,12 +8,37 @@ let getTermo6;
 
 // Build the main expression parser
 const buildExpressão = () => {
-  return operação(
-    getTermo6(),
-    alternativa(
-      operador("&", (v1, v2) => v1 !== 0 ? v2 : 0),
-      operador("|", (v1, v2) => v1 !== 0 ? v1 : v2),
+  return transformar(
+    sequência(
+      getTermo6(),
+      vários(sequência(
+        opcional(espaço),
+        alternativa(
+          símbolo("&"),
+          símbolo("|"),
+        ),
+        opcional(espaço),
+        getTermo6()
+      ))
     ),
+    v => {
+      const [primeiroTermo, operaçõesSequenciais] = v;
+      if (operaçõesSequenciais.length === 0) return primeiroTermo;
+
+      return operaçõesSequenciais.reduce(
+        (esquerda, valSeq) => {
+          const operador = valSeq[1];
+          const direita = valSeq[3];
+          return {
+            tipo: 'operação_lógica',
+            esquerda: esquerda,
+            direita: direita,
+            operador: operador
+          };
+        },
+        primeiroTermo
+      );
+    }
   );
 };
 
@@ -41,18 +66,13 @@ const _0 = opcional(
       opcional(espaço),
     ),
     valorSeq => {
-      const [, importaçõesDetectadas_val, , valor_fn_expr] = valorSeq;
+      const [, importaçõesDetectadas_val, , corpoAst] = valorSeq;
       const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-      const corpo = outer_scope_param => {
-        const blockScope = { __parent__: outer_scope_param || null };
-        return valor_fn_expr(blockScope);
-      };
-
-      return [importações, [], corpo];
+      return [importações, [], corpoAst];
     }
   ),
-  [[], [], () => { }]
+  [[], [], undefined]
 );
 
 // Function to set termo6 getter reference
