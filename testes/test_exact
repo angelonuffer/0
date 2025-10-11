@@ -1,7 +1,0 @@
-uniteste # https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@812acbb477e23b000fd11ca09625e32c6aac7d8d/código/0
-lista # https://cdn.jsdelivr.net/gh/angelonuffer/lista@671da186a1fdfe00b2fc29dee5d45a5512d0dde8/código/lista.0
-edge_cases_division # edge_cases_division.0
-
-uniteste.descrever({"Test"
-  lista.mapear({{edge_cases_division} teste => teste(uniteste)})
-})(0)

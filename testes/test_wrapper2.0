@@ -1,6 +1,0 @@
-aritmética # aritmética.0
-
-{
-  obj: {aritmética}
-  obj[0]
-}[0]

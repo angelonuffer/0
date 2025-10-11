@@ -1,8 +1,0 @@
-uniteste # https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@812acbb477e23b000fd11ca09625e32c6aac7d8d/código/0
-
-uniteste.descrever({"Test" {
-  uniteste.listas_iguais({
-    {"a" "b" "c"}
-    {"a" "b" "c"}
-  })
-}})(0)
