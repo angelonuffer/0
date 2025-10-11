@@ -14,7 +14,7 @@ const lambda = transformar(
     código => expressão(código)
   ),
   (valorBrutoLambda) => {
-    const [paramsResultado, , , , corpoExprFunc] = valorBrutoLambda;
+    const [paramsResultado, , , , corpoExpr] = valorBrutoLambda;
 
     let nomeParam = null;
     if (Array.isArray(paramsResultado) && paramsResultado[0] === '(') {
@@ -25,21 +25,10 @@ const lambda = transformar(
       nomeParam = paramsResultado;
     }
 
-    return definition_scope => {
-      return (caller_context, ...valoresArgs) => {
-        const fn_scope = { __parent__: definition_scope || null };
-        if (nomeParam) {
-          // Function has a parameter
-          if (valoresArgs.length === 1) {
-            fn_scope[nomeParam] = valoresArgs[0];
-          } else {
-            // This case should not happen with the new syntax, but keeping for safety
-            fn_scope[nomeParam] = valoresArgs;
-          }
-        }
-        // If nomeParam is null, it's a zero-parameter function, so we don't assign anything
-        return corpoExprFunc(fn_scope);
-      };
+    return {
+      tipo: 'lambda',
+      parâmetro: nomeParam,
+      corpo: corpoExpr
     };
   }
 );
@@ -57,14 +46,10 @@ const chamada_função = transformar(
     opcional(espaço),
     símbolo(")"),
   ),
-  ([, , arg_seq_optional,]) => (escopo, função) => {
-    if (arg_seq_optional) {
-      const arg_value = arg_seq_optional[0](escopo);
-      return função(escopo, arg_value);
-    } else {
-      return função(escopo);
-    }
-  }
+  ([, , arg_seq_optional,]) => ({
+    tipo: 'operação_chamada_função',
+    argumento: arg_seq_optional ? arg_seq_optional[0] : undefined
+  })
 );
 
 const parênteses = transformar(
@@ -76,10 +61,10 @@ const parênteses = transformar(
     símbolo(")"),
   ),
   valorSeq => {
-    const [, , valor_fn,] = valorSeq;
-
-    return outer_scope_param => {
-      return valor_fn(outer_scope_param);
+    const [, , expr,] = valorSeq;
+    return {
+      tipo: 'parênteses',
+      expressão: expr
     };
   }
 );

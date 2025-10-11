@@ -11,21 +11,18 @@ const não = transformar(
     opcional(espaço),
     código => expressão(código),
   ),
-  ([, , v]) => escopo => v(escopo) === 0 ? 1 : 0,
+  ([, , expr]) => ({
+    tipo: 'não',
+    expressão: expr
+  })
 )
 
 const valor_constante = transformar(
   nome,
-  v => escopo => {
-    let atualEscopo = escopo;
-    while (atualEscopo) {
-      if (atualEscopo.hasOwnProperty(v)) {
-        return atualEscopo[v];
-      }
-      atualEscopo = atualEscopo.__parent__;
-    }
-    return undefined;
-  },
+  nome_var => ({
+    tipo: 'variável',
+    nome: nome_var
+  })
 )
 
 // Immediate function call - identifier directly followed by parentheses (no space)
@@ -43,30 +40,11 @@ const chamada_função_imediata = transformar(
     opcional(espaço),
     símbolo(")"),
   ),
-  ([nome_var, , , arg_seq_optional, ,]) => escopo => {
-    // Get the function from the scope
-    let atualEscopo = escopo;
-    let função = undefined;
-    while (atualEscopo) {
-      if (atualEscopo.hasOwnProperty(nome_var)) {
-        função = atualEscopo[nome_var];
-        break;
-      }
-      atualEscopo = atualEscopo.__parent__;
-    }
-    
-    if (typeof função !== 'function') {
-      throw new Error(`${nome_var} is not a function`);
-    }
-    
-    // Call the function with argument if provided
-    if (arg_seq_optional) {
-      const arg_value = arg_seq_optional[0](escopo);
-      return função(escopo, arg_value);
-    } else {
-      return função(escopo);
-    }
-  }
+  ([nome_var, , , arg_seq_optional, ,]) => ({
+    tipo: 'chamada_função_imediata',
+    nome: nome_var,
+    argumento: arg_seq_optional ? arg_seq_optional[0] : undefined
+  })
 )
 
 // Function to set the expressão reference

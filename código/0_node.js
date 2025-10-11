@@ -1,5 +1,6 @@
 import { _0 } from './analisador_sintático/index.js';
 import { importações } from './analisador_sintático/importações.js';
+import { avaliar } from './analisador_semântico/index.js';
 import fs from 'fs';
 
 const módulo_principal = process.argv[2];
@@ -160,14 +161,14 @@ try {
     }
     
     const [endereço, módulo] = executável;
-    const [importações, , corpo] = módulo;
+    const [importações, , corpoAst] = módulo;
     
     const escopo_importações = Object.fromEntries(
       importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
     );
     
-    const escopo = { ...escopo_importações };
-    const valor = corpo(escopo);
+    const escopo = { ...escopo_importações, __parent__: null };
+    const valor = corpoAst ? avaliar(corpoAst, escopo) : undefined;
     
     valores_módulos[endereço] = valor;
   }
