@@ -1,9 +1,7 @@
 import { _0 } from './analisador_sintático/index.js';
 import fs from 'fs';
 
-// Get command line arguments
-const argumentos = process.argv.slice(2);
-const [módulo_principal] = argumentos;
+const módulo_principal = process.argv[2];
 
 // Check and load cache
 let cache = {};
