@@ -103,7 +103,29 @@ export const avaliar = (ast, escopo) => {
         }
         
         listScope.length = autoIndex;
-        return listScope;
+        
+        // Convert to real array if it only has numeric properties and length
+        const hasNamedProps = Object.keys(listScope).some(key => 
+          key !== 'length' && key !== '__parent__' && !/^\d+$/.test(key)
+        );
+        
+        if (!hasNamedProps) {
+          // Convert to real array
+          const realArray = [];
+          for (let i = 0; i < autoIndex; i++) {
+            realArray[i] = listScope[i];
+          }
+          return realArray;
+        }
+        
+        // Create result object without __parent__
+        const result = {};
+        for (const key in listScope) {
+          if (key !== '__parent__') {
+            result[key] = listScope[key];
+          }
+        }
+        return result;
       } else {
         // Simple array implementation
         const result = [];
@@ -198,7 +220,7 @@ export const avaliar = (ast, escopo) => {
     case 'chamada_função': {
       const função = avaliar(ast.função, escopo);
       if (typeof função !== 'function') {
-        throw new Error(`Value is not a function`);
+        throw new Error(`Value is not a function, got ${typeof função}`);
       }
       if (ast.argumento !== undefined) {
         const arg_value = avaliar(ast.argumento, escopo);
