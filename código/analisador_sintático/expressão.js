@@ -69,10 +69,13 @@ const _0 = opcional(
       const [, importaçõesDetectadas_val, , corpoAst] = valorSeq;
       const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-      return [importações, [], corpoAst];
+      return {
+        importações: importações,
+        expressão: corpoAst
+      };
     }
   ),
-  [[], [], undefined]
+  { importações: [], expressão: undefined }
 );
 
 // Function to set termo6 getter reference
