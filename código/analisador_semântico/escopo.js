@@ -10,7 +10,22 @@ export const buscarVariável = (escopo, nome) => {
     }
     atualEscopo = atualEscopo.__parent__;
   }
-  return undefined;
+  // Collect all available names in scope for error message
+  const nomesDisponíveis = [];
+  atualEscopo = escopo;
+  while (atualEscopo) {
+    for (const key of Object.keys(atualEscopo)) {
+      if (key !== '__parent__' && !nomesDisponíveis.includes(key)) {
+        nomesDisponíveis.push(key);
+      }
+    }
+    atualEscopo = atualEscopo.__parent__;
+  }
+  
+  const erro = new Error(`Nome não encontrado: ${nome}`);
+  erro.nome_variável = nome;
+  erro.nomes_disponíveis = nomesDisponíveis;
+  throw erro;
 };
 
 export const definirVariável = (escopo, nome, valor) => {
