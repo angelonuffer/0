@@ -114,7 +114,7 @@ try {
       process.exit(1);
     }
     
-    const [, , corpo] = módulo_bruto.valor;
+    const corpo = módulo_bruto.valor.expressão;
     const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
     
     // Add new dependencies
@@ -127,7 +127,10 @@ try {
       }
     }
     
-    módulos[endereço] = [resolved_importações, [], corpo];
+    módulos[endereço] = {
+      importações: resolved_importações,
+      expressão: corpo
+    };
     
     // Load new content if needed
     while (true) {
@@ -146,7 +149,7 @@ try {
       ([e, m]) =>
         m !== null &&
         !valores_módulos.hasOwnProperty(e) &&
-        m[0].every(([, dep_end]) => valores_módulos.hasOwnProperty(dep_end))
+        m.importações.every(([, dep_end]) => valores_módulos.hasOwnProperty(dep_end))
     );
     
     if (!executável) {
@@ -161,7 +164,7 @@ try {
     }
     
     const [endereço, módulo] = executável;
-    const [importações, , corpoAst] = módulo;
+    const { importações, expressão: corpoAst } = módulo;
     
     const escopo_importações = Object.fromEntries(
       importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
