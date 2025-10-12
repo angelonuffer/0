@@ -39,6 +39,7 @@ Hierarquia de termos com precedência de operadores:
 Parser principal e construção de módulos:
 - `buildExpressão` - Constrói o parser de expressões completas
 - `_0` - Parser de módulos completos com importações
+- Retorna objeto com estrutura `{ importações: [[nome, endereço], ...], expressão: <AST> }`
 
 ### `importações.js`
 Parser de importações de módulos:
@@ -75,6 +76,7 @@ const resultado = expressão("2 + 3 * 4");
 
 // Parser de módulos completos (com importações)
 const módulo = _0("módulo # ./outro.0\n\n2 + módulo");
+// módulo.valor => { importações: [["módulo", "./outro.0"]], expressão: <AST> }
 
 // Parser de importações apenas
 const importsResult = importações("módulo # ./outro.0\n\n2 + módulo");
