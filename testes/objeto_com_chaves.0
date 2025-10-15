@@ -1,4 +1,6 @@
-uniteste => uniteste.descrever({"Objeto com chaves" {
+uniteste # uniteste.0
+
+uniteste.descrever({"Objeto com chaves" {
   uniteste.iguais({{
     objeto_com_chaves: {
       nome: "João"

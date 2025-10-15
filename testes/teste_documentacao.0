@@ -1,4 +1,6 @@
-uniteste => uniteste.descrever({"Exemplos da documentação" {
+uniteste # uniteste.0
+
+uniteste.descrever({"Exemplos da documentação" {
   // Primeiro exemplo da documentação
   uniteste.iguais({
     {

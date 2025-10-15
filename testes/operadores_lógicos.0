@@ -1,4 +1,6 @@
-uniteste => uniteste.descrever({"Operadores lógicos" {
+uniteste # uniteste.0
+
+uniteste.descrever({"Operadores lógicos" {
   uniteste.descrever({"E" {
     uniteste.iguais({
       0 & 0
