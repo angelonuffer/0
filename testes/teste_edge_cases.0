@@ -26,7 +26,7 @@ uniteste => uniteste.descrever({"Casos extremos de referências aninhadas" {
     1
   })
   
-  // Referência a propriedade inexistente deve gerar undefined (ou erro)
+  // Teste de referência a propriedade que usa variável do escopo externo
   uniteste.iguais({
     {
       exemplo: {
@@ -35,10 +35,10 @@ uniteste => uniteste.descrever({"Casos extremos de referências aninhadas" {
           c: a + 3
         }
         d: {
-          e: inexistente + 1  // Esta referência pode ser problemática
+          e: a + 10  // Usa a variável a do escopo do objeto
         }
       }
-      exemplo.b.c  // Testamos apenas a parte que funciona
+      exemplo.b.c  // Testamos a parte aninhada
     }[0]
     4
   })

@@ -36,6 +36,58 @@ const carregar_conteúdo = async (endereço) => {
   }
 };
 
+// Helper function to show undefined variable error with context
+const mostrar_erro_variável = (endereço, nome_variável, nomes_disponíveis) => {
+  const conteúdo = conteúdos[endereço];
+  const linhas = conteúdo.split('\n');
+  
+  // Find the first occurrence of the variable name in the source
+  // We need to find it as a whole word (not part of another word)
+  let posição_erro = -1;
+  let número_linha = 0;
+  let número_coluna = 0;
+  
+  // Create a regex that matches the variable name as a whole word
+  const regex = new RegExp(`\\b${nome_variável.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+  
+  for (let i = 0; i < linhas.length; i++) {
+    const match = linhas[i].match(regex);
+    if (match) {
+      número_linha = i + 1;
+      número_coluna = match.index + 1;
+      posição_erro = conteúdo.split('\n').slice(0, i).join('\n').length + (i > 0 ? 1 : 0) + match.index;
+      break;
+    }
+  }
+  
+  if (posição_erro === -1) {
+    // Fallback: just show the error without highlighting
+    console.log(`Erro: Nome não encontrado: ${nome_variável}\n${endereço}`);
+    if (nomes_disponíveis.length > 0) {
+      console.log(`Nomes disponíveis: ${nomes_disponíveis.join(', ')}`);
+    }
+    return;
+  }
+  
+  const linha = linhas[número_linha - 1];
+  
+  // Highlight the variable name with yellow background (ANSI code 43)
+  const linha_com_erro = linha.substring(0, número_coluna - 1) +
+    `\x1b[43m${nome_variável}\x1b[0m` +
+    linha.substring(número_coluna - 1 + nome_variável.length);
+  
+  console.log(`${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
+  
+  // Show available names aligned with the error position
+  if (nomes_disponíveis.length > 0) {
+    // Calculate padding to align with the variable position
+    const padding = ' '.repeat(`${número_linha}:${número_coluna}: `.length + número_coluna - 1);
+    for (const nome of nomes_disponíveis) {
+      console.log(`${padding}${nome}`);
+    }
+  }
+};
+
 // Helper function to show syntax error with context
 const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
   const unparsed_text = módulo_bruto.menor_resto || módulo_bruto.resto;
@@ -171,7 +223,19 @@ try {
     );
     
     const escopo = { ...escopo_importações, __parent__: null };
-    const valor = corpoAst ? avaliar(corpoAst, escopo) : undefined;
+    let valor;
+    try {
+      valor = corpoAst ? avaliar(corpoAst, escopo) : undefined;
+    } catch (erro) {
+      // Check if it's an undefined variable error
+      if (erro.nome_variável) {
+        mostrar_erro_variável(endereço, erro.nome_variável, erro.nomes_disponíveis);
+        fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
+        process.exit(1);
+      }
+      // Otherwise re-throw
+      throw erro;
+    }
     
     valores_módulos[endereço] = valor;
   }
