@@ -76,15 +76,14 @@ const mostrar_erro_variável = (endereço, nome_variável, nomes_disponíveis) =
     `\x1b[43m${nome_variável}\x1b[0m` +
     linha.substring(número_coluna - 1 + nome_variável.length);
   
-  console.log(`Erro: Nome não encontrado.\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
+  console.log(`${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
   
   // Show available names aligned with the error position
   if (nomes_disponíveis.length > 0) {
     // Calculate padding to align with the variable position
     const padding = ' '.repeat(`${número_linha}:${número_coluna}: `.length + número_coluna - 1);
-    console.log(`${padding}Nomes disponíveis:`);
     for (const nome of nomes_disponíveis) {
-      console.log(`${padding}  ${nome}`);
+      console.log(`${padding}${nome}`);
     }
   }
 };
