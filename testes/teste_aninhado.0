@@ -1,4 +1,6 @@
-uniteste => uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
+uniteste # uniteste.0
+
+uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
   // Caso básico do enunciado
   uniteste.iguais({
     {

@@ -1,4 +1,6 @@
-uniteste => uniteste.descrever({"Operador de espalhamento" {
+uniteste # uniteste.0
+
+uniteste.descrever({"Operador de espalhamento" {
   uniteste.descrever({"Com itens sem chaves (arrays simples)" {
     uniteste.listas_iguais({
       {...{"a" "b"} "c"}

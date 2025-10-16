@@ -1,4 +1,6 @@
-uniteste => uniteste.descrever({"Multiplicação de objeto" {
+uniteste # uniteste.0
+
+uniteste.descrever({"Multiplicação de objeto" {
   uniteste.descrever({"Join básico" {
     uniteste.iguais({
       {"a" "b" "c"} * " "

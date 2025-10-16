@@ -243,7 +243,7 @@ try {
   // Save cache
   fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
   
-  await eval(valores_módulos[módulo_principal])
+  await eval(valores_módulos[módulo_principal]("Node.js"))
   
 } catch (erro) {
   console.error(erro);
