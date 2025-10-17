@@ -26,9 +26,10 @@ const alternativa = (...analisadores) => código => {
     // Se teve sucesso, retorna imediatamente
     if (resultado.sucesso) return resultado
     
-    // Senão, acompanha o menor resto
-    if (resultado.menor_resto && resultado.menor_resto.length < menor_resto.length) {
-      menor_resto = resultado.menor_resto
+    // Acompanha o progresso mais profundo (menor resto)
+    const resto_atual = resultado.menor_resto || resultado.resto
+    if (resto_atual.length < menor_resto.length) {
+      menor_resto = resto_atual
       melhor_erro = resultado.erro
     }
   }
@@ -45,24 +46,37 @@ const alternativa = (...analisadores) => código => {
 const sequência = (...analisadores) => código => {
   const valores = []
   let resto = código
+  let menor_resto_global = código
 
   for (const analisador of analisadores) {
     const resultado = analisador(resto)
+    
+    // Atualiza o menor_resto_global com o progresso mais profundo
+    const resto_atual = resultado.menor_resto || resultado.resto
+    if (resto_atual.length < menor_resto_global.length) {
+      menor_resto_global = resto_atual
+    }
+    
     if (!resultado.sucesso) {
       return {
         sucesso: false,
         valor: undefined,
         resto: código,
-        menor_resto: resultado.menor_resto || resto,
+        menor_resto: menor_resto_global,
         erro: resultado.erro
       }
     }
 
     valores.push(resultado.valor)
     resto = resultado.resto
+    
+    // Atualiza menor_resto_global após sucesso também
+    if (resto.length < menor_resto_global.length) {
+      menor_resto_global = resto
+    }
   }
 
-  return { sucesso: true, valor: valores, resto }
+  return { sucesso: true, valor: valores, resto, menor_resto: menor_resto_global }
 }
 
 const opcional = (analisador, valor_padrão) => código => {
@@ -72,7 +86,7 @@ const opcional = (analisador, valor_padrão) => código => {
     sucesso: true, 
     valor: valor_padrão, 
     resto: código, 
-    menor_resto: resultado.menor_resto, 
+    menor_resto: resultado.menor_resto || código, 
     erro: resultado.erro 
   }
 }
@@ -80,15 +94,28 @@ const opcional = (analisador, valor_padrão) => código => {
 const vários = analisador => código => {
   const valores = []
   let resto = código
+  let menor_resto_global = código
 
   while (true) {
     const resultado = analisador(resto)
+    
+    // Atualiza o progresso mais profundo
+    const resto_atual = resultado.menor_resto || resultado.resto
+    if (resto_atual.length < menor_resto_global.length) {
+      menor_resto_global = resto_atual
+    }
+    
     if (!resultado.sucesso || resultado.resto === resto) break
     valores.push(resultado.valor)
     resto = resultado.resto
+    
+    // Atualiza após sucesso
+    if (resto.length < menor_resto_global.length) {
+      menor_resto_global = resto
+    }
   }
 
-  return { sucesso: true, valor: valores, resto }
+  return { sucesso: true, valor: valores, resto, menor_resto: menor_resto_global }
 }
 
 const transformar = (analisador, transformador) => código => {
@@ -101,14 +128,14 @@ const transformar = (analisador, transformador) => código => {
       sucesso: true,
       valor: transformador(resultado.valor), 
       resto: resultado.resto, 
-      menor_resto: resultado.menor_resto 
+      menor_resto: resultado.menor_resto || resultado.resto
     }
   } catch (erro) {
     return { 
       sucesso: false,
       valor: undefined,
       resto: código, 
-      menor_resto: resultado.menor_resto, 
+      menor_resto: resultado.menor_resto || código, 
       erro: { mensagem: erro.message, stack: erro.stack }
     }
   }
@@ -117,17 +144,19 @@ const transformar = (analisador, transformador) => código => {
 const inversão = analisador => código => {
   const resultado = analisador(código)
   if (!resultado.sucesso) {
+    const novo_resto = código.slice(1)
     return {
       sucesso: true,
       valor: código[0],
-      resto: código.slice(1),
+      resto: novo_resto,
+      menor_resto: novo_resto.length < código.length ? novo_resto : código
     }
   }
   return { 
     sucesso: false,
     valor: undefined,
     resto: código, 
-    menor_resto: resultado.menor_resto,
+    menor_resto: resultado.menor_resto || código,
     erro: { mensagem: "Inversão falhou", posição: código }
   }
 }
