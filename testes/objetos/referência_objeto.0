@@ -1,4 +1,4 @@
-uniteste # uniteste.0
+uniteste # ../integração/uniteste.0
 
 uniteste.descrever({"Referências de propriedades em objeto" {
   uniteste.iguais({
