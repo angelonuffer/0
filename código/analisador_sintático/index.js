@@ -5,7 +5,7 @@
 import { não, valor_constante, chamada_função_imediata, setExpressão as setExpressãoBásico } from './básico.js';
 
 // Import object operations
-import { fatia, tamanho, chaves, objeto, atributo, setExpressão as setExpressãoObjeto } from './objeto.js';
+import { fatia, tamanho, chaves, lista, objeto, atributo, setExpressão as setExpressãoObjeto } from './objeto.js';
 
 // Import function operations
 import { lambda, chamada_função, parênteses, setExpressão as setExpressãoFunção } from './função.js';
@@ -24,6 +24,7 @@ setDependências(null, {
   fatia,
   tamanho,
   chaves,
+  lista,
   objeto,
   atributo,
   lambda,
@@ -49,6 +50,7 @@ setDependências(expressão, {
   fatia,
   tamanho,
   chaves,
+  lista,
   objeto,
   atributo,
   lambda,
