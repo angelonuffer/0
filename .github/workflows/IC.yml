@@ -1,7 +1,11 @@
 name: IC
 on:
+  push:
+    branches: 
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - main
 jobs:
   testar:
     runs-on: ubuntu-latest
