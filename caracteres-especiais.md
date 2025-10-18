@@ -189,8 +189,22 @@ Delimita um objeto ou coleção de valores. Objetos podem conter valores indexad
 }
 ```
 
-### `[]` (Colchetes - Acesso a Elementos)
-Acessa elementos de um objeto ou texto por índice ou chave.
+### `[]` (Colchetes - Definição de Lista ou Acesso a Elementos)
+Os colchetes têm dois usos na linguagem 0:
+
+1. **Definição de lista**: Cria uma lista simples (array) sem chaves nomeadas. É equivalente a usar `{}` para listas simples.
+
+**Exemplo de lista:**
+```
+[1 2 3 4 5]
+```
+
+**Equivalente com chaves:**
+```
+{1 2 3 4 5}
+```
+
+2. **Acesso a elementos**: Acessa elementos de um objeto ou texto por índice ou chave.
 
 **Exemplo de acesso por índice:**
 ```
@@ -521,7 +535,7 @@ Use parênteses `()` para alterar a ordem de avaliação quando necessário.
 | `>=` | Maior ou igual | Comparação |
 | `<=` | Menor ou igual | Comparação |
 | `{}` | Chaves | Define objeto/coleção |
-| `[]` | Colchetes | Acessa elementos por índice ou chave |
+| `[]` | Colchetes | Define lista simples ou acessa elementos por índice/chave |
 | `[inicio:fim]` | Fatiamento | Extrai fatia de objeto ou texto |
 | `[.]` | Tamanho | Retorna quantidade de elementos |
 | `[*]` | Chaves | Retorna todas as chaves |

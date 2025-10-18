@@ -351,10 +351,49 @@ Use multiplicação de objeto com string vazia.
 
 Armazena coleções ordenadas de valores.
 
+### Sintaxe de listas com colchetes
+
+Listas simples podem ser criadas usando colchetes `[]`, que é uma sintaxe alternativa às chaves `{}` para objetos sem chaves nomeadas.
+
+Exemplo com colchetes:
+```
+["Zelda" "Mario" "Minecraft"]
+---
+["Zelda","Mario","Minecraft"]
+```
+
+Exemplo equivalente com chaves:
+```
+{"Zelda" "Mario" "Minecraft"}
+---
+["Zelda","Mario","Minecraft"]
+```
+
+Ambas as sintaxes produzem o mesmo resultado. Use `[]` quando quiser enfatizar que está criando uma lista simples, e `{}` quando quiser criar um objeto que pode ter chaves nomeadas.
+
 ### Fatiando o objeto
 Acesse elementos por índice ou um intervalo de índices.
 
-Exemplos:
+Exemplos com colchetes:
+```
+{
+  jogos: ["Zelda" "Mario" "Minecraft"]
+  jogos[0] // Primeiro elemento
+}[0]
+---
+"Zelda"
+```
+
+```
+{
+  series: ["Stranger Things" "Breaking Bad" "GoT"]
+  series[0:2] // Do primeiro ao segundo elemento
+}[0]
+---
+["Stranger Things","Breaking Bad"]
+```
+
+Exemplos com chaves:
 ```
 {
   jogos: {"Zelda" "Mario" "Minecraft"}
@@ -376,7 +415,17 @@ Exemplos:
 ### Espalhando itens
 Use `...` para incluir itens de um objeto em outro.
 
-Exemplo:
+Exemplo com colchetes:
+```
+{
+  filmes: ["Star Wars" "O Senhor dos Anéis" "Matrix"]
+  resultado: [...filmes[0:2] "Jurassic Park"]
+}.resultado
+---
+["Star Wars","O Senhor dos Anéis","Jurassic Park"]
+```
+
+Exemplo com chaves:
 ```
 {
   filmes: {"Star Wars" "O Senhor dos Anéis" "Matrix"}
@@ -389,7 +438,17 @@ Exemplo:
 ### Obtendo o tamanho do objeto
 Use `[.]` para obter o número de itens.
 
-Exemplo:
+Exemplo com colchetes:
+```
+{
+  bandas: ["The Beatles" "Queen" "Pink Floyd"]
+  bandas[.]
+}[0]
+---
+3
+```
+
+Exemplo com chaves:
 ```
 {
   bandas: {"The Beatles" "Queen" "Pink Floyd"}
