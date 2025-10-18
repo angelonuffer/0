@@ -43,6 +43,61 @@ const chaves = transformar(
   })
 );
 
+const lista = transformar(
+  sequência(
+    símbolo("["),
+    opcional(espaço),
+    vários(
+      alternativa(
+        sequência( // Spread syntax ...expression
+          símbolo("..."),
+          código => expressão(código),
+          opcional(espaço),
+        ),
+        sequência( // Value-only (auto-indexed)
+          código => expressão(código),
+          opcional(espaço),
+        ),
+      ),
+    ),
+    símbolo("]")
+  ),
+  ([, , valores_vários,]) => {
+    if (!valores_vários) {
+      return {
+        tipo: 'objeto',
+        items: [],
+        usarObjeto: false
+      };
+    }
+    
+    // Check if any spread operations exist
+    const hasSpreads = valores_vários.some(v_seq => v_seq[0] === "...");
+    
+    const usarObjeto = hasSpreads;
+    
+    const items = valores_vários.map(v_alt => {
+      const firstEl = v_alt[0];
+      if (firstEl === "...") {
+        return {
+          tipo: 'espalhamento',
+          expressão: v_alt[1]
+        };
+      } else {
+        return {
+          valor: v_alt[0]
+        };
+      }
+    });
+    
+    return {
+      tipo: 'objeto',
+      items: items,
+      usarObjeto: usarObjeto
+    };
+  }
+);
+
 const objeto = transformar(
   sequência(
     símbolo("{"),
@@ -149,4 +204,4 @@ const setExpressão = (expr) => {
   expressão = expr;
 };
 
-export { fatia, tamanho, chaves, objeto, atributo, setExpressão };
+export { fatia, tamanho, chaves, lista, objeto, atributo, setExpressão };
