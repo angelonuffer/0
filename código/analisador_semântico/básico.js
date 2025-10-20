@@ -20,6 +20,24 @@ export const avaliarBásico = (ast, escopo) => {
     case 'parênteses':
       return avaliar(ast.expressão, escopo);
 
+    case 'parênteses_com_declarações': {
+      // Create a new scope for the declarations
+      const novoEscopo = { __parent__: escopo };
+      
+      // First pass: declare all names
+      for (const decl of ast.declarações) {
+        novoEscopo[decl.nome] = undefined;
+      }
+      
+      // Second pass: evaluate and assign values
+      for (const decl of ast.declarações) {
+        novoEscopo[decl.nome] = avaliar(decl.valor, novoEscopo);
+      }
+      
+      // Evaluate the expression in the new scope
+      return avaliar(ast.expressão, novoEscopo);
+    }
+
     default:
       return null; // Not handled by this module
   }
