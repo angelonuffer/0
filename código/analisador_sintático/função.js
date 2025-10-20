@@ -1,13 +1,44 @@
 // Function operations - lambda, chamada_função, parênteses
-import { sequência, opcional, transformar, símbolo } from '../combinadores/index.js';
+import { sequência, opcional, transformar, símbolo, alternativa, vários } from '../combinadores/index.js';
 import { espaço, nome } from '../analisador_léxico/index.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
 
+// Parser for object destructuring pattern: { a b c }
+const objeto_destructuring = transformar(
+  sequência(
+    símbolo("{"),
+    opcional(espaço),
+    vários(
+      sequência(
+        nome,
+        opcional(espaço),
+      )
+    ),
+    símbolo("}")
+  ),
+  ([, , nomes_seq,]) => {
+    if (!nomes_seq) {
+      return {
+        tipo: 'destructuring',
+        nomes: []
+      };
+    }
+    const nomes = nomes_seq.map(seq => seq[0]);
+    return {
+      tipo: 'destructuring',
+      nomes: nomes
+    };
+  }
+);
+
 const lambda = transformar(
   sequência(
-    nome,
+    alternativa(
+      objeto_destructuring,
+      nome
+    ),
     opcional(espaço),
     símbolo("=>"),
     opcional(espaço),
@@ -17,7 +48,12 @@ const lambda = transformar(
     const [paramsResultado, , , , corpoExpr] = valorBrutoLambda;
 
     let nomeParam = null;
-    if (Array.isArray(paramsResultado) && paramsResultado[0] === '(') {
+    let destructuringParam = null;
+    
+    if (typeof paramsResultado === 'object' && paramsResultado.tipo === 'destructuring') {
+      // Object destructuring case: { a b c }
+      destructuringParam = paramsResultado.nomes;
+    } else if (Array.isArray(paramsResultado) && paramsResultado[0] === '(') {
       // Parentheses case: (param) or ()
       nomeParam = paramsResultado[2] || null;
     } else {
@@ -28,6 +64,7 @@ const lambda = transformar(
     return {
       tipo: 'lambda',
       parâmetro: nomeParam,
+      destructuring: destructuringParam,
       corpo: corpoExpr
     };
   }
