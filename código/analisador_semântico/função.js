@@ -10,7 +10,21 @@ export const avaliarFunção = (ast, escopo) => {
     case 'lambda':
       return (caller_context, ...valoresArgs) => {
         const fn_scope = { __parent__: escopo || null };
-        if (ast.parâmetro) {
+        
+        // Handle object destructuring
+        if (ast.destructuring) {
+          const argValue = valoresArgs.length === 1 ? valoresArgs[0] : valoresArgs;
+          
+          // Extract values from the argument object based on destructuring keys
+          for (const nome of ast.destructuring) {
+            if (typeof argValue === 'object' && argValue !== null) {
+              fn_scope[nome] = argValue[nome];
+            } else {
+              fn_scope[nome] = undefined;
+            }
+          }
+        } else if (ast.parâmetro) {
+          // Original behavior for named parameters
           if (valoresArgs.length === 1) {
             fn_scope[ast.parâmetro] = valoresArgs[0];
           } else {
