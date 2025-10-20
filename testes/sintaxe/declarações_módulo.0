@@ -1,0 +1,59 @@
+uniteste # ../integração/uniteste.0
+
+// Helper module for testing
+teste_módulo_a = 5
+
+teste_módulo_b = 10
+
+teste_módulo_c = teste_módulo_a * 2
+
+uniteste.descrever({"Declarações no nível do módulo" {
+  // Test basic module-level declarations
+  uniteste.iguais({
+    teste_módulo_a
+    5
+  })
+  
+  uniteste.iguais({
+    teste_módulo_b
+    10
+  })
+  
+  // Test that declarations can reference each other
+  uniteste.iguais({
+    teste_módulo_c
+    10
+  })
+  
+  // Test using module-level declarations in main expression
+  uniteste.iguais({
+    teste_módulo_a + teste_módulo_b
+    15
+  })
+  
+  // Test with more complex expression
+  uniteste.iguais({
+    teste_módulo_a * teste_módulo_b + teste_módulo_c
+    60
+  })
+  
+  // Test with text
+  uniteste.iguais({
+    {
+      nome_teste: "João"
+      sobrenome_teste: "Silva"
+      nome_teste + " " + sobrenome_teste
+    }[0]
+    "João Silva"
+  })
+  
+  // Test mixed with objects
+  uniteste.iguais({
+    {
+      x_teste: teste_módulo_a
+      y_teste: teste_módulo_b
+      soma_teste: x_teste + y_teste
+    }.soma_teste
+    15
+  })
+}})

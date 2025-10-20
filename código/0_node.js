@@ -175,6 +175,7 @@ try {
     }
     
     const corpo = módulo_bruto.valor.expressão;
+    const declarações = módulo_bruto.valor.declarações || [];
     const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
     
     // Add new dependencies
@@ -189,6 +190,7 @@ try {
     
     módulos[endereço] = {
       importações: resolved_importações,
+      declarações: declarações,
       expressão: corpo
     };
     
@@ -224,13 +226,39 @@ try {
     }
     
     const [endereço, módulo] = executável;
-    const { importações, expressão: corpoAst } = módulo;
+    const { importações, declarações, expressão: corpoAst } = módulo;
     
     const escopo_importações = Object.fromEntries(
       importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
     );
     
     const escopo = { ...escopo_importações, __parent__: null };
+    
+    // First pass: declare all constant names
+    if (declarações) {
+      for (const decl of declarações) {
+        escopo[decl.nome] = undefined;
+      }
+    }
+    
+    // Second pass: evaluate and assign values
+    if (declarações) {
+      for (const decl of declarações) {
+        try {
+          escopo[decl.nome] = avaliar(decl.valor, escopo);
+        } catch (erro) {
+          // Check if it's an undefined variable error
+          if (erro.nome_variável) {
+            mostrar_erro_variável(endereço, erro.nome_variável, erro.nomes_disponíveis);
+            salvar_cache();
+            process.exit(1);
+          }
+          // Otherwise re-throw
+          throw erro;
+        }
+      }
+    }
+    
     let valor;
     try {
       valor = corpoAst ? avaliar(corpoAst, escopo) : undefined;
