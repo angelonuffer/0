@@ -782,6 +782,72 @@ Esta função retorna o maior valor entre dois números fornecidos em um objeto.
 
 Esses exemplos mostram como funções com múltiplos parâmetros recebem um objeto com os argumentos e podem ser usadas para resolver problemas variados de forma simples e eficiente.
 
+### Destructuring de objetos em parâmetros
+
+A linguagem 0 também suporta destructuring de objetos diretamente na definição de parâmetros de funções. Isso permite extrair valores de objetos com chaves nomeadas de forma mais clara e concisa.
+
+#### Sintaxe básica
+
+Ao invés de usar `args => args[0] + args[1]`, você pode usar `{ a b } => a + b`:
+
+```
+{
+  soma: { a b } => a + b
+  soma({ a: 2 b: 3 })
+}[0]
+---
+5
+```
+
+#### Vantagens do destructuring
+
+1. **Clareza**: Os nomes dos parâmetros ficam explícitos na definição da função
+2. **Ordem independente**: Os argumentos podem ser passados em qualquer ordem
+
+```
+{
+  subtrair: { a b } => a - b
+  subtrair({ b: 5 a: 10 })
+}[0]
+---
+5
+```
+
+#### Exemplo com múltiplos parâmetros
+
+```
+{
+  calc: { x y z } => x + y * z
+  calc({ x: 2 y: 3 z: 4 })
+}[0]
+---
+14
+```
+
+#### Exemplo com textos
+
+```
+{
+  juntar: { primeiro segundo } => {primeiro " " segundo} * ""
+  juntar({ primeiro: "Hello" segundo: "World" })
+}[0]
+---
+"Hello World"
+```
+
+#### Exemplo do uso prático
+
+```
+{
+  soma: { a b } => a + b
+  resultado: soma({ a: 2 b: 3 })
+}.resultado
+---
+5
+```
+
+Esses exemplos mostram como o destructuring torna o código mais legível ao deixar explícito quais propriedades do objeto são esperadas pela função.
+
 ## Funções dentro de objetos
 
 Na linguagem 0, é possível armazenar funções dentro de objetos e chamá-las diretamente pelo índice. Isso permite criar coleções de comportamentos ou ações.
