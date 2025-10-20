@@ -2,14 +2,22 @@ import { _0 } from './analisador_sintático/index.js';
 import { importações } from './analisador_sintático/importações.js';
 import { avaliar } from './analisador_semântico/index.js';
 import fs from 'fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const módulo_principal = process.argv[2];
 
-// Check and load cache
+// Caminho absoluto do arquivo de cache no mesmo diretório deste 0_node.js
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const CAMINHO_CACHE = path.join(__dirname, '0_cache.json');
+
 let cache = {};
-if (fs.existsSync("0_cache.json")) {
-  cache = JSON.parse(fs.readFileSync("0_cache.json", 'utf-8'));
+if (fs.existsSync(CAMINHO_CACHE)) {
+  cache = JSON.parse(fs.readFileSync(CAMINHO_CACHE, 'utf-8'));
 }
+
+const salvar_cache = () => fs.writeFileSync(CAMINHO_CACHE, JSON.stringify(cache, null, 2));
 
 // Helper function to resolve relative paths
 const resolve_endereço = (base_module_path, rel_path) => {
@@ -156,13 +164,13 @@ try {
         // Otherwise show syntax error
         mostrar_erro_sintaxe(endereço, módulo_bruto);
       }
-      fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
+      salvar_cache();
       process.exit(1);
     }
     
     if (módulo_bruto.resto.length > 0) {
       mostrar_erro_sintaxe(endereço, módulo_bruto);
-      fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
+      salvar_cache();
       process.exit(1);
     }
     
@@ -230,7 +238,7 @@ try {
       // Check if it's an undefined variable error
       if (erro.nome_variável) {
         mostrar_erro_variável(endereço, erro.nome_variável, erro.nomes_disponíveis);
-        fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
+        salvar_cache();
         process.exit(1);
       }
       // Otherwise re-throw
@@ -241,7 +249,7 @@ try {
   }
   
   // Save cache
-  fs.writeFileSync("0_cache.json", JSON.stringify(cache, null, 2));
+  salvar_cache();
   
   await eval(valores_módulos[módulo_principal]("Node.js"))
   
