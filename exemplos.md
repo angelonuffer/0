@@ -32,6 +32,66 @@ retorna_5()
 
 Neste exemplo, o módulo `retorna_5.0` é importado, e sua função `retorna_5` é utilizada.
 
+## Declarações no nível do módulo
+
+Você pode declarar constantes no nível do módulo, antes da expressão principal. Isso funciona de maneira similar às declarações dentro de parênteses, mas no escopo global do módulo.
+
+Sintaxe: `nome1 = valor1` seguido de espaço ou nova linha, depois `nome2 = valor2`, e assim por diante, até a expressão principal.
+
+Exemplo básico:
+
+```
+pi = 3.14159
+raio = 5
+
+_ => pi * raio * raio
+---
+78.53975
+```
+
+As constantes podem referenciar outras constantes declaradas anteriormente:
+
+```
+base = 10
+altura = 5
+area = base * altura
+
+_ => area
+---
+50
+```
+
+Exemplo com múltiplas declarações:
+
+```
+nome = "João"
+sobrenome = "Silva"
+ano_nascimento = 1990
+ano_atual = 2024
+idade = ano_atual - ano_nascimento
+
+_ => {nome " " sobrenome " tem " {idade} * "" " anos"} * ""
+---
+"João Silva tem 34 anos"
+```
+
+As constantes declaradas no módulo ficam disponíveis para toda a expressão principal:
+
+```
+taxa = 0.1
+valor_base = 100
+
+_ => {
+  valor_com_taxa: valor_base * (1 + taxa)
+  desconto: valor_base * 0.05
+  valor_final: valor_com_taxa - desconto
+}.valor_final
+---
+105
+```
+
+Diferentemente de declarações em parênteses, as declarações no nível do módulo afetam todo o módulo e estão disponíveis em qualquer parte da expressão principal.
+
 
 ## Tipo lógico
 

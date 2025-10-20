@@ -62,20 +62,39 @@ const _0 = opcional(
       ), []),
 
       opcional(espaço),
+      // Parse constant declarations: nome = expressão
+      opcional(vários(
+        sequência(
+          nome,
+          opcional(espaço),
+          símbolo("="),
+          opcional(espaço),
+          código => expressão(código),
+          espaço,
+        )
+      ), []),
+      opcional(espaço),
       código => expressão(código),
       opcional(espaço),
     ),
     valorSeq => {
-      const [, importaçõesDetectadas_val, , corpoAst] = valorSeq;
+      const [, importaçõesDetectadas_val, , declarações_val, , corpoAst] = valorSeq;
       const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+
+      // Extract declarations
+      const declarações = declarações_val.map(([nome_var, , , , valorExpr]) => ({
+        nome: nome_var,
+        valor: valorExpr
+      }));
 
       return {
         importações: importações,
+        declarações: declarações,
         expressão: corpoAst
       };
     }
   ),
-  { importações: [], expressão: undefined }
+  { importações: [], declarações: [], expressão: undefined }
 );
 
 // Function to set termo6 getter reference
