@@ -188,6 +188,50 @@ Exemplos:
 20
 ```
 
+### Declarações de constantes em parênteses
+Você pode declarar constantes dentro dos parênteses antes da avaliação da expressão principal. Isso permite criar variáveis locais temporárias que existem apenas dentro do contexto dos parênteses.
+
+Sintaxe: `( nome1 = valor1 nome2 = valor2 expressão )`
+
+Exemplo básico:
+```
+( a = 2 b = 3 a + b )
+---
+5
+```
+
+As constantes podem referenciar outras constantes declaradas anteriormente:
+```
+( a = 5 b = a * 2 b + 3 )
+---
+13
+```
+
+Múltiplas declarações com operações complexas:
+```
+( x = 4 y = 5 z = 10 x * y + z )
+---
+30
+```
+
+Parênteses com declarações podem ser aninhados:
+```
+( a = 2 b = ( x = 3 y = 4 x + y ) a * b )
+---
+14
+```
+
+As constantes declaradas em parênteses não afetam o escopo externo:
+```
+{
+  x: 10
+  resultado: ( x = 5 x * 2 )
+  final_x: x
+}.final_x
+---
+10
+```
+
 ### Comparadores
 Comparam dois valores.
 

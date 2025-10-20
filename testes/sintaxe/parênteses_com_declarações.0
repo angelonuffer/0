@@ -66,4 +66,20 @@ uniteste.descrever({"Parênteses com declarações" {
     ( a = 2 (a + 3) * 4 )
     20
   })
+  
+  // Documentation example: Multiple declarations with complex operations
+  uniteste.iguais({
+    ( x = 4 y = 5 z = 10 x * y + z )
+    30
+  })
+  
+  // Documentation example: Constants don't affect outer scope
+  uniteste.iguais({
+    {
+      x: 10
+      resultado: ( x = 5 x * 2 )
+      final_x: x
+    }.final_x
+    10
+  })
 }})
