@@ -93,12 +93,39 @@ const parênteses = transformar(
   sequência(
     símbolo("("),
     opcional(espaço),
+    // Try to parse declarations first (name = expr pairs)
+    vários(
+      sequência(
+        nome,
+        opcional(espaço),
+        símbolo("="),
+        opcional(espaço),
+        código => expressão(código),
+        espaço,
+      )
+    ),
     código => expressão(código),
     opcional(espaço),
     símbolo(")"),
   ),
   valorSeq => {
-    const [, , expr,] = valorSeq;
+    const [, , declarações_vários, expr,] = valorSeq;
+    
+    // If we have declarations, create a parentheses node with declarations
+    if (declarações_vários && declarações_vários.length > 0) {
+      const declarações = declarações_vários.map(([nome_var, , , , valorExpr]) => ({
+        nome: nome_var,
+        valor: valorExpr
+      }));
+      
+      return {
+        tipo: 'parênteses_com_declarações',
+        declarações: declarações,
+        expressão: expr
+      };
+    }
+    
+    // Otherwise, simple parentheses
     return {
       tipo: 'parênteses',
       expressão: expr
