@@ -41,19 +41,22 @@ Sintaxe: `nome1 = valor1` seguido de espaço ou nova linha, depois `nome2 = valo
 Exemplo básico:
 
 ```
-pi = 3.14159
-raio = 5
+base = 10
 
-_ => pi * raio * raio
+altura = 5
+
+_ => base * altura
 ---
-78.53975
+50
 ```
 
 As constantes podem referenciar outras constantes declaradas anteriormente:
 
 ```
 base = 10
+
 altura = 5
+
 area = base * altura
 
 _ => area
@@ -65,9 +68,13 @@ Exemplo com múltiplas declarações:
 
 ```
 nome = "João"
+
 sobrenome = "Silva"
+
 ano_nascimento = 1990
+
 ano_atual = 2024
+
 idade = ano_atual - ano_nascimento
 
 _ => {nome " " sobrenome " tem " {idade} * "" " anos"} * ""
@@ -78,16 +85,33 @@ _ => {nome " " sobrenome " tem " {idade} * "" " anos"} * ""
 As constantes declaradas no módulo ficam disponíveis para toda a expressão principal:
 
 ```
-taxa = 0.1
+taxa = 10
+
 valor_base = 100
 
 _ => {
-  valor_com_taxa: valor_base * (1 + taxa)
-  desconto: valor_base * 0.05
+  valor_com_taxa: valor_base + taxa
+  desconto: 5
   valor_final: valor_com_taxa - desconto
 }.valor_final
 ---
 105
+```
+
+Você também pode declarar funções no nível do módulo:
+
+```
+dobro = x => x * 2
+
+triplo = x => x * 3
+
+_ => {
+  resultado_dobro: dobro(5)
+  resultado_triplo: triplo(5)
+  soma: resultado_dobro + resultado_triplo
+}.soma
+---
+25
 ```
 
 Diferentemente de declarações em parênteses, as declarações no nível do módulo afetam todo o módulo e estão disponíveis em qualquer parte da expressão principal.
