@@ -4,6 +4,7 @@ import { espaço, nome } from '../analisador_léxico/index.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
+let getTermo6;
 
 // Parser for object destructuring pattern: { a b c }
 const objeto_destructuring = transformar(
@@ -33,6 +34,73 @@ const objeto_destructuring = transformar(
   }
 );
 
+// Parser for guard expressions: | condition = expression or | expression (default)
+// Note: expects to be called after whitespace has been consumed
+// Uses getTermo6 instead of expressão to avoid parsing | as logical operator
+const guardExpression = transformar(
+  sequência(
+    símbolo("|"),
+    opcional(espaço),
+    código => getTermo6()(código),
+    opcional(
+      sequência(
+        opcional(espaço),
+        símbolo("="),
+        opcional(espaço),
+        código => getTermo6()(código)
+      )
+    ),
+    opcional(espaço)
+  ),
+  ([, , conditionOrDefault, assignmentOpt,]) => {
+    if (assignmentOpt) {
+      // This is a guard with condition: | condition = expression
+      const [, , , resultExpr] = assignmentOpt;
+      return {
+        tipo: 'guard',
+        condição: conditionOrDefault,
+        expressão: resultExpr
+      };
+    } else {
+      // This is the default case: | expression
+      return {
+        tipo: 'guard_default',
+        expressão: conditionOrDefault
+      };
+    }
+  }
+);
+
+// Parser for guard body - requires at least one guard
+const guardBody = código => {
+  // First, consume required space
+  const spaceResult = espaço(código);
+  if (!spaceResult.sucesso) {
+    return spaceResult;
+  }
+  
+  // Then try to parse guards using vários
+  const guardsResult = vários(guardExpression)(spaceResult.resto);
+  
+  // Check if we got at least one guard
+  if (guardsResult.sucesso && guardsResult.valor.length > 0) {
+    return {
+      sucesso: true,
+      valor: { tipo: 'guard_body', guards: guardsResult.valor },
+      resto: guardsResult.resto,
+      menor_resto: guardsResult.menor_resto
+    };
+  }
+  
+  // Failed - no guards found
+  return {
+    sucesso: false,
+    valor: undefined,
+    resto: código,
+    menor_resto: guardsResult.menor_resto || spaceResult.menor_resto || código
+  };
+};
+
 const lambda = transformar(
   sequência(
     alternativa(
@@ -41,11 +109,18 @@ const lambda = transformar(
     ),
     opcional(espaço),
     símbolo("=>"),
-    opcional(espaço),
-    código => expressão(código)
+    alternativa(
+      // Try guard body first (requires space before | and at least one guard)
+      guardBody,
+      // Fall back to regular expression
+      sequência(
+        opcional(espaço),
+        código => expressão(código)
+      )
+    )
   ),
   (valorBrutoLambda) => {
-    const [paramsResultado, , , , corpoExpr] = valorBrutoLambda;
+    const [paramsResultado, , , corpoInfo] = valorBrutoLambda;
 
     let nomeParam = null;
     let destructuringParam = null;
@@ -61,11 +136,27 @@ const lambda = transformar(
       nomeParam = paramsResultado;
     }
 
+    // Check if corpoInfo is guards or regular expression
+    let corpo;
+    if (corpoInfo && typeof corpoInfo === 'object' && corpoInfo.tipo === 'guard_body') {
+      // This is the guards case
+      corpo = {
+        tipo: 'guards',
+        guards: corpoInfo.guards
+      };
+    } else if (Array.isArray(corpoInfo) && corpoInfo.length === 2) {
+      // This is the regular expression case: [opcional(espaço), expressão]
+      corpo = corpoInfo[1];
+    } else {
+      // Fallback
+      corpo = corpoInfo;
+    }
+
     return {
       tipo: 'lambda',
       parâmetro: nomeParam,
       destructuring: destructuringParam,
-      corpo: corpoExpr
+      corpo: corpo
     };
   }
 );
@@ -138,4 +229,9 @@ const setExpressão = (expr) => {
   expressão = expr;
 };
 
-export { lambda, chamada_função, parênteses, setExpressão };
+// Function to set the getTermo6 reference
+const setGetTermo6 = (getter) => {
+  getTermo6 = getter;
+};
+
+export { lambda, chamada_função, parênteses, setExpressão, setGetTermo6 };

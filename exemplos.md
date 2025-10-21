@@ -910,6 +910,150 @@ Esta função retorna o maior valor entre dois números fornecidos em um objeto.
 
 Esses exemplos mostram como funções com múltiplos parâmetros recebem um objeto com os argumentos e podem ser usadas para resolver problemas variados de forma simples e eficiente.
 
+### Guards em funções
+
+A linguagem 0 suporta guards (condicionais) em funções usando a sintaxe com `|`, similar aos guards do Haskell. Guards permitem definir diferentes comportamentos para uma função baseados em condições.
+
+#### Sintaxe básica
+
+Guards são definidos com o símbolo `|` seguido de uma condição e `=` antes da expressão de retorno:
+
+```
+| condição = expressão_retorno
+```
+
+O último guard pode omitir a condição e o `=`, tornando-se o caso padrão (equivalente ao `otherwise` do Haskell):
+
+```
+| expressão_padrão
+```
+
+#### Exemplo: Valor absoluto
+
+Esta função retorna o valor absoluto de um número usando guards:
+
+```
+{
+  abs: x =>
+    | x < 0 = 0 - x
+    | x
+  abs(-5)
+}[0]
+---
+5
+```
+
+```
+{
+  abs: x =>
+    | x < 0 = 0 - x
+    | x
+  abs(7)
+}[0]
+---
+7
+```
+
+#### Exemplo: Função sinal
+
+Esta função retorna 1 para números positivos, -1 para negativos e 0 para zero:
+
+```
+{
+  sign: x =>
+    | x > 0 = 1
+    | x < 0 = 0 - 1
+    | 0
+  sign(5)
+}[0]
+---
+1
+```
+
+```
+{
+  sign: x =>
+    | x > 0 = 1
+    | x < 0 = 0 - 1
+    | 0
+  sign(-3)
+}[0]
+---
+-1
+```
+
+```
+{
+  sign: x =>
+    | x > 0 = 1
+    | x < 0 = 0 - 1
+    | 0
+  sign(0)
+}[0]
+---
+0
+```
+
+#### Exemplo: Classificação de valores
+
+Guards podem ter múltiplas condições que são avaliadas em ordem:
+
+```
+{
+  classify: x =>
+    | x > 10 = "grande"
+    | x > 5 = "médio"
+    | "pequeno"
+  classify(15)
+}[0]
+---
+"grande"
+```
+
+```
+{
+  classify: x =>
+    | x > 10 = "grande"
+    | x > 5 = "médio"
+    | "pequeno"
+  classify(7)
+}[0]
+---
+"médio"
+```
+
+```
+{
+  classify: x =>
+    | x > 10 = "grande"
+    | x > 5 = "médio"
+    | "pequeno"
+  classify(3)
+}[0]
+---
+"pequeno"
+```
+
+#### Observações importantes
+
+- Guards são avaliados em ordem, de cima para baixo
+- O primeiro guard cuja condição for verdadeira (diferente de 0) será executado
+- O último guard sem `=` é o caso padrão e sempre será executado se nenhum guard anterior corresponder
+- Guards funcionam com funções de qualquer aridade (com ou sem parâmetros)
+- Guards podem ser escritos inline com espaços: `x => | x < 0 = 0 - x | x`
+- Ou em múltiplas linhas para melhor legibilidade (como mostrado nos exemplos acima)
+
+Exemplo inline:
+
+```
+{
+  abs: x => | x < 0 = 0 - x | x
+  abs(-5)
+}[0]
+---
+5
+```
+
 ### Destructuring de objetos em parâmetros
 
 A linguagem 0 também suporta destructuring de objetos diretamente na definição de parâmetros de funções. Isso permite extrair valores de objetos com chaves nomeadas de forma mais clara e concisa.

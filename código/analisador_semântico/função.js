@@ -31,7 +31,29 @@ export const avaliarFunção = (ast, escopo) => {
             fn_scope[ast.parâmetro] = valoresArgs;
           }
         }
-        return avaliar(ast.corpo, fn_scope);
+        
+        // Check if the body is a guards expression
+        if (ast.corpo && ast.corpo.tipo === 'guards') {
+          // Evaluate guards in order
+          for (const guard of ast.corpo.guards) {
+            if (guard.tipo === 'guard_default') {
+              // Default guard - always matches
+              return avaliar(guard.expressão, fn_scope);
+            } else if (guard.tipo === 'guard') {
+              // Conditional guard - check condition
+              const conditionValue = avaliar(guard.condição, fn_scope);
+              // In the language, 0 is false, anything else is true
+              if (conditionValue !== 0) {
+                return avaliar(guard.expressão, fn_scope);
+              }
+            }
+          }
+          // If no guards matched and no default, return undefined
+          return undefined;
+        } else {
+          // Regular function body
+          return avaliar(ast.corpo, fn_scope);
+        }
       };
 
     case 'chamada_função': {

@@ -8,7 +8,7 @@ import { não, valor_constante, chamada_função_imediata, setExpressão as setE
 import { fatia, tamanho, chaves, lista, objeto, atributo, setExpressão as setExpressãoObjeto } from './objeto.js';
 
 // Import function operations
-import { lambda, chamada_função, parênteses, setExpressão as setExpressãoFunção } from './função.js';
+import { lambda, chamada_função, parênteses, setExpressão as setExpressãoFunção, setGetTermo6 as setGetTermo6Função } from './função.js';
 
 // Import term operations
 import { getTermo1, getTermo2, getTermo3, getTermo4, getTermo5, getTermo6, setDependências } from './termos.js';
@@ -34,6 +34,9 @@ setDependências(null, {
 
 // Set getTermo6 for expression builder
 setGetTermo6(getTermo6);
+
+// Set getTermo6 for function operations
+setGetTermo6Função(getTermo6);
 
 // Build the main expression
 const expressão = buildExpressão();
