@@ -1,0 +1,25 @@
+uniteste # ../integração/uniteste.0
+
+uniteste.descrever({"Guards inline" {
+  uniteste.iguais({
+    {
+      abs: x => | x < 0 = 0 - x | x
+      abs(-5)
+    }[0]
+    5
+  })
+  uniteste.iguais({
+    {
+      max: { a b } => | a > b = a | b
+      max({ a: 10 b: 5 })
+    }[0]
+    10
+  })
+  uniteste.iguais({
+    {
+      max: { a b } => | a > b = a | b
+      max({ a: 3 b: 8 })
+    }[0]
+    8
+  })
+}})
