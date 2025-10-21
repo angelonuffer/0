@@ -232,7 +232,7 @@ try {
       importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
     );
     
-    const escopo = { ...escopo_importações, __parent__: null };
+    const escopo = { ...escopo_importações, __parent__: null, __módulo__: endereço };
     
     // First pass: declare all constant names
     if (declarações) {
@@ -249,7 +249,8 @@ try {
         } catch (erro) {
           // Check if it's an undefined variable error
           if (erro.nome_variável) {
-            mostrar_erro_variável(endereço, erro.nome_variável, erro.nomes_disponíveis);
+            const erro_endereço = erro.módulo_endereço || endereço;
+            mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
             salvar_cache();
             process.exit(1);
           }
@@ -265,7 +266,8 @@ try {
     } catch (erro) {
       // Check if it's an undefined variable error
       if (erro.nome_variável) {
-        mostrar_erro_variável(endereço, erro.nome_variável, erro.nomes_disponíveis);
+        const erro_endereço = erro.módulo_endereço || endereço;
+        mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
         salvar_cache();
         process.exit(1);
       }
