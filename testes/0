@@ -24,6 +24,7 @@ multiplicacao_objeto # objetos/multiplicacao_objeto.0
 operador_espalhamento # objetos/operador_espalhamento.0
 função # funções/função.0
 destructuring # funções/destructuring.0
+guards # funções/guards.0
 comentário # sintaxe/comentário.0
 
 uniteste.descrever({"0" {
@@ -52,5 +53,6 @@ uniteste.descrever({"0" {
   operador_espalhamento
   função
   destructuring
+  guards
   comentário
 }})

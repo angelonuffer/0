@@ -1,0 +1,82 @@
+uniteste # ../integração/uniteste.0
+
+uniteste.descrever({"Guards em funções" {
+  // Test 1: Simple guard with default
+  uniteste.iguais({
+    {
+      abs: x =>
+        | x < 0 = 0 - x
+        | x
+      abs(-5)
+    }[0]
+    5
+  })
+  
+  // Test 2: Multiple guards with default
+  uniteste.iguais({
+    {
+      sign: x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      sign(5)
+    }[0]
+    1
+  })
+  
+  uniteste.iguais({
+    {
+      sign: x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      sign(-3)
+    }[0]
+    0 - 1
+  })
+  
+  uniteste.iguais({
+    {
+      sign: x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      sign(0)
+    }[0]
+    0
+  })
+  
+  // Test 3: Guard with multiple conditions
+  uniteste.iguais({
+    {
+      classify: x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      classify(15)
+    }[0]
+    "grande"
+  })
+  
+  uniteste.iguais({
+    {
+      classify: x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      classify(7)
+    }[0]
+    "médio"
+  })
+  
+  uniteste.iguais({
+    {
+      classify: x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      classify(3)
+    }[0]
+    "pequeno"
+  })
+}})
