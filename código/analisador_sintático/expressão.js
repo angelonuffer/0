@@ -91,20 +91,21 @@ const _0 = opcional(
       const [, importaçõesDetectadas_val, , declarações_ou_debug_val, , corpoAst] = valorSeq;
       const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-      // Extract declarations and debug commands
-      const declarações = [];
-      const debugs = [];
+      // Extract declarations and debug commands, preserving order
+      const statements = [];
       
       for (const item of declarações_ou_debug_val) {
         if (item.length === 6) {
           // This is a declaration: [nome, espaço?, "=", espaço?, expressão, espaço]
-          declarações.push({
+          statements.push({
+            tipo: 'declaração',
             nome: item[0],
             valor: item[4]
           });
         } else if (item.length === 4) {
           // This is a debug command: ["%", espaço?, expressão, espaço]
-          debugs.push({
+          statements.push({
+            tipo: 'debug',
             expressão: item[2]
           });
         }
@@ -112,13 +113,12 @@ const _0 = opcional(
 
       return {
         importações: importações,
-        declarações: declarações,
-        debugs: debugs,
+        statements: statements,
         expressão: corpoAst
       };
     }
   ),
-  { importações: [], declarações: [], debugs: [], expressão: undefined }
+  { importações: [], statements: [], expressão: undefined }
 );
 
 // Function to set termo6 getter reference
