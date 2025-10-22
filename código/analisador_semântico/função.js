@@ -5,6 +5,18 @@ import { buscarVariável } from './escopo.js';
 // Forward declaration for recursive avaliar reference
 let avaliar;
 
+// Helper to get module address from scope chain
+const obterEndereçoMódulo = (escopo) => {
+  let atualEscopo = escopo;
+  while (atualEscopo) {
+    if (atualEscopo.hasOwnProperty('__módulo__')) {
+      return atualEscopo.__módulo__;
+    }
+    atualEscopo = atualEscopo.__parent__;
+  }
+  return null;
+};
+
 export const avaliarFunção = (ast, escopo) => {
   switch (ast.tipo) {
     case 'lambda':
@@ -59,7 +71,12 @@ export const avaliarFunção = (ast, escopo) => {
     case 'chamada_função': {
       const função = avaliar(ast.função, escopo);
       if (typeof função !== 'function') {
-        throw new Error(`Value is not a function, got ${typeof função}`);
+        const erro = new Error(`Value is not a function, got ${typeof função}`);
+        erro.é_erro_semântico = true;
+        erro.módulo_endereço = obterEndereçoMódulo(escopo);
+        // For anonymous function calls, we don't have a good search term
+        // The error will be caught and displayed without specific highlighting
+        throw erro;
       }
       if (ast.argumento !== undefined) {
         const arg_value = avaliar(ast.argumento, escopo);
@@ -72,7 +89,11 @@ export const avaliarFunção = (ast, escopo) => {
     case 'chamada_função_imediata': {
       const função = buscarVariável(escopo, ast.nome);
       if (typeof função !== 'function') {
-        throw new Error(`${ast.nome} is not a function`);
+        const erro = new Error(`${ast.nome} is not a function`);
+        erro.é_erro_semântico = true;
+        erro.termo_busca = ast.nome;
+        erro.módulo_endereço = obterEndereçoMódulo(escopo);
+        throw erro;
       }
       if (ast.argumento !== undefined) {
         const arg_value = avaliar(ast.argumento, escopo);

@@ -3,6 +3,18 @@
 // Forward declaration for recursive avaliar reference
 let avaliar;
 
+// Helper to get module address from scope chain
+const obterEndereçoMódulo = (escopo) => {
+  let atualEscopo = escopo;
+  while (atualEscopo) {
+    if (atualEscopo.hasOwnProperty('__módulo__')) {
+      return atualEscopo.__módulo__;
+    }
+    atualEscopo = atualEscopo.__parent__;
+  }
+  return null;
+};
+
 export const avaliarOperações = (ast, escopo) => {
   switch (ast.tipo) {
     case 'operação_binária': {
@@ -18,7 +30,10 @@ export const avaliarOperações = (ast, escopo) => {
       } else if (ast.operador === '|') {
         return esquerda !== 0 ? esquerda : avaliar(ast.direita, escopo);
       }
-      throw new Error(`Unknown logical operator: ${ast.operador}`);
+      const erro = new Error(`Unknown logical operator: ${ast.operador}`);
+      erro.é_erro_semântico = true;
+      erro.módulo_endereço = obterEndereçoMódulo(escopo);
+      throw erro;
     }
 
     case 'condicional': {

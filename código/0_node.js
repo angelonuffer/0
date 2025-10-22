@@ -44,19 +44,19 @@ const carregar_conteúdo = async (endereço) => {
   }
 };
 
-// Helper function to show undefined variable error with context
-const mostrar_erro_variável = (endereço, nome_variável, nomes_disponíveis) => {
+// Helper function to show semantic errors with highlighted code
+const mostrar_erro_semântico = (endereço, mensagem_erro, termo_busca, informações_extras = []) => {
   const conteúdo = conteúdos[endereço];
   const linhas = conteúdo.split('\n');
   
-  // Find the first occurrence of the variable name in the source
-  // We need to find it as a whole word (not part of another word)
+  // Find the first occurrence of the search term in the source
   let posição_erro = -1;
   let número_linha = 0;
   let número_coluna = 0;
+  let comprimento_termo = termo_busca.length;
   
-  // Create a regex that matches the variable name as a whole word
-  const regex = new RegExp(`\\b${nome_variável.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
+  // Create a regex that matches the search term as a whole word
+  const regex = new RegExp(`\\b${termo_busca.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
   
   for (let i = 0; i < linhas.length; i++) {
     const match = linhas[i].match(regex);
@@ -70,30 +70,39 @@ const mostrar_erro_variável = (endereço, nome_variável, nomes_disponíveis) =
   
   if (posição_erro === -1) {
     // Fallback: just show the error without highlighting
-    console.log(`Erro: Nome não encontrado: ${nome_variável}\n${endereço}`);
-    if (nomes_disponíveis.length > 0) {
-      console.log(`Nomes disponíveis: ${nomes_disponíveis.join(', ')}`);
+    console.log(`Erro: ${mensagem_erro}\n${endereço}`);
+    for (const info of informações_extras) {
+      console.log(info);
     }
     return;
   }
   
   const linha = linhas[número_linha - 1];
   
-  // Highlight the variable name with yellow background (ANSI code 43)
+  // Highlight the term with yellow background (ANSI code 43)
   const linha_com_erro = linha.substring(0, número_coluna - 1) +
-    `\x1b[43m${nome_variável}\x1b[0m` +
-    linha.substring(número_coluna - 1 + nome_variável.length);
+    `\x1b[43m${termo_busca}\x1b[0m` +
+    linha.substring(número_coluna - 1 + comprimento_termo);
   
-  console.log(`${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
+  console.log(`Erro: ${mensagem_erro}\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
   
-  // Show available names aligned with the error position
-  if (nomes_disponíveis.length > 0) {
-    // Calculate padding to align with the variable position
+  // Show extra information aligned with the error position
+  if (informações_extras.length > 0) {
+    // Calculate padding to align with the term position
     const padding = ' '.repeat(`${número_linha}:${número_coluna}: `.length + número_coluna - 1);
-    for (const nome of nomes_disponíveis) {
-      console.log(`${padding}${nome}`);
+    for (const info of informações_extras) {
+      console.log(`${padding}${info}`);
     }
   }
+};
+
+// Helper function to show undefined variable error with context
+const mostrar_erro_variável = (endereço, nome_variável, nomes_disponíveis) => {
+  const informações_extras = nomes_disponíveis.length > 0 
+    ? nomes_disponíveis 
+    : [];
+  
+  mostrar_erro_semântico(endereço, `Nome não encontrado: ${nome_variável}`, nome_variável, informações_extras);
 };
 
 // Helper function to show syntax error with context
@@ -247,10 +256,21 @@ try {
         try {
           escopo[decl.nome] = avaliar(decl.valor, escopo);
         } catch (erro) {
-          // Check if it's an undefined variable error
-          if (erro.nome_variável) {
+          // Check if it's a semantic analyzer error
+          if (erro.é_erro_semântico) {
             const erro_endereço = erro.módulo_endereço || endereço;
-            mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+            
+            // Check if it's an undefined variable error (special case)
+            if (erro.nome_variável) {
+              mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+            } else if (erro.termo_busca) {
+              // Generic semantic error with search term
+              mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
+            } else {
+              // Semantic error without search term - just show the message
+              console.log(`Erro: ${erro.message}\n${erro_endereço}`);
+            }
+            
             salvar_cache();
             process.exit(1);
           }
@@ -264,10 +284,21 @@ try {
     try {
       valor = corpoAst ? avaliar(corpoAst, escopo) : undefined;
     } catch (erro) {
-      // Check if it's an undefined variable error
-      if (erro.nome_variável) {
+      // Check if it's a semantic analyzer error
+      if (erro.é_erro_semântico) {
         const erro_endereço = erro.módulo_endereço || endereço;
-        mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+        
+        // Check if it's an undefined variable error (special case)
+        if (erro.nome_variável) {
+          mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+        } else if (erro.termo_busca) {
+          // Generic semantic error with search term
+          mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
+        } else {
+          // Semantic error without search term - just show the message
+          console.log(`Erro: ${erro.message}\n${erro_endereço}`);
+        }
+        
         salvar_cache();
         process.exit(1);
       }

@@ -36,7 +36,9 @@ export const avaliar = (ast, escopo) => {
   result = avaliarFunção(ast, escopo);
   if (result !== null) return result;
 
-  throw new Error(`Unknown AST node type: ${ast.tipo}`);
+  const erro = new Error(`Unknown AST node type: ${ast.tipo}`);
+  erro.é_erro_semântico = true;
+  throw erro;
 };
 
 // Wire up recursive references
