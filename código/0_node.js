@@ -185,6 +185,7 @@ try {
     
     const corpo = módulo_bruto.valor.expressão;
     const declarações = módulo_bruto.valor.declarações || [];
+    const debugs = módulo_bruto.valor.debugs || [];
     const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
     
     // Add new dependencies
@@ -200,6 +201,7 @@ try {
     módulos[endereço] = {
       importações: resolved_importações,
       declarações: declarações,
+      debugs: debugs,
       expressão: corpo
     };
     
@@ -235,7 +237,7 @@ try {
     }
     
     const [endereço, módulo] = executável;
-    const { importações, declarações, expressão: corpoAst } = módulo;
+    const { importações, declarações, debugs, expressão: corpoAst } = módulo;
     
     const escopo_importações = Object.fromEntries(
       importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
@@ -250,11 +252,41 @@ try {
       }
     }
     
-    // Second pass: evaluate and assign values
-    if (declarações) {
+    // Second pass: evaluate and assign values, and execute debug commands
+    if (declarações || debugs) {
       for (const decl of declarações) {
         try {
           escopo[decl.nome] = avaliar(decl.valor, escopo);
+        } catch (erro) {
+          // Check if it's a semantic analyzer error
+          if (erro.é_erro_semântico) {
+            const erro_endereço = erro.módulo_endereço || endereço;
+            
+            // Check if it's an undefined variable error (special case)
+            if (erro.nome_variável) {
+              mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+            } else if (erro.termo_busca) {
+              // Generic semantic error with search term
+              mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
+            } else {
+              // Semantic error without search term - just show the message
+              console.log(`Erro: ${erro.message}\n${erro_endereço}`);
+            }
+            
+            salvar_cache();
+            process.exit(1);
+          }
+          // Otherwise re-throw
+          throw erro;
+        }
+      }
+      
+      // Execute debug commands
+      for (const debug of debugs) {
+        try {
+          const valor_debug = avaliar(debug.expressão, escopo);
+          // Display with green background (ANSI code 42) on stderr
+          console.error(`\x1b[42m%\x1b[0m ${valor_debug}`);
         } catch (erro) {
           // Check if it's a semantic analyzer error
           if (erro.é_erro_semântico) {

@@ -62,15 +62,25 @@ const _0 = opcional(
       ), []),
 
       opcional(espaço),
-      // Parse constant declarations: nome = expressão
+      // Parse constant declarations and debug commands: nome = expressão OR % expressão
       opcional(vários(
-        sequência(
-          nome,
-          opcional(espaço),
-          símbolo("="),
-          opcional(espaço),
-          código => expressão(código),
-          espaço,
+        alternativa(
+          // Declaration: nome = expressão
+          sequência(
+            nome,
+            opcional(espaço),
+            símbolo("="),
+            opcional(espaço),
+            código => expressão(código),
+            espaço,
+          ),
+          // Debug command: % expressão
+          sequência(
+            símbolo("%"),
+            opcional(espaço),
+            código => expressão(código),
+            espaço,
+          )
         )
       ), []),
       opcional(espaço),
@@ -78,23 +88,37 @@ const _0 = opcional(
       opcional(espaço),
     ),
     valorSeq => {
-      const [, importaçõesDetectadas_val, , declarações_val, , corpoAst] = valorSeq;
+      const [, importaçõesDetectadas_val, , declarações_ou_debug_val, , corpoAst] = valorSeq;
       const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
-      // Extract declarations
-      const declarações = declarações_val.map(([nome_var, , , , valorExpr]) => ({
-        nome: nome_var,
-        valor: valorExpr
-      }));
+      // Extract declarations and debug commands
+      const declarações = [];
+      const debugs = [];
+      
+      for (const item of declarações_ou_debug_val) {
+        if (item.length === 6) {
+          // This is a declaration: [nome, espaço?, "=", espaço?, expressão, espaço]
+          declarações.push({
+            nome: item[0],
+            valor: item[4]
+          });
+        } else if (item.length === 4) {
+          // This is a debug command: ["%", espaço?, expressão, espaço]
+          debugs.push({
+            expressão: item[2]
+          });
+        }
+      }
 
       return {
         importações: importações,
         declarações: declarações,
+        debugs: debugs,
         expressão: corpoAst
       };
     }
   ),
-  { importações: [], declarações: [], expressão: undefined }
+  { importações: [], declarações: [], debugs: [], expressão: undefined }
 );
 
 // Function to set termo6 getter reference
