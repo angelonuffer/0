@@ -66,7 +66,14 @@ export const avaliarColeção = (ast, escopo) => {
     }
 
     case 'tamanho':
-      return avaliar(ast.valor, escopo).length;
+      const valor = avaliar(ast.valor, escopo);
+      if (typeof valor === 'string' || Array.isArray(valor)) {
+        return valor.length;
+      }
+      const erro = new Error(`'${ast.valor.nome}' do tipo '${typeof valor}' não tem um tamanho`);
+      erro.é_erro_semântico = true;
+      erro.módulo_endereço = obterEndereçoMódulo(escopo);
+      throw erro;
 
     case 'chaves': {
       const objeto = avaliar(ast.valor, escopo);
