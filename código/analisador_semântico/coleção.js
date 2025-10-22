@@ -67,7 +67,7 @@ export const avaliarColeção = (ast, escopo) => {
 
     case 'tamanho':
       const valor = avaliar(ast.valor, escopo);
-      if (typeof valor === 'string' || Array.isArray(valor)) {
+      if (valor?.length !== undefined) {
         return valor.length;
       }
       const erro = new Error(`'${ast.valor.nome}' do tipo '${typeof valor}' não tem um tamanho`);
