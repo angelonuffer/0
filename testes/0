@@ -27,6 +27,7 @@ destructuring # funções/destructuring.0
 guards # funções/guards.0
 guards_inline # funções/guards_inline.0
 comentário # sintaxe/comentário.0
+debug # sintaxe/debug.0
 
 uniteste.descrever({"0" {
   aritmética
@@ -57,4 +58,5 @@ uniteste.descrever({"0" {
   guards
   guards_inline
   comentário
+  debug
 }})

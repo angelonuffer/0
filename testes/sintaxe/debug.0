@@ -1,0 +1,32 @@
+uniteste # ../integração/uniteste.0
+
+// Test that % debug commands don't affect the module's return value
+a = 2
+% a + 3  // This outputs to stderr: % 5
+
+uniteste.descrever({"Debug Command" {
+  // The debug command should not affect the value returned by the module
+  uniteste.iguais({
+    a
+    2
+  })
+  
+  // Test that expressions continue to work normally after debug commands
+  uniteste.iguais({
+    a + 3
+    5
+  })
+  
+  // Test with multiple debug commands
+  uniteste.iguais({
+    {
+      x: 10
+      y: 20
+      // % x       // These would output to stderr if uncommented
+      // % y
+      // % x + y
+      x + y
+    }[0]
+    30
+  })
+}})
