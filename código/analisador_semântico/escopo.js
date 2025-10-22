@@ -34,6 +34,7 @@ export const buscarVariável = (escopo, nome) => {
   }
   
   const erro = new Error(`Nome não encontrado: ${nome}`);
+  erro.é_erro_semântico = true;
   erro.nome_variável = nome;
   erro.nomes_disponíveis = nomesDisponíveis;
   erro.módulo_endereço = módulo_endereço;

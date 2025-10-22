@@ -3,6 +3,18 @@
 // Forward declaration for recursive avaliar reference
 let avaliar;
 
+// Helper to get module address from scope chain
+const obterEndereçoMódulo = (escopo) => {
+  let atualEscopo = escopo;
+  while (atualEscopo) {
+    if (atualEscopo.hasOwnProperty('__módulo__')) {
+      return atualEscopo.__módulo__;
+    }
+    atualEscopo = atualEscopo.__parent__;
+  }
+  return null;
+};
+
 export const avaliarColeção = (ast, escopo) => {
   switch (ast.tipo) {
     case 'fatia': {
@@ -24,7 +36,11 @@ export const avaliarColeção = (ast, escopo) => {
         }
       } else if (typeof valor === 'object' && valor !== null) {
         if (typeof índice !== 'string' && typeof índice !== 'number') {
-          throw new Error(`Object key must be a string or number, got type ${typeof índice}`);
+          const erro = new Error(`Object key must be a string or number, got type ${typeof índice}`);
+          erro.é_erro_semântico = true;
+          erro.módulo_endereço = obterEndereçoMódulo(escopo);
+          // No good search term for this error
+          throw erro;
         }
         if (ast.éFaixa || fim !== undefined) {
           if (typeof valor.length === 'number') {
@@ -34,12 +50,18 @@ export const avaliarColeção = (ast, escopo) => {
             }
             return arr.slice(índice, fim);
           } else {
-            throw new Error(`Slicing syntax not supported for object property access`);
+            const erro = new Error(`Slicing syntax not supported for object property access`);
+            erro.é_erro_semântico = true;
+            erro.módulo_endereço = obterEndereçoMódulo(escopo);
+            throw erro;
           }
         }
         return valor[índice];
       } else {
-        throw new Error(`Cannot apply indexing/slicing to type '${typeof valor}'`);
+        const erro = new Error(`Cannot apply indexing/slicing to type '${typeof valor}'`);
+        erro.é_erro_semântico = true;
+        erro.módulo_endereço = obterEndereçoMódulo(escopo);
+        throw erro;
       }
     }
 

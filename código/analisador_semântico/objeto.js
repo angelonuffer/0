@@ -3,6 +3,18 @@
 // Forward declaration for recursive avaliar reference
 let avaliar;
 
+// Helper to get module address from scope chain
+const obterEndereçoMódulo = (escopo) => {
+  let atualEscopo = escopo;
+  while (atualEscopo) {
+    if (atualEscopo.hasOwnProperty('__módulo__')) {
+      return atualEscopo.__módulo__;
+    }
+    atualEscopo = atualEscopo.__parent__;
+  }
+  return null;
+};
+
 export const avaliarObjeto = (ast, escopo) => {
   if (ast.tipo !== 'objeto') {
     return null; // Not handled by this module
@@ -19,7 +31,10 @@ export const avaliarObjeto = (ast, escopo) => {
       } else if (item.chave !== undefined) {
         const chave = typeof item.chave === 'object' ? avaliar(item.chave, escopo) : item.chave;
         if (typeof chave !== 'string' && typeof chave !== 'number') {
-          throw new Error(`Object key must be a string or number, got ${typeof chave}`);
+          const erro = new Error(`Object key must be a string or number, got ${typeof chave}`);
+          erro.é_erro_semântico = true;
+          erro.módulo_endereço = obterEndereçoMódulo(escopo);
+          throw erro;
         }
         listScope[chave] = undefined;
       } else {
