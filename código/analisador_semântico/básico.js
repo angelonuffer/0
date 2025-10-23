@@ -17,6 +17,13 @@ export const avaliarBásico = (ast, escopo) => {
     case 'não':
       return avaliar(ast.expressão, escopo) === 0 ? 1 : 0;
 
+    case 'depuração': {
+      const valor = avaliar(ast.expressão, escopo);
+      // Display debug output to stderr with green background
+      console.error(`\x1b[42m%\x1b[0m ${JSON.stringify(valor)}`);
+      return valor;
+    }
+
     case 'parênteses':
       return avaliar(ast.expressão, escopo);
 

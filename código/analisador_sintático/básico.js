@@ -17,6 +17,18 @@ const não = transformar(
   })
 )
 
+const depuração = transformar(
+  sequência(
+    símbolo("%"),
+    opcional(espaço),
+    código => expressão(código),
+  ),
+  ([, , expr]) => ({
+    tipo: 'depuração',
+    expressão: expr
+  })
+)
+
 const valor_constante = transformar(
   nome,
   nome_var => ({
@@ -52,4 +64,4 @@ const setExpressão = (expr) => {
   expressão = expr;
 };
 
-export { não, valor_constante, chamada_função_imediata, setExpressão };
+export { não, depuração, valor_constante, chamada_função_imediata, setExpressão };

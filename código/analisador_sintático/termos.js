@@ -7,7 +7,7 @@ import { espaço, número, número_negativo, texto } from '../analisador_léxico
 let expressão;
 
 // Import basic operations
-let não, valor_constante, chamada_função_imediata;
+let não, depuração, valor_constante, chamada_função_imediata;
 
 // Import object operations
 let fatia, tamanho, chaves, lista, objeto, atributo;
@@ -117,6 +117,7 @@ const getTermo2 = () => alternativa(
   getTermo1(),
   número_negativo,
   não,
+  depuração,
   valor_constante,
   parênteses
 );
@@ -230,6 +231,7 @@ const getTermo6 = () => transformar(
 const setDependências = (expr, deps) => {
   expressão = expr;
   não = deps.não;
+  depuração = deps.depuração;
   valor_constante = deps.valor_constante;
   chamada_função_imediata = deps.chamada_função_imediata;
   fatia = deps.fatia;
