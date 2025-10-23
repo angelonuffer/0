@@ -169,6 +169,43 @@ Exemplo:
 1
 ```
 
+### Operador de depuração (%)
+
+O operador `%` exibe o valor da expressão no stderr (erro padrão) formatado com JSON e retorna o valor normalmente. É útil para depurar o código durante o desenvolvimento.
+
+Exemplo básico:
+
+```
+a = 2
+b = % a + 3  // Exibe no stderr: % 5
+_ => b
+---
+5
+```
+
+O valor é exibido com fundo verde para facilitar a identificação. Você pode usar `%` em qualquer expressão:
+
+```
+{
+  lista: {1 2 3}
+  segundo: % lista[1]  // Exibe no stderr: % 2
+  segundo
+}[0]
+---
+2
+```
+
+Múltiplos operadores de depuração podem ser usados no mesmo código:
+
+```
+x = 5
+y = 3
+z = % x + % y  // Exibe: % 5 e % 3
+_ => z
+---
+8
+```
+
 ## Tipo número
 
 Utilizado para operações matemáticas e comparações.

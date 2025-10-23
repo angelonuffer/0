@@ -109,6 +109,25 @@ Inverte o valor lógico: `0` (falso) vira `1` (verdadeiro), e vice-versa.
 1
 ```
 
+### `%` (Depuração)
+Exibe o valor da expressão no stderr formatado com JSON.stringify e retorna o valor normalmente. Útil para depurar código durante a análise semântica. A saída é exibida com fundo verde.
+
+**Exemplo:**
+```
+a = 2
+b = % a + 3  // Exibe no stderr: % 5
+_ => b
+---
+5
+```
+
+**Exemplo com lista:**
+```
+% {1 2 3}  // Exibe no stderr: % [1,2,3]
+---
+{1 2 3}
+```
+
 ## Operadores de Comparação
 
 ### `>` (Maior que)
@@ -505,7 +524,7 @@ A linguagem 0 segue a seguinte precedência de operadores (do mais alto para o m
 
 1. Acesso a propriedades: `.`, `[]`
 2. Chamada de função: `()`
-3. Operador unário: `!`, `-` (negativo)
+3. Operador unário: `!`, `%`, `-` (negativo)
 4. Multiplicação e Divisão: `*`, `/`
 5. Adição e Subtração: `+`, `-`
 6. Comparação: `>`, `<`, `>=`, `<=`
@@ -528,6 +547,7 @@ Use parênteses `()` para alterar a ordem de avaliação quando necessário.
 | `&` | E lógico | Operação lógica AND |
 | `|` | Ou lógico | Operação lógica OR |
 | `!` | Não lógico | Negação lógica |
+| `%` | Depuração | Exibe valor no stderr e retorna |
 | `>` | Maior que | Comparação |
 | `<` | Menor que | Comparação |
 | `==` | Igual a | Comparação de igualdade |
