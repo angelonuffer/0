@@ -2,7 +2,7 @@
 // This module imports from sub-modules and wires everything together
 
 // Import basic operations
-import { não, valor_constante, chamada_função_imediata, setExpressão as setExpressãoBásico } from './básico.js';
+import { não, depuração, valor_constante, chamada_função_imediata, setExpressão as setExpressãoBásico } from './básico.js';
 
 // Import object operations
 import { fatia, tamanho, chaves, lista, objeto, atributo, setExpressão as setExpressãoObjeto } from './objeto.js';
@@ -19,6 +19,7 @@ import { buildExpressão, _0, setGetTermo6, setExpressão as setExpressãoModule
 // Wire up all the dependencies
 setDependências(null, {
   não,
+  depuração,
   valor_constante,
   chamada_função_imediata,
   fatia,
@@ -48,6 +49,7 @@ setExpressãoFunção(expressão);
 setExpressãoModule(expressão);
 setDependências(expressão, {
   não,
+  depuração,
   valor_constante,
   chamada_função_imediata,
   fatia,

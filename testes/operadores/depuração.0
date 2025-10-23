@@ -1,0 +1,51 @@
+uniteste # ../integração/uniteste.0
+
+uniteste.descrever({"Operador de depuração (%)" {
+  uniteste.iguais({
+    % 5
+    5
+  })
+  uniteste.iguais({
+    % 2 + 3
+    5
+  })
+  uniteste.iguais({
+    {
+      a: 10
+      b: % a * 2
+      b
+    }[0]
+    20
+  })
+  uniteste.iguais({
+    {
+      lista: {1 2 3}
+      % lista[1]
+    }[0]
+    2
+  })
+  uniteste.iguais({
+    {
+      x: 5
+      y: 3
+      z: % x + % y
+      z
+    }[0]
+    8
+  })
+  uniteste.iguais({
+    % "teste"
+    "teste"
+  })
+  uniteste.iguais({
+    (% {1 2 3})[1]
+    2
+  })
+  uniteste.iguais({
+    {
+      obj: {nome: "João" idade: 30}
+      (% obj).nome
+    }[0]
+    "João"
+  })
+}})

@@ -2,6 +2,7 @@ uniteste # integração/uniteste.0
 aritmética # operadores/aritmética.0
 operadores_lógicos # operadores/operadores_lógicos.0
 comparadores # operadores/comparadores.0
+depuração # operadores/depuração.0
 constantes # sintaxe/constantes.0
 parênteses_com_declarações # sintaxe/parênteses_com_declarações.0
 declarações_módulo # sintaxe/declarações_módulo.0
@@ -32,6 +33,7 @@ uniteste.descrever({"0" {
   aritmética
   operadores_lógicos
   comparadores
+  depuração
   constantes
   parênteses_com_declarações
   declarações_módulo
