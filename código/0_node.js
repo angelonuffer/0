@@ -284,7 +284,7 @@ try {
           try {
             const valor_debug = avaliar(stmt.expressão, escopo);
             // Display with green background (ANSI code 42) on stderr
-            console.error(`\x1b[42m%\x1b[0m ${valor_debug}`);
+            console.error(`\x1b[42m%\x1b[0m ${JSON.stringify(valor_debug)}`);
           } catch (erro) {
             // Check if it's a semantic analyzer error
             if (erro.é_erro_semântico) {
