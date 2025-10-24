@@ -32,6 +32,47 @@ retorna_5()
 
 Neste exemplo, o módulo `retorna_5.0` é importado, e sua função `retorna_5` é utilizada.
 
+## Carregamento de recursos
+
+O carregamento de recursos permite carregar o conteúdo de arquivos ou URLs como texto puro, sem executá-los como módulos da linguagem 0. Use `@` seguido do caminho do arquivo ou URL.
+
+Exemplo com arquivo local:
+
+```
+conteúdo @ ./dados.txt
+
+conteúdo
+---
+(conteúdo do arquivo dados.txt como texto)
+```
+
+Exemplo com URL:
+
+```
+página @ https://exemplo.com/dados.txt
+
+página[.]
+---
+(número de caracteres do arquivo carregado)
+```
+
+Diferença entre `#` e `@`:
+- `#` importa e executa um módulo da linguagem 0, retornando o valor exportado pelo módulo
+- `@` carrega o conteúdo bruto de um arquivo ou URL como texto, sem executá-lo
+
+Você pode usar o conteúdo carregado com `@` para processar dados, dividir strings, acessar caracteres específicos, etc:
+
+```
+dados @ ./arquivo.csv
+
+linhas = dados / "\n"
+primeira_linha = linhas[0]
+
+primeira_linha
+---
+(primeira linha do arquivo CSV)
+```
+
 ## Declarações no nível do módulo
 
 Você pode declarar constantes no nível do módulo, antes da expressão principal. Isso funciona de maneira similar às declarações dentro de parênteses, mas no escopo global do módulo.

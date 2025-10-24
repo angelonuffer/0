@@ -1,0 +1,34 @@
+uniteste # ../integração/uniteste.0
+
+conteúdo @ ../recursos/texto.txt
+número @ ../recursos/numero.txt
+
+uniteste.descrever({"Carregamento de recursos (@)" {
+  uniteste.iguais({
+    conteúdo
+    "Hello World"
+  })
+  
+  uniteste.iguais({
+    número
+    "42"
+  })
+  
+  uniteste.iguais({
+    {conteúdo " - " número} * ""
+    "Hello World - 42"
+  })
+  
+  uniteste.iguais({
+    conteúdo[.]
+    11
+  })
+  
+  uniteste.iguais({
+    conteúdo[0:5]
+    "Hello"
+  })
+}})
+
+
+

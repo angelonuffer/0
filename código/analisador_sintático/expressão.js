@@ -62,6 +62,20 @@ const _0 = opcional(
       ), []),
 
       opcional(espaço),
+      opcional(vários(
+        sequência(
+          sequência(
+            nome,
+            opcional(espaço),
+            símbolo("@"),
+            opcional(espaço),
+            endereço,
+          ),
+          espaço,
+        ),
+      ), []),
+
+      opcional(espaço),
       // Parse constant declarations: nome = expressão
       opcional(vários(
         sequência(
@@ -78,8 +92,9 @@ const _0 = opcional(
       opcional(espaço),
     ),
     valorSeq => {
-      const [, importaçõesDetectadas_val, , declarações_val, , corpoAst] = valorSeq;
+      const [, importaçõesDetectadas_val, , carregamentosDetectados_val, , declarações_val, , corpoAst] = valorSeq;
       const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+      const carregamentos = carregamentosDetectados_val.map(([[nome, , , , endereço]]) => [nome, endereço])
 
       // Extract declarations
       const declarações = declarações_val.map(([nome_var, , , , valorExpr]) => ({
@@ -89,12 +104,13 @@ const _0 = opcional(
 
       return {
         importações: importações,
+        carregamentos: carregamentos,
         declarações: declarações,
         expressão: corpoAst
       };
     }
   ),
-  { importações: [], declarações: [], expressão: undefined }
+  { importações: [], carregamentos: [], declarações: [], expressão: undefined }
 );
 
 // Function to set termo6 getter reference

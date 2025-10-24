@@ -1,5 +1,4 @@
 import { _0 } from './analisador_sintático/index.js';
-import { importações } from './analisador_sintático/importações.js';
 import { avaliar } from './analisador_semântico/index.js';
 import fs from 'fs';
 import path from 'node:path';
@@ -22,6 +21,10 @@ const salvar_cache = () => fs.writeFileSync(CAMINHO_CACHE, JSON.stringify(cache,
 // Helper function to resolve relative paths
 const resolve_endereço = (base_module_path, rel_path) => {
   if (rel_path.startsWith('https://')) {
+    return rel_path;
+  }
+  // If it's an absolute path (starts with /), use it directly
+  if (rel_path.startsWith('/')) {
     return rel_path;
   }
   const base_dir = base_module_path.includes('/') ? base_module_path.substring(0, base_module_path.lastIndexOf('/') + 1) : '';
@@ -158,10 +161,6 @@ try {
     
     const [endereço] = pendente;
     
-    // Extract imports using the import parser
-    const importações_resultado = importações(conteúdos[endereço]);
-    const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
-    
     const módulo_bruto = _0(conteúdos[endereço]);
     
     // Check if parsing failed
@@ -185,7 +184,11 @@ try {
     
     const corpo = módulo_bruto.valor.expressão;
     const declarações = módulo_bruto.valor.declarações || [];
-    const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
+    const importações_brutas = módulo_bruto.valor.importações || [];
+    const carregamentos_brutos = módulo_bruto.valor.carregamentos || [];
+    
+    const resolved_importações = importações_brutas.map(([nome, end_rel]) => [nome, resolve_endereço(endereço, end_rel)]);
+    const resolved_carregamentos = carregamentos_brutos.map(([nome, end_rel]) => [nome, resolve_endereço(endereço, end_rel)]);
     
     // Add new dependencies
     for (const [, end] of resolved_importações) {
@@ -197,8 +200,16 @@ try {
       }
     }
     
+    // Load resource content for @ directives (but don't add as modules)
+    for (const [, end] of resolved_carregamentos) {
+      if (!conteúdos.hasOwnProperty(end)) {
+        conteúdos[end] = null;
+      }
+    }
+    
     módulos[endereço] = {
       importações: resolved_importações,
+      carregamentos: resolved_carregamentos,
       declarações: declarações,
       expressão: corpo
     };
@@ -235,13 +246,17 @@ try {
     }
     
     const [endereço, módulo] = executável;
-    const { importações, declarações, expressão: corpoAst } = módulo;
+    const { importações, carregamentos, declarações, expressão: corpoAst } = módulo;
     
     const escopo_importações = Object.fromEntries(
       importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
     );
     
-    const escopo = { ...escopo_importações, __parent__: null, __módulo__: endereço };
+    const escopo_carregamentos = Object.fromEntries(
+      carregamentos.map(([nome, dep_end]) => [nome, conteúdos[dep_end]])
+    );
+    
+    const escopo = { ...escopo_importações, ...escopo_carregamentos, __parent__: null, __módulo__: endereço };
     
     // First pass: declare all constant names
     if (declarações) {
