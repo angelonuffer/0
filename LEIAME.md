@@ -21,7 +21,15 @@ curl -sSL https://cdn.jsdelivr.net/gh/Nuffem/0@main/install.sh | bash
 O script instala o interpretador e o adiciona ao seu PATH. Se o diretório `~/.local/bin` não estiver no seu PATH, o script fornecerá instruções sobre como adicioná-lo.
 
 ## Sintaxe
-A sintaxe é definida diretamente no interpretador [0.js](https://github.com/Nuffem/0/blob/main/0.js) e pode ser compreendida mais facilmente com o auxílio dos [exemplos](https://github.com/Nuffem/0/blob/main/exemplos.md).
+A sintaxe é definida diretamente no interpretador e pode ser compreendida mais facilmente com o auxílio dos [exemplos](https://github.com/Nuffem/0/blob/main/exemplos.md).
+
+### Principais recursos
+- **Importação de módulos (`#`)**: Importa e executa módulos da linguagem 0
+- **Carregamento de recursos (`@`)**: Carrega conteúdo de arquivos ou URLs como texto
+- **Operações matemáticas**: Suporte completo para aritmética e comparações
+- **Funções**: Funções lambda com suporte a guards (condicionais)
+- **Objetos e listas**: Estruturas de dados flexíveis com sintaxe intuitiva
+- **Manipulação de texto**: Divisão, fatiamento e concatenação de strings
 
 ## Testes
 Para rodar os testes, execute o seguinte comando:
