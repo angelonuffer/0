@@ -7,6 +7,7 @@ constantes # sintaxe/constantes.0
 parênteses_com_declarações # sintaxe/parênteses_com_declarações.0
 declarações_módulo # sintaxe/declarações_módulo.0
 lista # sintaxe/lista.0
+carregamento # sintaxe/carregamento.0
 texto # texto/texto.0
 documentation_examples # texto/documentation_examples.0
 edge_cases_division # texto/edge_cases_division.0
@@ -38,6 +39,7 @@ uniteste.descrever({"0" {
   parênteses_com_declarações
   declarações_módulo
   lista
+  carregamento
   texto
   documentation_examples
   edge_cases_division
