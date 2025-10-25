@@ -654,15 +654,25 @@ Para objetos com chaves nomeadas, retorna apenas as chaves explícitas:
 
 Na Linguagem 0, objetos e listas são conceitos distintos e não podem ser misturados:
 
-- **Listas**: Contêm apenas valores sem chaves - `{1 2 3}` ou `[1 2 3]`
+- **Listas**: Contêm apenas valores sem chaves. Podem ser escritas com `{1 2 3}` ou `[1 2 3]` - ambas as sintaxes são equivalentes
 - **Objetos**: Contêm apenas pares chave-valor - `{nome: "João" idade: 30}`
 
-Não é permitido misturar valores com chave e sem chave no mesmo literal.
+**Importante**: Não é permitido misturar valores com chave e sem chave no mesmo literal. Tentar fazer isso resultará em erro de sintaxe.
 
 Exemplo de lista (valores sem chaves):
 ```
 {
   lista: {"valor1" "valor2" "valor3"}
+  resultado: lista[0]
+}.resultado
+---
+"valor1"
+```
+
+A sintaxe `[...]` também pode ser usada para listas e é equivalente:
+```
+{
+  lista: ["valor1" "valor2" "valor3"]
   resultado: lista[0]
 }.resultado
 ---
