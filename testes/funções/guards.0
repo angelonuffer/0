@@ -1,82 +1,82 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Guards em funções" {
+uniteste.descrever({ nome: "Guards em funções" testes: [
   // Test 1: Simple guard with default
-  uniteste.iguais({
+  uniteste.iguais([
     {
       abs: x =>
         | x < 0 = 0 - x
         | x
-      abs(-5)
-    }[0]
+      resultado: abs(-5)
+    }.resultado
     5
-  })
+  ])
   
   // Test 2: Multiple guards with default
-  uniteste.iguais({
+  uniteste.iguais([
     {
       sign: x =>
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      sign(5)
-    }[0]
+      resultado: sign(5)
+    }.resultado
     1
-  })
+  ])
   
-  uniteste.iguais({
+  uniteste.iguais([
     {
       sign: x =>
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      sign(-3)
-    }[0]
+      resultado: sign(-3)
+    }.resultado
     0 - 1
-  })
+  ])
   
-  uniteste.iguais({
+  uniteste.iguais([
     {
       sign: x =>
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      sign(0)
-    }[0]
+      resultado: sign(0)
+    }.resultado
     0
-  })
+  ])
   
   // Test 3: Guard with multiple conditions
-  uniteste.iguais({
+  uniteste.iguais([
     {
       classify: x =>
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      classify(15)
-    }[0]
+      resultado: classify(15)
+    }.resultado
     "grande"
-  })
+  ])
   
-  uniteste.iguais({
+  uniteste.iguais([
     {
       classify: x =>
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      classify(7)
-    }[0]
+      resultado: classify(7)
+    }.resultado
     "médio"
-  })
+  ])
   
-  uniteste.iguais({
+  uniteste.iguais([
     {
       classify: x =>
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      classify(3)
-    }[0]
+      resultado: classify(3)
+    }.resultado
     "pequeno"
-  })
-}})
+  ])
+  ]})

@@ -1,8 +1,8 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
+uniteste.descrever({ nome: "Referências aninhadas em objeto - Teste Completo" testes: [
   // Caso básico do enunciado
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo: {
         a: 2
@@ -10,13 +10,13 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           c: a + 3
         }
       }
-      exemplo.b.c
-    }[0]
+      resultado: exemplo.b.c
+    }.resultado
     5
-  })
+  ])
   
   // Múltiplos níveis de aninhamento
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo_complexo: {
         x: 5
@@ -27,13 +27,13 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_complexo.y.w.v
-    }[0]
+      resultado: exemplo_complexo.y.w.v
+    }.resultado
     15
-  })
+  ])
   
   // Múltiplas referências no mesmo nível
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo_múltiplas_refs: {
         a: 1
@@ -46,13 +46,13 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_múltiplas_refs.c.nested.resultado
-    }[0]
+      resultado: exemplo_múltiplas_refs.c.nested.resultado
+    }.resultado
     5
-  })
+  ])
   
   // Referências cruzadas entre níveis
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo_cruzado: {
         base: 10
@@ -64,13 +64,13 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_cruzado.nivel1.nivel2.valor3
-    }[0]
+      resultado: exemplo_cruzado.nivel1.nivel2.valor3
+    }.resultado
     35
-  })
+  ])
   
   // Referência a propriedade que também referencia outra
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo_cadeia: {
         a: 1
@@ -82,13 +82,13 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_cadeia.c.e.f
-    }[0]
+      resultado: exemplo_cadeia.c.e.f
+    }.resultado
     4
-  })
+  ])
   
   // Teste com operações mais complexas
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo_operações: {
         x: 3
@@ -101,8 +101,8 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_operações.geometria.hipotenusa.quadrado_total
-    }[0]
+      resultado: exemplo_operações.geometria.hipotenusa.quadrado_total
+    }.resultado
     25
-  })
-}})
+  ])
+  ]})

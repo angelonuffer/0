@@ -77,7 +77,7 @@ ano_atual = 2024
 
 idade = ano_atual - ano_nascimento
 
-_ => {nome " " sobrenome " tem " {idade} * "" " anos"} * ""
+_ => [nome " " sobrenome " tem " {idade} * "" " anos"] * ""
 ---
 "João Silva tem 34 anos"
 ```
@@ -187,7 +187,7 @@ O valor é exibido com fundo verde para facilitar a identificação. Você pode 
 
 ```
 {
-  lista: {1 2 3}
+  lista: [1 2 3]
   segundo: % lista[1]  // Exibe no stderr: % 2
   segundo
 }[0]
@@ -238,7 +238,7 @@ Multiplica dois números.
 
 Quando aplicado a um objeto e um texto, junta os elementos do objeto usando o texto como separador:
 ```
-{"a" "b" "c"} * " "
+["a" "b" "c"] * " "
 ---
 "a b c"
 ```
@@ -255,7 +255,7 @@ Quando aplicado a textos, divide o texto usando o segundo operando como separado
 ```
 "a b c" / " "
 ---
-{"a" "b" "c"}
+["a" "b" "c"]
 ```
 
 ### Números negativos
@@ -470,7 +470,7 @@ Exemplos:
 ```
 "a b c" / " "
 ---
-{"a" "b" "c"}
+["a" "b" "c"]
 ```
 
 ```
@@ -529,7 +529,7 @@ Exemplo com colchetes:
 
 Exemplo equivalente com chaves:
 ```
-{"Zelda" "Mario" "Minecraft"}
+["Zelda" "Mario" "Minecraft"]
 ---
 ["Zelda","Mario","Minecraft"]
 ```
@@ -561,7 +561,7 @@ Exemplos com colchetes:
 Exemplos com chaves:
 ```
 {
-  jogos: {"Zelda" "Mario" "Minecraft"}
+  jogos: ["Zelda" "Mario" "Minecraft"]
   jogos[0] // Primeiro elemento
 }[0]
 ---
@@ -641,73 +641,60 @@ Para objetos com chaves nomeadas, retorna apenas as chaves explícitas:
 {
   dados: {
     nome: "João"
-    "valor_sem_chave"
     idade: 30
-    "outro_valor_sem_chave"
+    cidade: "São Paulo"
   }
-  dados[*]
-}[0]
+  resultado: dados[*]
+}.resultado
 ---
-{"nome","idade"}
+{"nome","idade","cidade"}
 ```
 
-### Chaves opcionais em objetos
-Listas podem conter itens com chaves explícitas além de valores com índices automáticos.
+### Separação entre Objetos e Listas
 
-Exemplo:
+Na Linguagem 0, objetos e listas são conceitos distintos com sintaxes exclusivas:
+
+- **Listas**: Contêm apenas valores sem chaves. **Devem** usar a sintaxe de colchetes `[1 2 3]`
+- **Objetos**: Contêm apenas pares chave-valor. **Devem** usar a sintaxe de chaves `{nome: "João" idade: 30}`
+
+**Importante**: 
+- A sintaxe `{}` é **exclusiva** para objetos (com chaves)
+- A sintaxe `[]` é **exclusiva** para listas (sem chaves)
+- Não é permitido misturar valores com chave e sem chave no mesmo literal
+- Tentar usar `{}` para listas resultará em erro de sintaxe
+
+Exemplo de lista (valores sem chaves):
+```
+{
+  lista: ["valor1" "valor2" "valor3"]
+  resultado: lista[0]
+}.resultado
+---
+"valor1"
+```
+
+Exemplo de objeto (apenas chaves):
 ```
 {
   dados: {
     nome: "João"
-    "valor_sem_chave"
     idade: 30
-    "outro_valor_sem_chave"
+    cidade: "São Paulo"
   }
-  dados["nome"]
-}[0]
+  resultado: dados["nome"]
+}.resultado
 ---
 "João"
 ```
 
+Exemplo de acesso por índice em lista:
 ```
 {
-  dados: {
-    nome: "João"
-    "valor_sem_chave"
-    idade: 30
-    "outro_valor_sem_chave"
-  }
-  dados[0]
-}[0]
+  dados: {"primeiro" "segundo" "terceiro"}
+  resultado: dados[0:2]
+}.resultado
 ---
-"valor_sem_chave"
-```
-
-```
-{
-  dados: {
-    nome: "João"
-    "valor_sem_chave"
-    idade: 30
-    "outro_valor_sem_chave"
-  }
-  dados["idade"]
-}[0]
----
-30
-```
-
-```
-dados = {
-  nome: "João"
-  "primeiro_valor"
-  idade: 30
-  "segundo_valor"
-}
-
-dados[0:2]
----
-{"primeiro_valor","segundo_valor"}
+{"primeiro","segundo"}
 ```
 
 ### Acessando chaves com notação de ponto
@@ -718,12 +705,11 @@ Exemplo:
 {
   dados: {
     nome: "João"
-    "valor_sem_chave"
     idade: 30
-    "outro_valor_sem_chave"
+    profissao: "Desenvolvedor"
   }
-  dados.nome
-}[0]
+  resultado: dados.nome
+}.resultado
 ---
 "João"
 ```
@@ -732,12 +718,11 @@ Exemplo:
 {
   dados: {
     nome: "João"
-    "valor_sem_chave"
     idade: 30
-    "outro_valor_sem_chave"
+    profissao: "Desenvolvedor"
   }
-  dados.idade
-}[0]
+  resultado: dados.idade
+}.resultado
 ---
 30
 ```
@@ -751,10 +736,10 @@ Propriedades calculadas permitem definir chaves dinamicamente em um objeto, com 
   chave: "nome"
   objeto: {
     [chave]: "João"
-    "valor_sem_chave"
+    idade: 30
   }
-  objeto["nome"]
-}[0]
+  resultado: objeto["nome"]
+}.resultado
 ---
 "João"
 ```
@@ -886,8 +871,8 @@ Esta função recebe um objeto com dois textos e os combina em uma única string
 
 ```
 {
-  nome_completo: args => {args[0] " de " args[1]} * ""
-  nome_completo({"Geralt", "The Witcher"})
+  nome_completo: args => [args[0] " de " args[1]] * ""
+  nome_completo(["Geralt", "The Witcher"])
 }[0]
 ---
 "Geralt de The Witcher"
@@ -1137,7 +1122,7 @@ Ao invés de usar `args => args[0] + args[1]`, você pode usar `{ a b } => a + b
 
 ```
 {
-  juntar: { primeiro segundo } => {primeiro " " segundo} * ""
+  juntar: { primeiro segundo } => [primeiro " " segundo] * ""
   juntar({ primeiro: "Hello" segundo: "World" })
 }[0]
 ---
@@ -1163,11 +1148,11 @@ Na linguagem 0, é possível armazenar funções dentro de objetos e chamá-las 
 
 ```
 {
-  iniciais: {
+  iniciais: [
     _ => "Bulbasaur"
     _ => "Charmander"
     _ => "Squirtle"
-  }
+  ]
   iniciais[1](0)
 }[0]
 ---

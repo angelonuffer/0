@@ -1,57 +1,45 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Objeto" {
-  uniteste.descrever({"Fatiamento" {
-    uniteste.iguais({
+uniteste.descrever({ nome: "Objeto" testes: [
+  uniteste.descrever({ nome: "Fatiamento" testes: [
+    uniteste.iguais([
       {
-        jogos: {"The Legend of Zelda" "Super Mario Bros." "Minecraft"}
-        jogos[0]
-      }[0]
+        jogos: ["The Legend of Zelda" "Super Mario Bros." "Minecraft"]
+        resultado: jogos[0]
+      }.resultado
       "The Legend of Zelda"
-    })
-    uniteste.listas_iguais({
+    ])
+    uniteste.listas_iguais([
       {
-        séries: {"Stranger Things" "Breaking Bad" "Game of Thrones"}
-        séries[0:2]
-      }[0]
-      {"Stranger Things" "Breaking Bad"}
-    })
-    uniteste.listas_iguais({
+        séries: ["Stranger Things" "Breaking Bad" "Game of Thrones"]
+        resultado: séries[0:2]
+      }.resultado
+      ["Stranger Things" "Breaking Bad"]
+    ])
+    uniteste.listas_iguais([
       {
-        filmes: {"Star Wars" "O Senhor dos Anéis" "Matrix"}
-        {...filmes[0:2] "Jurassic Park"}
-      }[0]
-      {"Star Wars" "O Senhor dos Anéis" "Jurassic Park"}
-    })
-  }})
-  uniteste.descrever({"Tamanho" {
-    uniteste.iguais({
+        filmes: ["Star Wars" "O Senhor dos Anéis" "Matrix"]
+        resultado: [...filmes[0:2] "Jurassic Park"]
+      }.resultado
+      ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]
+    ])
+  ]})
+  uniteste.descrever({ nome: "Tamanho" testes: [
+    uniteste.iguais([
       {
-        bandas: {"The Beatles" "Queen" "Pink Floyd"}
-        bandas[.]
-      }[0]
+        bandas: ["The Beatles" "Queen" "Pink Floyd"]
+        resultado: bandas[.]
+      }.resultado
       3
-    })
-  }})
-  uniteste.descrever({"Objeto de chaves" {
-    uniteste.listas_iguais({
+    ])
+  ]})
+  uniteste.descrever({ nome: "Objeto de chaves" testes: [
+    uniteste.listas_iguais([
       {
-        objeto_com_chaves: {
-          nome: "João"
-          "valor_sem_chave"
-          idade: 30
-          "outro_valor_sem_chave"
-        }
-        objeto_com_chaves[*]
-      }[0]
-      {"nome" "idade"}
-    })
-    uniteste.listas_iguais({
-      {
-        objeto_simples: {"item1" "item2" "item3"}
-        objeto_simples[*]
-      }[0]
-      {"0" "1" "2"}
-    })
-  }})
-}})
+        objeto_simples: ["item1" "item2" "item3"]
+        resultado: objeto_simples[*]
+      }.resultado
+      ["0" "1" "2"]
+    ])
+  ]})
+  ]})

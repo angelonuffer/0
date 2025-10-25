@@ -1,8 +1,8 @@
 uniteste # uniteste.0
 
-uniteste.descrever({"Exemplos da documentação" {
+uniteste.descrever({ nome: "Exemplos da documentação" testes: [
   // Primeiro exemplo da documentação
-  uniteste.iguais({
+  uniteste.iguais([
     {
       configuracao: {
         base: 10
@@ -13,13 +13,13 @@ uniteste.descrever({"Exemplos da documentação" {
           }
         }
       }
-      configuracao.processamento.etapa2.resultado
-    }[0]
+      resultado: configuracao.processamento.etapa2.resultado
+    }.resultado
     30
-  })
+  ])
   
   // Segundo exemplo da documentação
-  uniteste.iguais({
+  uniteste.iguais([
     {
       geometria: {
         x: 3
@@ -32,8 +32,8 @@ uniteste.descrever({"Exemplos da documentação" {
           }
         }
       }
-      geometria.calculos.hipotenusa.soma_quadrados
-    }[0]
+      resultado: geometria.calculos.hipotenusa.soma_quadrados
+    }.resultado
     25
-  })
-}})
+  ])
+  ]})

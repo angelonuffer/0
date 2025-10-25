@@ -1,140 +1,140 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Operador de espalhamento" {
-  uniteste.descrever({"Com itens sem chaves (arrays simples)" {
-    uniteste.listas_iguais({
-      {...{"a" "b"} "c"}
-      {"a" "b" "c"}
-    })
+uniteste.descrever({ nome: "Operador de espalhamento" testes: [
+  uniteste.descrever({ nome: "Com itens sem chaves (arrays simples)" testes: [
+    uniteste.listas_iguais([
+      [...["a" "b"] "c"]
+      ["a" "b" "c"]
+    ])
     
-    uniteste.listas_iguais({
+    uniteste.listas_iguais([
       {
-        objeto1: {"Star Wars" "Matrix"}
-        objeto2: {"Jurassic Park" "Avatar"}
-        {...objeto1 ...objeto2}
-      }[0]
-      {"Star Wars" "Matrix" "Jurassic Park" "Avatar"}
-    })
+        objeto1: ["Star Wars" "Matrix"]
+        objeto2: ["Jurassic Park" "Avatar"]
+        resultado: {...objeto1 ...objeto2}
+      }.resultado
+      ["Star Wars" "Matrix" "Jurassic Park" "Avatar"]
+    ])
     
-    uniteste.listas_iguais({
+    uniteste.listas_iguais([
       {
-        números: {1 2 3}
-        {"inicio" ...números "fim"}
-      }[0]
-      {"inicio" 1 2 3 "fim"}
-    })
+        números: [1 2 3]
+        resultado: ["inicio" ...números "fim"]
+      }.resultado
+      ["inicio" 1 2 3 "fim"]
+    ])
     
-    uniteste.listas_iguais({
+    uniteste.listas_iguais([
       {
-        filmes: {"Star Wars" "O Senhor dos Anéis" "Matrix"}
-        {...filmes[0:2] "Jurassic Park"}
-      }[0]
-      {"Star Wars" "O Senhor dos Anéis" "Jurassic Park"}
-    })
-  }})
+        filmes: ["Star Wars" "O Senhor dos Anéis" "Matrix"]
+        resultado: [...filmes[0:2] "Jurassic Park"]
+      }.resultado
+      ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]
+    ])
+  ]})
   
-  uniteste.descrever({"Com itens com chaves" {
+  uniteste.descrever({ nome: "Com itens com chaves" testes: [
     // Teste: objeto com chaves pode ser acessada normalmente
-    uniteste.iguais({
+    uniteste.iguais([
       {
         dados: {nome: "João" idade: 30}
-        dados["nome"]
-      }[0]
+        resultado: dados["nome"]
+      }.resultado
       "João"
-    })
+    ])
     
     // Teste: espalhar objeto simples em contexto que aceita chaves
-    uniteste.iguais({
+    uniteste.iguais([
       {
-        objeto_simples: {"valor1" "valor2"}
+        objeto_simples: ["valor1" "valor2"]
         dados_com_chaves: {nome: "João" ...objeto_simples idade: 30}
-        dados_com_chaves[0]
-      }[0]
+        resultado: dados_com_chaves[0]
+      }.resultado
       "valor1"
-    })
+    ])
     
     // Teste: espalhar objeto com chaves
-    uniteste.iguais({
+    uniteste.iguais([
       {
         dados1: {nome: "João" cidade: "São Paulo"}
         dados2: {idade: 30 profissao: "Desenvolvedor"}
         resultado: {...dados1 ...dados2}
-        resultado["nome"]
-      }[0]
+        final: resultado["nome"]
+      }.final
       "João"
-    })
+    ])
     
     // Teste: espalhar objeto com chaves (propriedade do segundo objeto)
-    uniteste.iguais({
+    uniteste.iguais([
       {
         dados1: {nome: "João" cidade: "São Paulo"}
         dados2: {idade: 30 profissao: "Desenvolvedor"}
         resultado: {...dados1 ...dados2}
-        resultado["profissao"]
-      }[0]
+        final: resultado["profissao"]
+      }.final
       "Desenvolvedor"
-    })
+    ])
     
     // Teste: misturar espalhamento com novos valores
-    uniteste.iguais({
+    uniteste.iguais([
       {
         base: {nome: "João"}
         resultado: {...base idade: 30 cidade: "São Paulo"}
-        resultado["cidade"]
-      }[0]
+        final: resultado["cidade"]
+      }.final
       "São Paulo"
-    })
-  }})
+    ])
+  ]})
   
-  uniteste.descrever({"Comportamento misto" {
+  uniteste.descrever({ nome: "Comportamento misto" testes: [
     // Misturar itens simples e com chaves
-    uniteste.listas_iguais({
+    uniteste.listas_iguais([
       {
-        objeto_simples: {"item1" "item2"}
+        objeto_simples: ["item1" "item2"]
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        {objeto_resultado[0] objeto_resultado[1]}
-      }[0]
-      {"item1" "item2"}
-    })
+        final: [objeto_resultado[0] objeto_resultado[1]]
+      }.final
+      ["item1" "item2"]
+    ])
     
     // Acessar propriedade nomeada após espalhamento
-    uniteste.iguais({
+    uniteste.iguais([
       {
-        objeto_simples: {"item1" "item2"}
+        objeto_simples: ["item1" "item2"]
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        objeto_resultado["nome"]
-      }[0]
+        final: objeto_resultado["nome"]
+      }.final
       "João"
-    })
+    ])
     
     // Acessar propriedade nomeada adicionada após espalhamento
-    uniteste.iguais({
+    uniteste.iguais([
       {
-        objeto_simples: {"item1" "item2"}
+        objeto_simples: ["item1" "item2"]
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        objeto_resultado["cidade"]
-      }[0]
+        final: objeto_resultado["cidade"]
+      }.final
       "São Paulo"
-    })
+    ])
     
     // Verificar tamanho do objeto resultante
-    uniteste.iguais({
+    uniteste.iguais([
       {
-        objeto_simples: {"item1" "item2"}
+        objeto_simples: ["item1" "item2"]
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        objeto_resultado[.]
-      }[0]
+        final: objeto_resultado[.]
+      }.final
       2
-    })
+    ])
     
     // Verificar chaves do objeto resultante
-    uniteste.listas_iguais({
+    uniteste.listas_iguais([
       {
-        objeto_simples: {"item1" "item2"}
+        objeto_simples: ["item1" "item2"]
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        objeto_resultado[*]
-      }[0]
-      {"nome" "cidade"}
-    })
-  }})
-}})
+        final: objeto_resultado[*]
+      }.final
+      ["nome" "cidade"]
+    ])
+  ]})
+  ]})

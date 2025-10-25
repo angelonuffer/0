@@ -1,41 +1,41 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Referências de propriedades em objeto" {
-  uniteste.iguais({
+uniteste.descrever({ nome: "Referências de propriedades em objeto" testes: [
+  uniteste.iguais([
     {
       exemplo: {
         a: 1
         b: a + 1
       }
-      exemplo.a
-    }[0]
+      resultado: exemplo.a
+    }.resultado
     1
-  })
+  ])
   
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo: {
         a: 1
         b: a + 1
       }
-      exemplo.b
-    }[0]
+      resultado: exemplo.b
+    }.resultado
     2
-  })
+  ])
   
-  uniteste.iguais({
+  uniteste.iguais([
     {
       pessoa: {
         nome: "João"
         sobrenome: "Silva"
         nomeCompleto: nome + " " + sobrenome
       }
-      pessoa.nomeCompleto
-    }[0]
+      resultado: pessoa.nomeCompleto
+    }.resultado
     "João Silva"
-  })
+  ])
   
-  uniteste.iguais({
+  uniteste.iguais([
     {
       calculos: {
         base: 10
@@ -43,8 +43,8 @@ uniteste.descrever({"Referências de propriedades em objeto" {
         triplo: base * 3
         somaDobroTriplo: dobro + triplo
       }
-      calculos.somaDobroTriplo
-    }[0]
+      resultado: calculos.somaDobroTriplo
+    }.resultado
     50
-  })
-}})
+  ])
+  ]})
