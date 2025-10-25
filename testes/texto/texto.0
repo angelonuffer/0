@@ -6,7 +6,7 @@ uniteste.descrever({ nome: "Texto" testes: [
       {
         frase: "Que a força esteja com você."
 
-        resultado: frase[0:1]
+        resultado: (frase = "Que a força esteja com você." frase[0:1])
       }.resultado
       "Q"
     ])
@@ -14,7 +14,7 @@ uniteste.descrever({ nome: "Texto" testes: [
       {
         frase: "Que a força esteja com você."
 
-        resultado: frase[0:11]
+        resultado: (frase = "Que a força esteja com você." frase[0:11])
       }.resultado
       "Que a força"
     ])
@@ -22,7 +22,7 @@ uniteste.descrever({ nome: "Texto" testes: [
       {
         frase: "O destino de Hyrule está em suas mãos."
 
-        resultado: frase[13:]
+        resultado: (frase = "O destino de Hyrule está em suas mãos." frase[13:])
       }.resultado
       "Hyrule está em suas mãos."
     ])
@@ -32,7 +32,7 @@ uniteste.descrever({ nome: "Texto" testes: [
       {
         frase: "O céu é azul."
 
-        resultado: [frase[0:7] " o limite."] * ""
+        resultado: (frase = "O céu é azul." [frase[0:7] " o limite."] * "")
       }.resultado
       "O céu é o limite."
     ])
@@ -42,7 +42,7 @@ uniteste.descrever({ nome: "Texto" testes: [
       {
         frase: "O céu é o limite."
 
-        resultado: frase[.]
+        resultado: (frase = "O céu é o limite." frase[.])
       }.resultado
       17
     ])
@@ -52,7 +52,7 @@ uniteste.descrever({ nome: "Texto" testes: [
       {
         caractere: "A"
 
-        resultado: caractere[0]
+        resultado: (caractere = "A" caractere[0])
       }.resultado
       65
     ])
@@ -62,7 +62,7 @@ uniteste.descrever({ nome: "Texto" testes: [
       {
         codigo: 65
 
-        resultado: [codigo] * ""
+        resultado: (codigo = 65 [codigo] * "")
       }.resultado
       "A"
     ])

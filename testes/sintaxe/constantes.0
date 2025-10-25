@@ -5,7 +5,7 @@ uniteste.descrever({ nome: "Constantes" testes: [
     {
       a: 5
       b: 8
-      resultado: a + b
+      resultado: (a = 5 b = 8 a + b)
     }.resultado
     13
   ])
@@ -14,9 +14,12 @@ uniteste.descrever({ nome: "Constantes" testes: [
       função1: y => y == 42
       função2: _ => {
         x: 42
-        resultado: função1(x)
+        resultado: (função1 = (y => y == 42) x = 42 função1(x))
       }.resultado
-      resultado: função2(0)
+      resultado: (função2 = (_ => {
+        x: 42
+        resultado: (função1 = (y => y == 42) x = 42 função1(x))
+      }.resultado) função2(0))
     }.resultado
     1
   ])

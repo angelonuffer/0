@@ -23,21 +23,21 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
     uniteste.iguais([
       {
         lista: [10 20 30]
-        resultado: lista[0]
+        resultado: (lista = [10 20 30] lista[0])
       }.resultado
       10
     ])
     uniteste.iguais([
       {
         lista: [10 20 30]
-        resultado: lista[1]
+        resultado: (lista = [10 20 30] lista[1])
       }.resultado
       20
     ])
     uniteste.iguais([
       {
         lista: [10 20 30]
-        resultado: lista[2]
+        resultado: (lista = [10 20 30] lista[2])
       }.resultado
       30
     ])
@@ -46,14 +46,14 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
     uniteste.listas_iguais([
       {
         lista: [1 2 3 4 5]
-        resultado: lista[0:3]
+        resultado: (lista = [1 2 3 4 5] lista[0:3])
       }.resultado
       [1 2 3]
     ])
     uniteste.listas_iguais([
       {
         lista: [1 2 3 4 5]
-        resultado: lista[2:]
+        resultado: (lista = [1 2 3 4 5] lista[2:])
       }.resultado
       [3 4 5]
     ])
@@ -62,14 +62,14 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
     uniteste.iguais([
       {
         lista: [1 2 3 4 5]
-        resultado: lista[.]
+        resultado: (lista = [1 2 3 4 5] lista[.])
       }.resultado
       5
     ])
     uniteste.iguais([
       {
         vazia: []
-        resultado: vazia[.]
+        resultado: (vazia = [] vazia[.])
       }.resultado
       0
     ])
@@ -79,14 +79,14 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
       {
         lista1: [1 2]
         lista2: [3 4]
-        resultado: [...lista1 ...lista2]
+        resultado: (lista1 = [1 2] lista2 = [3 4] [...lista1 ...lista2])
       }.resultado
       [1 2 3 4]
     ])
     uniteste.listas_iguais([
       {
         lista: [2 3]
-        resultado: [1 ...lista 4]
+        resultado: (lista = [2 3] [1 ...lista 4])
       }.resultado
       [1 2 3 4]
     ])
@@ -109,14 +109,14 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
     uniteste.listas_iguais([
       {
         matriz: [[1 2] [3 4]]
-        resultado: matriz[0]
+        resultado: (matriz = [[1 2] [3 4]] matriz[0])
       }.resultado
       [1 2]
     ])
     uniteste.iguais([
       {
         matriz: [[1 2] [3 4]]
-        resultado: matriz[1][0]
+        resultado: (matriz = [[1 2] [3 4]] matriz[1][0])
       }.resultado
       3
     ])
@@ -126,7 +126,7 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
       {
         x: 10
         y: 20
-        resultado: [x y x + y]
+        resultado: (x = 10 y = 20 [x y x + y])
       }.resultado
       [10 20 30]
     ])

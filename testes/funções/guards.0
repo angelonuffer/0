@@ -7,7 +7,10 @@ uniteste.descrever({ nome: "Guards em funções" testes: [
       abs: x =>
         | x < 0 = 0 - x
         | x
-      resultado: abs(-5)
+      resultado: (abs = (x =>
+        | x < 0 = 0 - x
+        | x
+      ) abs(-5))
     }.resultado
     5
   ])
@@ -19,7 +22,11 @@ uniteste.descrever({ nome: "Guards em funções" testes: [
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      resultado: sign(5)
+      resultado: (sign = (x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      ) sign(5))
     }.resultado
     1
   ])
@@ -30,7 +37,11 @@ uniteste.descrever({ nome: "Guards em funções" testes: [
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      resultado: sign(-3)
+      resultado: (sign = (x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      ) sign(-3))
     }.resultado
     0 - 1
   ])
@@ -41,7 +52,11 @@ uniteste.descrever({ nome: "Guards em funções" testes: [
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      resultado: sign(0)
+      resultado: (sign = (x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      ) sign(0))
     }.resultado
     0
   ])
@@ -53,7 +68,11 @@ uniteste.descrever({ nome: "Guards em funções" testes: [
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      resultado: classify(15)
+      resultado: (classify = (x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      ) classify(15))
     }.resultado
     "grande"
   ])
@@ -64,7 +83,11 @@ uniteste.descrever({ nome: "Guards em funções" testes: [
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      resultado: classify(7)
+      resultado: (classify = (x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      ) classify(7))
     }.resultado
     "médio"
   ])
@@ -75,7 +98,11 @@ uniteste.descrever({ nome: "Guards em funções" testes: [
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      resultado: classify(3)
+      resultado: (classify = (x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      ) classify(3))
     }.resultado
     "pequeno"
   ])

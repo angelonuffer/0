@@ -78,7 +78,7 @@ uniteste.descrever({ nome: "Parênteses com declarações" testes: [
     {
       x: 10
       resultado: ( x = 5 x * 2 )
-      final_x: x
+      final_x: (x = 10 x)
     }.final_x
     10
   ])

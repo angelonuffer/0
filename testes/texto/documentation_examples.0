@@ -13,8 +13,8 @@ uniteste.descrever({ nome: "Documentation Examples" testes: [
     uniteste.iguais([
       {
         frase: "João Silva Santos"
-        nomes: frase / " "
-        resultado: nomes[0] // Primeiro nome
+        nomes: (frase = "João Silva Santos" frase / " ")
+        resultado: (nomes = (frase = "João Silva Santos" frase / " ") nomes[0]) // Primeiro nome
       }.resultado
       "João"
     ])

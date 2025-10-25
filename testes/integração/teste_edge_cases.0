@@ -8,10 +8,15 @@ uniteste.descrever({ nome: "Casos extremos de referências aninhadas" testes: [
       exemplo: {
         a: 2
         b: {
-          c: a + 3
+          c: (a = 2 a + 3)
         }
       }
-      resultado: exemplo.b.c
+      resultado: (exemplo = {
+        a: 2
+        b: {
+          c: (a = 2 a + 3)
+        }
+      } exemplo.b.c)
     }.resultado
     5  // Deve usar a = 2 do objeto, não a = 100 externa
   ])
@@ -23,7 +28,10 @@ uniteste.descrever({ nome: "Casos extremos de referências aninhadas" testes: [
         a: 1
         b: {}
       }
-      resultado: exemplo.a
+      resultado: (exemplo = {
+        a: 1
+        b: {}
+      } exemplo.a)
     }.resultado
     1
   ])
@@ -34,13 +42,21 @@ uniteste.descrever({ nome: "Casos extremos de referências aninhadas" testes: [
       exemplo: {
         a: 1
         b: {
-          c: a + 3
+          c: (a = 1 a + 3)
         }
         d: {
-          e: a + 10  // Usa a variável a do escopo do objeto
+          e: (a = 1 a + 10)  // Usa a variável a do escopo do objeto
         }
       }
-      resultado: exemplo.b.c  // Testamos a parte aninhada
+      resultado: (exemplo = {
+        a: 1
+        b: {
+          c: (a = 1 a + 3)
+        }
+        d: {
+          e: (a = 1 a + 10)  // Usa a variável a do escopo do objeto
+        }
+      } exemplo.b.c)  // Testamos a parte aninhada
     }.resultado
     4
   ])

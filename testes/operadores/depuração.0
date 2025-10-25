@@ -12,14 +12,14 @@ uniteste.descrever({ nome: "Operador de depuração (%)" testes: [
   uniteste.iguais([
     {
       a: 10
-      b: % a * 2
+      b: (a = 10 % a * 2)
     }.b
     20
   ])
   uniteste.iguais([
     {
       lista: [1 2 3]
-      resultado: % lista[1]
+      resultado: (lista = [1 2 3] % lista[1])
     }.resultado
     2
   ])
@@ -27,7 +27,7 @@ uniteste.descrever({ nome: "Operador de depuração (%)" testes: [
     {
       x: 5
       y: 3
-      z: % x + % y
+      z: (x = 5 y = 3 % x + % y)
     }.z
     8
   ])
@@ -42,7 +42,7 @@ uniteste.descrever({ nome: "Operador de depuração (%)" testes: [
   uniteste.iguais([
     {
       obj: {nome: "João" idade: 30}
-      resultado: (% obj).nome
+      resultado: (obj = {nome: "João" idade: 30} (% obj).nome)
     }.resultado
     "João"
   ])

@@ -5,9 +5,12 @@ uniteste.descrever({ nome: "Referências de propriedades em objeto" testes: [
     {
       exemplo: {
         a: 1
-        b: a + 1
+        b: (a = 1 a + 1)
       }
-      resultado: exemplo.a
+      resultado: (exemplo = {
+        a: 1
+        b: (a = 1 a + 1)
+      } exemplo.a)
     }.resultado
     1
   ])
@@ -16,9 +19,12 @@ uniteste.descrever({ nome: "Referências de propriedades em objeto" testes: [
     {
       exemplo: {
         a: 1
-        b: a + 1
+        b: (a = 1 a + 1)
       }
-      resultado: exemplo.b
+      resultado: (exemplo = {
+        a: 1
+        b: (a = 1 a + 1)
+      } exemplo.b)
     }.resultado
     2
   ])
@@ -28,9 +34,13 @@ uniteste.descrever({ nome: "Referências de propriedades em objeto" testes: [
       pessoa: {
         nome: "João"
         sobrenome: "Silva"
-        nomeCompleto: nome + " " + sobrenome
+        nomeCompleto: (nome = "João" sobrenome = "Silva" nome + " " + sobrenome)
       }
-      resultado: pessoa.nomeCompleto
+      resultado: (pessoa = {
+        nome: "João"
+        sobrenome: "Silva"
+        nomeCompleto: (nome = "João" sobrenome = "Silva" nome + " " + sobrenome)
+      } pessoa.nomeCompleto)
     }.resultado
     "João Silva"
   ])
@@ -39,11 +49,16 @@ uniteste.descrever({ nome: "Referências de propriedades em objeto" testes: [
     {
       calculos: {
         base: 10
-        dobro: base * 2
-        triplo: base * 3
-        somaDobroTriplo: dobro + triplo
+        dobro: (base = 10 base * 2)
+        triplo: (base = 10 base * 3)
+        somaDobroTriplo: (dobro = 20 triplo = 30 dobro + triplo)
       }
-      resultado: calculos.somaDobroTriplo
+      resultado: (calculos = {
+        base: 10
+        dobro: (base = 10 base * 2)
+        triplo: (base = 10 base * 3)
+        somaDobroTriplo: (dobro = 20 triplo = 30 dobro + triplo)
+      } calculos.somaDobroTriplo)
     }.resultado
     50
   ])

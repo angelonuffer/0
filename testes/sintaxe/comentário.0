@@ -5,7 +5,7 @@ uniteste.descrever({ nome: "Comentário" testes: [
     {
       // Este é um comentário explicando o código abaixo
       soma: args => args[0] + args[1]
-      resultado: soma([3 7])
+      resultado: (soma = (args => args[0] + args[1]) soma([3 7]))
     }.resultado
     10
   ])

@@ -3,17 +3,17 @@ uniteste # ../integração/uniteste.0
 uniteste.descrever({ nome: "String keys" testes: [
   uniteste.iguais([{
     obj: { "a-b": 1 }
-    resultado: obj["a-b"]
+    resultado: (obj = { "a-b": 1 } obj["a-b"])
   }.resultado 1])
   
   uniteste.iguais([{
     obj: { "hello-world": "test" }
-    resultado: obj["hello-world"]
+    resultado: (obj = { "hello-world": "test" } obj["hello-world"])
   }.resultado "test"])
   
   uniteste.iguais([{
     obj: { "special-chars!@#": 42 }
-    resultado: obj["special-chars!@#"]
+    resultado: (obj = { "special-chars!@#": 42 } obj["special-chars!@#"])
   }.resultado 42])
   
   uniteste.descrever({ nome: "Mixed key types" testes: [
@@ -21,34 +21,46 @@ uniteste.descrever({ nome: "String keys" testes: [
       obj: { 
         regularKey: "value1"
         "string-key": "value2"
-        [{ chave: "computed" resultado: chave }.resultado]: "value3"
+        [{ chave: "computed" resultado: (chave = "computed" chave) }.resultado]: "value3"
       }
-      resultado: obj["regularKey"]
+      resultado: (obj = { 
+        regularKey: "value1"
+        "string-key": "value2"
+        [{ chave: "computed" resultado: (chave = "computed" chave) }.resultado]: "value3"
+      } obj["regularKey"])
     }.resultado "value1"])
     
     uniteste.iguais([{
       obj: { 
         regularKey: "value1"
         "string-key": "value2"
-        [{ chave: "computed" resultado: chave }.resultado]: "value3"
+        [{ chave: "computed" resultado: (chave = "computed" chave) }.resultado]: "value3"
       }
-      resultado: obj["string-key"]
+      resultado: (obj = { 
+        regularKey: "value1"
+        "string-key": "value2"
+        [{ chave: "computed" resultado: (chave = "computed" chave) }.resultado]: "value3"
+      } obj["string-key"])
     }.resultado "value2"])
     
     uniteste.iguais([{
       obj: { 
         regularKey: "value1"
         "string-key": "value2"
-        [{ chave: "computed" resultado: chave }.resultado]: "value3"
+        [{ chave: "computed" resultado: (chave = "computed" chave) }.resultado]: "value3"
       }
-      resultado: obj["computed"]
+      resultado: (obj = { 
+        regularKey: "value1"
+        "string-key": "value2"
+        [{ chave: "computed" resultado: (chave = "computed" chave) }.resultado]: "value3"
+      } obj["computed"])
     }.resultado "value3"])
   ]})
   
   uniteste.descrever({ nome: "Dot notation with string keys" testes: [
     uniteste.iguais([{
       obj: { "someKey": "test" }
-      resultado: obj.someKey
+      resultado: (obj = { "someKey": "test" } obj.someKey)
     }.resultado "test"])
   ]})
   ]})

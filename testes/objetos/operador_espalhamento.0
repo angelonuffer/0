@@ -11,7 +11,7 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
       {
         objeto1: ["Star Wars" "Matrix"]
         objeto2: ["Jurassic Park" "Avatar"]
-        resultado: {...objeto1 ...objeto2}
+        resultado: (objeto1 = ["Star Wars" "Matrix"] objeto2 = ["Jurassic Park" "Avatar"] {...objeto1 ...objeto2})
       }.resultado
       ["Star Wars" "Matrix" "Jurassic Park" "Avatar"]
     ])
@@ -19,7 +19,7 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.listas_iguais([
       {
         números: [1 2 3]
-        resultado: ["inicio" ...números "fim"]
+        resultado: (números = [1 2 3] ["inicio" ...números "fim"])
       }.resultado
       ["inicio" 1 2 3 "fim"]
     ])
@@ -27,7 +27,7 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.listas_iguais([
       {
         filmes: ["Star Wars" "O Senhor dos Anéis" "Matrix"]
-        resultado: [...filmes[0:2] "Jurassic Park"]
+        resultado: (filmes = ["Star Wars" "O Senhor dos Anéis" "Matrix"] [...filmes[0:2] "Jurassic Park"])
       }.resultado
       ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]
     ])
@@ -38,7 +38,7 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.iguais([
       {
         dados: {nome: "João" idade: 30}
-        resultado: dados["nome"]
+        resultado: (dados = {nome: "João" idade: 30} dados["nome"])
       }.resultado
       "João"
     ])
@@ -47,8 +47,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.iguais([
       {
         objeto_simples: ["valor1" "valor2"]
-        dados_com_chaves: {nome: "João" ...objeto_simples idade: 30}
-        resultado: dados_com_chaves[0]
+        dados_com_chaves: (objeto_simples = ["valor1" "valor2"] {nome: "João" ...objeto_simples idade: 30})
+        resultado: (dados_com_chaves = (objeto_simples = ["valor1" "valor2"] {nome: "João" ...objeto_simples idade: 30}) dados_com_chaves[0])
       }.resultado
       "valor1"
     ])
@@ -58,8 +58,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
       {
         dados1: {nome: "João" cidade: "São Paulo"}
         dados2: {idade: 30 profissao: "Desenvolvedor"}
-        resultado: {...dados1 ...dados2}
-        final: resultado["nome"]
+        resultado: (dados1 = {nome: "João" cidade: "São Paulo"} dados2 = {idade: 30 profissao: "Desenvolvedor"} {...dados1 ...dados2})
+        final: (resultado = (dados1 = {nome: "João" cidade: "São Paulo"} dados2 = {idade: 30 profissao: "Desenvolvedor"} {...dados1 ...dados2}) resultado["nome"])
       }.final
       "João"
     ])
@@ -69,8 +69,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
       {
         dados1: {nome: "João" cidade: "São Paulo"}
         dados2: {idade: 30 profissao: "Desenvolvedor"}
-        resultado: {...dados1 ...dados2}
-        final: resultado["profissao"]
+        resultado: (dados1 = {nome: "João" cidade: "São Paulo"} dados2 = {idade: 30 profissao: "Desenvolvedor"} {...dados1 ...dados2})
+        final: (resultado = (dados1 = {nome: "João" cidade: "São Paulo"} dados2 = {idade: 30 profissao: "Desenvolvedor"} {...dados1 ...dados2}) resultado["profissao"])
       }.final
       "Desenvolvedor"
     ])
@@ -79,8 +79,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.iguais([
       {
         base: {nome: "João"}
-        resultado: {...base idade: 30 cidade: "São Paulo"}
-        final: resultado["cidade"]
+        resultado: (base = {nome: "João"} {...base idade: 30 cidade: "São Paulo"})
+        final: (resultado = (base = {nome: "João"} {...base idade: 30 cidade: "São Paulo"}) resultado["cidade"])
       }.final
       "São Paulo"
     ])
@@ -91,8 +91,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.listas_iguais([
       {
         objeto_simples: ["item1" "item2"]
-        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        final: [objeto_resultado[0] objeto_resultado[1]]
+        objeto_resultado: (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"})
+        final: (objeto_resultado = (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"}) [objeto_resultado[0] objeto_resultado[1]])
       }.final
       ["item1" "item2"]
     ])
@@ -101,8 +101,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.iguais([
       {
         objeto_simples: ["item1" "item2"]
-        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        final: objeto_resultado["nome"]
+        objeto_resultado: (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"})
+        final: (objeto_resultado = (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"}) objeto_resultado["nome"])
       }.final
       "João"
     ])
@@ -111,8 +111,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.iguais([
       {
         objeto_simples: ["item1" "item2"]
-        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        final: objeto_resultado["cidade"]
+        objeto_resultado: (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"})
+        final: (objeto_resultado = (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"}) objeto_resultado["cidade"])
       }.final
       "São Paulo"
     ])
@@ -121,8 +121,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.iguais([
       {
         objeto_simples: ["item1" "item2"]
-        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        final: objeto_resultado[.]
+        objeto_resultado: (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"})
+        final: (objeto_resultado = (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"}) objeto_resultado[.])
       }.final
       2
     ])
@@ -131,8 +131,8 @@ uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.listas_iguais([
       {
         objeto_simples: ["item1" "item2"]
-        objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        final: objeto_resultado[*]
+        objeto_resultado: (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"})
+        final: (objeto_resultado = (objeto_simples = ["item1" "item2"] {nome: "João" ...objeto_simples cidade: "São Paulo"}) objeto_resultado[*])
       }.final
       ["nome" "cidade"]
     ])
