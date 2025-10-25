@@ -11,24 +11,24 @@ uniteste.descrever({"Operador de espalhamento" {
       {
         objeto1: {"Star Wars" "Matrix"}
         objeto2: {"Jurassic Park" "Avatar"}
-        {...objeto1 ...objeto2}
-      }[0]
+        resultado: {...objeto1 ...objeto2}
+      }.resultado
       {"Star Wars" "Matrix" "Jurassic Park" "Avatar"}
     })
     
     uniteste.listas_iguais({
       {
         números: {1 2 3}
-        {"inicio" ...números "fim"}
-      }[0]
+        resultado: {"inicio" ...números "fim"}
+      }.resultado
       {"inicio" 1 2 3 "fim"}
     })
     
     uniteste.listas_iguais({
       {
         filmes: {"Star Wars" "O Senhor dos Anéis" "Matrix"}
-        {...filmes[0:2] "Jurassic Park"}
-      }[0]
+        resultado: {...filmes[0:2] "Jurassic Park"}
+      }.resultado
       {"Star Wars" "O Senhor dos Anéis" "Jurassic Park"}
     })
   }})
@@ -38,8 +38,8 @@ uniteste.descrever({"Operador de espalhamento" {
     uniteste.iguais({
       {
         dados: {nome: "João" idade: 30}
-        dados["nome"]
-      }[0]
+        resultado: dados["nome"]
+      }.resultado
       "João"
     })
     
@@ -48,8 +48,8 @@ uniteste.descrever({"Operador de espalhamento" {
       {
         objeto_simples: {"valor1" "valor2"}
         dados_com_chaves: {nome: "João" ...objeto_simples idade: 30}
-        dados_com_chaves[0]
-      }[0]
+        resultado: dados_com_chaves[0]
+      }.resultado
       "valor1"
     })
     
@@ -59,8 +59,8 @@ uniteste.descrever({"Operador de espalhamento" {
         dados1: {nome: "João" cidade: "São Paulo"}
         dados2: {idade: 30 profissao: "Desenvolvedor"}
         resultado: {...dados1 ...dados2}
-        resultado["nome"]
-      }[0]
+        final: resultado["nome"]
+      }.final
       "João"
     })
     
@@ -70,8 +70,8 @@ uniteste.descrever({"Operador de espalhamento" {
         dados1: {nome: "João" cidade: "São Paulo"}
         dados2: {idade: 30 profissao: "Desenvolvedor"}
         resultado: {...dados1 ...dados2}
-        resultado["profissao"]
-      }[0]
+        final: resultado["profissao"]
+      }.final
       "Desenvolvedor"
     })
     
@@ -80,8 +80,8 @@ uniteste.descrever({"Operador de espalhamento" {
       {
         base: {nome: "João"}
         resultado: {...base idade: 30 cidade: "São Paulo"}
-        resultado["cidade"]
-      }[0]
+        final: resultado["cidade"]
+      }.final
       "São Paulo"
     })
   }})
@@ -92,8 +92,8 @@ uniteste.descrever({"Operador de espalhamento" {
       {
         objeto_simples: {"item1" "item2"}
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        {objeto_resultado[0] objeto_resultado[1]}
-      }[0]
+        final: {objeto_resultado[0] objeto_resultado[1]}
+      }.final
       {"item1" "item2"}
     })
     
@@ -102,8 +102,8 @@ uniteste.descrever({"Operador de espalhamento" {
       {
         objeto_simples: {"item1" "item2"}
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        objeto_resultado["nome"]
-      }[0]
+        final: objeto_resultado["nome"]
+      }.final
       "João"
     })
     
@@ -112,8 +112,8 @@ uniteste.descrever({"Operador de espalhamento" {
       {
         objeto_simples: {"item1" "item2"}
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        objeto_resultado["cidade"]
-      }[0]
+        final: objeto_resultado["cidade"]
+      }.final
       "São Paulo"
     })
     
@@ -122,8 +122,8 @@ uniteste.descrever({"Operador de espalhamento" {
       {
         objeto_simples: {"item1" "item2"}
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        objeto_resultado[.]
-      }[0]
+        final: objeto_resultado[.]
+      }.final
       2
     })
     
@@ -132,8 +132,8 @@ uniteste.descrever({"Operador de espalhamento" {
       {
         objeto_simples: {"item1" "item2"}
         objeto_resultado: {nome: "João" ...objeto_simples cidade: "São Paulo"}
-        objeto_resultado[*]
-      }[0]
+        final: objeto_resultado[*]
+      }.final
       {"nome" "cidade"}
     })
   }})

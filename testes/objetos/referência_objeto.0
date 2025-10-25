@@ -7,8 +7,8 @@ uniteste.descrever({"Referências de propriedades em objeto" {
         a: 1
         b: a + 1
       }
-      exemplo.a
-    }[0]
+      resultado: exemplo.a
+    }.resultado
     1
   })
   
@@ -18,8 +18,8 @@ uniteste.descrever({"Referências de propriedades em objeto" {
         a: 1
         b: a + 1
       }
-      exemplo.b
-    }[0]
+      resultado: exemplo.b
+    }.resultado
     2
   })
   
@@ -30,8 +30,8 @@ uniteste.descrever({"Referências de propriedades em objeto" {
         sobrenome: "Silva"
         nomeCompleto: nome + " " + sobrenome
       }
-      pessoa.nomeCompleto
-    }[0]
+      resultado: pessoa.nomeCompleto
+    }.resultado
     "João Silva"
   })
   
@@ -43,8 +43,8 @@ uniteste.descrever({"Referências de propriedades em objeto" {
         triplo: base * 3
         somaDobroTriplo: dobro + triplo
       }
-      calculos.somaDobroTriplo
-    }[0]
+      resultado: calculos.somaDobroTriplo
+    }.resultado
     50
   })
 }})

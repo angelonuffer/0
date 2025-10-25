@@ -13,8 +13,8 @@ uniteste.descrever({"Exemplos da documentação" {
           }
         }
       }
-      configuracao.processamento.etapa2.resultado
-    }[0]
+      resultado: configuracao.processamento.etapa2.resultado
+    }.resultado
     30
   })
   
@@ -32,8 +32,8 @@ uniteste.descrever({"Exemplos da documentação" {
           }
         }
       }
-      geometria.calculos.hipotenusa.soma_quadrados
-    }[0]
+      resultado: geometria.calculos.hipotenusa.soma_quadrados
+    }.resultado
     25
   })
 }})

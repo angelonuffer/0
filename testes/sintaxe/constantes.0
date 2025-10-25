@@ -5,8 +5,8 @@ uniteste.descrever({"Constantes" {
     {
       a: 5
       b: 8
-      a + b
-    }[0]
+      resultado: a + b
+    }.resultado
     13
   })
   uniteste.iguais({
@@ -14,10 +14,10 @@ uniteste.descrever({"Constantes" {
       função1: y => y == 42
       função2: _ => {
         x: 42
-        função1(x)
-      }[0]
-      função2(0)
-    }[0]
+        resultado: função1(x)
+      }.resultado
+      resultado: função2(0)
+    }.resultado
     1
   })
 }})

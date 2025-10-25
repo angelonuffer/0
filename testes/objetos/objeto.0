@@ -5,22 +5,22 @@ uniteste.descrever({"Objeto" {
     uniteste.iguais({
       {
         jogos: {"The Legend of Zelda" "Super Mario Bros." "Minecraft"}
-        jogos[0]
-      }[0]
+        resultado: jogos[0]
+      }.resultado
       "The Legend of Zelda"
     })
     uniteste.listas_iguais({
       {
         séries: {"Stranger Things" "Breaking Bad" "Game of Thrones"}
-        séries[0:2]
-      }[0]
+        resultado: séries[0:2]
+      }.resultado
       {"Stranger Things" "Breaking Bad"}
     })
     uniteste.listas_iguais({
       {
         filmes: {"Star Wars" "O Senhor dos Anéis" "Matrix"}
-        {...filmes[0:2] "Jurassic Park"}
-      }[0]
+        resultado: {...filmes[0:2] "Jurassic Park"}
+      }.resultado
       {"Star Wars" "O Senhor dos Anéis" "Jurassic Park"}
     })
   }})
@@ -28,29 +28,17 @@ uniteste.descrever({"Objeto" {
     uniteste.iguais({
       {
         bandas: {"The Beatles" "Queen" "Pink Floyd"}
-        bandas[.]
-      }[0]
+        resultado: bandas[.]
+      }.resultado
       3
     })
   }})
   uniteste.descrever({"Objeto de chaves" {
     uniteste.listas_iguais({
       {
-        objeto_com_chaves: {
-          nome: "João"
-          "valor_sem_chave"
-          idade: 30
-          "outro_valor_sem_chave"
-        }
-        objeto_com_chaves[*]
-      }[0]
-      {"nome" "idade"}
-    })
-    uniteste.listas_iguais({
-      {
         objeto_simples: {"item1" "item2" "item3"}
-        objeto_simples[*]
-      }[0]
+        resultado: objeto_simples[*]
+      }.resultado
       {"0" "1" "2"}
     })
   }})

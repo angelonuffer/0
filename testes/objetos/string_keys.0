@@ -3,52 +3,52 @@ uniteste # ../integração/uniteste.0
 uniteste.descrever({"String keys" {
   uniteste.iguais({{
     obj: { "a-b": 1 }
-    obj["a-b"]
-  }[0] 1})
+    resultado: obj["a-b"]
+  }.resultado 1})
   
   uniteste.iguais({{
     obj: { "hello-world": "test" }
-    obj["hello-world"]
-  }[0] "test"})
+    resultado: obj["hello-world"]
+  }.resultado "test"})
   
   uniteste.iguais({{
     obj: { "special-chars!@#": 42 }
-    obj["special-chars!@#"]
-  }[0] 42})
+    resultado: obj["special-chars!@#"]
+  }.resultado 42})
   
   uniteste.descrever({"Mixed key types" {
     uniteste.iguais({{
       obj: { 
         regularKey: "value1"
         "string-key": "value2"
-        [{ key: "computed" key }[0]]: "value3"
+        [{ chave: "computed" resultado: chave }.resultado]: "value3"
       }
-      obj["regularKey"]
-    }[0] "value1"})
+      resultado: obj["regularKey"]
+    }.resultado "value1"})
     
     uniteste.iguais({{
       obj: { 
         regularKey: "value1"
         "string-key": "value2"
-        [{ key: "computed" key }[0]]: "value3"
+        [{ chave: "computed" resultado: chave }.resultado]: "value3"
       }
-      obj["string-key"]
-    }[0] "value2"})
+      resultado: obj["string-key"]
+    }.resultado "value2"})
     
     uniteste.iguais({{
       obj: { 
         regularKey: "value1"
         "string-key": "value2"
-        [{ key: "computed" key }[0]]: "value3"
+        [{ chave: "computed" resultado: chave }.resultado]: "value3"
       }
-      obj["computed"]
-    }[0] "value3"})
+      resultado: obj["computed"]
+    }.resultado "value3"})
   }})
   
   uniteste.descrever({"Dot notation with string keys" {
     uniteste.iguais({{
       obj: { "someKey": "test" }
-      obj.someKey
-    }[0] "test"})
+      resultado: obj.someKey
+    }.resultado "test"})
   }})
 }})

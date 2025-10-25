@@ -42,8 +42,8 @@ uniteste.descrever({"Declarações no nível do módulo" {
     {
       nome_teste: "João"
       sobrenome_teste: "Silva"
-      nome_teste + " " + sobrenome_teste
-    }[0]
+      resultado: nome_teste + " " + sobrenome_teste
+    }.resultado
     "João Silva"
   })
   

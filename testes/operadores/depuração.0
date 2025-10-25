@@ -13,15 +13,14 @@ uniteste.descrever({"Operador de depuração (%)" {
     {
       a: 10
       b: % a * 2
-      b
-    }[0]
+    }.b
     20
   })
   uniteste.iguais({
     {
       lista: {1 2 3}
-      % lista[1]
-    }[0]
+      resultado: % lista[1]
+    }.resultado
     2
   })
   uniteste.iguais({
@@ -29,8 +28,7 @@ uniteste.descrever({"Operador de depuração (%)" {
       x: 5
       y: 3
       z: % x + % y
-      z
-    }[0]
+    }.z
     8
   })
   uniteste.iguais({
@@ -44,8 +42,8 @@ uniteste.descrever({"Operador de depuração (%)" {
   uniteste.iguais({
     {
       obj: {nome: "João" idade: 30}
-      (% obj).nome
-    }[0]
+      resultado: (% obj).nome
+    }.resultado
     "João"
   })
 }})

@@ -14,8 +14,8 @@ uniteste.descrever({"Documentation Examples" {
       {
         frase: "João Silva Santos"
         nomes: frase / " "
-        nomes[0] // Primeiro nome
-      }[0]
+        resultado: nomes[0] // Primeiro nome
+      }.resultado
       "João"
     })
   }})

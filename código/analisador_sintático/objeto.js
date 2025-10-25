@@ -146,6 +146,16 @@ const objeto = transformar(
       v_alt.length === 5 && v_alt[1] === ":"
     );
     
+    // Check if we have any value-only items
+    const hasValueOnlyItems = valores_vários.some(v_alt => 
+      v_alt[0] !== "..." && !(v_alt.length === 5 && v_alt[1] === ":")
+    );
+    
+    // Enforce strict separation: cannot mix keyed and keyless items
+    if (hasKeyValuePairs && hasValueOnlyItems) {
+      throw new Error("Syntax error: Cannot mix items with keys and items without keys in the same object. Use {} for objects with keys or [] for lists without keys.");
+    }
+    
     // Check if any spread operations exist
     const hasSpreads = valores_vários.some(v_seq => v_seq[0] === "...");
     

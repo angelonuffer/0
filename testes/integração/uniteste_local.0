@@ -1,0 +1,80 @@
+lista # https://cdn.jsdelivr.net/gh/angelonuffer/lista@f8c5dc040d06f0659f1d6b057a77631b7aed1ac2/código/lista.0
+processo # https://cdn.jsdelivr.net/gh/angelonuffer/processo@4e8182fbf4c42a9a03eba17d60063edcbd30bc88/código/0
+
+{
+  compara_listas: args =>
+    args[0][.] != args[1][.] ? 0 :
+    args[0][.] == 0 ? 1 :
+    args[0][0] != args[1][0] ? 0 :
+    compara_listas({args[0][1:] args[1][1:]})
+  exibir: resultado =>
+    processo.nodejs({
+      ...lista.mapear({
+        resultado.mensagens
+        mensagem => processo.escreva(mensagem)
+      })
+      processo.escreva(resultado.passaram + "/" + resultado.mensagens[.] + " testes passaram.")
+      resultado.passaram == resultado.mensagens[.] ?
+        processo.saia(0)
+      :
+        processo.saia(1)
+    })
+
+  uniteste: {
+    descrever: args => destino => {
+      nome: args[0]
+      resultados: args[1]
+      resultado: {
+        passaram: lista.reduzir({
+          lista.mapear({
+            resultados
+            resultado => (resultado("descrever")).passaram
+          })
+          args => args[0] + args[1]
+        })
+        mensagens: lista.planificar(lista.mapear({
+          resultados
+          resultado => lista.mapear({
+            (resultado("descrever")).mensagens
+            mensagem => {
+              nome
+              " | "
+              mensagem
+            } * ""
+          })
+        }))
+      }
+      final: destino == "descrever" ? resultado : exibir(resultado)
+    }.final
+    iguais: args => destino => {
+      resultado: {
+        passaram: args[0] == args[1] ? 1 : 0
+        mensagens: {
+          passaram == 1 ? "ok" : {
+            "Esperava que "
+            "" + args[0]
+            " fosse igual a "
+            "" + args[1]
+            "."
+          } * ""
+        }
+      }
+      final: destino == "descrever" ? resultado : exibir(resultado)
+    }.final
+    listas_iguais: args => destino => {
+      resultado: {
+        passaram: compara_listas({args[0] args[1]}) ? 1 : 0
+        mensagens: {
+          passaram == 1 ? "ok" : {
+            "Esperava que {"
+            lista.juntar({args[0] ", "})
+            "} fosse igual a {"
+            lista.juntar({args[1] ", "})
+            "}."
+          } * ""
+        }
+      }
+      final: destino == "descrever" ? resultado : exibir(resultado)
+    }.final
+  }
+}.uniteste

@@ -10,8 +10,8 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           c: a + 3
         }
       }
-      exemplo.b.c
-    }[0]
+      resultado: exemplo.b.c
+    }.resultado
     5
   })
   
@@ -27,8 +27,8 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_complexo.y.w.v
-    }[0]
+      resultado: exemplo_complexo.y.w.v
+    }.resultado
     15
   })
   
@@ -46,8 +46,8 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_múltiplas_refs.c.nested.resultado
-    }[0]
+      resultado: exemplo_múltiplas_refs.c.nested.resultado
+    }.resultado
     5
   })
   
@@ -64,8 +64,8 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_cruzado.nivel1.nivel2.valor3
-    }[0]
+      resultado: exemplo_cruzado.nivel1.nivel2.valor3
+    }.resultado
     35
   })
   
@@ -82,8 +82,8 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_cadeia.c.e.f
-    }[0]
+      resultado: exemplo_cadeia.c.e.f
+    }.resultado
     4
   })
   
@@ -101,8 +101,8 @@ uniteste.descrever({"Referências aninhadas em objeto - Teste Completo" {
           }
         }
       }
-      exemplo_operações.geometria.hipotenusa.quadrado_total
-    }[0]
+      resultado: exemplo_operações.geometria.hipotenusa.quadrado_total
+    }.resultado
     25
   })
 }})

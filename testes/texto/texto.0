@@ -6,24 +6,24 @@ uniteste.descrever({"Texto" {
       {
         frase: "Que a força esteja com você."
 
-        frase[0:1]
-      }[0]
+        resultado: frase[0:1]
+      }.resultado
       "Q"
     })
     uniteste.iguais({
       {
         frase: "Que a força esteja com você."
 
-        frase[0:11]
-      }[0]
+        resultado: frase[0:11]
+      }.resultado
       "Que a força"
     })
     uniteste.iguais({
       {
         frase: "O destino de Hyrule está em suas mãos."
 
-        frase[13:]
-      }[0]
+        resultado: frase[13:]
+      }.resultado
       "Hyrule está em suas mãos."
     })
   }})
@@ -32,8 +32,8 @@ uniteste.descrever({"Texto" {
       {
         frase: "O céu é azul."
 
-        {frase[0:7] " o limite."} * ""
-      }[0]
+        resultado: {frase[0:7] " o limite."} * ""
+      }.resultado
       "O céu é o limite."
     })
   }})
@@ -42,8 +42,8 @@ uniteste.descrever({"Texto" {
       {
         frase: "O céu é o limite."
 
-        frase[.]
-      }[0]
+        resultado: frase[.]
+      }.resultado
       17
     })
   }})
@@ -52,8 +52,8 @@ uniteste.descrever({"Texto" {
       {
         caractere: "A"
 
-        caractere[0]
-      }[0]
+        resultado: caractere[0]
+      }.resultado
       65
     })
   }})
@@ -62,8 +62,8 @@ uniteste.descrever({"Texto" {
       {
         codigo: 65
 
-        {codigo} * ""
-      }[0]
+        resultado: {codigo} * ""
+      }.resultado
       "A"
     })
   }})
