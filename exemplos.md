@@ -641,73 +641,56 @@ Para objetos com chaves nomeadas, retorna apenas as chaves explícitas:
 {
   dados: {
     nome: "João"
-    "valor_sem_chave"
     idade: 30
-    "outro_valor_sem_chave"
+    cidade: "São Paulo"
   }
-  dados[*]
-}[0]
+  resultado: dados[*]
+}.resultado
 ---
-{"nome","idade"}
+{"nome","idade","cidade"}
 ```
 
-### Chaves opcionais em objetos
-Listas podem conter itens com chaves explícitas além de valores com índices automáticos.
+### Separação entre Objetos e Listas
 
-Exemplo:
+Na Linguagem 0, objetos e listas são conceitos distintos e não podem ser misturados:
+
+- **Listas**: Contêm apenas valores sem chaves - `{1 2 3}` ou `[1 2 3]`
+- **Objetos**: Contêm apenas pares chave-valor - `{nome: "João" idade: 30}`
+
+Não é permitido misturar valores com chave e sem chave no mesmo literal.
+
+Exemplo de lista (valores sem chaves):
+```
+{
+  lista: {"valor1" "valor2" "valor3"}
+  resultado: lista[0]
+}.resultado
+---
+"valor1"
+```
+
+Exemplo de objeto (apenas chaves):
 ```
 {
   dados: {
     nome: "João"
-    "valor_sem_chave"
     idade: 30
-    "outro_valor_sem_chave"
+    cidade: "São Paulo"
   }
-  dados["nome"]
-}[0]
+  resultado: dados["nome"]
+}.resultado
 ---
 "João"
 ```
 
+Exemplo de acesso por índice em lista:
 ```
 {
-  dados: {
-    nome: "João"
-    "valor_sem_chave"
-    idade: 30
-    "outro_valor_sem_chave"
-  }
-  dados[0]
-}[0]
+  dados: {"primeiro" "segundo" "terceiro"}
+  resultado: dados[0:2]
+}.resultado
 ---
-"valor_sem_chave"
-```
-
-```
-{
-  dados: {
-    nome: "João"
-    "valor_sem_chave"
-    idade: 30
-    "outro_valor_sem_chave"
-  }
-  dados["idade"]
-}[0]
----
-30
-```
-
-```
-dados = {
-  nome: "João"
-  "primeiro_valor"
-  idade: 30
-  "segundo_valor"
-}
-
-dados[0:2]
----
-{"primeiro_valor","segundo_valor"}
+{"primeiro","segundo"}
 ```
 
 ### Acessando chaves com notação de ponto
@@ -718,12 +701,11 @@ Exemplo:
 {
   dados: {
     nome: "João"
-    "valor_sem_chave"
     idade: 30
-    "outro_valor_sem_chave"
+    profissao: "Desenvolvedor"
   }
-  dados.nome
-}[0]
+  resultado: dados.nome
+}.resultado
 ---
 "João"
 ```
@@ -732,12 +714,11 @@ Exemplo:
 {
   dados: {
     nome: "João"
-    "valor_sem_chave"
     idade: 30
-    "outro_valor_sem_chave"
+    profissao: "Desenvolvedor"
   }
-  dados.idade
-}[0]
+  resultado: dados.idade
+}.resultado
 ---
 30
 ```
@@ -751,10 +732,10 @@ Propriedades calculadas permitem definir chaves dinamicamente em um objeto, com 
   chave: "nome"
   objeto: {
     [chave]: "João"
-    "valor_sem_chave"
+    idade: 30
   }
-  objeto["nome"]
-}[0]
+  resultado: objeto["nome"]
+}.resultado
 ---
 "João"
 ```
