@@ -1,13 +1,13 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Aritmética" [
-  uniteste.descrever(["Adição" [
+uniteste.descrever({ nome: "Aritmética" testes: [
+  uniteste.descrever({ nome: "Adição" testes: [
     uniteste.iguais([
       42 + 5
       47
     ])
-  ]])
-  uniteste.descrever(["Números negativos" [
+  ]})
+  uniteste.descrever({ nome: "Números negativos" testes: [
     uniteste.iguais([
       -5
       (-5)
@@ -20,8 +20,8 @@ uniteste.descrever(["Aritmética" [
       10 + -2
       8
     ])
-  ]])
-  uniteste.descrever(["Casos extremos de números negativos" [
+  ]})
+  uniteste.descrever({ nome: "Casos extremos de números negativos" testes: [
     uniteste.iguais([
       -0
       0
@@ -38,26 +38,26 @@ uniteste.descrever(["Aritmética" [
       -5 == -5
       1
     ])
-  ]])
-  uniteste.descrever(["Subtração" [
+  ]})
+  uniteste.descrever({ nome: "Subtração" testes: [
     uniteste.iguais([
       8 - 4
       4
     ])
-  ]])
-  uniteste.descrever(["Multiplicação" [
+  ]})
+  uniteste.descrever({ nome: "Multiplicação" testes: [
     uniteste.iguais([
       3 * 4
       12
     ])
-  ]])
-  uniteste.descrever(["Divisão" [
+  ]})
+  uniteste.descrever({ nome: "Divisão" testes: [
     uniteste.iguais([
       8 / 2
       4
     ])
-  ]])
-  uniteste.descrever(["Expressão com precedência" [
+  ]})
+  uniteste.descrever({ nome: "Expressão com precedência" testes: [
     uniteste.iguais([
       2 + 3 * 4
       14
@@ -78,5 +78,5 @@ uniteste.descrever(["Aritmética" [
       10 - (6 / 2)
       7
     ])
-  ]])
-]])
+  ]})
+]})

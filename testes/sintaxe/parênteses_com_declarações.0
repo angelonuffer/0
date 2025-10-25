@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Parênteses com declarações" [
+uniteste.descrever({ nome: "Parênteses com declarações" testes: [
   // Test basic constant declaration
   uniteste.iguais([
     ( a = 2 b = 3 a + b )
@@ -82,4 +82,4 @@ uniteste.descrever(["Parênteses com declarações" [
     }.final_x
     10
   ])
-  ]])
+  ]})

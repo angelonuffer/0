@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Comentário" [
+uniteste.descrever({ nome: "Comentário" testes: [
   uniteste.iguais([
     {
       // Este é um comentário explicando o código abaixo
@@ -9,4 +9,4 @@ uniteste.descrever(["Comentário" [
     }.resultado
     10
   ])
-  ]])
+  ]})

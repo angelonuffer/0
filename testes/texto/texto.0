@@ -1,7 +1,7 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Texto" [
-  uniteste.descrever(["Fatiamento" [
+uniteste.descrever({ nome: "Texto" testes: [
+  uniteste.descrever({ nome: "Fatiamento" testes: [
     uniteste.iguais([
       {
         frase: "Que a força esteja com você."
@@ -26,8 +26,8 @@ uniteste.descrever(["Texto" [
       }.resultado
       "Hyrule está em suas mãos."
     ])
-  ]])
-  uniteste.descrever(["Geração" [
+  ]})
+  uniteste.descrever({ nome: "Geração" testes: [
     uniteste.iguais([
       {
         frase: "O céu é azul."
@@ -36,8 +36,8 @@ uniteste.descrever(["Texto" [
       }.resultado
       "O céu é o limite."
     ])
-  ]])
-  uniteste.descrever(["Tamanho" [
+  ]})
+  uniteste.descrever({ nome: "Tamanho" testes: [
     uniteste.iguais([
       {
         frase: "O céu é o limite."
@@ -46,8 +46,8 @@ uniteste.descrever(["Texto" [
       }.resultado
       17
     ])
-  ]])
-  uniteste.descrever(["Converter para número" [
+  ]})
+  uniteste.descrever({ nome: "Converter para número" testes: [
     uniteste.iguais([
       {
         caractere: "A"
@@ -56,8 +56,8 @@ uniteste.descrever(["Texto" [
       }.resultado
       65
     ])
-  ]])
-  uniteste.descrever(["Converter de número" [
+  ]})
+  uniteste.descrever({ nome: "Converter de número" testes: [
     uniteste.iguais([
       {
         codigo: 65
@@ -66,5 +66,5 @@ uniteste.descrever(["Texto" [
       }.resultado
       "A"
     ])
-  ]])
-  ]])
+  ]})
+  ]})

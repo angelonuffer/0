@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Destructuring de objetos em parâmetros de função" [
+uniteste.descrever({ nome: "Destructuring de objetos em parâmetros de função" testes: [
   // Test basic destructuring
   uniteste.iguais([
     {
@@ -63,4 +63,4 @@ uniteste.descrever(["Destructuring de objetos em parâmetros de função" [
     }.resultado
     42
   ])
-  ]])
+  ]})

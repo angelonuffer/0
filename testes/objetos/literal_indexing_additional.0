@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Casos adicionais de acesso direto a literais" [
+uniteste.descrever({ nome: "Casos adicionais de acesso direto a literais" testes: [
   // Test with nested list access
   uniteste.iguais([
     [[1 2] [3 4]][0][1]
@@ -30,4 +30,4 @@ uniteste.descrever(["Casos adicionais de acesso direto a literais" [
     [ 10 20 30 ][1 + 1]
     30
   ])
-  ]])
+  ]})

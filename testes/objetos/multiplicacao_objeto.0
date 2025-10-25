@@ -1,58 +1,58 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Multiplicação de objeto" [
-  uniteste.descrever(["Join básico" [
+uniteste.descrever({ nome: "Multiplicação de objeto" testes: [
+  uniteste.descrever({ nome: "Join básico" testes: [
     uniteste.iguais([
       ["a" "b" "c"] * " "
       "a b c"
     ])
-  ]])
-  uniteste.descrever(["Join com vírgula" [
+  ]})
+  uniteste.descrever({ nome: "Join com vírgula" testes: [
     uniteste.iguais([
       ["primeira" "segunda" "terceira"] * ", "
       "primeira, segunda, terceira"
     ])
-  ]])
-  uniteste.descrever(["Objeto de números" [
+  ]})
+  uniteste.descrever({ nome: "Objeto de números" testes: [
     uniteste.iguais([
       [1 2 3] * "-"
       "1-2-3"
     ])
-  ]])
-  uniteste.descrever(["Join com string vazia" [
+  ]})
+  uniteste.descrever({ nome: "Join com string vazia" testes: [
     uniteste.iguais([
       ["x" "y" "z"] * ""
       "xyz"
     ])
-  ]])
-  uniteste.descrever(["Objeto vazio" [
+  ]})
+  uniteste.descrever({ nome: "Objeto vazio" testes: [
     uniteste.iguais([
       {} * " "
       ""
     ])
-  ]])
-  uniteste.descrever(["Ordem inversa (string * objeto)" [
+  ]})
+  uniteste.descrever({ nome: "Ordem inversa (string * objeto)" testes: [
     uniteste.iguais([
       " " * ["a" "b" "c"]
       "a b c"
     ])
-  ]])
-  uniteste.descrever(["Multiplicação numérica ainda funciona" [
+  ]})
+  uniteste.descrever({ nome: "Multiplicação numérica ainda funciona" testes: [
     uniteste.iguais([
       3 * 4
       12
     ])
-  ]])
-  uniteste.descrever(["Objeto de valores mistos" [
+  ]})
+  uniteste.descrever({ nome: "Objeto de valores mistos" testes: [
     uniteste.iguais([
       ["hello" 42 "world"] * " "
       "hello 42 world"
     ])
-  ]])
-  uniteste.descrever(["Objeto com um elemento" [
+  ]})
+  uniteste.descrever({ nome: "Objeto com um elemento" testes: [
     uniteste.iguais([
       ["único"] * ", "
       "único"
     ])
-  ]])
-  ]])
+  ]})
+  ]})

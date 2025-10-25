@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Referências aninhadas em objeto - Teste Completo" [
+uniteste.descrever({ nome: "Referências aninhadas em objeto - Teste Completo" testes: [
   // Caso básico do enunciado
   uniteste.iguais([
     {
@@ -105,4 +105,4 @@ uniteste.descrever(["Referências aninhadas em objeto - Teste Completo" [
     }.resultado
     25
   ])
-  ]])
+  ]})

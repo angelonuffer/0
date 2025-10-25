@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Operador de depuração (%)" [
+uniteste.descrever({ nome: "Operador de depuração (%)" testes: [
   uniteste.iguais([
     % 5
     5
@@ -46,4 +46,4 @@ uniteste.descrever(["Operador de depuração (%)" [
     }.resultado
     "João"
   ])
-  ]])
+  ]})

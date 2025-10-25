@@ -1,6 +1,6 @@
 uniteste # uniteste.0
 
-uniteste.descrever(["Exemplos da documentação" [
+uniteste.descrever({ nome: "Exemplos da documentação" testes: [
   // Primeiro exemplo da documentação
   uniteste.iguais([
     {
@@ -36,4 +36,4 @@ uniteste.descrever(["Exemplos da documentação" [
     }.resultado
     25
   ])
-  ]])
+  ]})

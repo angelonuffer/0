@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Função" [
+uniteste.descrever({ nome: "Função" testes: [
   uniteste.iguais([
     {
       quadrado: x => x * x
@@ -79,4 +79,4 @@ uniteste.descrever(["Função" [
     }.resultado
     "Charmander"
   ])
-  ]])
+  ]})

@@ -1,6 +1,6 @@
 uniteste # uniteste.0
 
-uniteste.descrever(["Casos extremos de referências aninhadas" [
+uniteste.descrever({ nome: "Casos extremos de referências aninhadas" testes: [
   // Caso onde propriedade pode mascarar variável externa
   uniteste.iguais([
     {
@@ -44,4 +44,4 @@ uniteste.descrever(["Casos extremos de referências aninhadas" [
     }.resultado
     4
   ])
-  ]])
+  ]})

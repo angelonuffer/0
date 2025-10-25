@@ -1,7 +1,7 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Objeto" [
-  uniteste.descrever(["Fatiamento" [
+uniteste.descrever({ nome: "Objeto" testes: [
+  uniteste.descrever({ nome: "Fatiamento" testes: [
     uniteste.iguais([
       {
         jogos: ["The Legend of Zelda" "Super Mario Bros." "Minecraft"]
@@ -23,8 +23,8 @@ uniteste.descrever(["Objeto" [
       }.resultado
       ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]
     ])
-  ]])
-  uniteste.descrever(["Tamanho" [
+  ]})
+  uniteste.descrever({ nome: "Tamanho" testes: [
     uniteste.iguais([
       {
         bandas: ["The Beatles" "Queen" "Pink Floyd"]
@@ -32,8 +32,8 @@ uniteste.descrever(["Objeto" [
       }.resultado
       3
     ])
-  ]])
-  uniteste.descrever(["Objeto de chaves" [
+  ]})
+  uniteste.descrever({ nome: "Objeto de chaves" testes: [
     uniteste.listas_iguais([
       {
         objeto_simples: ["item1" "item2" "item3"]
@@ -41,5 +41,5 @@ uniteste.descrever(["Objeto" [
       }.resultado
       ["0" "1" "2"]
     ])
-  ]])
-  ]])
+  ]})
+  ]})

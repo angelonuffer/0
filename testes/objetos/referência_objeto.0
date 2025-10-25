@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Referências de propriedades em objeto" [
+uniteste.descrever({ nome: "Referências de propriedades em objeto" testes: [
   uniteste.iguais([
     {
       exemplo: {
@@ -47,4 +47,4 @@ uniteste.descrever(["Referências de propriedades em objeto" [
     }.resultado
     50
   ])
-  ]])
+  ]})

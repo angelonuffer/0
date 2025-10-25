@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Acesso direto a literais de objeto" [
+uniteste.descrever({ nome: "Acesso direto a literais de objeto" testes: [
   uniteste.iguais([
     [ 2 3 ][0]
     2
@@ -17,4 +17,4 @@ uniteste.descrever(["Acesso direto a literais de objeto" [
     { a: 4 resultado: a + 5 }.resultado
     9
   ])
-  ]])
+  ]})

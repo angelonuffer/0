@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Constantes" [
+uniteste.descrever({ nome: "Constantes" testes: [
   uniteste.iguais([
     {
       a: 5
@@ -20,4 +20,4 @@ uniteste.descrever(["Constantes" [
     }.resultado
     1
   ])
-  ]])
+  ]})

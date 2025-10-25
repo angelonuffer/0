@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Guards em funções" [
+uniteste.descrever({ nome: "Guards em funções" testes: [
   // Test 1: Simple guard with default
   uniteste.iguais([
     {
@@ -79,4 +79,4 @@ uniteste.descrever(["Guards em funções" [
     }.resultado
     "pequeno"
   ])
-  ]])
+  ]})

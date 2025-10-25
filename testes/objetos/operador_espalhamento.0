@@ -1,7 +1,7 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Operador de espalhamento" [
-  uniteste.descrever(["Com itens sem chaves (arrays simples)" [
+uniteste.descrever({ nome: "Operador de espalhamento" testes: [
+  uniteste.descrever({ nome: "Com itens sem chaves (arrays simples)" testes: [
     uniteste.listas_iguais([
       [...["a" "b"] "c"]
       ["a" "b" "c"]
@@ -31,9 +31,9 @@ uniteste.descrever(["Operador de espalhamento" [
       }.resultado
       ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]
     ])
-  ]])
+  ]})
   
-  uniteste.descrever(["Com itens com chaves" [
+  uniteste.descrever({ nome: "Com itens com chaves" testes: [
     // Teste: objeto com chaves pode ser acessada normalmente
     uniteste.iguais([
       {
@@ -84,9 +84,9 @@ uniteste.descrever(["Operador de espalhamento" [
       }.final
       "São Paulo"
     ])
-  ]])
+  ]})
   
-  uniteste.descrever(["Comportamento misto" [
+  uniteste.descrever({ nome: "Comportamento misto" testes: [
     // Misturar itens simples e com chaves
     uniteste.listas_iguais([
       {
@@ -136,5 +136,5 @@ uniteste.descrever(["Operador de espalhamento" [
       }.final
       ["nome" "cidade"]
     ])
-  ]])
-  ]])
+  ]})
+  ]})

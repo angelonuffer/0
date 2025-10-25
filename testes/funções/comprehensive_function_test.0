@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Complete Function Call Parsing" [
+uniteste.descrever({ nome: "Complete Function Call Parsing" testes: [
   // Test case 1: a(5) should be function call
   uniteste.iguais([
     {
@@ -42,4 +42,4 @@ uniteste.descrever(["Complete Function Call Parsing" [
     }[0]
     4
   ])
-  ]])
+  ]})

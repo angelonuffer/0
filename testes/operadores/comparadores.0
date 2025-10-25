@@ -1,7 +1,7 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Comparadores" [
-  uniteste.descrever(["Maior que (>)" [
+uniteste.descrever({ nome: "Comparadores" testes: [
+  uniteste.descrever({ nome: "Maior que (>)" testes: [
     uniteste.iguais([
       2 > 8
       0
@@ -14,8 +14,8 @@ uniteste.descrever(["Comparadores" [
       8 > 8
       0
     ])
-  ]])
-  uniteste.descrever(["Menor que (<)" [
+  ]})
+  uniteste.descrever({ nome: "Menor que (<)" testes: [
     uniteste.iguais([
       2 < 8
       1
@@ -28,8 +28,8 @@ uniteste.descrever(["Comparadores" [
       8 < 8
       0
     ])
-  ]])
-  uniteste.descrever(["Igual a (==)" [
+  ]})
+  uniteste.descrever({ nome: "Igual a (==)" testes: [
     uniteste.iguais([
       2 == 8
       0
@@ -42,8 +42,8 @@ uniteste.descrever(["Comparadores" [
       8 == 8
       1
     ])
-  ]])
-  uniteste.descrever(["Diferente de (!=)" [
+  ]})
+  uniteste.descrever({ nome: "Diferente de (!=)" testes: [
     uniteste.iguais([
       2 != 8
       1
@@ -56,8 +56,8 @@ uniteste.descrever(["Comparadores" [
       8 != 8
       0
     ])
-  ]])
-  uniteste.descrever(["Maior ou igual a (>=)" [
+  ]})
+  uniteste.descrever({ nome: "Maior ou igual a (>=)" testes: [
     uniteste.iguais([
       2 >= 8
       0
@@ -70,8 +70,8 @@ uniteste.descrever(["Comparadores" [
       8 >= 8
       1
     ])
-  ]])
-  uniteste.descrever(["Menor ou igual a (<=)" [
+  ]})
+  uniteste.descrever({ nome: "Menor ou igual a (<=)" testes: [
     uniteste.iguais([
       2 <= 8
       1
@@ -84,5 +84,5 @@ uniteste.descrever(["Comparadores" [
       8 <= 8
       1
     ])
-  ]])
-  ]])
+  ]})
+  ]})

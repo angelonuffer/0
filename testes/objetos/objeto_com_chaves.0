@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Objeto com chaves" [
+uniteste.descrever({ nome: "Objeto com chaves" testes: [
   uniteste.iguais([{
     objeto_com_chaves: {
       nome: "João"
@@ -31,7 +31,7 @@ uniteste.descrever(["Objeto com chaves" [
     resultado: objeto_com_chaves["cidade"]
   }.resultado "São Paulo"])
 
-  uniteste.descrever(["Notação de ponto" [
+  uniteste.descrever({ nome: "Notação de ponto" testes: [
     uniteste.iguais([{
       objeto_com_chaves: {
         nome: "João"
@@ -61,8 +61,8 @@ uniteste.descrever(["Objeto com chaves" [
       
       resultado: objeto_com_chaves.profissao
     }.resultado "Desenvolvedor"])
-  ]])
-  uniteste.descrever(["Propriedade calculada" [
+  ]})
+  uniteste.descrever({ nome: "Propriedade calculada" testes: [
     uniteste.iguais([{
       chave: "nome"
       
@@ -73,5 +73,5 @@ uniteste.descrever(["Objeto com chaves" [
       
       resultado: objeto_com_chaves["nome"]
     }.resultado "João"])
-  ]])
-  ]])
+  ]})
+  ]})

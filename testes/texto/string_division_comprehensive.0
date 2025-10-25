@@ -1,37 +1,37 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["String Division" [
-  uniteste.descrever(["Basic splitting" [
+uniteste.descrever({ nome: "String Division" testes: [
+  uniteste.descrever({ nome: "Basic splitting" testes: [
     uniteste.listas_iguais([
       "a b c" / " "
       ["a" "b" "c"]
     ])
-  ]])
-  uniteste.descrever(["Split by comma" [
+  ]})
+  uniteste.descrever({ nome: "Split by comma" testes: [
     uniteste.listas_iguais([
       "apple,banana,cherry" / ","
       ["apple" "banana" "cherry"]
     ])
-  ]])
-  uniteste.descrever(["Split with empty parts" [
+  ]})
+  uniteste.descrever({ nome: "Split with empty parts" testes: [
     uniteste.listas_iguais([
       "a,,b" / ","
       ["a" "" "b"]
     ])
-  ]])
-  uniteste.descrever(["Split with no separator found" [
+  ]})
+  uniteste.descrever({ nome: "Split with no separator found" testes: [
     uniteste.listas_iguais([
       "hello" / ","
       ["hello"]
     ])
-  ]])
-  uniteste.descrever(["Split with empty string" [
+  ]})
+  uniteste.descrever({ nome: "Split with empty string" testes: [
     uniteste.listas_iguais([
       "" / ","
       [""]
     ])
-  ]])
-  uniteste.descrever(["Numeric division still works" [
+  ]})
+  uniteste.descrever({ nome: "Numeric division still works" testes: [
     uniteste.iguais([
       8 / 2
       4
@@ -40,5 +40,5 @@ uniteste.descrever(["String Division" [
       15 / 3
       5
     ])
-  ]])
-  ]])
+  ]})
+  ]})

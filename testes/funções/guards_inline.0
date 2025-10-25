@@ -1,6 +1,6 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Guards inline" [
+uniteste.descrever({ nome: "Guards inline" testes: [
   uniteste.iguais([
     {
       abs: x => | x < 0 = 0 - x | x
@@ -22,4 +22,4 @@ uniteste.descrever(["Guards inline" [
     }.resultado
     8
   ])
-  ]])
+  ]})

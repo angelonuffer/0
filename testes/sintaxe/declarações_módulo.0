@@ -7,7 +7,7 @@ teste_módulo_b = 10
 
 teste_módulo_c = teste_módulo_a * 2
 
-uniteste.descrever(["Declarações no nível do módulo" [
+uniteste.descrever({ nome: "Declarações no nível do módulo" testes: [
   // Test basic module-level declarations
   uniteste.iguais([
     teste_módulo_a
@@ -56,4 +56,4 @@ uniteste.descrever(["Declarações no nível do módulo" [
     }.soma_teste
     15
   ])
-  ]])
+  ]})

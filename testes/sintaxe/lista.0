@@ -1,25 +1,25 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever(["Sintaxe de Lista com Colchetes" [
-  uniteste.descrever(["Lista básica" [
+uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
+  uniteste.descrever({ nome: "Lista básica" testes: [
     uniteste.listas_iguais([
       [1 2 3]
       [1 2 3]
     ])
-  ]])
-  uniteste.descrever(["Lista vazia" [
+  ]})
+  uniteste.descrever({ nome: "Lista vazia" testes: [
     uniteste.listas_iguais([
       []
       {}
     ])
-  ]])
-  uniteste.descrever(["Lista de textos" [
+  ]})
+  uniteste.descrever({ nome: "Lista de textos" testes: [
     uniteste.listas_iguais([
       ["a" "b" "c"]
       ["a" "b" "c"]
     ])
-  ]])
-  uniteste.descrever(["Acesso por índice" [
+  ]})
+  uniteste.descrever({ nome: "Acesso por índice" testes: [
     uniteste.iguais([
       {
         lista: [10 20 30]
@@ -41,8 +41,8 @@ uniteste.descrever(["Sintaxe de Lista com Colchetes" [
       }.resultado
       30
     ])
-  ]])
-  uniteste.descrever(["Fatiamento" [
+  ]})
+  uniteste.descrever({ nome: "Fatiamento" testes: [
     uniteste.listas_iguais([
       {
         lista: [1 2 3 4 5]
@@ -57,8 +57,8 @@ uniteste.descrever(["Sintaxe de Lista com Colchetes" [
       }.resultado
       [3 4 5]
     ])
-  ]])
-  uniteste.descrever(["Tamanho" [
+  ]})
+  uniteste.descrever({ nome: "Tamanho" testes: [
     uniteste.iguais([
       {
         lista: [1 2 3 4 5]
@@ -73,8 +73,8 @@ uniteste.descrever(["Sintaxe de Lista com Colchetes" [
       }.resultado
       0
     ])
-  ]])
-  uniteste.descrever(["Operador de espalhamento" [
+  ]})
+  uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.listas_iguais([
       {
         lista1: [1 2]
@@ -90,8 +90,8 @@ uniteste.descrever(["Sintaxe de Lista com Colchetes" [
       }.resultado
       [1 2 3 4]
     ])
-  ]])
-  uniteste.descrever(["Multiplicação (join)" [
+  ]})
+  uniteste.descrever({ nome: "Multiplicação (join)" testes: [
     uniteste.iguais([
       ["a" "b" "c"] * " "
       "a b c"
@@ -104,8 +104,8 @@ uniteste.descrever(["Sintaxe de Lista com Colchetes" [
       [65 66 67] * ""
       "ABC"
     ])
-  ]])
-  uniteste.descrever(["Listas aninhadas" [
+  ]})
+  uniteste.descrever({ nome: "Listas aninhadas" testes: [
     uniteste.listas_iguais([
       {
         matriz: [[1 2] [3 4]]
@@ -120,8 +120,8 @@ uniteste.descrever(["Sintaxe de Lista com Colchetes" [
       }.resultado
       3
     ])
-  ]])
-  uniteste.descrever(["Lista com expressões" [
+  ]})
+  uniteste.descrever({ nome: "Lista com expressões" testes: [
     uniteste.listas_iguais([
       {
         x: 10
@@ -130,8 +130,8 @@ uniteste.descrever(["Sintaxe de Lista com Colchetes" [
       }.resultado
       [10 20 30]
     ])
-  ]])
-  uniteste.descrever(["Equivalência com sintaxe de chaves" [
+  ]})
+  uniteste.descrever({ nome: "Equivalência com sintaxe de chaves" testes: [
     uniteste.listas_iguais([
       ["Alice" "Bob" "Charlie"]
       ["Alice" "Bob" "Charlie"]
@@ -144,5 +144,5 @@ uniteste.descrever(["Sintaxe de Lista com Colchetes" [
       [1 2 3][.]
       [1 2 3][.]
     ])
-  ]])
-  ]])
+  ]})
+  ]})
