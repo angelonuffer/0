@@ -1,45 +1,45 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Objeto" {
-  uniteste.descrever({"Fatiamento" {
-    uniteste.iguais({
+uniteste.descrever(["Objeto" [
+  uniteste.descrever(["Fatiamento" [
+    uniteste.iguais([
       {
-        jogos: {"The Legend of Zelda" "Super Mario Bros." "Minecraft"}
+        jogos: ["The Legend of Zelda" "Super Mario Bros." "Minecraft"]
         resultado: jogos[0]
       }.resultado
       "The Legend of Zelda"
-    })
-    uniteste.listas_iguais({
+    ])
+    uniteste.listas_iguais([
       {
-        séries: {"Stranger Things" "Breaking Bad" "Game of Thrones"}
+        séries: ["Stranger Things" "Breaking Bad" "Game of Thrones"]
         resultado: séries[0:2]
       }.resultado
-      {"Stranger Things" "Breaking Bad"}
-    })
-    uniteste.listas_iguais({
+      ["Stranger Things" "Breaking Bad"]
+    ])
+    uniteste.listas_iguais([
       {
-        filmes: {"Star Wars" "O Senhor dos Anéis" "Matrix"}
-        resultado: {...filmes[0:2] "Jurassic Park"}
+        filmes: ["Star Wars" "O Senhor dos Anéis" "Matrix"]
+        resultado: [...filmes[0:2] "Jurassic Park"]
       }.resultado
-      {"Star Wars" "O Senhor dos Anéis" "Jurassic Park"}
-    })
-  }})
-  uniteste.descrever({"Tamanho" {
-    uniteste.iguais({
+      ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]
+    ])
+  ]])
+  uniteste.descrever(["Tamanho" [
+    uniteste.iguais([
       {
-        bandas: {"The Beatles" "Queen" "Pink Floyd"}
+        bandas: ["The Beatles" "Queen" "Pink Floyd"]
         resultado: bandas[.]
       }.resultado
       3
-    })
-  }})
-  uniteste.descrever({"Objeto de chaves" {
-    uniteste.listas_iguais({
+    ])
+  ]])
+  uniteste.descrever(["Objeto de chaves" [
+    uniteste.listas_iguais([
       {
-        objeto_simples: {"item1" "item2" "item3"}
+        objeto_simples: ["item1" "item2" "item3"]
         resultado: objeto_simples[*]
       }.resultado
-      {"0" "1" "2"}
-    })
-  }})
-}})
+      ["0" "1" "2"]
+    ])
+  ]])
+  ]])

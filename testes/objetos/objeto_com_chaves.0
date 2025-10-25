@@ -1,7 +1,7 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Objeto com chaves" {
-  uniteste.iguais({{
+uniteste.descrever(["Objeto com chaves" [
+  uniteste.iguais([{
     objeto_com_chaves: {
       nome: "João"
       idade: 30
@@ -9,9 +9,9 @@ uniteste.descrever({"Objeto com chaves" {
     }
     
     resultado: objeto_com_chaves["nome"]
-  }.resultado "João"})
+  }.resultado "João"])
   
-  uniteste.iguais({{
+  uniteste.iguais([{
     objeto_com_chaves: {
       nome: "João"
       idade: 30
@@ -19,9 +19,9 @@ uniteste.descrever({"Objeto com chaves" {
     }
     
     resultado: objeto_com_chaves["idade"]
-  }.resultado 30})
+  }.resultado 30])
   
-  uniteste.iguais({{
+  uniteste.iguais([{
     objeto_com_chaves: {
       nome: "João"
       idade: 30
@@ -29,10 +29,10 @@ uniteste.descrever({"Objeto com chaves" {
     }
     
     resultado: objeto_com_chaves["cidade"]
-  }.resultado "São Paulo"})
+  }.resultado "São Paulo"])
 
-  uniteste.descrever({"Notação de ponto" {
-    uniteste.iguais({{
+  uniteste.descrever(["Notação de ponto" [
+    uniteste.iguais([{
       objeto_com_chaves: {
         nome: "João"
         idade: 30
@@ -40,9 +40,9 @@ uniteste.descrever({"Objeto com chaves" {
       }
       
       resultado: objeto_com_chaves.nome
-    }.resultado "João"})
+    }.resultado "João"])
     
-    uniteste.iguais({{
+    uniteste.iguais([{
       objeto_com_chaves: {
         nome: "João"
         idade: 30
@@ -50,9 +50,9 @@ uniteste.descrever({"Objeto com chaves" {
       }
       
       resultado: objeto_com_chaves.idade
-    }.resultado 30})
+    }.resultado 30])
     
-    uniteste.iguais({{
+    uniteste.iguais([{
       objeto_com_chaves: {
         nome: "João"
         idade: 30
@@ -60,10 +60,10 @@ uniteste.descrever({"Objeto com chaves" {
       }
       
       resultado: objeto_com_chaves.profissao
-    }.resultado "Desenvolvedor"})
-  }})
-  uniteste.descrever({"Propriedade calculada" {
-    uniteste.iguais({{
+    }.resultado "Desenvolvedor"])
+  ]])
+  uniteste.descrever(["Propriedade calculada" [
+    uniteste.iguais([{
       chave: "nome"
       
       objeto_com_chaves: {
@@ -72,6 +72,6 @@ uniteste.descrever({"Objeto com chaves" {
       }
       
       resultado: objeto_com_chaves["nome"]
-    }.resultado "João"})
-  }})
-}})
+    }.resultado "João"])
+  ]])
+  ]])

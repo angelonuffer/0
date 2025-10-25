@@ -1,10 +1,10 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Edge Cases" {
-  uniteste.descrever({"Empty separator splits each character" {
-    uniteste.listas_iguais({
+uniteste.descrever(["Edge Cases" [
+  uniteste.descrever(["Empty separator splits each character" [
+    uniteste.listas_iguais([
       "abc" / ""
-      {"a" "b" "c"}
-    })
-  }})
-}})
+      ["a" "b" "c"]
+    ])
+  ]])
+  ]])

@@ -1,8 +1,8 @@
 uniteste # uniteste.0
 
-uniteste.descrever({"Casos extremos de referências aninhadas" {
+uniteste.descrever(["Casos extremos de referências aninhadas" [
   // Caso onde propriedade pode mascarar variável externa
-  uniteste.iguais({
+  uniteste.iguais([
     {
       a: 100
       exemplo: {
@@ -14,10 +14,10 @@ uniteste.descrever({"Casos extremos de referências aninhadas" {
       resultado: exemplo.b.c
     }.resultado
     5  // Deve usar a = 2 do objeto, não a = 100 externa
-  })
+  ])
   
   // Lista vazia aninhada
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo: {
         a: 1
@@ -26,10 +26,10 @@ uniteste.descrever({"Casos extremos de referências aninhadas" {
       resultado: exemplo.a
     }.resultado
     1
-  })
+  ])
   
   // Teste de referência a propriedade que usa variável do escopo externo
-  uniteste.iguais({
+  uniteste.iguais([
     {
       exemplo: {
         a: 1
@@ -43,5 +43,5 @@ uniteste.descrever({"Casos extremos de referências aninhadas" {
       resultado: exemplo.b.c  // Testamos a parte aninhada
     }.resultado
     4
-  })
-}})
+  ])
+  ]])

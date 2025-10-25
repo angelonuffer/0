@@ -151,9 +151,9 @@ const objeto = transformar(
       v_alt[0] !== "..." && !(v_alt.length === 5 && v_alt[1] === ":")
     );
     
-    // Enforce strict separation: cannot mix keyed and keyless items
-    if (hasKeyValuePairs && hasValueOnlyItems) {
-      throw new Error("Syntax error: Cannot mix items with keys and items without keys in the same object. Use {} for objects with keys or [] for lists without keys.");
+    // Enforce strict separation: {} is ONLY for objects with keys, [] is ONLY for lists
+    if (hasValueOnlyItems) {
+      throw new Error("Syntax error: Lists must use [] syntax. The {} syntax is only for objects with key-value pairs.");
     }
     
     // Check if any spread operations exist

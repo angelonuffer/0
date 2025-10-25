@@ -29,7 +29,7 @@ guards # funções/guards.0
 guards_inline # funções/guards_inline.0
 comentário # sintaxe/comentário.0
 
-uniteste.descrever({"0" {
+uniteste.descrever(["0" [
   aritmética
   operadores_lógicos
   comparadores
@@ -59,4 +59,4 @@ uniteste.descrever({"0" {
   guards
   guards_inline
   comentário
-}})
+]])

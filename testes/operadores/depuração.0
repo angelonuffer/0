@@ -1,49 +1,49 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Operador de depuração (%)" {
-  uniteste.iguais({
+uniteste.descrever(["Operador de depuração (%)" [
+  uniteste.iguais([
     % 5
     5
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     % 2 + 3
     5
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       a: 10
       b: % a * 2
     }.b
     20
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
-      lista: {1 2 3}
+      lista: [1 2 3]
       resultado: % lista[1]
     }.resultado
     2
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       x: 5
       y: 3
       z: % x + % y
     }.z
     8
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     % "teste"
     "teste"
-  })
-  uniteste.iguais({
-    (% {1 2 3})[1]
+  ])
+  uniteste.iguais([
+    (% [1 2 3])[1]
     2
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       obj: {nome: "João" idade: 30}
       resultado: (% obj).nome
     }.resultado
     "João"
-  })
-}})
+  ])
+  ]])

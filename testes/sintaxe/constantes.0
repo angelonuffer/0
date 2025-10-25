@@ -1,15 +1,15 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Constantes" {
-  uniteste.iguais({
+uniteste.descrever(["Constantes" [
+  uniteste.iguais([
     {
       a: 5
       b: 8
       resultado: a + b
     }.resultado
     13
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       função1: y => y == 42
       função2: _ => {
@@ -19,5 +19,5 @@ uniteste.descrever({"Constantes" {
       resultado: função2(0)
     }.resultado
     1
-  })
-}})
+  ])
+  ]])

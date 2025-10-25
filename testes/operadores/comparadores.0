@@ -1,88 +1,88 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Comparadores" {
-  uniteste.descrever({"Maior que (>)" {
-    uniteste.iguais({
+uniteste.descrever(["Comparadores" [
+  uniteste.descrever(["Maior que (>)" [
+    uniteste.iguais([
       2 > 8
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 > 2
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 > 8
       0
-    })
-  }})
-  uniteste.descrever({"Menor que (<)" {
-    uniteste.iguais({
+    ])
+  ]])
+  uniteste.descrever(["Menor que (<)" [
+    uniteste.iguais([
       2 < 8
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 < 2
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 < 8
       0
-    })
-  }})
-  uniteste.descrever({"Igual a (==)" {
-    uniteste.iguais({
+    ])
+  ]])
+  uniteste.descrever(["Igual a (==)" [
+    uniteste.iguais([
       2 == 8
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 == 2
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 == 8
       1
-    })
-  }})
-  uniteste.descrever({"Diferente de (!=)" {
-    uniteste.iguais({
+    ])
+  ]])
+  uniteste.descrever(["Diferente de (!=)" [
+    uniteste.iguais([
       2 != 8
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 != 2
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 != 8
       0
-    })
-  }})
-  uniteste.descrever({"Maior ou igual a (>=)" {
-    uniteste.iguais({
+    ])
+  ]])
+  uniteste.descrever(["Maior ou igual a (>=)" [
+    uniteste.iguais([
       2 >= 8
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 >= 2
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 >= 8
       1
-    })
-  }})
-  uniteste.descrever({"Menor ou igual a (<=)" {
-    uniteste.iguais({
+    ])
+  ]])
+  uniteste.descrever(["Menor ou igual a (<=)" [
+    uniteste.iguais([
       2 <= 8
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 <= 2
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       8 <= 8
       1
-    })
-  }})
-}})
+    ])
+  ]])
+  ]])

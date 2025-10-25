@@ -1,33 +1,33 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Casos adicionais de acesso direto a literais" {
+uniteste.descrever(["Casos adicionais de acesso direto a literais" [
   // Test with nested list access
-  uniteste.iguais({
-    {{ 1 2 } { 3 4 }}[0][1]
+  uniteste.iguais([
+    [[1 2] [3 4]][0][1]
     2
-  })
+  ])
   
   // Test with function call on list literal
-  uniteste.iguais({
-    { 1 2 3 }[.]
+  uniteste.iguais([
+    [ 1 2 3 ][.]
     3
-  })
+  ])
   
   // Test with key access on object literal
-  uniteste.listas_iguais({
+  uniteste.listas_iguais([
     { nome: "João" idade: 30 }[*]
-    {"nome" "idade"}
-  })
+    ["nome" "idade"]
+  ])
   
   // Test slicing on list literal
-  uniteste.listas_iguais({
-    { 1 2 3 4 5 }[1:3]
-    {2 3}
-  })
+  uniteste.listas_iguais([
+    [ 1 2 3 4 5 ][1:3]
+    [2 3]
+  ])
   
   // Test complex expression in indexing
-  uniteste.iguais({
-    { 10 20 30 }[1 + 1]
+  uniteste.iguais([
+    [ 10 20 30 ][1 + 1]
     30
-  })
-}})
+  ])
+  ]])
