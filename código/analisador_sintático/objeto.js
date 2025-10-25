@@ -146,6 +146,16 @@ const objeto = transformar(
       v_alt.length === 5 && v_alt[1] === ":"
     );
     
+    // Check if we have any value-only items
+    const hasValueOnlyItems = valores_vários.some(v_alt => 
+      v_alt[0] !== "..." && !(v_alt.length === 5 && v_alt[1] === ":")
+    );
+    
+    // Enforce strict separation: {} is ONLY for objects with keys, [] is ONLY for lists
+    if (hasValueOnlyItems) {
+      throw new Error("Syntax error: Lists must use [] syntax. The {} syntax is only for objects with key-value pairs.");
+    }
+    
     // Check if any spread operations exist
     const hasSpreads = valores_vários.some(v_seq => v_seq[0] === "...");
     

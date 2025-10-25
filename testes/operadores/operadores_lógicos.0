@@ -1,50 +1,50 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Operadores lógicos" {
-  uniteste.descrever({"E" {
-    uniteste.iguais({
+uniteste.descrever({ nome: "Operadores lógicos" testes: [
+  uniteste.descrever({ nome: "E" testes: [
+    uniteste.iguais([
       0 & 0
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       0 & 1
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       1 & 0
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       1 & 2
       2
-    })
-  }})
-  uniteste.descrever({"Ou" {
-    uniteste.iguais({
+    ])
+  ]})
+  uniteste.descrever({ nome: "Ou" testes: [
+    uniteste.iguais([
       0 | 0
       0
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       0 | 1
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       1 | 0
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       1 | 2
       1
-    })
-  }})
-  uniteste.descrever({"Não" {
-    uniteste.iguais({
+    ])
+  ]})
+  uniteste.descrever({ nome: "Não" testes: [
+    uniteste.iguais([
       ! 0
       1
-    })
-    uniteste.iguais({
+    ])
+    uniteste.iguais([
       ! 1
       0
-    })
-  }})
-}})
+    ])
+  ]})
+  ]})

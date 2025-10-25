@@ -1,22 +1,22 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Documentation Examples" {
-  uniteste.descrever({"String division examples" {
-    uniteste.listas_iguais({
+uniteste.descrever({ nome: "Documentation Examples" testes: [
+  uniteste.descrever({ nome: "String division examples" testes: [
+    uniteste.listas_iguais([
       "a b c" / " "
-      {"a" "b" "c"}
-    })
-    uniteste.listas_iguais({
+      ["a" "b" "c"]
+    ])
+    uniteste.listas_iguais([
       "apple,banana,cherry" / ","
-      {"apple" "banana" "cherry"}
-    })
-    uniteste.iguais({
+      ["apple" "banana" "cherry"]
+    ])
+    uniteste.iguais([
       {
         frase: "João Silva Santos"
         nomes: frase / " "
-        nomes[0] // Primeiro nome
-      }[0]
+        resultado: nomes[0] // Primeiro nome
+      }.resultado
       "João"
-    })
-  }})
-}})
+    ])
+  ]})
+  ]})

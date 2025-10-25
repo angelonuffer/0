@@ -1,82 +1,82 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({"Função" {
-  uniteste.iguais({
+uniteste.descrever({ nome: "Função" testes: [
+  uniteste.iguais([
     {
       quadrado: x => x * x
-      quadrado(5)
-    }[0]
+      resultado: quadrado(5)
+    }.resultado
     25
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       soma: args => args[0] + args[1]
-      soma({3 7})
-    }[0]
+      resultado: soma([3 7])
+    }.resultado
     10
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
-      dentro_intervalo({5 1 10})
-    }[0]
+      resultado: dentro_intervalo([5 1 10])
+    }.resultado
     1
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       dentro_intervalo: args => args[0] >= args[1] & args[0] <= args[2]
-      dentro_intervalo({15 1 10})
-    }[0]
+      resultado: dentro_intervalo([15 1 10])
+    }.resultado
     0
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
-      nome_completo: args => {args[0] " de " args[1]} * ""
-      nome_completo({"Geralt" "The Witcher"})
-    }[0]
+      nome_completo: args => [args[0] " de " args[1]] * ""
+      resultado: nome_completo(["Geralt" "The Witcher"])
+    }.resultado
     "Geralt de The Witcher"
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       área_retângulo: args => args[0] * args[1]
-      área_retângulo({5 10})
-    }[0]
+      resultado: área_retângulo([5 10])
+    }.resultado
     50
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       área_triângulo: args => {
         divisor: 2
         área: (args[0] * args[1]) / divisor
-        área
-      }[0]
-      área_triângulo({10 8})
-    }[0]
+        resultado: área
+      }.resultado
+      resultado: área_triângulo([10 8])
+    }.resultado
     40
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       maior: args => args[0] > args[1] ? args[0] : args[1]
-      maior({8 3})
-    }[0]
+      resultado: maior([8 3])
+    }.resultado
     8
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
       maior: args => args[0] > args[1] ? args[0] : args[1]
-      maior({2 9})
-    }[0]
+      resultado: maior([2 9])
+    }.resultado
     9
-  })
-  uniteste.iguais({
+  ])
+  uniteste.iguais([
     {
-      iniciais: {
+      iniciais: [
         _ => "Bulbasaur"
         _ => "Charmander"
         _ => "Squirtle"
-      }
-      iniciais[1](0)
-    }[0]
+      ]
+      resultado: iniciais[1](0)
+    }.resultado
     "Charmander"
-  })
-}})
+  ])
+  ]})
