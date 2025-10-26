@@ -1,0 +1,108 @@
+uniteste # ../integração/uniteste.0
+
+uniteste.descrever({ nome: "Propriedade resumida de objeto" testes: [
+  uniteste.iguais([
+    (
+      a = 2
+      obj = { a }
+      obj["a"]
+    )
+    2
+  ])
+  
+  uniteste.iguais([
+    (
+      nome = "João"
+      idade = 30
+      pessoa = { nome idade }
+      pessoa["nome"]
+    )
+    "João"
+  ])
+  
+  uniteste.iguais([
+    (
+      nome = "João"
+      idade = 30
+      pessoa = { nome idade }
+      pessoa["idade"]
+    )
+    30
+  ])
+  
+  uniteste.iguais([
+    (
+      x = 10
+      y = 20
+      z = 30
+      coords = { x y z }
+      coords["x"]
+    )
+    10
+  ])
+  
+  uniteste.iguais([
+    (
+      x = 10
+      y = 20
+      z = 30
+      coords = { x y z }
+      coords["y"]
+    )
+    20
+  ])
+  
+  uniteste.iguais([
+    (
+      x = 10
+      y = 20
+      z = 30
+      coords = { x y z }
+      coords["z"]
+    )
+    30
+  ])
+  
+  uniteste.descrever({ nome: "Sintaxe mista com propriedades explícitas" testes: [
+    uniteste.iguais([
+      (
+        a = 1
+        b = 2
+        obj = { a b c: 3 }
+        obj["a"]
+      )
+      1
+    ])
+    
+    uniteste.iguais([
+      (
+        a = 1
+        b = 2
+        obj = { a b c: 3 }
+        obj["b"]
+      )
+      2
+    ])
+    
+    uniteste.iguais([
+      (
+        a = 1
+        b = 2
+        obj = { a b c: 3 }
+        obj["c"]
+      )
+      3
+    ])
+  ]})
+  
+  uniteste.descrever({ nome: "Com notação de ponto" testes: [
+    uniteste.iguais([
+      (
+        nome = "Maria"
+        pessoa = { nome }
+        pessoa.nome
+      )
+      "Maria"
+    ])
+  ]})
+]})
