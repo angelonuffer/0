@@ -3,107 +3,80 @@ uniteste # ../integração/uniteste.0
 uniteste.descrever({ nome: "Guards em funções" testes: [
   // Test 1: Simple guard with default
   uniteste.iguais([
-    {
-      abs: x =>
+    (
+      abs = x =>
         | x < 0 = 0 - x
         | x
-      resultado: (abs = (x =>
-        | x < 0 = 0 - x
-        | x
-      ) abs(-5))
-    }.resultado
+      abs(-5)
+    )
     5
   ])
   
   // Test 2: Multiple guards with default
   uniteste.iguais([
-    {
-      sign: x =>
+    (
+      sign = x =>
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      resultado: (sign = (x =>
-        | x > 0 = 1
-        | x < 0 = 0 - 1
-        | 0
-      ) sign(5))
-    }.resultado
+      sign(5)
+    )
     1
   ])
   
   uniteste.iguais([
-    {
-      sign: x =>
+    (
+      sign = x =>
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      resultado: (sign = (x =>
-        | x > 0 = 1
-        | x < 0 = 0 - 1
-        | 0
-      ) sign(-3))
-    }.resultado
+      sign(-3)
+    )
     0 - 1
   ])
   
   uniteste.iguais([
-    {
-      sign: x =>
+    (
+      sign = x =>
         | x > 0 = 1
         | x < 0 = 0 - 1
         | 0
-      resultado: (sign = (x =>
-        | x > 0 = 1
-        | x < 0 = 0 - 1
-        | 0
-      ) sign(0))
-    }.resultado
+      sign(0)
+    )
     0
   ])
   
   // Test 3: Guard with multiple conditions
   uniteste.iguais([
-    {
-      classify: x =>
+    (
+      classify = x =>
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      resultado: (classify = (x =>
-        | x > 10 = "grande"
-        | x > 5 = "médio"
-        | "pequeno"
-      ) classify(15))
-    }.resultado
+      classify(15)
+    )
     "grande"
   ])
   
   uniteste.iguais([
-    {
-      classify: x =>
+    (
+      classify = x =>
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      resultado: (classify = (x =>
-        | x > 10 = "grande"
-        | x > 5 = "médio"
-        | "pequeno"
-      ) classify(7))
-    }.resultado
+      classify(7)
+    )
     "médio"
   ])
   
   uniteste.iguais([
-    {
-      classify: x =>
+    (
+      classify = x =>
         | x > 10 = "grande"
         | x > 5 = "médio"
         | "pequeno"
-      resultado: (classify = (x =>
-        | x > 10 = "grande"
-        | x > 5 = "médio"
-        | "pequeno"
-      ) classify(3))
-    }.resultado
+      classify(3)
+    )
     "pequeno"
   ])
-  ]})
+]})

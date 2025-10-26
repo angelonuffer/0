@@ -27,6 +27,7 @@ função # funções/função.0
 destructuring # funções/destructuring.0
 guards # funções/guards.0
 guards_inline # funções/guards_inline.0
+comprehensive_function_test # funções/comprehensive_function_test.0
 comentário # sintaxe/comentário.0
 
 uniteste.descrever({ nome: "0" testes: [
@@ -58,5 +59,6 @@ uniteste.descrever({ nome: "0" testes: [
   destructuring
   guards
   guards_inline
+  comprehensive_function_test
   comentário
 ]})
