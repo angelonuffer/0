@@ -11,12 +11,12 @@ uniteste.descrever({ nome: "Documentation Examples" testes: [
       ["apple" "banana" "cherry"]
     ])
     uniteste.iguais([
-      {
-        frase: "João Silva Santos"
-        nomes: frase / " "
-        resultado: nomes[0] // Primeiro nome
-      }.resultado
+      (
+        frase = "João Silva Santos"
+        nomes = (frase = "João Silva Santos" frase / " ")
+        nomes[0] // Primeiro nome
+      )
       "João"
     ])
   ]})
-  ]})
+]})

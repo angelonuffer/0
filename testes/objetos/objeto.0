@@ -3,43 +3,43 @@ uniteste # ../integração/uniteste.0
 uniteste.descrever({ nome: "Objeto" testes: [
   uniteste.descrever({ nome: "Fatiamento" testes: [
     uniteste.iguais([
-      {
-        jogos: ["The Legend of Zelda" "Super Mario Bros." "Minecraft"]
-        resultado: jogos[0]
-      }.resultado
+      (
+        jogos = ["The Legend of Zelda" "Super Mario Bros." "Minecraft"]
+        jogos[0]
+      )
       "The Legend of Zelda"
     ])
     uniteste.listas_iguais([
-      {
-        séries: ["Stranger Things" "Breaking Bad" "Game of Thrones"]
-        resultado: séries[0:2]
-      }.resultado
+      (
+        séries = ["Stranger Things" "Breaking Bad" "Game of Thrones"]
+        séries[0:2]
+      )
       ["Stranger Things" "Breaking Bad"]
     ])
     uniteste.listas_iguais([
-      {
-        filmes: ["Star Wars" "O Senhor dos Anéis" "Matrix"]
-        resultado: [...filmes[0:2] "Jurassic Park"]
-      }.resultado
+      (
+        filmes = ["Star Wars" "O Senhor dos Anéis" "Matrix"]
+        [...filmes[0:2] "Jurassic Park"]
+      )
       ["Star Wars" "O Senhor dos Anéis" "Jurassic Park"]
     ])
   ]})
   uniteste.descrever({ nome: "Tamanho" testes: [
     uniteste.iguais([
-      {
-        bandas: ["The Beatles" "Queen" "Pink Floyd"]
-        resultado: bandas[.]
-      }.resultado
+      (
+        bandas = ["The Beatles" "Queen" "Pink Floyd"]
+        bandas[.]
+      )
       3
     ])
   ]})
   uniteste.descrever({ nome: "Objeto de chaves" testes: [
     uniteste.listas_iguais([
-      {
-        objeto_simples: ["item1" "item2" "item3"]
-        resultado: objeto_simples[*]
-      }.resultado
+      (
+        objeto_simples = ["item1" "item2" "item3"]
+        objeto_simples[*]
+      )
       ["0" "1" "2"]
     ])
   ]})
-  ]})
+]})

@@ -30,4 +30,22 @@ uniteste.descrever({ nome: "Casos adicionais de acesso direto a literais" testes
     [ 10 20 30 ][1 + 1]
     30
   ])
+  
+  // Test with constant expression
+  uniteste.iguais([
+    (
+      x = 7
+      x * 2
+    )
+    14
+  ])
+  
+  // Test with string constant
+  uniteste.iguais([
+    (
+      texto = "abc"
+      texto[1]
+    )
+    98
+  ])
   ]})

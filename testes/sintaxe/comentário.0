@@ -2,11 +2,11 @@ uniteste # ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Comentário" testes: [
   uniteste.iguais([
-    {
-      // Este é um comentário explicando o código abaixo
-      soma: args => args[0] + args[1]
-      resultado: soma([3 7])
-    }.resultado
-    10
+    (
+      a = 2 // comentário
+      b = 3 // outro comentário
+      a + b
+    )
+    5
   ])
-  ]})
+]})

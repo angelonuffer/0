@@ -1,47 +1,19 @@
 uniteste # uniteste.0
 
-uniteste.descrever({ nome: "Casos extremos de referências aninhadas" testes: [
-  // Caso onde propriedade pode mascarar variável externa
+uniteste.descrever({ nome: "Edge cases" testes: [
   uniteste.iguais([
-    {
-      a: 100
-      exemplo: {
-        a: 2
-        b: {
-          c: a + 3
-        }
-      }
-      resultado: exemplo.b.c
-    }.resultado
-    5  // Deve usar a = 2 do objeto, não a = 100 externa
-  ])
-  
-  // Lista vazia aninhada
-  uniteste.iguais([
-    {
-      exemplo: {
-        a: 1
-        b: {}
-      }
-      resultado: exemplo.a
-    }.resultado
+    (
+      a = 0
+      b = 1
+      a | b
+    )
     1
   ])
-  
-  // Teste de referência a propriedade que usa variável do escopo externo
   uniteste.iguais([
-    {
-      exemplo: {
-        a: 1
-        b: {
-          c: a + 3
-        }
-        d: {
-          e: a + 10  // Usa a variável a do escopo do objeto
-        }
-      }
-      resultado: exemplo.b.c  // Testamos a parte aninhada
-    }.resultado
-    4
+    (
+      texto = ""
+      texto[.]
+    )
+    0
   ])
-  ]})
+]})

@@ -3,49 +3,85 @@ uniteste # ../integração/uniteste.0
 uniteste.descrever({ nome: "Parênteses com declarações" testes: [
   // Test basic constant declaration
   uniteste.iguais([
-    ( a = 2 b = 3 a + b )
+    (
+      a = 2
+      b = 3
+      a + b
+    )
     5
   ])
   
   // Test with multiplication
   uniteste.iguais([
-    ( x = 4 y = 5 x * y )
+    (
+      x = 4
+      y = 5
+      x * y
+    )
     20
   ])
   
   // Test with single constant
   uniteste.iguais([
-    ( valor = 10 valor + 5 )
+    (
+      valor = 10
+      valor + 5
+    )
     15
   ])
   
   // Test with multiple operations
   uniteste.iguais([
-    ( a = 2 b = 3 c = 4 a + b * c )
+    (
+      a = 2
+      b = 3
+      c = 4
+      a + b * c
+    )
     14
   ])
   
   // Test that constants can reference each other
   uniteste.iguais([
-    ( a = 5 b = a * 2 b + 3 )
+    (
+      a = 5
+      b = a * 2
+      b + 3
+    )
     13
   ])
   
   // Test nested parentheses with declarations
   uniteste.iguais([
-    ( a = 2 b = ( x = 3 y = 4 x + y ) a * b )
+    (
+      a = 2
+      b = (
+        x = 3
+        y = 4
+        x + y
+      )
+      a * b
+    )
     14
   ])
   
   // Test with comparisons
   uniteste.iguais([
-    ( a = 5 b = 10 a < b )
+    (
+      a = 5
+      b = 10
+      a < b
+    )
     1
   ])
   
   // Test with text
   uniteste.iguais([
-    ( nome = "João" sobrenome = "Silva" [nome " " sobrenome] * "" )
+    (
+      nome = "João"
+      sobrenome = "Silva"
+      [ nome " " sobrenome ] * ""
+    )
     "João Silva"
   ])
   
@@ -63,23 +99,34 @@ uniteste.descrever({ nome: "Parênteses com declarações" testes: [
   
   // Test mixed simple and with declarations
   uniteste.iguais([
-    ( a = 2 (a + 3) * 4 )
+    (
+      a = 2
+      (a + 3) * 4
+    )
     20
   ])
   
   // Documentation example: Multiple declarations with complex operations
   uniteste.iguais([
-    ( x = 4 y = 5 z = 10 x * y + z )
+    (
+      x = 4
+      y = 5
+      z = 10
+      x * y + z
+    )
     30
   ])
   
   // Documentation example: Constants don't affect outer scope
   uniteste.iguais([
-    {
-      x: 10
-      resultado: ( x = 5 x * 2 )
-      final_x: x
-    }.final_x
+    (
+      x = 10
+      resultado = (
+        x = 6
+        x * 2
+      )
+      x
+    )
     10
   ])
-  ]})
+]})

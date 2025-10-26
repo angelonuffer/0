@@ -3,64 +3,86 @@ uniteste # ../integração/uniteste.0
 uniteste.descrever({ nome: "Destructuring de objetos em parâmetros de função" testes: [
   // Test basic destructuring
   uniteste.iguais([
-    {
-      soma: { a b } => a + b
-      resultado: soma({ a: 2 b: 3 })
-    }.resultado
+    (
+      soma = { a b } => a + b
+      soma({
+        a: 2
+        b: 3
+      })
+    )
     5
   ])
   
   // Test destructuring with more keys
   uniteste.iguais([
-    {
-      calc: { x y z } => x + y * z
-      resultado: calc({ x: 2 y: 3 z: 4 })
-    }.resultado
+    (
+      calc = { x y z } => x + y * z
+      calc({
+        x: 2
+        y: 3
+        z: 4
+      })
+    )
     14
   ])
   
   // Test destructuring with named keys in different order
   uniteste.iguais([
-    {
-      subtrair: { a b } => a - b
-      resultado: subtrair({ b: 5 a: 10 })
-    }.resultado
+    (
+      subtrair = { a b } => a - b
+      subtrair({
+        b: 5
+        a: 10
+      })
+    )
     5
   ])
   
   // Test destructuring with text values
   uniteste.iguais([
-    {
-      juntar: { primeiro segundo } => [primeiro " " segundo] * ""
-      resultado: juntar({ primeiro: "Hello" segundo: "World" })
-    }.resultado
+    (
+      juntar = { primeiro segundo } => [primeiro " " segundo] * ""
+      juntar({
+        primeiro: "Hello"
+        segundo: "World"
+      })
+    )
     "Hello World"
   ])
   
   // Test the exact example from the issue
   uniteste.iguais([
-    {
-      soma: { a b } => a + b
-      resultado: soma({ a: 2 b: 3 })
-    }.resultado
+    (
+      soma = { a b } => a + b
+      soma({
+        a: 2
+        b: 3
+      })
+    )
     5
   ])
   
   // Test with more complex expressions
   uniteste.iguais([
-    {
-      multiplicar_e_somar: { x y base } => x * y + base
-      resultado: multiplicar_e_somar({ x: 5 y: 3 base: 10 })
-    }.resultado
+    (
+      multiplicar_e_somar = { x y base } => x * y + base
+      multiplicar_e_somar({
+        x: 5
+        y: 3
+        base: 10
+      })
+    )
     25
   ])
   
   // Test with single parameter destructuring
   uniteste.iguais([
-    {
-      obter_valor: { valor } => valor
-      resultado: obter_valor({ valor: 42 })
-    }.resultado
+    (
+      obter_valor = { valor } => valor
+      obter_valor({
+        valor: 42
+      })
+    )
     42
   ])
-  ]})
+]})

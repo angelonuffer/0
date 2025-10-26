@@ -1,77 +1,91 @@
 uniteste # ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Objeto com chaves" testes: [
-  uniteste.iguais([{
-    objeto_com_chaves: {
-      nome: "João"
-      idade: 30
-      cidade: "São Paulo"
-    }
-    
-    resultado: objeto_com_chaves["nome"]
-  }.resultado "João"])
+  uniteste.iguais([
+    (
+      objeto_com_chaves = {
+        nome: "João"
+        idade: 30
+        cidade: "São Paulo"
+      }
+      objeto_com_chaves["nome"]
+    )
+    "João"
+  ])
   
-  uniteste.iguais([{
-    objeto_com_chaves: {
-      nome: "João"
-      idade: 30
-      cidade: "São Paulo"
-    }
-    
-    resultado: objeto_com_chaves["idade"]
-  }.resultado 30])
+  uniteste.iguais([
+    (
+      objeto_com_chaves = {
+        nome: "João"
+        idade: 30
+        cidade: "São Paulo"
+      }
+      objeto_com_chaves["idade"]
+    )
+    30
+  ])
   
-  uniteste.iguais([{
-    objeto_com_chaves: {
-      nome: "João"
-      idade: 30
-      cidade: "São Paulo"
-    }
-    
-    resultado: objeto_com_chaves["cidade"]
-  }.resultado "São Paulo"])
+  uniteste.iguais([
+    (
+      objeto_com_chaves = {
+        nome: "João"
+        idade: 30
+        cidade: "São Paulo"
+      }
+      objeto_com_chaves["cidade"]
+    )
+    "São Paulo"
+  ])
 
   uniteste.descrever({ nome: "Notação de ponto" testes: [
-    uniteste.iguais([{
-      objeto_com_chaves: {
-        nome: "João"
-        idade: 30
-        profissao: "Desenvolvedor"
-      }
-      
-      resultado: objeto_com_chaves.nome
-    }.resultado "João"])
+    uniteste.iguais([
+      (
+        objeto_com_chaves = {
+          nome: "João"
+          idade: 30
+          profissao: "Desenvolvedor"
+        }
+        objeto_com_chaves.nome
+      )
+      "João"
+    ])
     
-    uniteste.iguais([{
-      objeto_com_chaves: {
-        nome: "João"
-        idade: 30
-        profissao: "Desenvolvedor"
-      }
-      
-      resultado: objeto_com_chaves.idade
-    }.resultado 30])
+    uniteste.iguais([
+      (
+        objeto_com_chaves = {
+          nome: "João"
+          idade: 30
+          profissao: "Desenvolvedor"
+        }
+        objeto_com_chaves.idade
+      )
+      30
+    ])
     
-    uniteste.iguais([{
-      objeto_com_chaves: {
-        nome: "João"
-        idade: 30
-        profissao: "Desenvolvedor"
-      }
-      
-      resultado: objeto_com_chaves.profissao
-    }.resultado "Desenvolvedor"])
+    uniteste.iguais([
+      (
+        objeto_com_chaves = {
+          nome: "João"
+          idade: 30
+          profissao: "Desenvolvedor"
+        }
+        objeto_com_chaves.profissao
+      )
+      "Desenvolvedor"
+    ])
   ]})
+  
   uniteste.descrever({ nome: "Propriedade calculada" testes: [
-    uniteste.iguais([{
-      chave: "nome"
-      
-      objeto_com_chaves: {
-        [chave]: "João"
-        idade: 30
-      }
-      
-      resultado: objeto_com_chaves["nome"]
-    }.resultado "João"])
+    uniteste.iguais([
+      (
+        chave = "nome"
+        objeto_com_chaves = {
+          [chave]: "João"
+          idade: 30
+        }
+        objeto_com_chaves["nome"]
+      )
+      "João"
+    ])
   ]})
-  ]})
+]})

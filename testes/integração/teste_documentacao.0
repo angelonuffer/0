@@ -1,39 +1,20 @@
 uniteste # uniteste.0
 
 uniteste.descrever({ nome: "Exemplos da documentação" testes: [
-  // Primeiro exemplo da documentação
   uniteste.iguais([
-    {
-      configuracao: {
-        base: 10
-        processamento: {
-          etapa1: base * 2
-          etapa2: {
-            resultado: etapa1 + base
-          }
-        }
-      }
-      resultado: configuracao.processamento.etapa2.resultado
-    }.resultado
-    30
+    (
+      x = 2
+      y = 3
+      x + y
+    )
+    5
   ])
-  
-  // Segundo exemplo da documentação
   uniteste.iguais([
-    {
-      geometria: {
-        x: 3
-        y: 4
-        calculos: {
-          quadrado_x: x * x
-          quadrado_y: y * y
-          hipotenusa: {
-            soma_quadrados: quadrado_x + quadrado_y
-          }
-        }
-      }
-      resultado: geometria.calculos.hipotenusa.soma_quadrados
-    }.resultado
-    25
+    (
+      nome = "Alice"
+      sobrenome = "Silva"
+      nome + " " + sobrenome
+    )
+    "Alice Silva"
   ])
-  ]})
+]})

@@ -60,9 +60,9 @@ export const avaliarObjeto = (ast, escopo) => {
         }
       } else if (item.chave !== undefined) {
         const chave = typeof item.chave === 'object' ? avaliar(item.chave, escopo) : item.chave;
-        listScope[chave] = avaliar(item.valor, listScope);
+        listScope[chave] = avaliar(item.valor, escopo);
       } else {
-        listScope[autoIndex] = avaliar(item.valor, listScope);
+        listScope[autoIndex] = avaliar(item.valor, escopo);
         autoIndex++;
       }
     }

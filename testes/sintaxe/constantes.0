@@ -2,22 +2,30 @@ uniteste # ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Constantes" testes: [
   uniteste.iguais([
-    {
-      a: 5
-      b: 8
-      resultado: a + b
-    }.resultado
+    (
+      a = 5
+      b = 8
+      a + b
+    )
     13
   ])
   uniteste.iguais([
-    {
-      função1: y => y == 42
-      função2: _ => {
-        x: 42
-        resultado: função1(x)
-      }.resultado
-      resultado: função2(0)
-    }.resultado
+    (
+      função1 = y => y == 42
+      função2 = _ => (
+        x = 42
+        função1 = y => y == 42
+        x = 42
+        função1(x)
+      )
+      função2 = _ => (
+        x = 42
+        função1 = y => y == 42
+        x = 42
+        função1(x)
+      )
+      função2(0)
+    )
     1
   ])
-  ]})
+]})
