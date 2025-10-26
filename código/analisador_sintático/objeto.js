@@ -124,6 +124,10 @@ const objeto = transformar(
           código => expressão(código),
           opcional(espaço),
         ),
+        sequência( // Shorthand property: { name } equivalent to { name: name }
+          nome,
+          opcional(espaço),
+        ),
         sequência( // Value-only (auto-indexed)
           código => expressão(código),
           opcional(espaço),
@@ -141,14 +145,17 @@ const objeto = transformar(
       };
     }
     
-    // Check if we have any key-value pairs
+    // Check if we have any key-value pairs (explicit or shorthand)
     const hasKeyValuePairs = valores_vários.some(v_alt => 
-      v_alt.length === 5 && v_alt[1] === ":"
+      (v_alt.length === 5 && v_alt[1] === ":") || // Explicit key-value pair
+      (v_alt.length === 2 && typeof v_alt[0] === 'string') // Shorthand property
     );
     
-    // Check if we have any value-only items
+    // Check if we have any value-only items (excluding spread and shorthand)
     const hasValueOnlyItems = valores_vários.some(v_alt => 
-      v_alt[0] !== "..." && !(v_alt.length === 5 && v_alt[1] === ":")
+      v_alt[0] !== "..." && 
+      !(v_alt.length === 5 && v_alt[1] === ":") &&
+      !(v_alt.length === 2 && typeof v_alt[0] === 'string')
     );
     
     // Enforce strict separation: {} is ONLY for objects with keys, [] is ONLY for lists
@@ -182,6 +189,13 @@ const objeto = transformar(
         return {
           chave: chave,
           valor: v_alt[3]
+        };
+      } else if (v_alt.length === 2 && typeof v_alt[0] === 'string') {
+        // Shorthand property: { name } equivalent to { name: name }
+        const nomeProp = v_alt[0];
+        return {
+          chave: nomeProp,
+          valor: { tipo: 'variável', nome: nomeProp }
         };
       } else {
         return {
