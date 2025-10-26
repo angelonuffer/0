@@ -63,7 +63,7 @@ uniteste.descrever({ nome: "Propriedade resumida de objeto" testes: [
     30
   ])
   
-  uniteste.descrever({ nome: "Mistura de sintaxes" testes: [
+  uniteste.descrever({ nome: "Sintaxe mista com propriedades explícitas" testes: [
     uniteste.iguais([
       (
         a = 1
