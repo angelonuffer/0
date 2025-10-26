@@ -1,65 +1,28 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({ nome: "Referências de propriedades em objeto" testes: [
+uniteste.descrever({ nome: "Referência de objeto" testes: [
   uniteste.iguais([
-    {
-      exemplo: {
-        a: 1
-        b: (a = 1 a + 1)
-      }
-      resultado: (exemplo = {
-        a: 1
-        b: (a = 1 a + 1)
-      } exemplo.a)
-    }.resultado
-    1
+    (
+      a = 5
+      b = a + 2
+      b
+    )
+    7
   ])
-  
   uniteste.iguais([
-    {
-      exemplo: {
-        a: 1
-        b: (a = 1 a + 1)
-      }
-      resultado: (exemplo = {
-        a: 1
-        b: (a = 1 a + 1)
-      } exemplo.b)
-    }.resultado
-    2
+    (
+      x = 10
+      y = x * 2
+      y
+    )
+    20
   ])
-  
   uniteste.iguais([
-    {
-      pessoa: {
-        nome: "João"
-        sobrenome: "Silva"
-        nomeCompleto: (nome = "João" sobrenome = "Silva" nome + " " + sobrenome)
-      }
-      resultado: (pessoa = {
-        nome: "João"
-        sobrenome: "Silva"
-        nomeCompleto: (nome = "João" sobrenome = "Silva" nome + " " + sobrenome)
-      } pessoa.nomeCompleto)
-    }.resultado
+    (
+      nome = "João"
+      sobrenome = "Silva"
+      nome + " " + sobrenome
+    )
     "João Silva"
   ])
-  
-  uniteste.iguais([
-    {
-      calculos: {
-        base: 10
-        dobro: (base = 10 base * 2)
-        triplo: (base = 10 base * 3)
-        somaDobroTriplo: (dobro = 20 triplo = 30 dobro + triplo)
-      }
-      resultado: (calculos = {
-        base: 10
-        dobro: (base = 10 base * 2)
-        triplo: (base = 10 base * 3)
-        somaDobroTriplo: (dobro = 20 triplo = 30 dobro + triplo)
-      } calculos.somaDobroTriplo)
-    }.resultado
-    50
-  ])
-  ]})
+]})

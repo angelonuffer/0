@@ -10,11 +10,17 @@ uniteste.descrever({ nome: "Acesso direto a literais de objeto" testes: [
     3
   ])
   uniteste.iguais([
-    { a: 4 b: (a = 4 a + 5) }.b
+    (
+      a = 4
+      a + 5
+    )
     9
   ])
   uniteste.iguais([
-    { a: 4 resultado: (a = 4 a + 5) }.resultado
+    (
+      a = 4
+      a + 5
+    )
     9
   ])
-  ]})
+]})

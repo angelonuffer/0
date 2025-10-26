@@ -39,21 +39,21 @@ uniteste.descrever({ nome: "Declarações no nível do módulo" testes: [
   
   // Test with text
   uniteste.iguais([
-    {
-      nome_teste: "João"
-      sobrenome_teste: "Silva"
-      resultado: (nome_teste = "João" sobrenome_teste = "Silva" nome_teste + " " + sobrenome_teste)
-    }.resultado
+    (
+      nome_teste = "João"
+      sobrenome_teste = "Silva"
+      nome_teste + " " + sobrenome_teste
+    )
     "João Silva"
   ])
   
   // Test mixed with objects
   uniteste.iguais([
-    {
-      x_teste: teste_módulo_a
-      y_teste: teste_módulo_b
-      soma_teste: (x_teste = teste_módulo_a y_teste = teste_módulo_b x_teste + y_teste)
-    }.soma_teste
+    (
+      x_teste = teste_módulo_a
+      y_teste = teste_módulo_b
+      x_teste + y_teste
+    )
     15
   ])
-  ]})
+]})

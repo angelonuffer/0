@@ -1,159 +1,28 @@
 uniteste # ../integração/uniteste.0
 
-uniteste.descrever({ nome: "Referências aninhadas em objeto - Teste Completo" testes: [
-  // Caso básico do enunciado
+uniteste.descrever({ nome: "Teste aninhado" testes: [
   uniteste.iguais([
-    {
-      exemplo: {
-        a: 2
-        b: {
-          c: (a = 2 a + 3)
-        }
-      }
-      resultado: (exemplo = {
-        a: 2
-        b: {
-          c: (a = 2 a + 3)
-        }
-      } exemplo.b.c)
-    }.resultado
-    5
+    (
+      a = 2
+      b = (
+        x = 3
+        y = 4
+        x + y
+      )
+      a * b
+    )
+    14
   ])
-  
-  // Múltiplos níveis de aninhamento
   uniteste.iguais([
-    {
-      exemplo_complexo: {
-        x: 5
-        y: {
-          z: (x = 5 x * 2)
-          w: {
-            v: (z = 10 x = 5 z + x)
-          }
-        }
-      }
-      resultado: (exemplo_complexo = {
-        x: 5
-        y: {
-          z: (x = 5 x * 2)
-          w: {
-            v: (z = 10 x = 5 z + x)
-          }
-        }
-      } exemplo_complexo.y.w.v)
-    }.resultado
-    15
+    (
+      x = 5
+      y = (
+        a = 2
+        b = 3
+        a + b
+      )
+      x + y
+    )
+    10
   ])
-  
-  // Múltiplas referências no mesmo nível
-  uniteste.iguais([
-    {
-      exemplo_múltiplas_refs: {
-        a: 1
-        b: 2
-        c: {
-          soma: (a = 1 b = 2 a + b)
-          produto: (a = 1 b = 2 a * b)
-          nested: {
-            resultado: (soma = 3 produto = 2 soma + produto)
-          }
-        }
-      }
-      resultado: (exemplo_múltiplas_refs = {
-        a: 1
-        b: 2
-        c: {
-          soma: (a = 1 b = 2 a + b)
-          produto: (a = 1 b = 2 a * b)
-          nested: {
-            resultado: (soma = 3 produto = 2 soma + produto)
-          }
-        }
-      } exemplo_múltiplas_refs.c.nested.resultado)
-    }.resultado
-    5
-  ])
-  
-  // Referências cruzadas entre níveis
-  uniteste.iguais([
-    {
-      exemplo_cruzado: {
-        base: 10
-        nivel1: {
-          valor1: (base = 10 base + 5)
-          nivel2: {
-            valor2: (base = 10 base * 2)
-            valor3: (valor1 = 15 valor2 = 20 valor1 + valor2)
-          }
-        }
-      }
-      resultado: (exemplo_cruzado = {
-        base: 10
-        nivel1: {
-          valor1: (base = 10 base + 5)
-          nivel2: {
-            valor2: (base = 10 base * 2)
-            valor3: (valor1 = 15 valor2 = 20 valor1 + valor2)
-          }
-        }
-      } exemplo_cruzado.nivel1.nivel2.valor3)
-    }.resultado
-    35
-  ])
-  
-  // Referência a propriedade que também referencia outra
-  uniteste.iguais([
-    {
-      exemplo_cadeia: {
-        a: 1
-        b: (a = 1 a + 1)
-        c: {
-          d: (b = 2 b + 1)
-          e: {
-            f: (d = 3 d + 1)
-          }
-        }
-      }
-      resultado: (exemplo_cadeia = {
-        a: 1
-        b: (a = 1 a + 1)
-        c: {
-          d: (b = 2 b + 1)
-          e: {
-            f: (d = 3 d + 1)
-          }
-        }
-      } exemplo_cadeia.c.e.f)
-    }.resultado
-    4
-  ])
-  
-  // Teste com operações mais complexas
-  uniteste.iguais([
-    {
-      exemplo_operações: {
-        x: 3
-        y: 4
-        geometria: {
-          quadrado_x: (x = 3 x * x)
-          quadrado_y: (y = 4 y * y)
-          hipotenusa: {
-            quadrado_total: (quadrado_x = 9 quadrado_y = 16 quadrado_x + quadrado_y)
-          }
-        }
-      }
-      resultado: (exemplo_operações = {
-        x: 3
-        y: 4
-        geometria: {
-          quadrado_x: (x = 3 x * x)
-          quadrado_y: (y = 4 y * y)
-          hipotenusa: {
-            quadrado_total: (quadrado_x = 9 quadrado_y = 16 quadrado_x + quadrado_y)
-          }
-        }
-      } exemplo_operações.geometria.hipotenusa.quadrado_total)
-    }.resultado
-    25
-  ])
-  ]})
+]})

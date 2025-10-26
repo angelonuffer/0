@@ -21,73 +21,73 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
   ]})
   uniteste.descrever({ nome: "Acesso por índice" testes: [
     uniteste.iguais([
-      {
-        lista: [10 20 30]
-        resultado: (lista = [10 20 30] lista[0])
-      }.resultado
+      (
+        lista = [10 20 30]
+        lista[0]
+      )
       10
     ])
     uniteste.iguais([
-      {
-        lista: [10 20 30]
-        resultado: (lista = [10 20 30] lista[1])
-      }.resultado
+      (
+        lista = [10 20 30]
+        lista[1]
+      )
       20
     ])
     uniteste.iguais([
-      {
-        lista: [10 20 30]
-        resultado: (lista = [10 20 30] lista[2])
-      }.resultado
+      (
+        lista = [10 20 30]
+        lista[2]
+      )
       30
     ])
   ]})
   uniteste.descrever({ nome: "Fatiamento" testes: [
     uniteste.listas_iguais([
-      {
-        lista: [1 2 3 4 5]
-        resultado: (lista = [1 2 3 4 5] lista[0:3])
-      }.resultado
+      (
+        lista = [1 2 3 4 5]
+        lista[0:3]
+      )
       [1 2 3]
     ])
     uniteste.listas_iguais([
-      {
-        lista: [1 2 3 4 5]
-        resultado: (lista = [1 2 3 4 5] lista[2:])
-      }.resultado
+      (
+        lista = [1 2 3 4 5]
+        lista[2:]
+      )
       [3 4 5]
     ])
   ]})
   uniteste.descrever({ nome: "Tamanho" testes: [
     uniteste.iguais([
-      {
-        lista: [1 2 3 4 5]
-        resultado: (lista = [1 2 3 4 5] lista[.])
-      }.resultado
+      (
+        lista = [1 2 3 4 5]
+        lista[.]
+      )
       5
     ])
     uniteste.iguais([
-      {
-        vazia: []
-        resultado: (vazia = [] vazia[.])
-      }.resultado
+      (
+        vazia = []
+        vazia[.]
+      )
       0
     ])
   ]})
   uniteste.descrever({ nome: "Operador de espalhamento" testes: [
     uniteste.listas_iguais([
-      {
-        lista1: [1 2]
-        lista2: [3 4]
-        resultado: (lista1 = [1 2] lista2 = [3 4] [...lista1 ...lista2])
-      }.resultado
+      (
+        lista1 = [1 2]
+        lista2 = [3 4]
+        [...lista1 ...lista2]
+      )
       [1 2 3 4]
     ])
     uniteste.listas_iguais([
-      {
-        lista: [2 3]
-        resultado: (lista = [2 3] [1 ...lista 4])
-      }.resultado
+      (
+        lista = [2 3]
+        [1 ...lista 4]
+      )
       [1 2 3 4]
     ])
   ]})
@@ -107,27 +107,27 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
   ]})
   uniteste.descrever({ nome: "Listas aninhadas" testes: [
     uniteste.listas_iguais([
-      {
-        matriz: [[1 2] [3 4]]
-        resultado: (matriz = [[1 2] [3 4]] matriz[0])
-      }.resultado
+      (
+        matriz = [[1 2] [3 4]]
+        matriz[0]
+      )
       [1 2]
     ])
     uniteste.iguais([
-      {
-        matriz: [[1 2] [3 4]]
-        resultado: (matriz = [[1 2] [3 4]] matriz[1][0])
-      }.resultado
+      (
+        matriz = [[1 2] [3 4]]
+        matriz[1][0]
+      )
       3
     ])
   ]})
   uniteste.descrever({ nome: "Lista com expressões" testes: [
     uniteste.listas_iguais([
-      {
-        x: 10
-        y: 20
-        resultado: (x = 10 y = 20 [x y x + y])
-      }.resultado
+      (
+        x = 10
+        y = 20
+        [x y x + y]
+      )
       [10 20 30]
     ])
   ]})
