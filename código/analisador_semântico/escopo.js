@@ -2,11 +2,30 @@
 
 export const criarEscopo = (parent = null) => ({ __parent__: parent });
 
+// Lazy thunk marker
+export const criarLazyThunk = (avaliarFn) => {
+  return {
+    __é_lazy_thunk__: true,
+    __avaliar__: avaliarFn,
+    __valor_cache__: undefined,
+    __foi_avaliado__: false
+  };
+};
+
 export const buscarVariável = (escopo, nome) => {
   let atualEscopo = escopo;
   while (atualEscopo) {
     if (atualEscopo.hasOwnProperty(nome)) {
-      return atualEscopo[nome];
+      const valor = atualEscopo[nome];
+      // Check if it's a lazy thunk that needs evaluation
+      if (valor && typeof valor === 'object' && valor.__é_lazy_thunk__) {
+        if (!valor.__foi_avaliado__) {
+          valor.__valor_cache__ = valor.__avaliar__();
+          valor.__foi_avaliado__ = true;
+        }
+        return valor.__valor_cache__;
+      }
+      return valor;
     }
     atualEscopo = atualEscopo.__parent__;
   }
