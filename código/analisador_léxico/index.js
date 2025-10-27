@@ -123,6 +123,7 @@ const endereço_literal = transformar(
     // Relative path pattern: ./... or ../... (must have at least one character after the dot)
     sequência(
       símbolo("."),
+      opcional(símbolo(".")),
       símbolo("/"),
       vários(
         inversão(
