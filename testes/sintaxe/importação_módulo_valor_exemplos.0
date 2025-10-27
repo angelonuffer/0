@@ -1,0 +1,38 @@
+uniteste # ../integração/uniteste.0
+
+// Test examples from the problem statement
+
+// Helper: function that adds two numbers
+soma_exemplo = { a b } => a + b
+
+uniteste.descrever({ nome: "Exemplos da especificação - Importação de módulo como valor" testes: [
+  // Exemplo 1: Local import with assignment
+  uniteste.iguais([
+    (
+      soma = importação_módulo_valor_função.0
+      soma({ a: 2 b: 3 })
+    )
+    5
+  ])
+  
+  // Exemplo 2: Local import in parentheses with immediate call
+  uniteste.iguais([
+    (importação_módulo_valor_função.0)({ a: 2 b: 3 })
+    5
+  ])
+  
+  // Additional: Test with different values
+  uniteste.iguais([
+    (
+      soma = importação_módulo_valor_função.0
+      soma({ a: 10 b: 20 })
+    )
+    30
+  ])
+  
+  // Test relative paths work correctly
+  uniteste.iguais([
+    (./importação_módulo_valor_função.0)({ a: 5 b: 7 })
+    12
+  ])
+]})

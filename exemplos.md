@@ -18,9 +18,11 @@ Neste exemplo, `42` é o valor exportado pelo módulo.
 
 ## Importação
 
-A importação permite usar código de outros módulos. Use `#` seguido do caminho do arquivo para importar.
+A importação permite usar código de outros módulos de duas formas:
 
-Exemplo:
+### Importação com `#`
+
+Use `#` seguido do caminho do arquivo para importar e dar um nome ao módulo:
 
 ```
 retorna_5 # ./retorna_5.0
@@ -30,7 +32,35 @@ retorna_5()
 5
 ```
 
-Neste exemplo, o módulo `retorna_5.0` é importado, e sua função `retorna_5` é utilizada.
+Neste exemplo, o módulo `retorna_5.0` é importado com o nome `retorna_5`, e sua função é utilizada.
+
+### Importação como valor
+
+Você também pode importar módulos diretamente como valores em expressões, sem usar `#`:
+
+```
+// soma.0
+{ a b } => a + b
+
+// local.0
+soma = soma.0
+soma({ a: 2 b: 3 })
+---
+5
+```
+
+Também é possível usar o módulo importado diretamente em parênteses:
+
+```
+(soma.0)({ a: 2 b: 3 })
+---
+5
+```
+
+Importações como valor funcionam com:
+- Arquivos locais: `soma.0`
+- Caminhos relativos: `./soma.0`, `../dir/soma.0`
+- URLs remotas: `https://example.com/soma.0`
 
 ## Declarações no nível do módulo
 
