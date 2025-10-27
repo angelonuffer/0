@@ -47,13 +47,14 @@ export const avaliarBásico = (ast, escopo) => {
 
     case 'endereço_literal': {
       // Get module values from scope (check parent chain)
-      let valores_módulos, resolve_endereço, módulo_atual;
+      let valores_módulos, resolve_endereço, módulo_atual, avaliar_módulo_lazy;
       let current_scope = escopo;
       while (current_scope) {
         if (current_scope.__valores_módulos__) {
           valores_módulos = current_scope.__valores_módulos__;
           resolve_endereço = current_scope.__resolve_endereço__;
           módulo_atual = current_scope.__módulo__;
+          avaliar_módulo_lazy = current_scope.__avaliar_módulo_lazy__;
           break;
         }
         current_scope = current_scope.__parent__;
@@ -67,6 +68,11 @@ export const avaliarBásico = (ast, escopo) => {
       
       // Resolve the address relative to the current module
       const endereço_resolvido = resolve_endereço(módulo_atual, ast.valor);
+      
+      // If module not yet evaluated and we have lazy evaluator, evaluate it now
+      if (!valores_módulos.hasOwnProperty(endereço_resolvido) && avaliar_módulo_lazy) {
+        return avaliar_módulo_lazy(endereço_resolvido);
+      }
       
       // Return the module value
       if (!valores_módulos.hasOwnProperty(endereço_resolvido)) {

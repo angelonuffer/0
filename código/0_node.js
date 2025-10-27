@@ -1,6 +1,6 @@
 import { _0 } from './analisador_sintático/index.js';
 import { importações } from './analisador_sintático/importações.js';
-import { avaliar } from './analisador_semântico/index.js';
+import { avaliar, criarLazyThunk } from './analisador_semântico/index.js';
 import fs from 'fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -267,40 +267,89 @@ try {
     }
   }
   
-  // Step 3: Execute modules in dependency order
-  while (true) {
-    const executável = Object.entries(módulos).find(
-      ([e, m]) =>
-        m !== null &&
-        !valores_módulos.hasOwnProperty(e) &&
-        m.importações.every(([, dep_end]) => valores_módulos.hasOwnProperty(dep_end)) &&
-        (m.endereços_literais || []).every(dep_end => valores_módulos.hasOwnProperty(dep_end))
-    );
-    
-    if (!executável) {
-      // Check if all modules are executed
-      const todos_avaliados = Object.keys(módulos).every(e => valores_módulos.hasOwnProperty(e));
-      if (todos_avaliados) {
-        break;
-      } else {
-        console.log("Erro: Dependência circular detectada.");
-        process.exit(1);
-      }
+  // Step 3: Evaluate main module (with lazy dependency loading)
+  
+  // Helper function to parse a module on demand
+  const parsear_módulo = async (endereço) => {
+    // If already parsed, return cached result
+    if (módulos[endereço]) {
+      return módulos[endereço];
     }
     
-    const [endereço, módulo] = executável;
+    // Load content if not already loaded
+    if (!conteúdos.hasOwnProperty(endereço)) {
+      conteúdos[endereço] = await carregar_conteúdo(endereço);
+    }
+    
+    // Extract imports using the import parser
+    const importações_resultado = importações(conteúdos[endereço]);
+    const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
+    
+    const módulo_bruto = _0(conteúdos[endereço]);
+    
+    // Check if parsing failed
+    if (!módulo_bruto.sucesso) {
+      // If there's an error with stack trace, it's a transformer error
+      if (módulo_bruto.erro && módulo_bruto.erro.stack) {
+        console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
+      } else {
+        // Otherwise show syntax error
+        mostrar_erro_sintaxe(endereço, módulo_bruto);
+      }
+      salvar_cache();
+      process.exit(1);
+    }
+    
+    if (módulo_bruto.resto.length > 0) {
+      mostrar_erro_sintaxe(endereço, módulo_bruto);
+      salvar_cache();
+      process.exit(1);
+    }
+    
+    const corpo = módulo_bruto.valor.expressão;
+    const declarações = módulo_bruto.valor.declarações || [];
+    const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
+    
+    módulos[endereço] = {
+      importações: resolved_importações,
+      declarações: declarações,
+      expressão: corpo
+    };
+    
+    return módulos[endereço];
+  };
+  
+  // Helper function to evaluate a module and its dependencies lazily
+  const avaliar_módulo = (endereço) => {
+    // If already evaluated, return cached value
+    if (valores_módulos.hasOwnProperty(endereço)) {
+      return valores_módulos[endereço];
+    }
+    
+    // Parse module if not yet parsed (blocks for async, but that's OK for now)
+    let módulo = módulos[endereço];
+    if (!módulo) {
+      // We need to handle async parsing - wrap in a sync wrapper for now
+      // This will be called from sync context so we throw an error
+      const erro = new Error(`Module not parsed: ${endereço}. Lazy parsing not yet fully implemented.`);
+      throw erro;
+    }
+    
     const { importações, declarações, expressão: corpoAst } = módulo;
     
-    const escopo_importações = Object.fromEntries(
-      importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
-    );
+    // Create lazy thunks for imports
+    const escopo_importações = {};
+    for (const [nome, dep_end] of importações) {
+      escopo_importações[nome] = criarLazyThunk(() => avaliar_módulo(dep_end));
+    }
     
     const escopo = { 
       ...escopo_importações, 
       __parent__: null, 
       __módulo__: endereço,
       __valores_módulos__: valores_módulos,
-      __resolve_endereço__: resolve_endereço
+      __resolve_endereço__: resolve_endereço,
+      __avaliar_módulo_lazy__: avaliar_módulo
     };
     
     // First pass: declare all constant names
@@ -367,13 +416,16 @@ try {
     }
     
     valores_módulos[endereço] = valor;
-  }
+    return valor;
+  };
+  
+  // Evaluate the main module (which will trigger lazy evaluation of dependencies)
+  const main_value = avaliar_módulo(módulo_principal);
   
   // Save cache
   salvar_cache();
   
   // Execute main module if it's a function (for test runner), otherwise just complete
-  const main_value = valores_módulos[módulo_principal];
   if (typeof main_value === 'function') {
     await eval(main_value("Node.js"));
   }

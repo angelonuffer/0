@@ -2,7 +2,7 @@
 // This module integrates all sub-modules and provides the main evaluation function
 
 // Import scope management
-export { criarEscopo, buscarVariável, definirVariável } from './escopo.js';
+export { criarEscopo, buscarVariável, definirVariável, criarLazyThunk } from './escopo.js';
 
 // Import evaluation modules
 import { avaliarBásico, setAvaliar as setAvaliarBásico } from './básico.js';
