@@ -95,6 +95,65 @@ const texto = transformar(
   })
 )
 
+// Parser for address literals (file paths and URLs) as expression values
+// Recognizes patterns like: soma.0, ./soma.0, ../dir/soma.0, https://example.com/soma.0
+const endereço_literal = transformar(
+  alternativa(
+    // URL pattern: https://...
+    sequência(
+      símbolo("h"),
+      símbolo("t"),
+      símbolo("t"),
+      símbolo("p"),
+      símbolo("s"),
+      símbolo(":"),
+      símbolo("/"),
+      símbolo("/"),
+      vários(
+        inversão(
+          alternativa(
+            espaço_em_branco,
+            símbolo(")"),
+            símbolo("]"),
+            símbolo("}"),
+          )
+        )
+      )
+    ),
+    // Relative path pattern: ./... or ../... (must have at least one character after the dot)
+    sequência(
+      símbolo("."),
+      símbolo("/"),
+      vários(
+        inversão(
+          alternativa(
+            espaço_em_branco,
+            símbolo(")"),
+            símbolo("]"),
+            símbolo("}"),
+          )
+        )
+      )
+    ),
+    // Simple file pattern: something.0
+    sequência(
+      letra,
+      vários(
+        alternativa(
+          letra,
+          faixa("0", "9"),
+        )
+      ),
+      símbolo("."),
+      símbolo("0"),
+    ),
+  ),
+  v => ({
+    tipo: 'endereço_literal',
+    valor: v.flat(Infinity).join("")
+  })
+)
+
 export {
   espaço_em_branco,
   espaço,
@@ -103,5 +162,6 @@ export {
   letra,
   nome,
   endereço,
+  endereço_literal,
   texto
 };

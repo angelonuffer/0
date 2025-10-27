@@ -45,6 +45,40 @@ export const avaliarBásico = (ast, escopo) => {
       return avaliar(ast.expressão, novoEscopo);
     }
 
+    case 'endereço_literal': {
+      // Get module values from scope (check parent chain)
+      let valores_módulos, resolve_endereço, módulo_atual;
+      let current_scope = escopo;
+      while (current_scope) {
+        if (current_scope.__valores_módulos__) {
+          valores_módulos = current_scope.__valores_módulos__;
+          resolve_endereço = current_scope.__resolve_endereço__;
+          módulo_atual = current_scope.__módulo__;
+          break;
+        }
+        current_scope = current_scope.__parent__;
+      }
+      
+      if (!valores_módulos || !resolve_endereço || !módulo_atual) {
+        const erro = new Error('Module loading context not available');
+        erro.é_erro_semântico = true;
+        throw erro;
+      }
+      
+      // Resolve the address relative to the current module
+      const endereço_resolvido = resolve_endereço(módulo_atual, ast.valor);
+      
+      // Return the module value
+      if (!valores_módulos.hasOwnProperty(endereço_resolvido)) {
+        const erro = new Error(`Module not loaded: ${ast.valor}`);
+        erro.é_erro_semântico = true;
+        erro.termo_busca = ast.valor;
+        throw erro;
+      }
+      
+      return valores_módulos[endereço_resolvido];
+    }
+
     default:
       return null; // Not handled by this module
   }

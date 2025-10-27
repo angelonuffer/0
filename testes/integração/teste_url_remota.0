@@ -1,0 +1,17 @@
+uniteste # ../integração/uniteste.0
+
+// Test remote URL import
+// Note: This uses the uniteste module from a remote URL
+
+uniteste.descrever({ nome: "Importação de URL remota como valor" testes: [
+  // Test that we can import a remote module as a value
+  // Using the uniteste module itself as a test subject
+  uniteste.iguais([
+    (
+      uniteste_remoto = https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@e24cfba7808bd35cbcd0501a9fc5a71fd23e5d54/código/0
+      // Just verify it's an object with expected properties
+      (uniteste_remoto.iguais != 0) ? 1 : 0
+    )
+    1
+  ])
+]})
