@@ -1,0 +1,2 @@
+// This module should cause an error if evaluated
+undefined_variable

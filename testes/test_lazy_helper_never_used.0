@@ -1,0 +1,4 @@
+// This module should never be loaded
+never_used_value = 1 / 0  // This would cause error if evaluated
+
+999

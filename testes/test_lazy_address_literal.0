@@ -1,0 +1,9 @@
+// This uses address literals for modules
+
+result = (
+  some_condition = 0
+  
+  some_condition == 1 ? (./test_lazy_helper_never_used.0) : 42
+)
+
+result

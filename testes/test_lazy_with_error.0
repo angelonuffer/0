@@ -1,0 +1,5 @@
+// Import a module that would error
+error_module # ./test_lazy_helper_error.0
+
+// Return 42 without using the error module
+42
