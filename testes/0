@@ -6,6 +6,7 @@ depuração # operadores/depuração.0
 constantes # sintaxe/constantes.0
 parênteses_com_declarações # sintaxe/parênteses_com_declarações.0
 declarações_módulo # sintaxe/declarações_módulo.0
+importação_módulo_valor # sintaxe/importação_módulo_valor.0
 lista # sintaxe/lista.0
 texto # texto/texto.0
 documentation_examples # texto/documentation_examples.0
@@ -39,6 +40,7 @@ uniteste.descrever({ nome: "0" testes: [
   constantes
   parênteses_com_declarações
   declarações_módulo
+  importação_módulo_valor
   lista
   texto
   documentation_examples

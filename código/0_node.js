@@ -141,6 +141,34 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
   console.log(`Erro de sintaxe.\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
 };
 
+// Helper function to extract all address literals from an AST
+const extrair_endereços_literais = (ast) => {
+  const endereços = [];
+  
+  const visitar = (node) => {
+    if (!node || typeof node !== 'object') return;
+    
+    if (node.tipo === 'endereço_literal') {
+      endereços.push(node.valor);
+      return; // Don't recurse into the valor of endereço_literal
+    }
+    
+    // Visit all properties recursively
+    for (const key in node) {
+      if (key === 'tipo') continue;
+      const value = node[key];
+      if (Array.isArray(value)) {
+        value.forEach(visitar);
+      } else if (typeof value === 'object') {
+        visitar(value);
+      }
+    }
+  };
+  
+  visitar(ast);
+  return endereços;
+};
+
 // State for module loading and execution
 const conteúdos = {
   [módulo_principal]: await carregar_conteúdo(módulo_principal),
@@ -187,8 +215,32 @@ try {
     const declarações = módulo_bruto.valor.declarações || [];
     const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
     
-    // Add new dependencies
+    // Extract address literals from AST
+    const endereços_literais = [];
+    if (corpo) {
+      endereços_literais.push(...extrair_endereços_literais(corpo));
+    }
+    if (declarações) {
+      for (const decl of declarações) {
+        endereços_literais.push(...extrair_endereços_literais(decl.valor));
+      }
+    }
+    
+    // Resolve address literals relative to current module
+    const resolved_endereços_literais = endereços_literais.map(end => resolve_endereço(endereço, end));
+    
+    // Add new dependencies (from both # imports and address literals)
     for (const [, end] of resolved_importações) {
+      if (!conteúdos.hasOwnProperty(end)) {
+        conteúdos[end] = null;
+      }
+      if (!módulos.hasOwnProperty(end)) {
+        módulos[end] = null;
+      }
+    }
+    
+    // Add address literal dependencies
+    for (const end of resolved_endereços_literais) {
       if (!conteúdos.hasOwnProperty(end)) {
         conteúdos[end] = null;
       }
@@ -199,6 +251,7 @@ try {
     
     módulos[endereço] = {
       importações: resolved_importações,
+      endereços_literais: resolved_endereços_literais,
       declarações: declarações,
       expressão: corpo
     };
@@ -220,7 +273,8 @@ try {
       ([e, m]) =>
         m !== null &&
         !valores_módulos.hasOwnProperty(e) &&
-        m.importações.every(([, dep_end]) => valores_módulos.hasOwnProperty(dep_end))
+        m.importações.every(([, dep_end]) => valores_módulos.hasOwnProperty(dep_end)) &&
+        (m.endereços_literais || []).every(dep_end => valores_módulos.hasOwnProperty(dep_end))
     );
     
     if (!executável) {
@@ -241,7 +295,13 @@ try {
       importações.map(([nome, dep_end]) => [nome, valores_módulos[dep_end]])
     );
     
-    const escopo = { ...escopo_importações, __parent__: null, __módulo__: endereço };
+    const escopo = { 
+      ...escopo_importações, 
+      __parent__: null, 
+      __módulo__: endereço,
+      __valores_módulos__: valores_módulos,
+      __resolve_endereço__: resolve_endereço
+    };
     
     // First pass: declare all constant names
     if (declarações) {
@@ -312,7 +372,11 @@ try {
   // Save cache
   salvar_cache();
   
-  await eval(valores_módulos[módulo_principal]("Node.js"))
+  // Execute main module if it's a function (for test runner), otherwise just complete
+  const main_value = valores_módulos[módulo_principal];
+  if (typeof main_value === 'function') {
+    await eval(main_value("Node.js"));
+  }
   
 } catch (erro) {
   console.error(erro);

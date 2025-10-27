@@ -1,7 +1,7 @@
 // Term operations - termo1, termo2, termo3, termo4, termo5, termo6
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
-import { espaço, número, número_negativo, texto } from '../analisador_léxico/index.js';
+import { espaço, número, número_negativo, texto, endereço_literal } from '../analisador_léxico/index.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
@@ -21,12 +21,13 @@ const getTermo1 = () => alternativa(
   transformar(
     sequência(
       alternativa(
-        valor_constante,
+        endereço_literal,
         parênteses,
         lista,
         objeto,
         número,
         texto,
+        valor_constante,
       ),
       alternativa(
         // No space - allow all operations including function calls

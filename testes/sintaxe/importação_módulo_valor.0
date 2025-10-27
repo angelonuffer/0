@@ -1,0 +1,36 @@
+uniteste # ../integração/uniteste.0
+
+// Test helper module
+helper = 5
+
+uniteste.descrever({ nome: "Importação de módulo como valor" testes: [
+  // Test local file import as value
+  uniteste.iguais([
+    (importação_módulo_valor_helper.0)
+    5
+  ])
+  
+  // Test import in assignment
+  uniteste.iguais([
+    (
+      valor = importação_módulo_valor_helper.0
+      valor
+    )
+    5
+  ])
+  
+  // Test import with function call
+  uniteste.iguais([
+    (
+      função = importação_módulo_valor_função.0
+      função({ a: 10 b: 20 })
+    )
+    30
+  ])
+  
+  // Test import in parentheses with immediate function call
+  uniteste.iguais([
+    (importação_módulo_valor_função.0)({ a: 7 b: 3 })
+    10
+  ])
+]})
