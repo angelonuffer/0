@@ -427,7 +427,7 @@ try {
   
   // Execute main module if it's a function (for test runner), otherwise just complete
   if (typeof main_value === 'function') {
-    await eval(main_value("Node.js"));
+    console.log(main_value(process.argv[3] || ""));
   }
   
 } catch (erro) {
