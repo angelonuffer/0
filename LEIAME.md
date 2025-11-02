@@ -1,12 +1,34 @@
 # Linguagem 0
 
-Esta especificação descreve de forma precisa a sintaxe da linguagem 0, indicando os caracteres esperados, a forma de formação dos tokens e a semântica das construções de linguagem. Todos os exemplos práticos e testes estão no diretório "testes"; este documento contém apenas a especificação formal e descritiva.
+Uma linguagem de programação funcional projetada para ser universal. A 0 está sendo criada com dois valores fundamentais em mente:
 
-Pré-requisitos
+- **Sintaxe Matemática**: A 0 utiliza uma sintaxe que se assemelha à notação matemática, eliminando a necessidade de comandos em linguagem natural. Isso facilita a compreensão e a escrita de código, independente da língua nativa do desenvolvedor.
 
-- Node.js versão 22 ou superior.
+- **Integração Universal**: A 0 será projetada para se integrar facilmente com outras linguagens de programação e plataformas. Isso permitirá que desenvolvedores utilizem a 0 em uma ampla variedade de ambientes, aproveitando suas capacidades funcionais sem sacrificar a compatibilidade.
 
-Observação
+O nome 0 foi escolhido por sua simplicidade e universalidade. O zero é um conceito fundamental na matemática e é representado da mesma forma em diversos idiomas, refletindo a natureza inclusiva e acessível da linguagem.
+
+Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor do mundo, promovendo a eficiência e a clareza no desenvolvimento de software.
+
+**Pré-requisitos**: Node.js versão 22 ou superior.
+
+## Execução
+
+### Executar um módulo que exporta uma função
+
+```bash
+node código/0_node.js <módulo.0> <argumento>
+```
+
+A função deve retornar um valor do tipo texto, que será enviado para o stdout do processo.
+
+### Executar os testes
+
+```bash
+node código/0_node.js testes/0 node | node
+```
+
+## Sintaxe
 
 - Exemplos e casos de uso estão disponíveis no diretório "testes" do repositório.
 
