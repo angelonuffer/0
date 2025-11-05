@@ -1,68 +1,34 @@
-uniteste # integração/uniteste.0
-aritmética # operadores/aritmética.0
-operadores_lógicos # operadores/operadores_lógicos.0
-comparadores # operadores/comparadores.0
-depuração # operadores/depuração.0
-constantes # sintaxe/constantes.0
-parênteses_com_declarações # sintaxe/parênteses_com_declarações.0
-declarações_módulo # sintaxe/declarações_módulo.0
-importação_módulo_valor # sintaxe/importação_módulo_valor.0
-lista # sintaxe/lista.0
-texto # texto/texto.0
-documentation_examples # texto/documentation_examples.0
-edge_cases_division # texto/edge_cases_division.0
-string_division_comprehensive # texto/string_division_comprehensive.0
-test_string_division # texto/test_string_division.0
-teste_objeto # objetos/objeto.0
-objeto_com_chaves # objetos/objeto_com_chaves.0
-string_keys # objetos/string_keys.0
-referência_objeto # objetos/referência_objeto.0
-teste_aninhado # objetos/teste_aninhado.0
-teste_documentacao # integração/teste_documentacao.0
-teste_edge_cases # integração/teste_edge_cases.0
-literal_indexing # objetos/literal_indexing.0
-literal_indexing_additional # objetos/literal_indexing_additional.0
-multiplicacao_objeto # objetos/multiplicacao_objeto.0
-operador_espalhamento # objetos/operador_espalhamento.0
-propriedade_resumida # objetos/propriedade_resumida.0
-função # funções/função.0
-destructuring # funções/destructuring.0
-guards # funções/guards.0
-guards_inline # funções/guards_inline.0
-comprehensive_function_test # funções/comprehensive_function_test.0
-comentário # sintaxe/comentário.0
-
-uniteste.descrever({ nome: "0" testes: [
-  aritmética
-  operadores_lógicos
-  comparadores
-  depuração
-  constantes
-  parênteses_com_declarações
-  declarações_módulo
-  importação_módulo_valor
-  lista
-  texto
-  documentation_examples
-  edge_cases_division
-  string_division_comprehensive
-  test_string_division
-  teste_objeto
-  objeto_com_chaves
-  string_keys
-  referência_objeto
-  teste_aninhado
-  teste_documentacao
-  teste_edge_cases
-  literal_indexing
-  literal_indexing_additional
-  multiplicacao_objeto
-  operador_espalhamento
-  propriedade_resumida
-  função
-  destructuring
-  guards
-  guards_inline
-  comprehensive_function_test
-  comentário
+(./integração/uniteste.0).descrever({ nome: "0" testes: [
+  ./operadores/aritmética.0
+  ./operadores/operadores_lógicos.0
+  ./operadores/comparadores.0
+  ./operadores/depuração.0
+  ./sintaxe/constantes.0
+  ./sintaxe/parênteses_com_declarações.0
+  ./sintaxe/declarações_módulo.0
+  ./sintaxe/importação_módulo_valor.0
+  ./sintaxe/lista.0
+  ./texto/texto.0
+  ./texto/documentation_examples.0
+  ./texto/edge_cases_division.0
+  ./texto/string_division_comprehensive.0
+  ./texto/test_string_division.0
+  ./objetos/objeto.0
+  ./objetos/objeto_com_chaves.0
+  ./objetos/string_keys.0
+  ./objetos/referência_objeto.0
+  ./objetos/teste_aninhado.0
+  ./integração/teste_documentacao.0
+  ./integração/teste_edge_cases.0
+  ./objetos/literal_indexing.0
+  ./objetos/literal_indexing_additional.0
+  ./objetos/multiplicacao_objeto.0
+  ./objetos/operador_espalhamento.0
+  ./objetos/propriedade_resumida.0
+  ./funções/função.0
+  ./funções/destructuring.0
+  ./funções/guards.0
+  ./funções/guards_inline.0
+  ./funções/comprehensive_function_test.0
+  ./sintaxe/comentário.0
 ]})("node")
