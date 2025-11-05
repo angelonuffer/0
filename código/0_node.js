@@ -153,8 +153,9 @@ const valores_módulos = {};
 const extrair_referências_endereços = (conteúdo) => {
   const endereços = [];
   
-  // Match address literals in parentheses: (endereço)
-  const regex_literal = /\(([^)]+\.0)\)/g;
+  // Match address literals in parentheses: (path/to/file.0) or (./file.0) or (../file.0)
+  // Supports Unicode characters in paths
+  const regex_literal = /\(([./][^\s()]+\.0)\)/gu;
   let match;
   while ((match = regex_literal.exec(conteúdo)) !== null) {
     endereços.push(match[1]);
