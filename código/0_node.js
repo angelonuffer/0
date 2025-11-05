@@ -141,144 +141,77 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
   console.log(`Erro de sintaxe.\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
 };
 
-// Helper function to extract all address literals from an AST
-const extrair_endereços_literais = (ast) => {
+
+
+// State for module loading and execution
+const conteúdos = {};
+const módulos = {};
+const valores_módulos = {};
+
+// Helper function to extract address references from source text using regex
+// This is a lightweight alternative to full parsing for pre-fetching
+const extrair_referências_endereços = (conteúdo) => {
   const endereços = [];
   
-  const visitar = (node) => {
-    if (!node || typeof node !== 'object') return;
-    
-    if (node.tipo === 'endereço_literal') {
-      endereços.push(node.valor);
-      return; // Don't recurse into the valor of endereço_literal
-    }
-    
-    // Visit all properties recursively
-    for (const key in node) {
-      if (key === 'tipo') continue;
-      const value = node[key];
-      if (Array.isArray(value)) {
-        value.forEach(visitar);
-      } else if (typeof value === 'object') {
-        visitar(value);
-      }
-    }
-  };
+  // Match address literals in parentheses: (endereço)
+  const regex_literal = /\(([^)]+\.0)\)/g;
+  let match;
+  while ((match = regex_literal.exec(conteúdo)) !== null) {
+    endereços.push(match[1]);
+  }
   
-  visitar(ast);
   return endereços;
 };
 
-// State for module loading and execution
-const conteúdos = {
-  [módulo_principal]: await carregar_conteúdo(módulo_principal),
-};
-const módulos = {
-  [módulo_principal]: null,
-};
-const valores_módulos = {};
-
-try {
-  // Step 2: Parse all modules and resolve dependencies
-  while (true) {
-    const pendente = Object.entries(módulos).find(([endereço, módulo]) => módulo === null);
-    if (!pendente) break;
-    
-    const [endereço] = pendente;
-    
-    // Extract imports using the import parser
-    const importações_resultado = importações(conteúdos[endereço]);
-    const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
-    
-    const módulo_bruto = _0(conteúdos[endereço]);
-    
-    // Check if parsing failed
-    if (!módulo_bruto.sucesso) {
-      // If there's an error with stack trace, it's a transformer error
-      if (módulo_bruto.erro && módulo_bruto.erro.stack) {
-        console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
-      } else {
-        // Otherwise show syntax error
-        mostrar_erro_sintaxe(endereço, módulo_bruto);
-      }
-      salvar_cache();
-      process.exit(1);
-    }
-    
-    if (módulo_bruto.resto.length > 0) {
-      mostrar_erro_sintaxe(endereço, módulo_bruto);
-      salvar_cache();
-      process.exit(1);
-    }
-    
-    const corpo = módulo_bruto.valor.expressão;
-    const declarações = módulo_bruto.valor.declarações || [];
-    const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
-    
-    // Extract address literals from AST
-    const endereços_literais = [];
-    if (corpo) {
-      endereços_literais.push(...extrair_endereços_literais(corpo));
-    }
-    if (declarações) {
-      for (const decl of declarações) {
-        endereços_literais.push(...extrair_endereços_literais(decl.valor));
-      }
-    }
-    
-    // Resolve address literals relative to current module
-    const resolved_endereços_literais = endereços_literais.map(end => resolve_endereço(endereço, end));
-    
-    // Add new dependencies (from both # imports and address literals)
-    for (const [, end] of resolved_importações) {
-      if (!conteúdos.hasOwnProperty(end)) {
-        conteúdos[end] = null;
-      }
-      if (!módulos.hasOwnProperty(end)) {
-        módulos[end] = null;
-      }
-    }
-    
-    // Add address literal dependencies
-    for (const end of resolved_endereços_literais) {
-      if (!conteúdos.hasOwnProperty(end)) {
-        conteúdos[end] = null;
-      }
-      if (!módulos.hasOwnProperty(end)) {
-        módulos[end] = null;
-      }
-    }
-    
-    módulos[endereço] = {
-      importações: resolved_importações,
-      endereços_literais: resolved_endereços_literais,
-      declarações: declarações,
-      expressão: corpo
-    };
-    
-    // Load new content if needed
-    while (true) {
-      const pendente_conteúdo = Object.entries(conteúdos).find(([endereço, conteúdo]) => conteúdo === null);
-      if (!pendente_conteúdo) break;
-      
-      const [end_pendente] = pendente_conteúdo;
-      
-      conteúdos[pendente_conteúdo[0]] = await carregar_conteúdo(end_pendente);
-    }
+// Helper to pre-fetch all remote URLs recursively
+const pré_carregar_urls_remotas = async (endereço, visitados = new Set()) => {
+  if (visitados.has(endereço)) {
+    return; // Already processed
+  }
+  visitados.add(endereço);
+  
+  // Load this module's content if not already loaded
+  if (!conteúdos[endereço]) {
+    conteúdos[endereço] = await carregar_conteúdo(endereço);
   }
   
-  // Step 3: Evaluate main module (with lazy dependency loading)
+  // Use lightweight parsing to find imports (# syntax)
+  const importações_resultado = importações(conteúdos[endereço]);
+  const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
   
-  // Helper function to parse a module on demand
-  const parsear_módulo = async (endereço) => {
+  // Use regex to find address literals (avoid full parsing during pre-fetch)
+  const endereços_literais = extrair_referências_endereços(conteúdos[endereço]);
+  
+  // Collect all dependencies
+  const todas_dependências = [
+    ...importações_lista.map(({ endereço: end_rel }) => resolve_endereço(endereço, end_rel)),
+    ...endereços_literais.map(end_rel => resolve_endereço(endereço, end_rel))
+  ];
+  
+  // Recursively pre-fetch all dependencies
+  for (const dep of todas_dependências) {
+    await pré_carregar_urls_remotas(dep, visitados);
+  }
+};
+
+try {
+  // Step 1: Pre-fetch all remote URLs to enable synchronous lazy parsing
+  await pré_carregar_urls_remotas(módulo_principal);
+  
+  // Helper function to parse a module on demand (now synchronous)
+  const parsear_módulo = (endereço) => {
     // If already parsed, return cached result
     if (módulos[endereço]) {
       return módulos[endereço];
     }
     
-    // Load content if not already loaded
-    if (!conteúdos.hasOwnProperty(endereço)) {
-      conteúdos[endereço] = await carregar_conteúdo(endereço);
+    // Load content (synchronous since we pre-fetched remote URLs)
+    if (!conteúdos[endereço]) {
+      if (endereço.startsWith('https://')) {
+        const erro = new Error(`Remote URL not pre-fetched: ${endereço}`);
+        throw erro;
+      }
+      conteúdos[endereço] = fs.readFileSync(endereço, 'utf-8');
     }
     
     // Extract imports using the import parser
@@ -326,13 +259,10 @@ try {
       return valores_módulos[endereço];
     }
     
-    // Parse module if not yet parsed (blocks for async, but that's OK for now)
+    // Parse module if not yet parsed (lazy parsing)
     let módulo = módulos[endereço];
     if (!módulo) {
-      // We need to handle async parsing - wrap in a sync wrapper for now
-      // This will be called from sync context so we throw an error
-      const erro = new Error(`Module not parsed: ${endereço}. Lazy parsing not yet fully implemented.`);
-      throw erro;
+      módulo = parsear_módulo(endereço);
     }
     
     const { importações, declarações, expressão: corpoAst } = módulo;
@@ -419,7 +349,10 @@ try {
     return valor;
   };
   
-  // Evaluate the main module (which will trigger lazy evaluation of dependencies)
+  // Step 2: Parse only the main module initially
+  parsear_módulo(módulo_principal);
+  
+  // Step 3: Evaluate the main module (will trigger lazy parsing and evaluation of dependencies)
   const main_value = avaliar_módulo(módulo_principal);
   
   // Save cache
