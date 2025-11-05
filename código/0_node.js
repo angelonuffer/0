@@ -425,10 +425,7 @@ try {
   // Save cache
   salvar_cache();
   
-  // Execute main module if it's a function (for test runner), otherwise just complete
-  if (typeof main_value === 'function') {
-    console.log(main_value(process.argv[3] || ""));
-  }
+  console.log(main_value);
   
 } catch (erro) {
   console.error(erro);

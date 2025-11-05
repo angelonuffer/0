@@ -65,4 +65,4 @@ uniteste.descrever({ nome: "0" testes: [
   guards_inline
   comprehensive_function_test
   comentário
-]})
+]})("node")
