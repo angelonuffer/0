@@ -1,0 +1,2 @@
+// Teste de erro de sintaxe: colchete não fechado
+x = [1 2 3

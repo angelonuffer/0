@@ -1,0 +1,3 @@
+// Teste de erro de referência: uso de variável antes da definição
+// Na expressão principal (última linha), a variável não está definida
+x + 10

@@ -1,0 +1,2 @@
+// Teste de erro de sintaxe: colchete de fechamento sem abertura
+x = ]

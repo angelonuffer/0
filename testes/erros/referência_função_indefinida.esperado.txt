@@ -1,0 +1,6 @@
+Erro: Nome não encontrado: funcaoNaoDefinida
+testes/erros/referência_função_indefinida.0
+2:1: funcaoNaoDefinida(42)
+     __valores_módulos__
+     __resolve_endereço__
+     __avaliar_módulo_lazy__
