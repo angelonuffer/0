@@ -23,12 +23,35 @@ Testes que demonstram erros de referência na linguagem:
 - `referência_módulo_inexistente.0` - Importação de módulo inexistente
 - `referência_propriedade_indefinida.0` - Acesso a campo em objeto não definido
 
+## Estrutura dos Arquivos
+
+Para cada teste de erro, existem dois arquivos:
+
+- `<nome>.0` - O arquivo de teste com código que gera erro
+- `<nome>.esperado.txt` - A saída esperada do erro
+
 ## Como Executar
 
-Estes testes são exemplos de código inválido que devem gerar erros. Para verificar se um erro é gerado corretamente:
+### Executar um teste individual
+
+Para verificar manualmente se um erro é gerado corretamente:
 
 ```bash
 node código/0_node.js testes/erros/<arquivo>.0 node
 ```
 
 O interpretador deve retornar um código de saída diferente de zero e exibir uma mensagem de erro apropriada.
+
+### Executar todos os testes automaticamente
+
+Use o runner para executar todos os testes e comparar as saídas:
+
+```bash
+node testes/erros/runner.js
+```
+
+O runner irá:
+- Executar cada teste de erro
+- Comparar a saída obtida com a saída esperada
+- Reportar quais testes passaram ou falharam
+- Retornar código de saída 0 se todos passarem, 1 caso contrário
