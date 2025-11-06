@@ -1,0 +1,2 @@
+// Teste de erro de referência: acesso a campo em objeto não definido
+objetoNaoDefinido["campo"]
