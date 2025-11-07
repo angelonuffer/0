@@ -1,0 +1,5 @@
+// Teste de erro de sintaxe: colchete não fechado em múltiplas linhas
+lista = [
+  1
+  2
+  3

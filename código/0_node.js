@@ -129,21 +129,72 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
     return;
   }
   
-  // Determine error position based on the type of syntax error
-  // For unexpected tokens (closing brackets, invalid operators), error is at the token
-  // For unclosed constructs, error is at end of line (newline position)
+  // Determine the error position based on the nature of the syntax error
+  // Check if this is an unexpected closing delimiter (}, ], ))
   const trimmed_unparsed = unparsed_text.trimStart();
-  const is_unexpected_closing = /^[)\]}]\s*\n/.test(trimmed_unparsed);
-  const is_invalid_operator = /^=\s+[^>]/.test(trimmed_unparsed);
+  const starts_with_closing = /^[)\]}]/.test(trimmed_unparsed);
   
   let posição_erro;
-  if (is_unexpected_closing || is_invalid_operator) {
-    // Error at the unexpected token (start of menor_resto)
-    posição_erro = posição_base;
+  if (starts_with_closing) {
+    // Unexpected closing delimiter at the start - point to it
+    const whitespace_before = unparsed_text.length - trimmed_unparsed.length;
+    posição_erro = posição_base + whitespace_before;
   } else {
-    // Error at end of line (newline position)
-    const newline_pos = unparsed_text.indexOf('\n');
-    posição_erro = newline_pos !== -1 ? posição_base + newline_pos : posição_base;
+    // Check if there's a closing delimiter somewhere in the unparsed text
+    const closing_match = trimmed_unparsed.match(/([)\]}])/);
+    
+    if (closing_match && closing_match.index !== undefined && closing_match.index > 0) {
+      // There's content before the closing delimiter
+      // Check if that content contains an unclosed opening delimiter
+      const content_before = trimmed_unparsed.substring(0, closing_match.index);
+      const has_opening = /[\[\{\(]/.test(content_before);
+      
+      if (has_opening) {
+        // There's an opening delimiter before the closing delimiter
+        // This suggests a mismatch - point to the closing delimiter
+        const whitespace_before = unparsed_text.length - trimmed_unparsed.length;
+        posição_erro = posição_base + whitespace_before + closing_match.index;
+      } else {
+        // No opening delimiter, check if there's non-whitespace content
+        const has_nonwhitespace_before = /\S/.test(content_before);
+        
+        if (has_nonwhitespace_before) {
+          // There's actual content before the closing delimiter
+          // The error is in that content, not at the closing delimiter
+          // Point to the first non-whitespace character in unparsed text
+          const whitespace_match = unparsed_text.match(/^[\s]*/);
+          const whitespace_length = whitespace_match ? whitespace_match[0].length : 0;
+          posição_erro = posição_base + whitespace_length;
+        } else {
+          // Only whitespace before closing delimiter - the closing delimiter is unexpected
+          const whitespace_before = unparsed_text.length - trimmed_unparsed.length;
+          posição_erro = posição_base + whitespace_before + closing_match.index;
+        }
+      }
+    } else {
+      // No closing delimiter found, or it's at the very start
+      // If the unparsed text contains substantial content (multiple tokens),
+      // it's probably an unclosed structure - point to end of input
+      // Otherwise, point to the first non-whitespace character
+      const first_nonwhite_match = unparsed_text.match(/^[\s]*(.)/);
+      if (!first_nonwhite_match) {
+        // Only whitespace - point to end
+        posição_erro = conteúdos[endereço].trimEnd().length;
+      } else {
+        // Check if unparsed text looks like substantial content (multiple tokens/words)
+        const has_multiple_tokens = (trimmed_unparsed.match(/\w+/g) || []).length > 1;
+        
+        if (has_multiple_tokens) {
+          // Substantial content - likely unclosed structure, point to end
+          posição_erro = conteúdos[endereço].trimEnd().length;
+        } else {
+          // Single token/character - point to it
+          const whitespace_match = unparsed_text.match(/^[\s]*/);
+          const whitespace_length = whitespace_match ? whitespace_match[0].length : 0;
+          posição_erro = posição_base + whitespace_length;
+        }
+      }
+    }
   }
   
   const linhas = conteúdos[endereço].split('\n');

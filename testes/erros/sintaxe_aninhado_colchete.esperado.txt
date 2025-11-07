@@ -1,0 +1,3 @@
+Erro de sintaxe.
+testes/erros/sintaxe_aninhado_colchete.0
+7:1: }

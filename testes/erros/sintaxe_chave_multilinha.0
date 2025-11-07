@@ -1,0 +1,4 @@
+// Teste de erro de sintaxe: chave não fechada em múltiplas linhas
+obj = {
+  a: 1
+  b: 2

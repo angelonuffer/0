@@ -1,0 +1,8 @@
+// Teste de erro de sintaxe: chave não fechada dentro de outro objeto
+obj = {
+  a: 1
+  b: {
+    x: 1
+    y: 2
+  c: 3
+}
