@@ -1,0 +1,5 @@
+// Teste de erro de sintaxe: parêntese de fechamento inesperado
+lista = [
+  1
+  2
+)

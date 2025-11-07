@@ -1,0 +1,4 @@
+// Teste de erro de sintaxe: parêntese não fechado em múltiplas linhas
+result = (
+  1 + 2 +
+  3 + 4

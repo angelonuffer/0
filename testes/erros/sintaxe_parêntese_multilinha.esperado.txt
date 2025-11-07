@@ -1,0 +1,3 @@
+Erro de sintaxe.
+testes/erros/sintaxe_parêntese_multilinha.0
+4:8:   3 + 4
