@@ -129,8 +129,22 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
     return;
   }
   
-  // The error position is exactly where the parser stopped
-  const posição_erro = posição_base;
+  // Determine error position based on the type of syntax error
+  // For unexpected tokens (closing brackets, invalid operators), error is at the token
+  // For unclosed constructs, error is at end of line (newline position)
+  const trimmed_unparsed = unparsed_text.trimStart();
+  const is_unexpected_closing = /^[)\]}]\s*\n/.test(trimmed_unparsed);
+  const is_invalid_operator = /^=\s+[^>]/.test(trimmed_unparsed);
+  
+  let posição_erro;
+  if (is_unexpected_closing || is_invalid_operator) {
+    // Error at the unexpected token (start of menor_resto)
+    posição_erro = posição_base;
+  } else {
+    // Error at end of line (newline position)
+    const newline_pos = unparsed_text.indexOf('\n');
+    posição_erro = newline_pos !== -1 ? posição_base + newline_pos : posição_base;
+  }
   
   const linhas = conteúdos[endereço].split('\n');
   const linhas_antes = conteúdos[endereço].substring(0, posição_erro).split('\n');
