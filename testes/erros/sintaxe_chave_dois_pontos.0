@@ -1,0 +1,5 @@
+// Teste de erro de sintaxe: dois pontos inesperados dentro de chaves
+obj = {
+  a: 1
+  : 2
+}

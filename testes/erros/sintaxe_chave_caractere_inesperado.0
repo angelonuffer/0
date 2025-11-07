@@ -1,0 +1,6 @@
+// Teste de erro de sintaxe: caractere inesperado dentro de chaves
+obj = {
+  a: 1
+  b: 2
+  $
+}
