@@ -20,9 +20,7 @@ const obterEndereçoMódulo = (escopo) => {
 export const avaliarFunção = async (ast, escopo) => {
   switch (ast.tipo) {
     case 'lambda':
-      // Return a regular function (not async) to maintain compatibility
-      // The function internally returns a Promise by calling the async avaliar
-      return (caller_context, ...valoresArgs) => {
+      return async (caller_context, ...valoresArgs) => {
         const fn_scope = { __parent__: escopo || null };
         
         // Handle object destructuring
@@ -48,27 +46,25 @@ export const avaliarFunção = async (ast, escopo) => {
         
         // Check if the body is a guards expression
         if (ast.corpo && ast.corpo.tipo === 'guards') {
-          // Evaluate guards in order - return Promise
-          return (async () => {
-            for (const guard of ast.corpo.guards) {
-              if (guard.tipo === 'guard_default') {
-                // Default guard - always matches
+          // Evaluate guards in order
+          for (const guard of ast.corpo.guards) {
+            if (guard.tipo === 'guard_default') {
+              // Default guard - always matches
+              return await avaliar(guard.expressão, fn_scope);
+            } else if (guard.tipo === 'guard') {
+              // Conditional guard - check condition
+              const conditionValue = await avaliar(guard.condição, fn_scope);
+              // In the language, 0 is false, anything else is true
+              if (conditionValue !== 0) {
                 return await avaliar(guard.expressão, fn_scope);
-              } else if (guard.tipo === 'guard') {
-                // Conditional guard - check condition
-                const conditionValue = await avaliar(guard.condição, fn_scope);
-                // In the language, 0 is false, anything else is true
-                if (conditionValue !== 0) {
-                  return await avaliar(guard.expressão, fn_scope);
-                }
               }
             }
-            // If no guards matched and no default, return undefined
-            return undefined;
-          })();
+          }
+          // If no guards matched and no default, return undefined
+          return undefined;
         } else {
-          // Regular function body - avaliar returns a Promise
-          return avaliar(ast.corpo, fn_scope);
+          // Regular function body
+          return await avaliar(ast.corpo, fn_scope);
         }
       };
 
