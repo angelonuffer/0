@@ -12,7 +12,7 @@ export const criarLazyThunk = (avaliarFn) => {
   };
 };
 
-export const buscarVariável = (escopo, nome) => {
+export const buscarVariável = async (escopo, nome) => {
   let atualEscopo = escopo;
   while (atualEscopo) {
     if (atualEscopo.hasOwnProperty(nome)) {
@@ -20,7 +20,7 @@ export const buscarVariável = (escopo, nome) => {
       // Check if it's a lazy thunk that needs evaluation
       if (valor && typeof valor === 'object' && valor.__é_lazy_thunk__) {
         if (!valor.__foi_avaliado__) {
-          valor.__valor_cache__ = valor.__avaliar__();
+          valor.__valor_cache__ = await valor.__avaliar__();
           valor.__foi_avaliado__ = true;
         }
         return valor.__valor_cache__;

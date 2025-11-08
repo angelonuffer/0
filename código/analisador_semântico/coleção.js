@@ -15,12 +15,12 @@ const obterEndereçoMódulo = (escopo) => {
   return null;
 };
 
-export const avaliarColeção = (ast, escopo) => {
+export const avaliarColeção = async (ast, escopo) => {
   switch (ast.tipo) {
     case 'fatia': {
-      const valor = avaliar(ast.valor, escopo);
-      const índice = avaliar(ast.índice, escopo);
-      const fim = ast.fim ? avaliar(ast.fim, escopo) : undefined;
+      const valor = await avaliar(ast.valor, escopo);
+      const índice = await avaliar(ast.índice, escopo);
+      const fim = ast.fim ? await avaliar(ast.fim, escopo) : undefined;
 
       if (typeof valor === "string") {
         if (ast.éFaixa || fim !== undefined) {
@@ -66,7 +66,7 @@ export const avaliarColeção = (ast, escopo) => {
     }
 
     case 'tamanho':
-      const valor = avaliar(ast.valor, escopo);
+      const valor = await avaliar(ast.valor, escopo);
       if (valor?.length !== undefined) {
         return valor.length;
       }
@@ -76,7 +76,7 @@ export const avaliarColeção = (ast, escopo) => {
       throw erro;
 
     case 'chaves': {
-      const objeto = avaliar(ast.valor, escopo);
+      const objeto = await avaliar(ast.valor, escopo);
       const keys = Object.keys(objeto);
       
       if (Array.isArray(objeto)) {
@@ -91,7 +91,7 @@ export const avaliarColeção = (ast, escopo) => {
     }
 
     case 'atributo': {
-      const objeto = avaliar(ast.objeto, escopo);
+      const objeto = await avaliar(ast.objeto, escopo);
       return objeto[ast.nome];
     }
 

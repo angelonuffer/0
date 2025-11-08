@@ -17,10 +17,10 @@ const obterEndereçoMódulo = (escopo) => {
   return null;
 };
 
-export const avaliarFunção = (ast, escopo) => {
+export const avaliarFunção = async (ast, escopo) => {
   switch (ast.tipo) {
     case 'lambda':
-      return (caller_context, ...valoresArgs) => {
+      return async (caller_context, ...valoresArgs) => {
         const fn_scope = { __parent__: escopo || null };
         
         // Handle object destructuring
@@ -50,13 +50,13 @@ export const avaliarFunção = (ast, escopo) => {
           for (const guard of ast.corpo.guards) {
             if (guard.tipo === 'guard_default') {
               // Default guard - always matches
-              return avaliar(guard.expressão, fn_scope);
+              return await avaliar(guard.expressão, fn_scope);
             } else if (guard.tipo === 'guard') {
               // Conditional guard - check condition
-              const conditionValue = avaliar(guard.condição, fn_scope);
+              const conditionValue = await avaliar(guard.condição, fn_scope);
               // In the language, 0 is false, anything else is true
               if (conditionValue !== 0) {
-                return avaliar(guard.expressão, fn_scope);
+                return await avaliar(guard.expressão, fn_scope);
               }
             }
           }
@@ -64,12 +64,12 @@ export const avaliarFunção = (ast, escopo) => {
           return undefined;
         } else {
           // Regular function body
-          return avaliar(ast.corpo, fn_scope);
+          return await avaliar(ast.corpo, fn_scope);
         }
       };
 
     case 'chamada_função': {
-      const função = avaliar(ast.função, escopo);
+      const função = await avaliar(ast.função, escopo);
       if (typeof função !== 'function') {
         const erro = new Error(`Value is not a function, got ${typeof função}`);
         erro.é_erro_semântico = true;
@@ -79,15 +79,15 @@ export const avaliarFunção = (ast, escopo) => {
         throw erro;
       }
       if (ast.argumento !== undefined) {
-        const arg_value = avaliar(ast.argumento, escopo);
-        return função(escopo, arg_value);
+        const arg_value = await avaliar(ast.argumento, escopo);
+        return await função(escopo, arg_value);
       } else {
-        return função(escopo);
+        return await função(escopo);
       }
     }
 
     case 'chamada_função_imediata': {
-      const função = buscarVariável(escopo, ast.nome);
+      const função = await buscarVariável(escopo, ast.nome);
       if (typeof função !== 'function') {
         const erro = new Error(`${ast.nome} is not a function`);
         erro.é_erro_semântico = true;
@@ -96,10 +96,10 @@ export const avaliarFunção = (ast, escopo) => {
         throw erro;
       }
       if (ast.argumento !== undefined) {
-        const arg_value = avaliar(ast.argumento, escopo);
-        return função(escopo, arg_value);
+        const arg_value = await avaliar(ast.argumento, escopo);
+        return await função(escopo, arg_value);
       } else {
-        return função(escopo);
+        return await função(escopo);
       }
     }
 

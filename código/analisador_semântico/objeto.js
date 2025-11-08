@@ -15,7 +15,7 @@ const obterEndereçoMódulo = (escopo) => {
   return null;
 };
 
-export const avaliarObjeto = (ast, escopo) => {
+export const avaliarObjeto = async (ast, escopo) => {
   if (ast.tipo !== 'objeto') {
     return null; // Not handled by this module
   }
@@ -29,7 +29,7 @@ export const avaliarObjeto = (ast, escopo) => {
       if (item.tipo === 'espalhamento') {
         continue;
       } else if (item.chave !== undefined) {
-        const chave = typeof item.chave === 'object' ? avaliar(item.chave, escopo) : item.chave;
+        const chave = typeof item.chave === 'object' ? await avaliar(item.chave, escopo) : item.chave;
         if (typeof chave !== 'string' && typeof chave !== 'number') {
           const erro = new Error(`Object key must be a string or number, got ${typeof chave}`);
           erro.é_erro_semântico = true;
@@ -46,7 +46,7 @@ export const avaliarObjeto = (ast, escopo) => {
     autoIndex = 0;
     for (const item of ast.items) {
       if (item.tipo === 'espalhamento') {
-        const spreadValue = avaliar(item.expressão, escopo);
+        const spreadValue = await avaliar(item.expressão, escopo);
         if (Array.isArray(spreadValue)) {
           for (const v of spreadValue) {
             listScope[autoIndex++] = v;
@@ -59,10 +59,10 @@ export const avaliarObjeto = (ast, escopo) => {
           }
         }
       } else if (item.chave !== undefined) {
-        const chave = typeof item.chave === 'object' ? avaliar(item.chave, escopo) : item.chave;
-        listScope[chave] = avaliar(item.valor, escopo);
+        const chave = typeof item.chave === 'object' ? await avaliar(item.chave, escopo) : item.chave;
+        listScope[chave] = await avaliar(item.valor, escopo);
       } else {
-        listScope[autoIndex] = avaliar(item.valor, escopo);
+        listScope[autoIndex] = await avaliar(item.valor, escopo);
         autoIndex++;
       }
     }
@@ -96,12 +96,12 @@ export const avaliarObjeto = (ast, escopo) => {
     const result = [];
     for (const item of ast.items) {
       if (item.tipo === 'espalhamento') {
-        const spreadValue = avaliar(item.expressão, escopo);
+        const spreadValue = await avaliar(item.expressão, escopo);
         if (Array.isArray(spreadValue)) {
           result.push(...spreadValue);
         }
       } else {
-        result.push(avaliar(item.valor, escopo));
+        result.push(await avaliar(item.valor, escopo));
       }
     }
     return result;

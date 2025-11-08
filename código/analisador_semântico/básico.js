@@ -5,27 +5,27 @@ import { buscarVariável } from './escopo.js';
 // Forward declaration for recursive avaliar reference
 let avaliar;
 
-export const avaliarBásico = (ast, escopo) => {
+export const avaliarBásico = async (ast, escopo) => {
   switch (ast.tipo) {
     case 'número':
     case 'texto':
       return ast.valor;
 
     case 'variável':
-      return buscarVariável(escopo, ast.nome);
+      return await buscarVariável(escopo, ast.nome);
 
     case 'não':
-      return avaliar(ast.expressão, escopo) === 0 ? 1 : 0;
+      return (await avaliar(ast.expressão, escopo)) === 0 ? 1 : 0;
 
     case 'depuração': {
-      const valor = avaliar(ast.expressão, escopo);
+      const valor = await avaliar(ast.expressão, escopo);
       // Display debug output to stderr with green background
       console.error(`\x1b[42m%\x1b[0m ${JSON.stringify(valor)}`);
       return valor;
     }
 
     case 'parênteses':
-      return avaliar(ast.expressão, escopo);
+      return await avaliar(ast.expressão, escopo);
 
     case 'parênteses_com_declarações': {
       // Create a new scope for the declarations
@@ -38,11 +38,11 @@ export const avaliarBásico = (ast, escopo) => {
       
       // Second pass: evaluate and assign values
       for (const decl of ast.declarações) {
-        novoEscopo[decl.nome] = avaliar(decl.valor, novoEscopo);
+        novoEscopo[decl.nome] = await avaliar(decl.valor, novoEscopo);
       }
       
       // Evaluate the expression in the new scope
-      return avaliar(ast.expressão, novoEscopo);
+      return await avaliar(ast.expressão, novoEscopo);
     }
 
     case 'endereço_literal': {
@@ -71,7 +71,7 @@ export const avaliarBásico = (ast, escopo) => {
       
       // If module not yet evaluated and we have lazy evaluator, evaluate it now
       if (!valores_módulos.hasOwnProperty(endereço_resolvido) && avaliar_módulo_lazy) {
-        return avaliar_módulo_lazy(endereço_resolvido);
+        return await avaliar_módulo_lazy(endereço_resolvido);
       }
       
       // Return the module value

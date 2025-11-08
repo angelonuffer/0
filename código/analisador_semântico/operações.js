@@ -15,20 +15,20 @@ const obterEndereçoMódulo = (escopo) => {
   return null;
 };
 
-export const avaliarOperações = (ast, escopo) => {
+export const avaliarOperações = async (ast, escopo) => {
   switch (ast.tipo) {
     case 'operação_binária': {
-      const esquerda = avaliar(ast.esquerda, escopo);
-      const direita = avaliar(ast.direita, escopo);
+      const esquerda = await avaliar(ast.esquerda, escopo);
+      const direita = await avaliar(ast.direita, escopo);
       return ast.operador(esquerda, direita);
     }
 
     case 'operação_lógica': {
-      const esquerda = avaliar(ast.esquerda, escopo);
+      const esquerda = await avaliar(ast.esquerda, escopo);
       if (ast.operador === '&') {
-        return esquerda !== 0 ? avaliar(ast.direita, escopo) : 0;
+        return esquerda !== 0 ? await avaliar(ast.direita, escopo) : 0;
       } else if (ast.operador === '|') {
-        return esquerda !== 0 ? esquerda : avaliar(ast.direita, escopo);
+        return esquerda !== 0 ? esquerda : await avaliar(ast.direita, escopo);
       }
       const erro = new Error(`Unknown logical operator: ${ast.operador}`);
       erro.é_erro_semântico = true;
@@ -37,8 +37,8 @@ export const avaliarOperações = (ast, escopo) => {
     }
 
     case 'condicional': {
-      const condição = avaliar(ast.condição, escopo);
-      return condição !== 0 ? avaliar(ast.seVerdadeiro, escopo) : avaliar(ast.seFalso, escopo);
+      const condição = await avaliar(ast.condição, escopo);
+      return condição !== 0 ? await avaliar(ast.seVerdadeiro, escopo) : await avaliar(ast.seFalso, escopo);
     }
 
     default:
