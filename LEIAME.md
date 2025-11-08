@@ -12,6 +12,19 @@ Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor 
 
 **Pré-requisitos**: Node.js versão 22 ou superior.
 
+## ⚡ Novidades: Carregamento Preguiçoso Assíncrono
+
+A linguagem 0 agora utiliza **carregamento preguiçoso (lazy loading)** assíncrono de módulos. Principais benefícios:
+
+- ✨ **Início mais rápido:** Execução começa imediatamente, sem pré-carregar todos os módulos
+- 🌐 **Suporte a URLs remotas:** Importe módulos diretamente via HTTP/HTTPS
+- 💾 **Cache inteligente:** Módulos remotos são armazenados em cache local
+- 🔄 **Carregamento sob demanda:** Apenas módulos necessários são carregados
+
+**Nota:** Esta é uma mudança na API interna. Código escrito em 0 continua funcionando sem modificações.
+
+Para mais detalhes, consulte [docs/LAZY_LOADING.md](docs/LAZY_LOADING.md).
+
 ## Execução
 
 ### Executar um módulo que exporta uma função
