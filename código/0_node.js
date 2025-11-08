@@ -33,7 +33,7 @@ const resolve_endereço = (base_module_path, rel_path) => {
   return decodeURIComponent(resolved_url.pathname.substring(1));
 };
 
-// Helper function to load content (local or remote)
+// Helper function to load content (local or remote) - now async lazy
 const carregar_conteúdo = async (endereço) => {
   if (cache[endereço]) {
     return cache[endereço];
@@ -216,71 +216,17 @@ const conteúdos = {};
 const módulos = {};
 const valores_módulos = {};
 
-// Helper function to extract address references from source text using regex
-// This is a lightweight alternative to full parsing for pre-fetching
-const extrair_referências_endereços = (conteúdo) => {
-  const endereços = [];
-  
-  // Match address literals in parentheses: (path/to/file.0) or (./file.0) or (../file.0)
-  // Supports Unicode characters in paths
-  const regex_literal = /\(([./][^\s()]+\.0)\)/gu;
-  let match;
-  while ((match = regex_literal.exec(conteúdo)) !== null) {
-    endereços.push(match[1]);
-  }
-  
-  return endereços;
-};
-
-// Helper to pre-fetch all remote URLs recursively
-const pré_carregar_urls_remotas = async (endereço, visitados = new Set()) => {
-  if (visitados.has(endereço)) {
-    return; // Already processed
-  }
-  visitados.add(endereço);
-  
-  // Load this module's content if not already loaded
-  if (!conteúdos[endereço]) {
-    conteúdos[endereço] = await carregar_conteúdo(endereço);
-  }
-  
-  // Use lightweight parsing to find imports (# syntax)
-  const importações_resultado = importações(conteúdos[endereço]);
-  const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
-  
-  // Use regex to find address literals (avoid full parsing during pre-fetch)
-  const endereços_literais = extrair_referências_endereços(conteúdos[endereço]);
-  
-  // Collect all dependencies
-  const todas_dependências = [
-    ...importações_lista.map(({ endereço: end_rel }) => resolve_endereço(endereço, end_rel)),
-    ...endereços_literais.map(end_rel => resolve_endereço(endereço, end_rel))
-  ];
-  
-  // Recursively pre-fetch all dependencies
-  for (const dep of todas_dependências) {
-    await pré_carregar_urls_remotas(dep, visitados);
-  }
-};
-
 try {
-  // Step 1: Pre-fetch all remote URLs to enable synchronous lazy parsing
-  await pré_carregar_urls_remotas(módulo_principal);
-  
-  // Helper function to parse a module on demand (now synchronous)
-  const parsear_módulo = (endereço) => {
+  // Helper function to parse a module on demand (async lazy loading)
+  const parsear_módulo = async (endereço) => {
     // If already parsed, return cached result
     if (módulos[endereço]) {
       return módulos[endereço];
     }
     
-    // Load content (synchronous since we pre-fetched remote URLs)
+    // Load content lazily (async)
     if (!conteúdos[endereço]) {
-      if (endereço.startsWith('https://')) {
-        const erro = new Error(`Remote URL not pre-fetched: ${endereço}`);
-        throw erro;
-      }
-      conteúdos[endereço] = fs.readFileSync(endereço, 'utf-8');
+      conteúdos[endereço] = await carregar_conteúdo(endereço);
     }
     
     // Extract imports using the import parser
@@ -325,22 +271,22 @@ try {
     return módulos[endereço];
   };
   
-  // Helper function to evaluate a module and its dependencies lazily
-  const avaliar_módulo = (endereço) => {
+  // Helper function to evaluate a module and its dependencies lazily (now async)
+  const avaliar_módulo = async (endereço) => {
     // If already evaluated, return cached value
     if (valores_módulos.hasOwnProperty(endereço)) {
       return valores_módulos[endereço];
     }
     
-    // Parse module if not yet parsed (lazy parsing)
+    // Parse module if not yet parsed (lazy parsing - now async)
     let módulo = módulos[endereço];
     if (!módulo) {
-      módulo = parsear_módulo(endereço);
+      módulo = await parsear_módulo(endereço);
     }
     
     const { importações, declarações, expressão: corpoAst } = módulo;
     
-    // Create lazy thunks for imports
+    // Create lazy thunks for imports (now returns async functions)
     const escopo_importações = {};
     for (const [nome, dep_end] of importações) {
       escopo_importações[nome] = criarLazyThunk(() => avaliar_módulo(dep_end));
@@ -362,11 +308,11 @@ try {
       }
     }
     
-    // Second pass: evaluate and assign values
+    // Second pass: evaluate and assign values (now async)
     if (declarações) {
       for (const decl of declarações) {
         try {
-          escopo[decl.nome] = avaliar(decl.valor, escopo);
+          escopo[decl.nome] = await avaliar(decl.valor, escopo);
         } catch (erro) {
           // Check if it's a semantic analyzer error
           if (erro.é_erro_semântico) {
@@ -394,7 +340,7 @@ try {
     
     let valor;
     try {
-      valor = corpoAst ? avaliar(corpoAst, escopo) : undefined;
+      valor = corpoAst ? await avaliar(corpoAst, escopo) : undefined;
     } catch (erro) {
       // Check if it's a semantic analyzer error
       if (erro.é_erro_semântico) {
@@ -422,11 +368,8 @@ try {
     return valor;
   };
   
-  // Step 2: Parse only the main module initially
-  parsear_módulo(módulo_principal);
-  
-  // Step 3: Evaluate the main module (will trigger lazy parsing and evaluation of dependencies)
-  const main_value = avaliar_módulo(módulo_principal);
+  // Evaluate the main module (will trigger lazy parsing and evaluation of dependencies)
+  const main_value = await avaliar_módulo(módulo_principal);
   
   // Save cache
   salvar_cache();
