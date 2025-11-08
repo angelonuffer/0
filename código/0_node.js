@@ -237,9 +237,10 @@ const extrair_todas_referências = (conteúdo) => {
   // Match any of:
   // - Relative paths: ./path or ../path or ../../path
   // - URLs: https://...
-  // - Simple filenames with or without .0 extension
+  // - Simple filenames with .0 extension (including Unicode characters)
   // Note: Module files can be named just "0" or "something.0"
-  const regex_literal = /(?:^|[\s\[\{,(=])(\.\.\/[^\s\]\},)]+|\.\/[^\s\]\},)]+|https:\/\/\S+|[\w]+\.0)(?=[\s\]\},)]|$)/gmu;
+  // Use [^\s\]\},)] to match any non-whitespace, non-delimiter character
+  const regex_literal = /(?:^|[\s\[\{,(=])(\.\.\/[^\s\]\},)]+|\.\/[^\s\]\},)]+|https:\/\/\S+|[^\s\[\{,(=\]\},)]+\.0)(?=[\s\]\},)]|$)/gmu;
   let match;
   while ((match = regex_literal.exec(conteúdo)) !== null) {
     endereços.add(match[1]);
