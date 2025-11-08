@@ -110,90 +110,50 @@ const mostrar_erro_variável = (endereço, nome_variável, nomes_disponíveis) =
 
 // Helper function to show syntax error with context
 const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
+  // O analisador sintático fornece menor_resto que aponta para onde o erro ocorreu
   const unparsed_text = módulo_bruto.menor_resto || módulo_bruto.resto;
-  const posição_base = conteúdos[endereço].length - unparsed_text.length;
+  const resto_text = módulo_bruto.resto;
+  let posição_erro = conteúdos[endereço].length - unparsed_text.length;
   
-  // If no unparsed text available, the error is at the end of input
-  if (!unparsed_text || unparsed_text.length === 0) {
-    const posição_erro = conteúdos[endereço].length;
+  // Verifica se há delimitadores não fechados no texto restante (resto)
+  // Isso indica que um delimitador foi aberto mas nunca fechado
+  const resto_opening = (resto_text.match(/[\[\{\(]/g) || []).length;
+  const resto_closing = (resto_text.match(/[\]\}\)]/g) || []).length;
+  
+  // Verifica se há uma string não fechada
+  // Conta as aspas não escapadas no resto
+  const aspas_matches = resto_text.match(/(?<!\\)"/g) || [];
+  const tem_string_não_fechada = (aspas_matches.length % 2) === 1;
+  
+  // Se há mais aberturas que fechamentos no resto, o erro é provavelmente no final (falta um fechamento)
+  if (resto_opening > resto_closing || tem_string_não_fechada) {
+    // Move a posição do erro para o final do input (onde o delimitador deveria estar)
+    // Encontra a última linha não-vazia
     const linhas = conteúdos[endereço].split('\n');
-    const linhas_antes = conteúdos[endereço].substring(0, posição_erro).split('\n');
-    const número_linha = linhas_antes.length;
-    const número_coluna = linhas_antes.at(-1).length + 1;
-    const linha = linhas[número_linha - 1];
+    let última_linha_não_vazia = linhas.length - 1;
+    while (última_linha_não_vazia >= 0 && linhas[última_linha_não_vazia].trim() === '') {
+      última_linha_não_vazia--;
+    }
     
-    const linha_com_erro = (linha?.substring(0, número_coluna - 1) ?? "") +
-      `\x1b[41m${linha?.[número_coluna - 1] ?? ""}\x1b[0m` +
-      (linha?.substring(número_coluna) ?? "");
-    console.log(`Erro de sintaxe.\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
-    return;
-  }
-  
-  // Determine the error position based on the nature of the syntax error
-  // Check if this is an unexpected closing delimiter (}, ], ))
-  const trimmed_unparsed = unparsed_text.trimStart();
-  const starts_with_closing = /^[)\]}]/.test(trimmed_unparsed);
-  
-  let posição_erro;
-  if (starts_with_closing) {
-    // Unexpected closing delimiter at the start - point to it
-    const whitespace_before = unparsed_text.length - trimmed_unparsed.length;
-    posição_erro = posição_base + whitespace_before;
-  } else {
-    // Check if there's a closing delimiter somewhere in the unparsed text
-    const closing_match = trimmed_unparsed.match(/([)\]}])/);
+    // Calcula a posição no início da última linha não-vazia
+    let pos = 0;
+    for (let i = 0; i < última_linha_não_vazia; i++) {
+      pos += linhas[i].length + 1; // +1 for newline
+    }
     
-    if (closing_match && closing_match.index !== undefined && closing_match.index > 0) {
-      // There's content before the closing delimiter
-      // Check if that content contains an unclosed opening delimiter
-      const content_before = trimmed_unparsed.substring(0, closing_match.index);
-      const has_opening = /[\[\{\(]/.test(content_before);
-      
-      if (has_opening) {
-        // There's an opening delimiter before the closing delimiter
-        // This suggests a mismatch - point to the closing delimiter
-        const whitespace_before = unparsed_text.length - trimmed_unparsed.length;
-        posição_erro = posição_base + whitespace_before + closing_match.index;
-      } else {
-        // No opening delimiter, check if there's non-whitespace content
-        const has_nonwhitespace_before = /\S/.test(content_before);
-        
-        if (has_nonwhitespace_before) {
-          // There's actual content before the closing delimiter
-          // The error is in that content, not at the closing delimiter
-          // Point to the first non-whitespace character in unparsed text
-          const whitespace_match = unparsed_text.match(/^[\s]*/);
-          const whitespace_length = whitespace_match ? whitespace_match[0].length : 0;
-          posição_erro = posição_base + whitespace_length;
-        } else {
-          // Only whitespace before closing delimiter - the closing delimiter is unexpected
-          const whitespace_before = unparsed_text.length - trimmed_unparsed.length;
-          posição_erro = posição_base + whitespace_before + closing_match.index;
-        }
-      }
+    // Se a última linha contém um delimitador de fechamento não pareado, aponta para ele
+    // Caso contrário, aponta para o final da linha
+    const última_linha = linhas[última_linha_não_vazia];
+    const tem_delim_fechamento = /[\]\}\)]/.test(última_linha);
+    
+    if (tem_delim_fechamento && !tem_string_não_fechada) {
+      // Aponta para o início da linha (onde está o delimitador não pareado)
+      posição_erro = pos;
     } else {
-      // No closing delimiter found, or it's at the very start
-      // If the unparsed text contains substantial content (multiple tokens),
-      // it's probably an unclosed structure - point to end of input
-      // Otherwise, point to the first non-whitespace character
-      const first_nonwhite_match = unparsed_text.match(/^[\s]*(.)/);
-      if (!first_nonwhite_match) {
-        // Only whitespace - point to end
-        posição_erro = conteúdos[endereço].trimEnd().length;
-      } else {
-        // Check if unparsed text looks like substantial content (multiple tokens/words)
-        const has_multiple_tokens = (trimmed_unparsed.match(/\w+/g) || []).length > 1;
-        
-        if (has_multiple_tokens) {
-          // Substantial content - likely unclosed structure, point to end
-          posição_erro = conteúdos[endereço].trimEnd().length;
-        } else {
-          // Single token/character - point to it
-          const whitespace_match = unparsed_text.match(/^[\s]*/);
-          const whitespace_length = whitespace_match ? whitespace_match[0].length : 0;
-          posição_erro = posição_base + whitespace_length;
-        }
-      }
+      // Aponta para o final da linha (onde o delimitador deveria estar)
+      const última_linha_trimmed = última_linha.replace(/[ \t]+$/, '');
+      pos += última_linha_trimmed.length;
+      posição_erro = pos;
     }
   }
   
