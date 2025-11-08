@@ -10,22 +10,20 @@ O nome 0 foi escolhido por sua simplicidade e universalidade. O zero é um conce
 
 Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor do mundo, promovendo a eficiência e a clareza no desenvolvimento de software.
 
-**Pré-requisitos**: Node.js versão 22 ou superior.
-
 ## Execução
 
-### Executar um módulo que exporta uma função
+### Executar um módulo
 
 ```bash
-node código/0_node.js <módulo.0> <argumento>
+node código/0_node.js <módulo.0>
 ```
 
-A função deve retornar um valor do tipo texto, que será enviado para o stdout do processo.
+O módulo principal deve exportar um valor do tipo texto, que será enviado para o stdout do processo.
 
 ### Executar os testes
 
 ```bash
-node código/0_node.js testes/0 node | node
+node código/0_node.js testes/0 | node
 ```
 
 ## Sintaxe
