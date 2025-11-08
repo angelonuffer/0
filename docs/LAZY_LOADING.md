@@ -18,19 +18,24 @@ A linguagem 0 agora utiliza um modelo de carregamento preguiçoso (lazy loading)
 
 **Agora:** Os módulos são carregados sob demanda (lazy loading) apenas quando são realmente necessários durante a avaliação.
 
-### 3. Funções Assíncronas
+### 3. Funções e Promises
 
-**Importante:** Lambdas definidas na linguagem 0 agora retornam funções assíncronas. Isso significa que:
+**Importante:** Lambdas definidas na linguagem 0 retornam funções regulares, mas essas funções retornam Promises quando chamadas (devido ao motor de avaliação assíncrono interno).
 
 ```javascript
 // Exemplo de função na linguagem 0
 soma = a => b => a + b
 
-// Esta função agora retorna uma AsyncFunction
-// que deve ser aguardada ao ser chamada
+// Esta função é do tipo Function (não AsyncFunction)
+// mas retorna uma Promise ao ser chamada
 ```
 
-O motor de avaliação cuida automaticamente do `await` quando funções são chamadas dentro do código 0.
+O motor de avaliação cuida automaticamente do `await` quando funções são chamadas dentro do código 0. Para código JavaScript externo, as funções devem ser aguardadas:
+
+```javascript
+const func = avaliarResultado; // É uma Function normal
+const result = await func(escopo, arg); // Retorna Promise, precisa de await
+```
 
 ## Suporte a URLs Remotas
 
@@ -124,12 +129,12 @@ const resultado = avaliar(ast, escopo);
 const resultado = await avaliar(ast, escopo);
 ```
 
-2. **Funções Lambdas:** Funções definidas em 0 agora retornam AsyncFunctions:
+2. **Funções Lambdas:** Funções definidas em 0 são regulares (não AsyncFunction), mas retornam Promises:
 
 ```javascript
 // Se você estava integrando com JavaScript
-const func = await avaliar(funcAst, escopo);
-const resultado = await func(escopo, argumento);
+const func = await avaliar(funcAst, escopo); // func é uma Function normal
+const resultado = await func(escopo, argumento); // mas retorna Promise
 ```
 
 ### Compatibilidade

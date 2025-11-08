@@ -8,7 +8,7 @@
 #### 🚀 Async Semantic Analyzer
 - Converted all semantic analyzer functions to async/await
 - `avaliar()` and all sub-analyzers now return Promises
-- Lambda functions now return AsyncFunction instances
+- Lambda functions are regular Functions that return Promises (not AsyncFunction)
 - All recursive evaluation properly awaits results
 
 #### ⚡ Lazy Module Loading
