@@ -12,7 +12,7 @@ import { avaliarColeção, setAvaliar as setAvaliarColeção } from './coleção
 import { avaliarFunção, setAvaliar as setAvaliarFunção } from './função.js';
 
 // Main evaluation function - takes an AST node and scope, returns the evaluated value
-export const avaliar = (ast, escopo) => {
+export const avaliar = async (ast, escopo) => {
   if (!ast || typeof ast !== 'object' || !ast.tipo) {
     // Handle literal values (numbers, strings, etc.)
     return ast;
@@ -21,19 +21,19 @@ export const avaliar = (ast, escopo) => {
   // Try each module in order
   let result;
   
-  result = avaliarBásico(ast, escopo);
+  result = await avaliarBásico(ast, escopo);
   if (result !== null) return result;
   
-  result = avaliarOperações(ast, escopo);
+  result = await avaliarOperações(ast, escopo);
   if (result !== null) return result;
   
-  result = avaliarObjeto(ast, escopo);
+  result = await avaliarObjeto(ast, escopo);
   if (result !== null) return result;
   
-  result = avaliarColeção(ast, escopo);
+  result = await avaliarColeção(ast, escopo);
   if (result !== null) return result;
   
-  result = avaliarFunção(ast, escopo);
+  result = await avaliarFunção(ast, escopo);
   if (result !== null) return result;
 
   const erro = new Error(`Unknown AST node type: ${ast.tipo}`);
