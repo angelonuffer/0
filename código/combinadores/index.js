@@ -69,11 +69,6 @@ const sequência = (...analisadores) => código => {
 
     valores.push(resultado.valor)
     resto = resultado.resto
-    
-    // Atualiza menor_resto_global após sucesso também
-    if (resto.length < menor_resto_global.length) {
-      menor_resto_global = resto
-    }
   }
 
   return { sucesso: true, valor: valores, resto, menor_resto: menor_resto_global }
@@ -109,7 +104,7 @@ const vários = analisador => código => {
     valores.push(resultado.valor)
     resto = resultado.resto
     
-    // Atualiza após sucesso
+    // Após sucesso, também atualiza com o novo resto (ponto alcançado)
     if (resto.length < menor_resto_global.length) {
       menor_resto_global = resto
     }
