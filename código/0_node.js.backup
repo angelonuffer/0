@@ -221,65 +221,16 @@ const conteúdos = {};
 const módulos = {};
 const valores_módulos = {};
 
-// Helper function to extract all module references (imports and address literals)
-const extrair_todas_referências = (conteúdo) => {
-  const endereços = new Set();
-  
-  // Extract imports
-  const importações_resultado = importações(conteúdo);
-  if (importações_resultado.sucesso) {
-    for (const { endereço } of importações_resultado.valor) {
-      endereços.add(endereço);
-    }
-  }
-  
-  // Extract address literals - they can appear in various contexts:
-  // Match any of:
-  // - Relative paths: ./path or ../path or ../../path
-  // - URLs: https://...
-  // - Simple filenames with or without .0 extension
-  // Note: Module files can be named just "0" or "something.0"
-  const regex_literal = /(?:^|[\s\[\{,(=])(\.\.\/[^\s\]\},)]+|\.\/[^\s\]\},)]+|https:\/\/\S+|[\w]+\.0)(?=[\s\]\},)]|$)/gmu;
-  let match;
-  while ((match = regex_literal.exec(conteúdo)) !== null) {
-    endereços.add(match[1]);
-  }
-  
-  return Array.from(endereços);
-};
-
-// Helper to pre-load all module content recursively (async, runs at startup)
-const pré_carregar_conteúdo = async (endereço, visitados = new Set()) => {
-  if (visitados.has(endereço)) {
-    return;
-  }
-  visitados.add(endereço);
-  
-  // Load this module's content
-  if (!conteúdos[endereço]) {
-    conteúdos[endereço] = await carregar_conteúdo(endereço);
-  }
-  
-  // Extract all module references
-  const referências = extrair_todas_referências(conteúdos[endereço]);
-  
-  // Recursively pre-load all dependencies
-  for (const ref of referências) {
-    const endereço_resolvido = resolve_endereço(endereço, ref);
-    await pré_carregar_conteúdo(endereço_resolvido, visitados);
-  }
-};
-
-// Helper function to parse a module on demand (synchronous, lazy)
-const parsear_módulo = (endereço) => {
+// Helper function to parse a module on demand (async for lazy loading)
+const parsear_módulo = async (endereço) => {
   // If already parsed, return cached result
   if (módulos[endereço]) {
     return módulos[endereço];
   }
   
-  // Content must already be loaded by pré_carregar_conteúdo
+  // Load content (async - supports both local and remote)
   if (!conteúdos[endereço]) {
-    throw new Error(`Module content not pre-loaded: ${endereço}`);
+    conteúdos[endereço] = await carregar_conteúdo(endereço);
   }
   
   // Extract imports using the import parser
@@ -324,25 +275,25 @@ const parsear_módulo = (endereço) => {
   return módulos[endereço];
 };
 
-// Helper function to evaluate a module and its dependencies lazily (synchronous, lazy)
-const avaliar_módulo = (endereço) => {
+// Helper function to evaluate a module and its dependencies lazily (async for lazy loading)
+const avaliar_módulo = async (endereço) => {
   // If already evaluated, return cached value
   if (valores_módulos.hasOwnProperty(endereço)) {
     return valores_módulos[endereço];
   }
   
-  // Parse module if not yet parsed (lazy parsing)
+  // Parse module if not yet parsed (lazy parsing - async)
   let módulo = módulos[endereço];
   if (!módulo) {
-    módulo = parsear_módulo(endereço);
+    módulo = await parsear_módulo(endereço);
   }
   
   const { importações, declarações, expressão: corpoAst } = módulo;
   
-  // Eagerly evaluate all imports (content already pre-loaded, evaluation is lazy)
+  // Eagerly evaluate all imports (but loading is lazy - only happens when accessed)
   const escopo_importações = {};
   for (const [nome, dep_end] of importações) {
-    escopo_importações[nome] = avaliar_módulo(dep_end);
+    escopo_importações[nome] = await avaliar_módulo(dep_end);
   }
   
   const escopo = { 
@@ -365,7 +316,9 @@ const avaliar_módulo = (endereço) => {
   if (declarações) {
     for (const decl of declarações) {
       try {
-        escopo[decl.nome] = avaliar(decl.valor, escopo);
+        const valor = avaliar(decl.valor, escopo);
+        // If the value is a promise (from lazy thunk or module literal), await it
+        escopo[decl.nome] = valor instanceof Promise ? await valor : valor;
       } catch (erro) {
         // Check if it's a semantic analyzer error
         if (erro.é_erro_semântico) {
@@ -393,7 +346,9 @@ const avaliar_módulo = (endereço) => {
   
   let valor;
   try {
-    valor = corpoAst ? avaliar(corpoAst, escopo) : undefined;
+    const resultado = corpoAst ? avaliar(corpoAst, escopo) : undefined;
+    // If the result is a promise (from lazy thunk or module literal), await it
+    valor = resultado instanceof Promise ? await resultado : resultado;
   } catch (erro) {
     // Check if it's a semantic analyzer error
     if (erro.é_erro_semântico) {
@@ -422,11 +377,8 @@ const avaliar_módulo = (endereço) => {
 };
 
 try {
-  // Pre-load all module content (async, happens at startup)
-  await pré_carregar_conteúdo(módulo_principal);
-  
-  // Evaluate the main module (synchronous, lazy parsing and evaluation)
-  const main_value = avaliar_módulo(módulo_principal);
+  // Evaluate the main module (will trigger lazy loading and evaluation of dependencies)
+  const main_value = await avaliar_módulo(módulo_principal);
   
   // Save cache
   salvar_cache();
