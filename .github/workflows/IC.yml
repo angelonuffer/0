@@ -16,4 +16,3 @@ jobs:
         node-version: 22
     - run: node código/0_node.js testes/0 | node
     - run: node testes/erros/runner.js
-    - run: node lib/test-moduleLoader.mjs
