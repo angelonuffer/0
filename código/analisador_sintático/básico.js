@@ -32,6 +32,18 @@ const depuração = transformar(
   })
 )
 
+const carregar = transformar(
+  sequência(
+    símbolo("@"),
+    opcional(espaço),
+    código => expressão(código),
+  ),
+  ([, , expr]) => ({
+    tipo: 'carregar',
+    expressão: expr
+  })
+)
+
 const valor_constante = transformar(
   nome,
   nome_var => ({
@@ -135,4 +147,4 @@ const setOperações = (ops) => {
   chamada_função = ops.chamada_função;
 };
 
-export { não, depuração, valor_constante, chamada_função_imediata, setExpressão, setOperações };
+export { não, depuração, carregar, valor_constante, chamada_função_imediata, setExpressão, setOperações };
