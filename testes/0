@@ -33,6 +33,7 @@ uniteste.exibir(
     ./funções/guards.0
     ./funções/guards_inline.0
     ./funções/comprehensive_function_test.0
+    ./funções/currying.0
     ./sintaxe/comentário.0
   ]})
 )
