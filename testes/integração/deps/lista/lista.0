@@ -1,9 +1,0 @@
-_mapear = mapear.0
-_reduzir = reduzir.0
-_planificar = planificar.0
-
-{
-  mapear: _mapear
-  reduzir: _reduzir
-  planificar: _planificar
-}
