@@ -1,0 +1,69 @@
+uniteste = ../integração/uniteste.0
+
+uniteste.descrever({ nome: "Currying" testes: [
+  // Basic currying - 2 levels
+  uniteste.iguais([
+    (
+      soma = n1 => n2 => n1 + n2
+      soma(2)(3)
+    )
+    5
+  ])
+  
+  // Currying with 3 levels
+  uniteste.iguais([
+    (
+      soma3 = a => b => c => a + b + c
+      soma3(1)(2)(3)
+    )
+    6
+  ])
+  
+  // Currying with 4 levels
+  uniteste.iguais([
+    (
+      soma4 = a => b => c => d => a + b + c + d
+      soma4(1)(2)(3)(4)
+    )
+    10
+  ])
+  
+  // Mixed currying and intermediate variables
+  uniteste.iguais([
+    (
+      multiplica = x => y => x * y
+      dobro = multiplica(2)
+      dobro(5)
+    )
+    10
+  ])
+  
+  // Currying with indexing
+  uniteste.iguais([
+    (
+      soma = n1 => n2 => n1 + n2
+      funcs = [soma]
+      funcs[0](10)(20)
+    )
+    30
+  ])
+  
+  // Currying with operations after call
+  uniteste.iguais([
+    (
+      cria_lista = x => y => [x y]
+      cria_lista(1)(2)[.]
+    )
+    2
+  ])
+  
+  // Currying with attribute access simulation
+  uniteste.iguais([
+    (
+      cria_objeto = x => y => { a: x b: y }
+      obj = cria_objeto(5)(10)
+      obj.a + obj.b
+    )
+    15
+  ])
+]})
