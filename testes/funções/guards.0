@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Guards em funções" testes: [
   // Test 1: Simple guard with default

@@ -1,16 +1,15 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
-// Test remote URL import
-// Note: This uses the uniteste module from a remote URL
+// Test URL import as value
+// Note: Remote modules that use the old # syntax are no longer supported
 
-uniteste.descrever({ nome: "Importação de URL remota como valor" testes: [
-  // Test that we can import a remote module as a value
-  // Using the uniteste module itself as a test subject
+uniteste.descrever({ nome: "Importação de URL como valor" testes: [
+  // Test that we can import a local module using URL literal syntax
   uniteste.iguais([
     (
-      uniteste_remoto = https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@e24cfba7808bd35cbcd0501a9fc5a71fd23e5d54/código/0
+      uniteste_local = ../integração/uniteste.0
       // Just verify it's an object with expected properties
-      (uniteste_remoto.iguais != 0) ? 1 : 0
+      (uniteste_local.iguais != 0) ? 1 : 0
     )
     1
   ])

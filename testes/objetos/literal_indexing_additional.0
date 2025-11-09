@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Casos adicionais de acesso direto a literais" testes: [
   // Test with nested list access

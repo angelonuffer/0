@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Parênteses com declarações" testes: [
   // Test basic constant declaration

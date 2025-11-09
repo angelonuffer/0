@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Documentation Examples" testes: [
   uniteste.descrever({ nome: "String division examples" testes: [

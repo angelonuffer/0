@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Comparadores" testes: [
   uniteste.descrever({ nome: "Maior que (>)" testes: [

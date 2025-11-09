@@ -1,0 +1,18 @@
+mapear = { lista função } =>
+  | lista[.] == 0 = []
+  | lista[.] == 1 = [
+      função(lista[0])
+    ]
+  | [
+      função(lista[0])
+      ...(
+        _lista = lista
+        _função = função
+        mapear({
+          lista: _lista[1:]
+          função: _função
+        })
+      )
+    ]
+
+mapear

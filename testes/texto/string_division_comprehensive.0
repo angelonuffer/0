@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "String Division" testes: [
   uniteste.descrever({ nome: "Basic splitting" testes: [

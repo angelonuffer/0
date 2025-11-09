@@ -1,0 +1,14 @@
+_nodejs = nodejs.0
+
+comando = nome => {
+  [nome]: opções => {
+    tipo: nome
+    ...opções
+  }
+}
+
+{
+  nodejs: _nodejs
+  ...comando("escreva")
+  ...comando("saia")
+}

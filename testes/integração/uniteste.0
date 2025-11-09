@@ -1,3 +1,100 @@
-uniteste # https://cdn.jsdelivr.net/gh/angelonuffer/uniteste@e24cfba7808bd35cbcd0501a9fc5a71fd23e5d54/código/0
+_lista = ./deps/lista/lista.0
+processo = ./deps/processo/processo.0
 
-uniteste
+compara_listas = { lista_1 lista_2 } =>
+  | lista_1[.] != lista_2[.] = 0
+  | lista_1[.] == 0 = 1
+  | lista_1[0] != lista_2[0] = 0
+  | (
+    _lista_1 = lista_1
+    _lista_2 = lista_2
+    compara_listas({
+      lista_1: _lista_1[1:]
+      lista_2: _lista_2[1:]
+    })
+  )
+
+exibir = { passaram mensagens } => processo.nodejs({
+  comandos: [
+    ..._lista.mapear({
+      lista: mensagens
+      função: mensagem => processo.escreva({
+        texto: mensagem
+      })
+    })
+    processo.escreva({
+      texto: passaram + "/" + mensagens[.] + " testes passaram."
+    })
+    passaram == mensagens[.] ?
+      processo.saia({
+        código: 0
+      })
+    :
+      processo.saia({
+        código: 1
+      })
+  ]
+})
+
+{
+  descrever: { nome testes } => destino => (
+    resultado = {
+      passaram: _lista.reduzir({
+        lista: _lista.mapear({
+          lista: testes
+          função: resultado => (resultado("descrever")).passaram
+        })
+        função: args => args[0] + args[1]
+      })
+      mensagens: _lista.planificar({
+        lista: _lista.mapear({
+          lista: testes
+          função: resultado => _lista.mapear({
+            lista: (resultado("descrever")).mensagens
+            função: mensagem => [
+              nome
+              " | "
+              mensagem
+            ] * ""
+          })
+        })
+      })
+    }
+    destino == "descrever" ? resultado : exibir(resultado)
+  )
+  iguais: args => destino => (
+    _passaram = args[0] == args[1] ? 1 : 0
+    resultado = {
+      passaram: _passaram
+      mensagens: [
+        _passaram == 1 ? "ok" : [
+          "Esperava que "
+          "" + args[0]
+          " fosse igual a "
+          "" + args[1]
+          "."
+        ] * ""
+      ]
+    }
+    destino == "descrever" ? resultado : exibir(resultado)
+  )
+  listas_iguais: args => destino => (
+    _passaram = compara_listas({
+      lista_1: args[0]
+      lista_2: args[1]
+    }) ? 1 : 0
+    resultado = {
+      passaram: _passaram
+      mensagens: [
+        _passaram == 1 ? "ok" : [
+          "Esperava que ["
+          args[0] * ", "
+          "] fosse igual a ["
+          args[1] * ", "
+          "]."
+        ] * ""
+      ]
+    }
+    destino == "descrever" ? resultado : exibir(resultado)
+  )
+}

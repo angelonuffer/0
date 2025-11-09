@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Complete Function Call Parsing" testes: [
   // Test case 1: a(5) should be function call

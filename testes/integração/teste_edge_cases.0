@@ -1,4 +1,4 @@
-uniteste # uniteste.0
+uniteste = uniteste.0
 
 uniteste.descrever({ nome: "Edge cases" testes: [
   uniteste.iguais([
