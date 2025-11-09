@@ -4,3 +4,4 @@ testes/erros/referência_uso_antes_definição.0
      __valores_módulos__
      __resolve_endereço__
      __avaliar_módulo_lazy__
+     __carregar_conteúdo__
