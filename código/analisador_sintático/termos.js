@@ -7,7 +7,7 @@ import { espaço, número, número_negativo, texto, endereço_literal } from '..
 let expressão;
 
 // Import basic operations
-let não, depuração, valor_constante, chamada_função_imediata;
+let não, depuração, carregar, valor_constante, chamada_função_imediata;
 
 // Import object operations
 let fatia, tamanho, chaves, lista, objeto, atributo;
@@ -119,6 +119,7 @@ const getTermo2 = () => alternativa(
   número_negativo,
   não,
   depuração,
+  carregar,
   valor_constante,
   parênteses
 );
@@ -233,6 +234,7 @@ const setDependências = (expr, deps) => {
   expressão = expr;
   não = deps.não;
   depuração = deps.depuração;
+  carregar = deps.carregar;
   valor_constante = deps.valor_constante;
   chamada_função_imediata = deps.chamada_função_imediata;
   fatia = deps.fatia;

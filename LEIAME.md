@@ -59,6 +59,7 @@ Tokens léxicos
 - Setas: `=>` (usada para definir funções)
 - Operadores aritméticos e lógicos: `+`, `-`, `*`, `/`, `&`, `|`, `!`, `%`
 - Comparadores: `>`, `<`, `>=`, `<=`, `==`, `!=`
+- Operador de carregamento: `@` (carrega conteúdo de arquivo local ou remoto)
 - Operador de espalhamento: `...` (três pontos consecutivos)
 - Separador implícito: elementos em listas e objetos são separados por espaço em branco; vírgulas não são parte da sintaxe.
 
@@ -125,6 +126,7 @@ Semântica de avaliação (resumo)
 - Avaliação é estritamente por ordem de execução definida pelo interpretador: declarações de nível de módulo são avaliadas sequencialmente; a expressão principal final do módulo é avaliada e seu resultado é o valor exportado.
 - Funções são valores de primeira classe; chamadas são avaliadas aplicando os argumentos ao corpo da função no contexto de seus parâmetros.
 - Operadores lógicos `&` e `|` podem empregar avaliação curta (short-circuit) dependendo da implementação: `&` deve retornar `0` se um operando for logicamente falso; `|` deve retornar `0` somente se ambos operandos forem falsos. O operador `%` envia o valor para stderr e retorna o valor sem alteração.
+- Operador de carregamento `@`: este operador unário carrega e retorna o conteúdo textual de um arquivo a partir de um endereço local (caminho absoluto ou relativo) ou remoto (URL). Sintaxe: `@ expressão`, onde `expressão` é avaliada para obter o endereço. O conteúdo é retornado como uma string UTF-8. Suporta URLs HTTPS e caminhos de arquivo locais.
 
 Regras de parse e erros
 

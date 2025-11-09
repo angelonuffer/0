@@ -27,6 +27,10 @@ const resolve_endereço = (base_module_path, rel_path) => {
   if (rel_path.startsWith('https://')) {
     return rel_path;
   }
+  // Handle absolute paths
+  if (rel_path.startsWith('/')) {
+    return rel_path;
+  }
   const base_dir = base_module_path.includes('/') ? base_module_path.substring(0, base_module_path.lastIndexOf('/') + 1) : '';
   const base_url = 'file:///' + base_dir;
   const resolved_url = new URL(rel_path, base_url);
@@ -258,7 +262,8 @@ try {
       __módulo__: endereço,
       __valores_módulos__: valores_módulos,
       __resolve_endereço__: resolve_endereço,
-      __avaliar_módulo_lazy__: avaliar_módulo
+      __avaliar_módulo_lazy__: avaliar_módulo,
+      __carregar_conteúdo__: carregar_conteúdo
     };
     
     // First pass: declare all constant names

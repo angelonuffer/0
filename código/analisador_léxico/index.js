@@ -52,6 +52,7 @@ const letra = inversão(
   alternativa(
     espaço_em_branco,
     faixa("!", "?"),
+    símbolo("@"),
     faixa("[", "^"),
     faixa("{", "~"),
   ),

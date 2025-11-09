@@ -1,0 +1,27 @@
+uniteste = ../integração/uniteste.0
+
+uniteste.descrever({ nome: "Operador de carregamento (@)" testes: [
+  uniteste.iguais([
+    @ "./arquivos_teste/saudacao.txt"
+    "Olá mundo"
+  ])
+  uniteste.iguais([
+    @ "./arquivos_teste/numero.txt"
+    "123"
+  ])
+  uniteste.iguais([
+    @ "./arquivos_teste/utf8.txt"
+    "conteúdo UTF-8: café ☕"
+  ])
+  uniteste.iguais([
+    (
+      caminho = "./arquivos_teste/saudacao.txt"
+      @ caminho
+    )
+    "Olá mundo"
+  ])
+  uniteste.iguais([
+    (@ "./arquivos_teste/numero.txt")[.]
+    3
+  ])
+]})

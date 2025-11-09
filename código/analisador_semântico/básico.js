@@ -24,6 +24,36 @@ export const avaliarBásico = async (ast, escopo) => {
       return valor;
     }
 
+    case 'carregar': {
+      // Evaluate the expression to get the address
+      const endereço_expr = await avaliar(ast.expressão, escopo);
+      
+      // Get carregar_conteúdo and resolve_endereço from scope (check parent chain)
+      let carregar_conteúdo, resolve_endereço, módulo_atual;
+      let current_scope = escopo;
+      while (current_scope) {
+        if (current_scope.__carregar_conteúdo__) {
+          carregar_conteúdo = current_scope.__carregar_conteúdo__;
+          resolve_endereço = current_scope.__resolve_endereço__;
+          módulo_atual = current_scope.__módulo__;
+          break;
+        }
+        current_scope = current_scope.__parent__;
+      }
+      
+      if (!carregar_conteúdo || !resolve_endereço || !módulo_atual) {
+        const erro = new Error('Content loading context not available');
+        erro.é_erro_semântico = true;
+        throw erro;
+      }
+      
+      // Resolve the address relative to the current module
+      const endereço_resolvido = resolve_endereço(módulo_atual, endereço_expr);
+      
+      // Load and return the content
+      return await carregar_conteúdo(endereço_resolvido);
+    }
+
     case 'parênteses':
       return await avaliar(ast.expressão, escopo);
 
