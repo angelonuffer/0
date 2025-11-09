@@ -1,7 +1,7 @@
 // Main expression and module parser - expressão, _0
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
-import { espaço, nome, endereço } from '../analisador_léxico/index.js';
+import { espaço, nome } from '../analisador_léxico/index.js';
 
 // Forward declarations
 let getTermo6;
@@ -48,20 +48,6 @@ const _0 = opcional(
   transformar(
     sequência(
       opcional(espaço),
-      opcional(vários(
-        sequência(
-          sequência(
-            nome,
-            opcional(espaço),
-            símbolo("#"),
-            opcional(espaço),
-            endereço,
-          ),
-          espaço,
-        ),
-      ), []),
-
-      opcional(espaço),
       // Parse constant declarations: nome = expressão
       opcional(vários(
         sequência(
@@ -78,8 +64,7 @@ const _0 = opcional(
       opcional(espaço),
     ),
     valorSeq => {
-      const [, importaçõesDetectadas_val, , declarações_val, , corpoAst] = valorSeq;
-      const importações = importaçõesDetectadas_val.map(([[nome, , , , endereço]]) => [nome, endereço])
+      const [, declarações_val, , corpoAst] = valorSeq;
 
       // Extract declarations
       const declarações = declarações_val.map(([nome_var, , , , valorExpr]) => ({
@@ -88,7 +73,7 @@ const _0 = opcional(
       }));
 
       return {
-        importações: importações,
+        importações: [],
         declarações: declarações,
         expressão: corpoAst
       };

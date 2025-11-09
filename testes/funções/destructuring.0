@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Destructuring de objetos em parâmetros de função" testes: [
   // Test basic destructuring

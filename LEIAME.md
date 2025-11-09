@@ -59,7 +59,6 @@ Tokens léxicos
 - Setas: `=>` (usada para definir funções)
 - Operadores aritméticos e lógicos: `+`, `-`, `*`, `/`, `&`, `|`, `!`, `%`
 - Comparadores: `>`, `<`, `>=`, `<=`, `==`, `!=`
-- Operador de importação formada por `#` (veja a seção de importação)
 - Operador de espalhamento: `...` (três pontos consecutivos)
 - Separador implícito: elementos em listas e objetos são separados por espaço em branco; vírgulas não são parte da sintaxe.
 
@@ -79,10 +78,10 @@ Gramática sintática (construções principais)
 - Não há terminador obrigatório de declaração; quebras de linha e espaços em branco separam declarações.
 
 3. Importação
-- A importação de módulo pode ocorrer de duas formas sintáticas:
-  a) Importação de módulo para avaliação imediata usando o operador `#`: a sintaxe é `expressao # caminho`, onde `caminho` é uma string literal ou um identificador que represente um caminho; o resultado desta expressão é o valor exportado do módulo referenciado.
-  b) Importação do módulo como valor: atribuir um caminho de módulo a um identificador no nível do módulo faz com que o identificador represente o módulo (ou seu valor) e possa ser chamado/avaliado posteriormente.
-- Caminhos aceitos: nomes de arquivo simples (ex.: `soma.0`), caminhos relativos começando com `./` ou `../`, ou URLs que iniciam com `http://` ou `https://`.
+- A importação de módulo é feita atribuindo um caminho de módulo a um identificador no nível do módulo. O identificador representa o módulo (ou seu valor) e pode ser usado posteriormente em expressões.
+- Sintaxe: `identificador = caminho`, onde `caminho` é um literal de endereço (path literal).
+- Caminhos aceitos: nomes de arquivo simples (ex.: `soma.0`), caminhos relativos começando com `./` ou `../`, ou URLs que iniciam com `https://`.
+- Exemplo: `uniteste = ../integração/uniteste.0` importa o módulo uniteste.0 e atribui seu valor ao identificador `uniteste`.
 
 4. Expressões e precedência
 - Expressões são compostas por literais, identificadores, chamadas de função, operadores binários/ unários, agrupamentos e construções de coleção.

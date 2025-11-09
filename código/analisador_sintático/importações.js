@@ -1,31 +1,17 @@
 // Import parser - extracts imports from module content
-import { sequência, opcional, vários, transformar, símbolo } from '../combinadores/index.js';
-import { espaço, nome, endereço } from '../analisador_léxico/index.js';
+// Note: This module no longer parses # imports as they have been removed.
+// Imports are now done only with URL literals as values.
+import { sequência, opcional, transformar } from '../combinadores/index.js';
+import { espaço } from '../analisador_léxico/index.js';
 
 // Parser for extracting imports from module content
-// Returns a list of objects with { nome, endereço } structure
+// Returns empty list since # imports are no longer supported
 const importações = transformar(
   sequência(
     opcional(espaço),
-    opcional(vários(
-      sequência(
-        sequência(
-          nome,
-          opcional(espaço),
-          símbolo("#"),
-          opcional(espaço),
-          endereço,
-        ),
-        espaço,
-      ),
-    ), []),
   ),
   valorSeq => {
-    const [, importaçõesDetectadas_val] = valorSeq;
-    return importaçõesDetectadas_val.map(([[nome_val, , , , endereço_val]]) => ({
-      nome: nome_val,
-      endereço: endereço_val
-    }));
+    return [];
   }
 );
 

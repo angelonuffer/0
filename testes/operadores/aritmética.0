@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Aritmética" testes: [
   uniteste.descrever({ nome: "Adição" testes: [

@@ -1,4 +1,4 @@
-uniteste # ../integração/uniteste.0
+uniteste = ../integração/uniteste.0
 
 uniteste.descrever({ nome: "Edge Cases" testes: [
   uniteste.descrever({ nome: "Empty separator splits each character" testes: [
