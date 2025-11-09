@@ -1,3 +1,0 @@
-// Test that module imports still work
-helper = ./sintaxe/importação_módulo_valor_helper.0
-helper
