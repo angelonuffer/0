@@ -1,6 +1,6 @@
 // Basic evaluation cases - números, texto, variável, não, parênteses
 
-import { buscarVariável } from './escopo.js';
+import { buscarVariável, INTERNAL_CONTEXT } from './escopo.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -28,30 +28,29 @@ export const avaliarBásico = async (ast, escopo) => {
       // Evaluate the expression to get the address
       const endereço_expr = await avaliar(ast.expressão, escopo);
       
-      // Get carregar_conteúdo and resolve_endereço from scope (check parent chain)
-      let carregar_conteúdo, resolve_endereço, módulo_atual;
+      // Get internal context from scope (check parent chain)
+      let context, módulo_atual;
       let current_scope = escopo;
       while (current_scope) {
-        if (current_scope.__carregar_conteúdo__) {
-          carregar_conteúdo = current_scope.__carregar_conteúdo__;
-          resolve_endereço = current_scope.__resolve_endereço__;
+        if (current_scope[INTERNAL_CONTEXT]) {
+          context = current_scope[INTERNAL_CONTEXT];
           módulo_atual = current_scope.__módulo__;
           break;
         }
         current_scope = current_scope.__parent__;
       }
       
-      if (!carregar_conteúdo || !resolve_endereço || !módulo_atual) {
+      if (!context || !context.carregar_conteúdo || !context.resolve_endereço || !módulo_atual) {
         const erro = new Error('Content loading context not available');
         erro.é_erro_semântico = true;
         throw erro;
       }
       
       // Resolve the address relative to the current module
-      const endereço_resolvido = resolve_endereço(módulo_atual, endereço_expr);
+      const endereço_resolvido = context.resolve_endereço(módulo_atual, endereço_expr);
       
       // Load and return the content
-      return await carregar_conteúdo(endereço_resolvido);
+      return await context.carregar_conteúdo(endereço_resolvido);
     }
 
     case 'parênteses':
@@ -76,43 +75,41 @@ export const avaliarBásico = async (ast, escopo) => {
     }
 
     case 'endereço_literal': {
-      // Get module values from scope (check parent chain)
-      let valores_módulos, resolve_endereço, módulo_atual, avaliar_módulo_lazy;
+      // Get internal context from scope (check parent chain)
+      let context, módulo_atual;
       let current_scope = escopo;
       while (current_scope) {
-        if (current_scope.__valores_módulos__) {
-          valores_módulos = current_scope.__valores_módulos__;
-          resolve_endereço = current_scope.__resolve_endereço__;
+        if (current_scope[INTERNAL_CONTEXT]) {
+          context = current_scope[INTERNAL_CONTEXT];
           módulo_atual = current_scope.__módulo__;
-          avaliar_módulo_lazy = current_scope.__avaliar_módulo_lazy__;
           break;
         }
         current_scope = current_scope.__parent__;
       }
       
-      if (!valores_módulos || !resolve_endereço || !módulo_atual) {
+      if (!context || !context.valores_módulos || !context.resolve_endereço || !módulo_atual) {
         const erro = new Error('Module loading context not available');
         erro.é_erro_semântico = true;
         throw erro;
       }
       
       // Resolve the address relative to the current module
-      const endereço_resolvido = resolve_endereço(módulo_atual, ast.valor);
+      const endereço_resolvido = context.resolve_endereço(módulo_atual, ast.valor);
       
       // If module not yet evaluated and we have lazy evaluator, evaluate it now
-      if (!valores_módulos.hasOwnProperty(endereço_resolvido) && avaliar_módulo_lazy) {
-        return await avaliar_módulo_lazy(endereço_resolvido);
+      if (!context.valores_módulos.hasOwnProperty(endereço_resolvido) && context.avaliar_módulo_lazy) {
+        return await context.avaliar_módulo_lazy(endereço_resolvido);
       }
       
       // Return the module value
-      if (!valores_módulos.hasOwnProperty(endereço_resolvido)) {
+      if (!context.valores_módulos.hasOwnProperty(endereço_resolvido)) {
         const erro = new Error(`Module not loaded: ${ast.valor}`);
         erro.é_erro_semântico = true;
         erro.termo_busca = ast.valor;
         throw erro;
       }
       
-      return valores_módulos[endereço_resolvido];
+      return context.valores_módulos[endereço_resolvido];
     }
 
     default:

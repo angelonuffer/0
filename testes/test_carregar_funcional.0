@@ -1,0 +1,3 @@
+// Test that @ operator (carregar) still works
+resultado = @ "./sintaxe/importação_módulo_valor_helper.0"
+resultado
