@@ -1,5 +1,8 @@
 // Scope management - Creating, searching, and defining variables in scope
 
+// Symbol for internal context - not accessible through normal variable lookup
+export const INTERNAL_CONTEXT = Symbol('internal_context');
+
 export const criarEscopo = (parent = null) => ({ __parent__: parent });
 
 // Lazy thunk marker
@@ -34,7 +37,7 @@ export const buscarVariável = async (escopo, nome) => {
   atualEscopo = escopo;
   while (atualEscopo) {
     for (const key of Object.keys(atualEscopo)) {
-      if (key !== '__parent__' && key !== '__módulo__' && !nomesDisponíveis.includes(key)) {
+      if (key !== '__parent__' && key !== '__módulo__' && key !== INTERNAL_CONTEXT && !nomesDisponíveis.includes(key)) {
         nomesDisponíveis.push(key);
       }
     }

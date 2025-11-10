@@ -1,6 +1,6 @@
 import { _0 } from './analisador_sintático/index.js';
 import { importações } from './analisador_sintático/importações.js';
-import { avaliar, criarLazyThunk } from './analisador_semântico/index.js';
+import { avaliar, criarLazyThunk, INTERNAL_CONTEXT } from './analisador_semântico/index.js';
 import fs from 'fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -260,10 +260,12 @@ try {
       ...escopo_importações, 
       __parent__: null, 
       __módulo__: endereço,
-      __valores_módulos__: valores_módulos,
-      __resolve_endereço__: resolve_endereço,
-      __avaliar_módulo_lazy__: avaliar_módulo,
-      __carregar_conteúdo__: carregar_conteúdo
+      [INTERNAL_CONTEXT]: {
+        valores_módulos: valores_módulos,
+        resolve_endereço: resolve_endereço,
+        avaliar_módulo_lazy: avaliar_módulo,
+        carregar_conteúdo: carregar_conteúdo
+      }
     };
     
     // First pass: declare all constant names
