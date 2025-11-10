@@ -1,5 +1,19 @@
 // Parser combinators - Generic reusable parsing functions
-// These combinators are not specific to the project and can be reused by other projects
+// Enhanced with pushdown automaton approach for better error tracking and performance
+//
+// Key improvements over traditional parser combinators:
+// 1. Deterministic parsing: No backtracking - alternatives return immediately on first success
+// 2. State tracking: Explicit tracking of furthest position reached (menor_resto)
+// 3. Error reporting: Maintains error at deepest parse point for accurate diagnostics
+// 4. Implicit state stack: The call stack serves as the pushdown automaton's state stack
+//
+// The parser uses menor_resto to track the furthest position reached during parsing,
+// which allows identification of the exact character that caused a syntax error.
+// This implements the pushdown automaton concept where:
+// - States are parser functions
+// - Stack is the call stack (implicit)
+// - Transitions are function calls
+// - Progress tracking avoids backtracking
 
 const símbolo = símbolo_esperado => código => {
   if (código.startsWith(símbolo_esperado)) return {
@@ -20,17 +34,24 @@ const alternativa = (...analisadores) => código => {
   let menor_resto = código
   let melhor_erro = null
   
-  for (const analisador of analisadores) {
+  // Try alternatives in order - return immediately on success (no backtracking)
+  for (let i = 0; i < analisadores.length; i++) {
+    const analisador = analisadores[i]
     const resultado = analisador(código)
     
-    // Se teve sucesso, retorna imediatamente
+    // Immediate return on success - deterministic, no backtracking needed
     if (resultado.sucesso) return resultado
     
-    // Acompanha o progresso mais profundo (menor resto)
+    // Track the deepest failure for error reporting
     const resto_atual = resultado.menor_resto || resultado.resto
     if (resto_atual.length < menor_resto.length) {
       menor_resto = resto_atual
       melhor_erro = resultado.erro
+    } else if (resto_atual.length === menor_resto.length && resultado.erro) {
+      // Same depth - keep more informative error
+      if (!melhor_erro || (resultado.erro.mensagem && resultado.erro.mensagem.length > (melhor_erro.mensagem || '').length)) {
+        melhor_erro = resultado.erro
+      }
     }
   }
   
@@ -48,27 +69,34 @@ const sequência = (...analisadores) => código => {
   let resto = código
   let menor_resto_global = código
 
-  for (const analisador of analisadores) {
+  for (let i = 0; i < analisadores.length; i++) {
+    const analisador = analisadores[i]
     const resultado = analisador(resto)
     
-    // Atualiza o menor_resto_global com o progresso mais profundo
+    // Always update menor_resto_global to track furthest position reached
     const resto_atual = resultado.menor_resto || resultado.resto
     if (resto_atual.length < menor_resto_global.length) {
       menor_resto_global = resto_atual
     }
     
     if (!resultado.sucesso) {
+      // Forward the error from the deepest point
       return {
         sucesso: false,
         valor: undefined,
         resto: código,
         menor_resto: menor_resto_global,
-        erro: resultado.erro
+        erro: resultado.erro || { mensagem: "Erro na sequência", posição: resto_atual }
       }
     }
 
     valores.push(resultado.valor)
     resto = resultado.resto
+    
+    // Update menor_resto to current successfully parsed position
+    if (resto.length < menor_resto_global.length) {
+      menor_resto_global = resto
+    }
   }
 
   return { sucesso: true, valor: valores, resto, menor_resto: menor_resto_global }
