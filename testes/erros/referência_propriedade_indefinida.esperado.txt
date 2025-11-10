@@ -1,7 +1,3 @@
 Erro: Nome não encontrado: objetoNaoDefinido
 testes/erros/referência_propriedade_indefinida.0
 2:1: objetoNaoDefinido["campo"]
-     __valores_módulos__
-     __resolve_endereço__
-     __avaliar_módulo_lazy__
-     __carregar_conteúdo__
