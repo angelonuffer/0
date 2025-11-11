@@ -96,8 +96,10 @@ Erros de referência ocorrem quando o código tenta acessar um identificador que
 
 Esses erros também gerarão mensagens informativas, como:
 
+```
 Erro: Nome não encontrado: <nome da variável ou função>
 <endereço do arquivo>
 <número da linha>:<número da coluna>: <linha com erro>
+```
 
 Essas mensagens ajudam o desenvolvedor a identificar e corrigir rapidamente o problema.
