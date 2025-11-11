@@ -26,109 +26,78 @@ O módulo principal deve exportar um valor do tipo texto, que será enviado para
 node código/0_node.js testes/0 | node
 ```
 
-## Sintaxe
+## Módulo
 
-- Exemplos e casos de uso estão disponíveis no diretório "testes" do repositório.
+Um módulo na linguagem 0 é um arquivo com extensão `.0` que contém zero ou mais declarações de nível superior seguidas por uma expressão final. As declarações são escritas na forma `identificador = expressão` e são avaliadas sequencialmente. A expressão final do módulo determina o valor exportado, sem necessidade de palavra-chave explícita de exportação. Importações são realizadas através de atribuições de caminhos de arquivo (relativos como `./arquivo.0` ou `../pasta/arquivo.0`) ou URLs HTTPS a identificadores, permitindo que módulos externos sejam referenciados e utilizados no código.
 
-Conjunto de caracteres e codificação
+## Identificador
 
-- A linguagem usa codificação UTF-8.
-- Espaços em branco válidos: caractere espaço (U+0020), tabulação horizontal (U+0009), quebra de linha (LF U+000A) e retorno de carro (CR U+000D). Todos são considerados separadores de tokens, exceto dentro de literais de texto.
-- Comentários de linha iniciam com os dois caracteres `//` e vão até o fim da linha; o conteúdo do comentário é ignorado pelo analisador léxico.
+Um identificador na linguagem 0 é um nome usado para referenciar valores, funções, parâmetros e módulos importados. Ele deve iniciar com uma letra Unicode (maiúscula ou minúscula) ou um underscore `_`, seguido por zero ou mais letras, dígitos ou underscores. Identificadores são sensíveis a maiúsculas e minúsculas, o que significa que `variavel`, `Variavel` e `VARIAVEL` são três identificadores distintos. Não existem palavras reservadas na linguagem, portanto qualquer sequência que siga essas regras pode ser usada como identificador. Exemplos válidos incluem: `x`, `soma`, `_temp`, `valor1`, `calcularMédia`, `π` (letra grega pi).
 
-Tokens léxicos
+## Expressão
 
-1. Identificadores
-- Sintaxe: um identificador inicia com um caractere Unicode de letra (A–Z, a–z, ou outras letras Unicode), ou o caractere underscore `_`, seguido por zero ou mais letras, dígitos (0–9) ou underscores. Regex aproximado: `^[_\p{L}][_\p{L}\p{N}]*` (onde `\p{L}` e `\p{N}` representam classes Unicode de letras e números respectivamente).
-- Identificadores são sensíveis a maiúsculas e minúsculas.
+Uma expressão é a unidade fundamental de computação que produz um valor. Pode ser um literal, identificador, operação, chamada de função, acesso a coleção ou definição de função.
 
-2. Números
-- A linguagem suporta números inteiros com sinal opcional. Formato: um sinal negativo opcional `-` seguido por uma sequência de um ou mais dígitos ASCII (`0`–`9`). Não há suporte a ponto decimal ou notação exponencial nesta especificação; somente inteiros.
-- Exemplos sintáticos no parser: um token numérico corresponde à regex `^-?[0-9]+`.
+### Literais
 
-3. Literais de texto (strings)
-- Delimitador: aspas duplas `"` (U+0022). Uma string inicia com `"` e termina no próximo `"` não escapado.
-- Caracteres de escape suportados: `\"` para aspas duplas, `\\` para barra invertida, `\n` para nova linha, `\r` para retorno de carro, `\t` para tabulação, e `\uXXXX` (onde `XXXX` são quatro hexadecimais) para escapes Unicode. Qualquer outro caractere precedido por `\` é inválido.
-- Strings podem incluir qualquer caractere Unicode exceto quebras de linha não escapadas.
+- **Números**: `42`, `-7`
+- **Textos**: `"olá"`
+- **Listas**: `[1 2 3]`
+- **Objetos**: `{x: 10 y: 20}`
 
-4. Pontuação e operadores (tokens únicos)
-- Parênteses: `(` e `)`
-- Colchetes: `[` e `]`
-- Chaves: `{` e `}`
-- Dois-pontos: `:` (usado em pares chave-valor e em slices)
-- Setas: `=>` (usada para definir funções)
-- Operadores aritméticos e lógicos: `+`, `-`, `*`, `/`, `&`, `|`, `!`, `%`
-- Comparadores: `>`, `<`, `>=`, `<=`, `==`, `!=`
-- Operador de carregamento: `@` (carrega conteúdo de arquivo local ou remoto)
-- Operador de espalhamento: `...` (três pontos consecutivos)
-- Separador implícito: elementos em listas e objetos são separados por espaço em branco; vírgulas não são parte da sintaxe.
+### Identificadores
 
-Notas lexicais
+Referências a valores previamente definidos: `variavel`, `resultado`
 
-- O analisador diferencia `-` como operador de subtração e como sinal de número automaticamente com base no contexto léxico/ sintático: se o `-` aparece imediatamente antes de um dígito e não separado por espaço quando um literal numérico é esperado, ele será interpretado como parte do literal numérico; caso contrário, é o operador binário/ unário de subtração.
-- Sequências de três pontos `...` têm prioridade léxica sobre duas ou uma ocorrências de ponto; o lexer deve agrupar o maior token válido.
+### Operações
 
-Gramática sintática (construções principais)
+- **Aritméticas**: `a + b * 2`
+- **Lógicas**: `x > 0 & y < 100`
 
-1. Módulo e exportação
-- Um arquivo fonte (módulo) consiste em zero ou mais declarações de nível de módulo seguidas por uma expressão principal final.
-- O valor exportado pelo módulo é o valor resultante da avaliação da expressão principal final do arquivo. Não existe uma palavra-chave `export`; a exportação é implícita pela expressão final do módulo.
+### Chamadas de Função
 
-2. Declarações no nível do módulo
-- Estrutura: uma declaração de nível de módulo é uma atribuição de forma `identificador = expressão` ou `identificador = referência` (referência pode ser um caminho de módulo). Declarações são avaliadas em ordem de aparição e ficam visíveis para as expressões subsequentes e para a expressão principal.
-- Não há terminador obrigatório de declaração; quebras de linha e espaços em branco separam declarações.
+Aplicação de funções a argumentos: `soma(5 3)`, `filtrar(lista condicao)`
 
-3. Importação
-- A importação de módulo é feita atribuindo um caminho de módulo a um identificador no nível do módulo. O identificador representa o módulo (ou seu valor) e pode ser usado posteriormente em expressões.
-- Sintaxe: `identificador = caminho`, onde `caminho` é um literal de endereço (path literal).
-- Caminhos aceitos: nomes de arquivo simples (ex.: `soma.0`), caminhos relativos começando com `./` ou `../`, ou URLs que iniciam com `https://`.
-- Exemplo: `uniteste = ../integração/uniteste.0` importa o módulo uniteste.0 e atribui seu valor ao identificador `uniteste`.
+### Indexação e Fatiamento
 
-4. Expressões e precedência
-- Expressões são compostas por literais, identificadores, chamadas de função, operadores binários/ unários, agrupamentos e construções de coleção.
-- Precedência dos operadores (do mais alto para o mais baixo):
-  1) Unary: `!` (negação), unário `-` (negação aritmética)
-  2) Multiplicativo: `*` `/`
-  3) Aditivo: `+` `-`
-  4) Comparadores: `>` `<` `>=` `<=` `==` `!=`
-  5) Lógicos: `&` (AND), `|` (OR)
-- Operadores são, por padrão, associativos à esquerda, exceto quando especificado de outra forma.
-- Parênteses `(` `)` alteram a ordem de avaliação e são usados para agrupar expressões.
+Acesso a elementos de coleções: `lista[0]`, `texto[1:5]`, `objeto[chave]`
 
-5. Funções
-- Sintaxe de definição: `identificador = parametros => corpo` onde `parametros` é uma lista de parâmetros separados por espaço e `corpo` é uma expressão que representa o valor retornado pela função.
-- Parâmetros simples são identificadores. Parâmetros por destructuring usam a sintaxe de objeto com chaves: `{ chave1 chave2 }` correspondendo aos campos do argumento de objeto.
-- Guards (condições alternativas) em definições de função são representados por linhas adicionais iniciadas por `|` seguidas de uma condição, `=` e a expressão resultante; as alternativas são avaliadas de cima para baixo.
-- Chamadas de função: uma expressão seguida por parênteses contendo argumentos separados por espaço é tratada como chamada, por exemplo `f(arg1 arg2)`; parênteses vazios `()` representam chamada sem argumentos.
+### Funções Inline
 
-6. Coleções: listas e objetos
-- Listas: delimitadas por colchetes `[` `]`. Contêm apenas valores e os elementos são separados por espaço em branco; não se utilizam vírgulas. Ordem preservada.
-- Objetos: delimitados por chaves `{` `}`. Contêm apenas pares chave-valor com a sintaxe `identificador : expressão` para cada par; pares são separados por espaço em branco.
-- Chaves (keys) de objetos são identificadores ou literais de texto. Chaves calculadas podem ser escritas com a sintaxe `[ expressao ]` dentro do lugar da chave, por exemplo, um par ` [expressao] : expressao` onde a primeira `expressao` produz uma string usada como chave.
-- Operador de espalhamento: dentro de colchetes ou chaves, o token `...` seguido por uma expressão injeta os elementos/chaves do valor avaliado nessa posição.
+Definições de função usando sintaxe de seta: `x => x * 2`
 
-7. Indexação e fatiamento
-- A indexação usa colchetes: `expressao[indice]` onde `indice` é um inteiro (0-based). Se `indice` for negativo, a semântica é definida pelo runtime (geralmente contando de trás para frente) — implemente conforme convenção do interpretador.
-- Fatiamento: `expressao[inicio:fim]` onde `inicio` e `fim` são inteiros ou podem ser omitidos para indicar início ou fim da coleção. O operador `:` é exigido para slices; espaços em torno de `:` são permitidos.
-- Acesso especial de tamanho: `expressao[.]` retorna o número de elementos/itens da coleção.
+### Agrupamento
 
-8. Operações específicas de texto e coleções
-- Textos suportam operações de fatiamento, obtenção de tamanho, divisão (split) por um separador e junção (join) a partir de uma lista de textos; a semântica exata das operações depende do runtime, mas a sintaxe para invocá-las utiliza operadores e indexação conforme descrito neste documento.
-- Conversões entre caractere e código numérico: indexação de texto por inteiro retorna o código Unicode do caractere; operações de multiplicação de uma lista contendo um número por uma string podem produzir um texto conforme semântica do runtime.
+Parênteses alteram a precedência: `(a + b) * 2`
 
-9. Comentários e espaços
-- Comentários de linha: iniciam com `//` e vão até o fim da linha.
-- Não existem comentários de bloco na sintaxe atual.
-- Espaco em branco e quebras de linha servem para separar tokens; a maioria dos delimitadores e operadores não exige um separador explícito além do espaço quando ambiguidade pode ocorrer.
+## Erros de Sintaxe
 
-Semântica de avaliação (resumo)
+Erros de sintaxe ocorrem quando o código não segue as regras da linguagem. Exemplos comuns incluem:
 
-- Avaliação é estritamente por ordem de execução definida pelo interpretador: declarações de nível de módulo são avaliadas sequencialmente; a expressão principal final do módulo é avaliada e seu resultado é o valor exportado.
-- Funções são valores de primeira classe; chamadas são avaliadas aplicando os argumentos ao corpo da função no contexto de seus parâmetros.
-- Operadores lógicos `&` e `|` podem empregar avaliação curta (short-circuit) dependendo da implementação: `&` deve retornar `0` se um operando for logicamente falso; `|` deve retornar `0` somente se ambos operandos forem falsos. O operador `%` envia o valor para stderr e retorna o valor sem alteração.
-- Operador de carregamento `@`: este operador unário carrega e retorna o conteúdo textual de um arquivo a partir de um endereço local (caminho absoluto ou relativo) ou remoto (URL). Sintaxe: `@ expressão`, onde `expressão` é avaliada para obter o endereço. O conteúdo é retornado como uma string UTF-8. Suporta URLs HTTPS e caminhos de arquivo locais.
+- **Falta de parênteses**: `soma(5 3` deve ser `soma(5 3)`.
+- **Identificadores inválidos**: `1variavel` não é um identificador válido.
 
-Regras de parse e erros
+Quando um erro de sintaxe é encontrado, a execução do módulo falhará e uma mensagem de erro será exibida no terminal, indicando a linha e a natureza do erro. A mensagem geralmente segue o formato:
 
-- O analisador deve produzir um erro sintático descritivo quando encontrar sequência de tokens que não correspondam à gramática.
-- Erros semânticos (tipos incompatíveis, índice fora de intervalo, chave inexistente) devem produzir mensagens de erro claras com indicação do local quando possível.
+```
+Erro de sintaxe.
+<endereço do arquivo>
+<número da linha>:<número da coluna>: <linha com erro>
+```
+
+Isso ajuda o desenvolvedor a identificar rapidamente onde o problema ocorreu e como corrigí-lo.
+
+## Erros de Referência
+
+Erros de referência ocorrem quando o código tenta acessar um identificador que não foi definido. Exemplos incluem:
+
+- **Uso de identificadores não declarados**: `resultado` se não houver uma declaração anterior como `resultado = 10`.
+- **Importações falhas**: Tentar importar um módulo que não existe resultará em um erro.
+
+Esses erros também gerarão mensagens informativas, como:
+
+Erro: Nome não encontrado: <nome da variável ou função>
+<endereço do arquivo>
+<número da linha>:<número da coluna>: <linha com erro>
+
+Essas mensagens ajudam o desenvolvedor a identificar e corrigir rapidamente o problema.
