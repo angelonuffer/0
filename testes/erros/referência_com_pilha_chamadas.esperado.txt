@@ -1,0 +1,12 @@
+Erro: Nome não encontrado: variavelNaoDefinida
+testes/erros/referência_com_pilha_chamadas.0
+5:10: h = z => variavelNaoDefinida + z
+               Pilha de chamadas:
+                 em f
+                 em g
+                 em h
+               
+               z
+               f
+               g
+               h

@@ -104,10 +104,27 @@ const mostrar_erro_semântico = (endereço, mensagem_erro, termo_busca, informa�
 };
 
 // Helper function to show undefined variable error with context
-const mostrar_erro_variável = (endereço, nome_variável, nomes_disponíveis) => {
-  const informações_extras = nomes_disponíveis.length > 0 
-    ? nomes_disponíveis 
-    : [];
+const mostrar_erro_variável = (endereço, nome_variável, nomes_disponíveis, pilha_chamadas = []) => {
+  const informações_extras = [];
+  
+  // Add call stack if available
+  if (pilha_chamadas && pilha_chamadas.length > 0) {
+    informações_extras.push('Pilha de chamadas:');
+    // Show from outermost to innermost (first call to last call)
+    for (const chamada of pilha_chamadas) {
+      if (chamada.nome) {
+        informações_extras.push(`  em ${chamada.nome}`);
+      }
+    }
+  }
+  
+  // Add available names
+  if (nomes_disponíveis.length > 0) {
+    if (informações_extras.length > 0) {
+      informações_extras.push(''); // Empty line separator
+    }
+    informações_extras.push(...nomes_disponíveis);
+  }
   
   mostrar_erro_semântico(endereço, `Nome não encontrado: ${nome_variável}`, nome_variável, informações_extras);
 };
@@ -287,7 +304,7 @@ try {
             
             // Check if it's an undefined variable error (special case)
             if (erro.nome_variável) {
-              mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+              mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis, erro.pilha_chamadas);
             } else if (erro.termo_busca) {
               // Generic semantic error with search term
               mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
@@ -315,7 +332,7 @@ try {
         
         // Check if it's an undefined variable error (special case)
         if (erro.nome_variável) {
-          mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+          mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis, erro.pilha_chamadas);
         } else if (erro.termo_busca) {
           // Generic semantic error with search term
           mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);

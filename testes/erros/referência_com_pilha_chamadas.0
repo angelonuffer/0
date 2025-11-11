@@ -1,0 +1,7 @@
+// Teste de erro de referência com pilha de chamadas
+// Quando uma variável não definida é acessada dentro de funções aninhadas
+f = x => g(x)
+g = y => h(y)
+h = z => variavelNaoDefinida + z
+
+f(10)

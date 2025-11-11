@@ -23,6 +23,11 @@ export const avaliarFunção = async (ast, escopo) => {
       return async (caller_context, ...valoresArgs) => {
         const fn_scope = { __parent__: escopo || null };
         
+        // If caller_context has call stack information, inherit it
+        if (caller_context && caller_context.__pilha_chamadas__) {
+          fn_scope.__pilha_chamadas__ = caller_context.__pilha_chamadas__;
+        }
+        
         // Handle object destructuring
         if (ast.destructuring) {
           const argValue = valoresArgs.length === 1 ? valoresArgs[0] : valoresArgs;
@@ -95,11 +100,33 @@ export const avaliarFunção = async (ast, escopo) => {
         erro.módulo_endereço = obterEndereçoMódulo(escopo);
         throw erro;
       }
+      
+      // Build the call stack by collecting from current scope and adding this call
+      const pilha_atual = [];
+      let atualEscopo = escopo;
+      while (atualEscopo) {
+        if (atualEscopo.__pilha_chamadas__) {
+          pilha_atual.push(...atualEscopo.__pilha_chamadas__);
+          break;
+        }
+        atualEscopo = atualEscopo.__parent__;
+      }
+      pilha_atual.push({
+        nome: ast.nome,
+        módulo: obterEndereçoMódulo(escopo)
+      });
+      
+      // Create a new scope for the call with call stack information
+      const call_scope = { 
+        __parent__: escopo,
+        __pilha_chamadas__: pilha_atual
+      };
+      
       if (ast.argumento !== undefined) {
         const arg_value = await avaliar(ast.argumento, escopo);
-        return await função(escopo, arg_value);
+        return await função(call_scope, arg_value);
       } else {
-        return await função(escopo);
+        return await função(call_scope);
       }
     }
 

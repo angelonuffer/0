@@ -37,7 +37,7 @@ export const buscarVariável = async (escopo, nome) => {
   atualEscopo = escopo;
   while (atualEscopo) {
     for (const key of Object.keys(atualEscopo)) {
-      if (key !== '__parent__' && key !== '__módulo__' && key !== INTERNAL_CONTEXT && !nomesDisponíveis.includes(key)) {
+      if (key !== '__parent__' && key !== '__módulo__' && key !== '__pilha_chamadas__' && key !== INTERNAL_CONTEXT && !nomesDisponíveis.includes(key)) {
         nomesDisponíveis.push(key);
       }
     }
@@ -55,11 +55,23 @@ export const buscarVariável = async (escopo, nome) => {
     atualEscopo = atualEscopo.__parent__;
   }
   
+  // Collect call stack from the scope chain
+  const pilha_chamadas = [];
+  atualEscopo = escopo;
+  while (atualEscopo) {
+    if (atualEscopo.__pilha_chamadas__) {
+      pilha_chamadas.push(...atualEscopo.__pilha_chamadas__);
+      break;
+    }
+    atualEscopo = atualEscopo.__parent__;
+  }
+  
   const erro = new Error(`Nome não encontrado: ${nome}`);
   erro.é_erro_semântico = true;
   erro.nome_variável = nome;
   erro.nomes_disponíveis = nomesDisponíveis;
   erro.módulo_endereço = módulo_endereço;
+  erro.pilha_chamadas = pilha_chamadas;
   throw erro;
 };
 
