@@ -1,3 +1,3 @@
 Erro: Nome não encontrado: objetoNaoDefinido
-testes/erros/referência_propriedade_indefinida.0
+testes/erros/referência/referência_propriedade_indefinida.0
 2:1: objetoNaoDefinido["campo"]

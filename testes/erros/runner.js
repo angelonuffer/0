@@ -57,11 +57,28 @@ function compararSaidas(obtida, esperada, caminhoBase) {
   return obtidaNorm === esperadaNorm;
 }
 
+// Função para coletar arquivos de teste de um diretório
+function coletarArquivosTeste(diretorio) {
+  const arquivos = [];
+  const itens = readdirSync(diretorio, { withFileTypes: true });
+  
+  for (const item of itens) {
+    if (item.isDirectory()) {
+      // Recursivamente busca em subdiretórios
+      const subDiretorio = join(diretorio, item.name);
+      const subArquivos = coletarArquivosTeste(subDiretorio);
+      arquivos.push(...subArquivos);
+    } else if (item.name.endsWith('.0')) {
+      arquivos.push(join(diretorio, item.name));
+    }
+  }
+  
+  return arquivos;
+}
+
 // Função principal de teste
 function executarTestes() {
-  const arquivosTeste = readdirSync(__dirname)
-    .filter(f => f.endsWith('.0'))
-    .sort();
+  const arquivosTeste = coletarArquivosTeste(__dirname).sort();
   
   let passaram = 0;
   let falharam = 0;
@@ -70,10 +87,10 @@ function executarTestes() {
   
   console.log('Executando testes de erros...\n');
   
-  for (const arquivo of arquivosTeste) {
-    const nomeBase = arquivo.replace('.0', '');
-    const caminhoTeste = join(__dirname, arquivo);
-    const caminhoEsperado = join(__dirname, `${nomeBase}.esperado.txt`);
+  for (const caminhoTeste of arquivosTeste) {
+    const arquivo = caminhoTeste.replace(__dirname + '/', '');
+    const nomeBase = caminhoTeste.replace('.0', '');
+    const caminhoEsperado = `${nomeBase}.esperado.txt`;
     
     try {
       // Verifica se existe arquivo esperado

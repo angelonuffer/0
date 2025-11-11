@@ -1,0 +1,1 @@
+Error: ENOENT: no such file or directory, open 'testes/erros/referência/arquivo_que_nao_existe.0'

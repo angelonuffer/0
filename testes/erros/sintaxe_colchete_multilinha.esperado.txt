@@ -1,3 +1,0 @@
-Erro de sintaxe.
-testes/erros/sintaxe_colchete_multilinha.0
-5:4:   3

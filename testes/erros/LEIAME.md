@@ -2,9 +2,16 @@
 
 Esta pasta contém testes de erros de sintaxe e referência da linguagem 0.
 
+## Estrutura
+
+Os testes de erro estão organizados em duas subpastas:
+
+- `sintaxe/` - Testes de erros de sintaxe
+- `referência/` - Testes de erros de referência
+
 ## Erros de Sintaxe
 
-Testes que demonstram erros de sintaxe na linguagem:
+Testes que demonstram erros de sintaxe na linguagem (localizados em `sintaxe/`):
 
 - `sintaxe_colchete.0` - Colchete não fechado
 - `sintaxe_parêntese.0` - Parêntese não fechado
@@ -15,7 +22,7 @@ Testes que demonstram erros de sintaxe na linguagem:
 
 ## Erros de Referência
 
-Testes que demonstram erros de referência na linguagem:
+Testes que demonstram erros de referência na linguagem (localizados em `referência/`):
 
 - `referência_variável_indefinida.0` - Uso de variável não definida
 - `referência_função_indefinida.0` - Chamada de função não definida
@@ -37,7 +44,9 @@ Para cada teste de erro, existem dois arquivos:
 Para verificar manualmente se um erro é gerado corretamente:
 
 ```bash
-node código/0_node.js testes/erros/<arquivo>.0 node
+node código/0_node.js testes/erros/sintaxe/<arquivo>.0 node
+# ou
+node código/0_node.js testes/erros/referência/<arquivo>.0 node
 ```
 
 O interpretador deve retornar um código de saída diferente de zero e exibir uma mensagem de erro apropriada.
@@ -51,7 +60,7 @@ node testes/erros/runner.js
 ```
 
 O runner irá:
-- Executar cada teste de erro
+- Executar cada teste de erro (incluindo os das subpastas)
 - Comparar a saída obtida com a saída esperada
 - Reportar quais testes passaram ou falharam
 - Retornar código de saída 0 se todos passarem, 1 caso contrário

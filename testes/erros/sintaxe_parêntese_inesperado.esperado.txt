@@ -1,3 +1,0 @@
-Erro de sintaxe.
-testes/erros/sintaxe_parêntese_inesperado.0
-5:1: )

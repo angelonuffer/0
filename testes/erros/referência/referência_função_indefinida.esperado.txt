@@ -1,3 +1,3 @@
 Erro: Nome não encontrado: funcaoNaoDefinida
-testes/erros/referência_função_indefinida.0
+testes/erros/referência/referência_função_indefinida.0
 2:1: funcaoNaoDefinida(42)

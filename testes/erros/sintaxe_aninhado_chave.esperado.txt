@@ -1,3 +1,0 @@
-Erro de sintaxe.
-testes/erros/sintaxe_aninhado_chave.0
-8:1: }

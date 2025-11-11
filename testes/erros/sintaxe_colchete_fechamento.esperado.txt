@@ -1,3 +1,0 @@
-Erro de sintaxe.
-testes/erros/sintaxe_colchete_fechamento.0
-2:5: x = ]
