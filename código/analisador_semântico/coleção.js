@@ -92,7 +92,38 @@ export const avaliarColeção = async (ast, escopo) => {
 
     case 'atributo': {
       const objeto = await avaliar(ast.objeto, escopo);
-      return objeto[ast.nome];
+
+      // If null or undefined, throw semantic error
+      if (objeto === null || objeto === undefined) {
+        const erro = new Error(`Cannot access property '${ast.nome}' of ${objeto}`);
+        erro.é_erro_semântico = true;
+        erro.módulo_endereço = obterEndereçoMódulo(escopo);
+        erro.termo_busca = String(ast.nome);
+        throw erro;
+      }
+
+      // If primitive (number/string/boolean), only allow string indexing/certain behavior via fatia
+      if (typeof objeto !== 'object') {
+        const erro = new Error(`Cannot access attribute '${ast.nome}' on value of type '${typeof objeto}'`);
+        erro.é_erro_semântico = true;
+        erro.módulo_endereço = obterEndereçoMódulo(escopo);
+        erro.termo_busca = String(ast.nome);
+        throw erro;
+      }
+
+      // If property exists, return it
+      if (Object.prototype.hasOwnProperty.call(objeto, ast.nome)) {
+        return objeto[ast.nome];
+      }
+
+      // Property does not exist -> semantic "name not found" error with available names
+      const nomesDisponíveis = Object.keys(objeto).filter(k => k !== '__parent__');
+      const erro = new Error(`Nome não encontrado: ${ast.nome}`);
+      erro.é_erro_semântico = true;
+      erro.nome_variável = ast.nome;
+      erro.nomes_disponíveis = nomesDisponíveis;
+      erro.módulo_endereço = obterEndereçoMódulo(escopo);
+      throw erro;
     }
 
     default:
