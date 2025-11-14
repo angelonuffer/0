@@ -5,10 +5,7 @@ import fs from 'fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const modo_verbose = args.includes('-v');
-const módulo_principal = args.find(arg => !arg.startsWith('-'));
+const módulo_principal = process.argv[2];
 
 // Caminho absoluto do arquivo de cache no mesmo diretório deste 0_node.js
 const __filename = fileURLToPath(import.meta.url);
@@ -203,11 +200,7 @@ try {
     if (!módulo_bruto.sucesso) {
       // If there's an error with stack trace, it's a transformer error
       if (módulo_bruto.erro && módulo_bruto.erro.stack) {
-        if (modo_verbose) {
-          console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
-        } else {
-          console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}`);
-        }
+        console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
       } else {
         // Otherwise show syntax error
         mostrar_erro_sintaxe(endereço, módulo_bruto);
@@ -344,11 +337,6 @@ try {
   console.log(main_value);
   
 } catch (erro) {
-  if (modo_verbose) {
-    console.error(erro);
-  } else {
-    const mensagem = erro.message || erro;
-    console.error(erro instanceof Error ? `Error: ${mensagem}` : mensagem);
-  }
+  console.error(erro);
   process.exit(1);
 }
