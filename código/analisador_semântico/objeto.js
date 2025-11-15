@@ -20,6 +20,11 @@ export const avaliarObjeto = async (ast, escopo) => {
     return null; // Not handled by this module
   }
 
+  // If AST represents an empty object literal, return an object (not an array)
+  if (!ast.items || ast.items.length === 0) {
+    return {};
+  }
+
   if (ast.usarObjeto) {
     const listScope = { __parent__: escopo };
     let autoIndex = 0;
