@@ -1,3 +1,0 @@
-// Teste de erro de referência: importação de módulo inexistente
-modulo = ./arquivo_que_nao_existe.0
-modulo

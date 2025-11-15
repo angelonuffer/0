@@ -177,166 +177,160 @@ const conteúdos = {};
 const módulos = {};
 const valores_módulos = {};
 
-try {
-  // Helper function to parse a module on demand (async lazy loading)
-  const parsear_módulo = async (endereço) => {
-    // If already parsed, return cached result
-    if (módulos[endereço]) {
-      return módulos[endereço];
-    }
-    
-    // Load content lazily (async)
-    if (!conteúdos[endereço]) {
-      conteúdos[endereço] = await carregar_conteúdo(endereço);
-    }
-    
-    // Extract imports using the import parser
-    const importações_resultado = importações(conteúdos[endereço]);
-    const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
-    
-    const módulo_bruto = _0(conteúdos[endereço]);
-    
-    // Check if parsing failed
-    if (!módulo_bruto.sucesso) {
-      // If there's an error with stack trace, it's a transformer error
-      if (módulo_bruto.erro && módulo_bruto.erro.stack) {
-        console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
-      } else {
-        // Otherwise show syntax error
-        mostrar_erro_sintaxe(endereço, módulo_bruto);
-      }
-      salvar_cache();
-      process.exit(1);
-    }
-    
-    if (módulo_bruto.resto.length > 0) {
-      mostrar_erro_sintaxe(endereço, módulo_bruto);
-      salvar_cache();
-      process.exit(1);
-    }
-    
-    const corpo = módulo_bruto.valor.expressão;
-    const declarações = módulo_bruto.valor.declarações || [];
-    const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
-    
-    módulos[endereço] = {
-      importações: resolved_importações,
-      declarações: declarações,
-      expressão: corpo
-    };
-    
+// Helper function to parse a module on demand (async lazy loading)
+const parsear_módulo = async (endereço) => {
+  // If already parsed, return cached result
+  if (módulos[endereço]) {
     return módulos[endereço];
+  }
+  
+  // Load content lazily (async)
+  if (!conteúdos[endereço]) {
+    conteúdos[endereço] = await carregar_conteúdo(endereço);
+  }
+  
+  // Extract imports using the import parser
+  const importações_resultado = importações(conteúdos[endereço]);
+  const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
+  
+  const módulo_bruto = _0(conteúdos[endereço]);
+  
+  // Check if parsing failed
+  if (!módulo_bruto.sucesso) {
+    // If there's an error with stack trace, it's a transformer error
+    if (módulo_bruto.erro && módulo_bruto.erro.stack) {
+      console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
+    } else {
+      // Otherwise show syntax error
+      mostrar_erro_sintaxe(endereço, módulo_bruto);
+    }
+    salvar_cache();
+    process.exit(1);
+  }
+  
+  if (módulo_bruto.resto.length > 0) {
+    mostrar_erro_sintaxe(endereço, módulo_bruto);
+    salvar_cache();
+    process.exit(1);
+  }
+  
+  const corpo = módulo_bruto.valor.expressão;
+  const declarações = módulo_bruto.valor.declarações || [];
+  const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
+  
+  módulos[endereço] = {
+    importações: resolved_importações,
+    declarações: declarações,
+    expressão: corpo
   };
   
-  // Helper function to evaluate a module and its dependencies lazily (now async)
-  const avaliar_módulo = async (endereço) => {
-    // If already evaluated, return cached value
-    if (valores_módulos.hasOwnProperty(endereço)) {
-      return valores_módulos[endereço];
+  return módulos[endereço];
+};
+
+// Helper function to evaluate a module and its dependencies lazily (now async)
+const avaliar_módulo = async (endereço) => {
+  // If already evaluated, return cached value
+  if (valores_módulos.hasOwnProperty(endereço)) {
+    return valores_módulos[endereço];
+  }
+  
+  // Parse module if not yet parsed (lazy parsing - now async)
+  let módulo = módulos[endereço];
+  if (!módulo) {
+    módulo = await parsear_módulo(endereço);
+  }
+  
+  const { importações, declarações, expressão: corpoAst } = módulo;
+  
+  // Create lazy thunks for imports (now returns async functions)
+  const escopo_importações = {};
+  for (const [nome, dep_end] of importações) {
+    escopo_importações[nome] = criarLazyThunk(() => avaliar_módulo(dep_end));
+  }
+  
+  const escopo = { 
+    ...escopo_importações, 
+    __parent__: null, 
+    __módulo__: endereço,
+    [INTERNAL_CONTEXT]: {
+      valores_módulos: valores_módulos,
+      resolve_endereço: resolve_endereço,
+      avaliar_módulo_lazy: avaliar_módulo,
+      carregar_conteúdo: carregar_conteúdo
     }
-    
-    // Parse module if not yet parsed (lazy parsing - now async)
-    let módulo = módulos[endereço];
-    if (!módulo) {
-      módulo = await parsear_módulo(endereço);
+  };
+  
+  // First pass: declare all constant names
+  if (declarações) {
+    for (const decl of declarações) {
+      escopo[decl.nome] = undefined;
     }
-    
-    const { importações, declarações, expressão: corpoAst } = módulo;
-    
-    // Create lazy thunks for imports (now returns async functions)
-    const escopo_importações = {};
-    for (const [nome, dep_end] of importações) {
-      escopo_importações[nome] = criarLazyThunk(() => avaliar_módulo(dep_end));
-    }
-    
-    const escopo = { 
-      ...escopo_importações, 
-      __parent__: null, 
-      __módulo__: endereço,
-      [INTERNAL_CONTEXT]: {
-        valores_módulos: valores_módulos,
-        resolve_endereço: resolve_endereço,
-        avaliar_módulo_lazy: avaliar_módulo,
-        carregar_conteúdo: carregar_conteúdo
-      }
-    };
-    
-    // First pass: declare all constant names
-    if (declarações) {
-      for (const decl of declarações) {
-        escopo[decl.nome] = undefined;
-      }
-    }
-    
-    // Second pass: evaluate and assign values (now async)
-    if (declarações) {
-      for (const decl of declarações) {
-        try {
-          escopo[decl.nome] = await avaliar(decl.valor, escopo);
-        } catch (erro) {
-          // Check if it's a semantic analyzer error
-          if (erro.é_erro_semântico) {
-            const erro_endereço = erro.módulo_endereço || endereço;
-            
-            // Check if it's an undefined variable error (special case)
-            if (erro.nome_variável) {
-              mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
-            } else if (erro.termo_busca) {
-              // Generic semantic error with search term
-              mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
-            } else {
-              // Semantic error without search term - just show the message
-              console.log(`Erro: ${erro.message}\n${erro_endereço}`);
-            }
-            
-            salvar_cache();
-            process.exit(1);
+  }
+  
+  // Second pass: evaluate and assign values (now async)
+  if (declarações) {
+    for (const decl of declarações) {
+      try {
+        escopo[decl.nome] = await avaliar(decl.valor, escopo);
+      } catch (erro) {
+        // Check if it's a semantic analyzer error
+        if (erro.é_erro_semântico) {
+          const erro_endereço = erro.módulo_endereço || endereço;
+          
+          // Check if it's an undefined variable error (special case)
+          if (erro.nome_variável) {
+            mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+          } else if (erro.termo_busca) {
+            // Generic semantic error with search term
+            mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
+          } else {
+            // Semantic error without search term - just show the message
+            console.log(`Erro: ${erro.message}\n${erro_endereço}`);
           }
-          // Otherwise re-throw
-          throw erro;
+          
+          salvar_cache();
+          process.exit(1);
         }
+        // Otherwise re-throw
+        throw erro;
       }
     }
-    
-    let valor;
-    try {
-      valor = corpoAst ? await avaliar(corpoAst, escopo) : undefined;
-    } catch (erro) {
-      // Check if it's a semantic analyzer error
-      if (erro.é_erro_semântico) {
-        const erro_endereço = erro.módulo_endereço || endereço;
-        
-        // Check if it's an undefined variable error (special case)
-        if (erro.nome_variável) {
-          mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
-        } else if (erro.termo_busca) {
-          // Generic semantic error with search term
-          mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
-        } else {
-          // Semantic error without search term - just show the message
-          console.log(`Erro: ${erro.message}\n${erro_endereço}`);
-        }
-        
-        salvar_cache();
-        process.exit(1);
+  }
+  
+  let valor;
+  try {
+    valor = corpoAst ? await avaliar(corpoAst, escopo) : undefined;
+  } catch (erro) {
+    // Check if it's a semantic analyzer error
+    if (erro.é_erro_semântico) {
+      const erro_endereço = erro.módulo_endereço || endereço;
+      
+      // Check if it's an undefined variable error (special case)
+      if (erro.nome_variável) {
+        mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+      } else if (erro.termo_busca) {
+        // Generic semantic error with search term
+        mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
+      } else {
+        // Semantic error without search term - just show the message
+        console.log(`Erro: ${erro.message}\n${erro_endereço}`);
       }
-      // Otherwise re-throw
-      throw erro;
+      
+      salvar_cache();
+      process.exit(1);
     }
-    
-    valores_módulos[endereço] = valor;
-    return valor;
-  };
+    // Otherwise re-throw
+    throw erro;
+  }
   
-  // Evaluate the main module (will trigger lazy parsing and evaluation of dependencies)
-  const main_value = await avaliar_módulo(módulo_principal);
-  
-  // Save cache
-  salvar_cache();
-  
-  console.log(main_value);
-  
-} catch (erro) {
-  console.error(erro);
-  process.exit(1);
-}
+  valores_módulos[endereço] = valor;
+  return valor;
+};
+
+// Evaluate the main module (will trigger lazy parsing and evaluation of dependencies)
+const main_value = await avaliar_módulo(módulo_principal);
+
+// Save cache
+salvar_cache();
+
+console.log(main_value);
