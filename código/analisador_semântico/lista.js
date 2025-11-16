@@ -1,4 +1,5 @@
 // List construction and evaluation (handles AST nodes with tipo 'lista')
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -26,7 +27,7 @@ export const avaliarLista = async (ast, escopo) => {
     
     // First pass: declare all property names
     for (const item of ast.items) {
-      if (item.tipo === 'espalhamento') {
+      if (item.tipo === TIPO_AST.ESPALHAMENTO) {
         continue;
       } else if (item.chave !== undefined) {
         const chave = typeof item.chave === 'object' ? await avaliar(item.chave, escopo) : item.chave;
@@ -47,7 +48,7 @@ export const avaliarLista = async (ast, escopo) => {
     // Second pass: evaluate and assign values
     autoIndex = 0;
     for (const item of ast.items) {
-      if (item.tipo === 'espalhamento') {
+      if (item.tipo === TIPO_AST.ESPALHAMENTO) {
         const spreadValue = await avaliar(item.expressão, escopo);
         if (Array.isArray(spreadValue)) {
           for (const v of spreadValue) {
@@ -97,7 +98,7 @@ export const avaliarLista = async (ast, escopo) => {
     // Simple array implementation
     const result = [];
     for (const item of ast.items) {
-      if (item.tipo === 'espalhamento') {
+      if (item.tipo === TIPO_AST.ESPALHAMENTO) {
         const spreadValue = await avaliar(item.expressão, escopo);
         if (Array.isArray(spreadValue)) {
           result.push(...spreadValue);

@@ -2,6 +2,7 @@
 
 import { buscarVariável } from './escopo.js';
 import { pushFrame, popFrame, getSnapshotForError } from './pilha.js';
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -20,7 +21,7 @@ const obterEndereçoMódulo = (escopo) => {
 
 export const avaliarFunção = async (ast, escopo) => {
   switch (ast.tipo) {
-    case 'lambda':
+    case TIPO_AST.LAMBDA:
       return async (caller_context, ...valoresArgs) => {
         const fn_scope = { __parent__: escopo || null };
         
@@ -46,13 +47,13 @@ export const avaliarFunção = async (ast, escopo) => {
         }
         
         // Check if the body is a guards expression
-        if (ast.corpo && ast.corpo.tipo === 'guards') {
+        if (ast.corpo && ast.corpo.tipo === TIPO_AST.GUARDS) {
           // Evaluate guards in order
           for (const guard of ast.corpo.guards) {
-            if (guard.tipo === 'guard_default') {
+            if (guard.tipo === TIPO_AST.GUARD_DEFAULT) {
               // Default guard - always matches
               return await avaliar(guard.expressão, fn_scope);
-            } else if (guard.tipo === 'guard') {
+            } else if (guard.tipo === TIPO_AST.GUARD) {
               // Conditional guard - check condition
               const conditionValue = await avaliar(guard.condição, fn_scope);
               // In the language, 0 is false, anything else is true
@@ -69,7 +70,7 @@ export const avaliarFunção = async (ast, escopo) => {
         }
       };
 
-    case 'chamada_função': {
+    case TIPO_AST.CHAMADA_FUNÇÃO: {
       const função = await avaliar(ast.função, escopo);
       if (typeof função !== 'function') {
         const erro = new Error(`Value is not a function, got ${typeof função}`);
@@ -109,7 +110,7 @@ export const avaliarFunção = async (ast, escopo) => {
       }
     }
 
-    case 'chamada_função_imediata': {
+    case TIPO_AST.CHAMADA_FUNÇÃO_IMEDIATA: {
       const função = await buscarVariável(escopo, ast.nome);
       if (typeof função !== 'function') {
         const erro = new Error(`${ast.nome} is not a function`);

@@ -37,6 +37,7 @@ export const TIPO_AST = {
   GUARD_DEFAULT: 'guard_default',
   
   // Operações
+  OPERAÇÃO_BINÁRIA: 'operação_binária',
   OPERAÇÃO_FATIA: 'operação_fatia',
   OPERAÇÃO_TAMANHO: 'operação_tamanho',
   OPERAÇÃO_CHAVES: 'operação_chaves',

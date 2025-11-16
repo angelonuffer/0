@@ -1,4 +1,5 @@
 // Collection operations - fatia, tamanho, chaves, atributo
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -17,7 +18,7 @@ const obterEndereçoMódulo = (escopo) => {
 
 export const avaliarColeção = async (ast, escopo) => {
   switch (ast.tipo) {
-    case 'fatia': {
+    case TIPO_AST.FATIA: {
       const valor = await avaliar(ast.valor, escopo);
       const índice = await avaliar(ast.índice, escopo);
       const fim = ast.fim ? await avaliar(ast.fim, escopo) : undefined;
@@ -71,7 +72,7 @@ export const avaliarColeção = async (ast, escopo) => {
       }
     }
 
-    case 'tamanho':
+    case TIPO_AST.TAMANHO:
       const valor = await avaliar(ast.valor, escopo);
       if (valor?.length !== undefined) {
         return valor.length;
@@ -83,7 +84,7 @@ export const avaliarColeção = async (ast, escopo) => {
       erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: ast.valor?.nome, comprimento: String(ast.valor?.nome || '').length, valor });
       throw erro;
 
-    case 'chaves': {
+    case TIPO_AST.CHAVES: {
       const objeto = await avaliar(ast.valor, escopo);
       const keys = Object.keys(objeto);
       
@@ -98,7 +99,7 @@ export const avaliarColeção = async (ast, escopo) => {
       return keys;
     }
 
-    case 'atributo': {
+    case TIPO_AST.ATRIBUTO: {
       const objeto = await avaliar(ast.objeto, escopo);
 
       // If null or undefined, throw semantic error

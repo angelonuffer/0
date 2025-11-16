@@ -1,4 +1,5 @@
 // Binary, logical, and conditional operations
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -17,13 +18,13 @@ const obterEndereçoMódulo = (escopo) => {
 
 export const avaliarOperações = async (ast, escopo) => {
   switch (ast.tipo) {
-    case 'operação_binária': {
+    case TIPO_AST.OPERAÇÃO_BINÁRIA: {
       const esquerda = await avaliar(ast.esquerda, escopo);
       const direita = await avaliar(ast.direita, escopo);
       return ast.operador(esquerda, direita);
     }
 
-    case 'operação_lógica': {
+    case TIPO_AST.OPERAÇÃO_LÓGICA: {
       const esquerda = await avaliar(ast.esquerda, escopo);
       if (ast.operador === '&') {
         return esquerda !== 0 ? await avaliar(ast.direita, escopo) : 0;
@@ -38,7 +39,7 @@ export const avaliarOperações = async (ast, escopo) => {
       throw erro;
     }
 
-    case 'condicional': {
+    case TIPO_AST.CONDICIONAL: {
       const condição = await avaliar(ast.condição, escopo);
       return condição !== 0 ? await avaliar(ast.seVerdadeiro, escopo) : await avaliar(ast.seFalso, escopo);
     }
