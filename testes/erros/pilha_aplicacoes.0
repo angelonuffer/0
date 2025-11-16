@@ -1,0 +1,6 @@
+// Teste: pilha de chamadas com aplicações
+a = b => c + 1
+
+d = e => a(e)
+
+d(2)

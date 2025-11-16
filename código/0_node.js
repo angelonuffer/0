@@ -50,7 +50,7 @@ const carregar_conteúdo = async (endereço) => {
 
 // Helper function to show semantic errors with highlighted code
 // Helper to print a single error block: endereço + linha:col: código da linha (with ANSI highlight)
-const exibir_bloco_erro = (endereço, número_linha, número_coluna, comprimento = 1, corAnsi = 41) => {
+const exibir_bloco_erro = (endereço, número_linha, número_coluna, comprimento = 1, corAnsi = 41, suprimirArquivoHeader = false) => {
   const conteúdo = conteúdos[endereço] || '';
   const linhas = conteúdo.split('\n');
   const linha = linhas[número_linha - 1] ?? '';
@@ -59,7 +59,8 @@ const exibir_bloco_erro = (endereço, número_linha, número_coluna, comprimento
   const highlight = linha.substring(start, start + Math.max(1, comprimento));
   const after = linha.substring(start + Math.max(1, comprimento));
   const linha_com_erro = `${before}\x1b[${corAnsi}m${highlight}\x1b[0m${after}`;
-  console.log(`${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
+  if (!suprimirArquivoHeader) console.log(`${endereço}`);
+  console.log(`${número_linha}:${número_coluna}: ${linha_com_erro}`);
 };
 
 // Helper to display a simulated line where the highlighted region is replaced by a value string
@@ -76,7 +77,7 @@ const exibir_bloco_erro_com_valor = (endereço, número_linha, número_coluna, c
 };
 
 // Helper function to show semantic errors with highlighted code (yellow)
-const mostrar_erro_semântico = (endereço, _mensagem_erro, termo_busca, informações_extras = []) => {
+const mostrar_erro_semântico = (endereço, _mensagem_erro, termo_busca, informações_extras = [], suprimirArquivoHeader = false) => {
   const conteúdo = conteúdos[endereço] || '';
   const linhas = conteúdo.split('\n');
 
@@ -87,13 +88,19 @@ const mostrar_erro_semântico = (endereço, _mensagem_erro, termo_busca, informa
 
   if (termo_busca) {
     const regex = new RegExp(`\\b${termo_busca.replace(/[.*+?^${}()|[\\]\\]/g, '\\\\$&')}\\b`);
+    // Prefer the last occurrence in the file so call-site highlighting chooses the deepest match
+    let lastMatchLine = null;
+    let lastMatchIndex = null;
     for (let i = 0; i < linhas.length; i++) {
       const match = linhas[i].match(regex);
       if (match) {
-        número_linha = i + 1;
-        número_coluna = match.index + 1;
-        break;
+        lastMatchLine = i + 1;
+        lastMatchIndex = match.index + 1;
       }
+    }
+    if (lastMatchLine !== null) {
+      número_linha = lastMatchLine;
+      número_coluna = lastMatchIndex;
     }
   } else {
     // Find first non-empty line
@@ -102,7 +109,7 @@ const mostrar_erro_semântico = (endereço, _mensagem_erro, termo_busca, informa
     }
   }
 
-  exibir_bloco_erro(endereço, número_linha, número_coluna, comprimento_termo, 43);
+  exibir_bloco_erro(endereço, número_linha, número_coluna, comprimento_termo, 43, suprimirArquivoHeader);
 
   // Show extra information aligned with the error position (no verbal messages)
   if (informações_extras.length > 0) {
@@ -221,7 +228,7 @@ const parsear_módulo = async (endereço) => {
       for (let i = 0; i < linhas_conteudo.length; i++) {
         if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
       }
-      exibir_bloco_erro(endereço, ln, col, 1, 41);
+      exibir_bloco_erro(endereço, ln, col, 1, 41, suprimirArquivoHeader);
     } else {
       // Otherwise show syntax error
       mostrar_erro_sintaxe(endereço, módulo_bruto);
@@ -298,24 +305,19 @@ const avaliar_módulo = async (endereço) => {
         // Check if it's a semantic analyzer error
         if (erro.é_erro_semântico) {
           const erro_endereço = erro.módulo_endereço || endereço;
-          
-          // Check if it's an undefined variable error (special case)
+
+          // If a semantic stack snapshot is present, defer printing here and rethrow
+          // so the outer (module-body) handler prints the full stack in call-site order.
+          if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
+            throw erro;
+          }
+
+          // Otherwise handle specific semantic errors locally
           if (erro.nome_variável) {
             mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
-          } else if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
-            // Print each frame in the semantic stack (top -> bottom)
-            for (const frame of erro.pilha_semântica) {
-              const frame_end = frame.endereço || erro_endereço;
-              const pos = mostrar_erro_semântico(frame_end, erro.message, frame.termo_busca);
-              if (frame.valor !== undefined) {
-                exibir_bloco_erro_com_valor(frame_end, pos.número_linha, pos.número_coluna, frame.comprimento || pos.comprimento_termo, frame.valor, 43);
-              }
-            }
           } else if (erro.termo_busca) {
-            // Generic semantic error with search term
-            mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
+            mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca, [], false);
           } else {
-            // Semantic error without search term - show endereço + first non-empty line highlighted
             const linhas_conteudo = (conteúdos[erro_endereço] || '').split('\n');
             let ln = 1, col = 1;
             for (let i = 0; i < linhas_conteudo.length; i++) {
@@ -323,7 +325,7 @@ const avaliar_módulo = async (endereço) => {
             }
             exibir_bloco_erro(erro_endereço, ln, col, 1, 43);
           }
-          
+
           salvar_cache();
           process.exit(1);
         }
@@ -341,20 +343,37 @@ const avaliar_módulo = async (endereço) => {
     if (erro.é_erro_semântico) {
       const erro_endereço = erro.módulo_endereço || endereço;
       
-      // Check if it's an undefined variable error (special case)
-      if (erro.nome_variável) {
-        mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
-      } else if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
-        for (const frame of erro.pilha_semântica) {
+      // Prefer printing semantic frames (if present) before handling specific variable error
+      if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
+        let framesToPrint = erro.pilha_semântica.slice().reverse();
+        const seen = new Set();
+        framesToPrint = framesToPrint.filter(f => {
+          const key = `${f.endereço || ''}|${f.termo_busca || ''}|${f.comprimento || ''}|${f.valor || ''}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        // If the error is a missing-variable error, move any frame that targets the missing name
+        // to the end so we print call-sites before the origin frame (which will include suggestions).
+        if (erro.nome_variável) {
+          const tail = framesToPrint.filter(f => String(f.termo_busca) === String(erro.nome_variável));
+          const head = framesToPrint.filter(f => String(f.termo_busca) !== String(erro.nome_variável));
+          framesToPrint = head.concat(tail);
+        }
+        for (let i = 0; i < framesToPrint.length; i++) {
+          const frame = framesToPrint[i];
           const frame_end = frame.endereço || erro_endereço;
-          const pos = mostrar_erro_semântico(frame_end, erro.message, frame.termo_busca);
+          const infos = (i === framesToPrint.length - 1 && erro.nome_variável) ? (erro.nomes_disponíveis || []) : [];
+          const pos = mostrar_erro_semântico(frame_end, erro.message, frame.termo_busca, infos, i !== 0);
           if (frame.valor !== undefined) {
             exibir_bloco_erro_com_valor(frame_end, pos.número_linha, pos.número_coluna, frame.comprimento || pos.comprimento_termo, frame.valor, 43);
           }
         }
+      } else if (erro.nome_variável) {
+        mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
       } else if (erro.termo_busca) {
         // Generic semantic error with search term
-        mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
+        mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca, [], false);
       } else {
         // Semantic error without search term - show endereço + first non-empty line highlighted
         const linhas_conteudo = (conteúdos[erro_endereço] || '').split('\n');

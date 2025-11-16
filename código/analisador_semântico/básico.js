@@ -1,6 +1,7 @@
 // Basic evaluation cases - números, texto, variável, não, parênteses
 
 import { buscarVariável, INTERNAL_CONTEXT } from './escopo.js';
+import { pushFrame, popFrame, getSnapshotForError } from './pilha.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -53,7 +54,17 @@ export const avaliarBásico = async (ast, escopo) => {
       const endereço_resolvido = context.resolve_endereço(módulo_atual, endereço_expr);
       
       // Load and return the content
-      return await context.carregar_conteúdo(endereço_resolvido);
+      pushFrame({ endereço: módulo_atual, termo_busca: undefined, comprimento: 1 });
+      try {
+        return await context.carregar_conteúdo(endereço_resolvido);
+      } catch (err) {
+        if (err && err.é_erro_semântico) {
+          err.pilha_semântica = getSnapshotForError().concat(err.pilha_semântica || []);
+        }
+        throw err;
+      } finally {
+        popFrame();
+      }
     }
 
     case 'parênteses':
@@ -104,7 +115,17 @@ export const avaliarBásico = async (ast, escopo) => {
       
       // If module not yet evaluated and we have lazy evaluator, evaluate it now
       if (!context.valores_módulos.hasOwnProperty(endereço_resolvido) && context.avaliar_módulo_lazy) {
-        return await context.avaliar_módulo_lazy(endereço_resolvido);
+        pushFrame({ endereço: módulo_atual, termo_busca: String(ast.valor), comprimento: String(ast.valor).length });
+        try {
+          return await context.avaliar_módulo_lazy(endereço_resolvido);
+        } catch (err) {
+          if (err && err.é_erro_semântico) {
+            err.pilha_semântica = getSnapshotForError().concat(err.pilha_semântica || []);
+          }
+          throw err;
+        } finally {
+          popFrame();
+        }
       }
       
       // Return the module value
@@ -113,7 +134,8 @@ export const avaliarBásico = async (ast, escopo) => {
         erro.é_erro_semântico = true;
         erro.termo_busca = ast.valor;
         erro.módulo_endereço = módulo_atual;
-        erro.pilha_semântica = erro.pilha_semântica || [];
+        // Prepend current semantic stack snapshot so runner can show full call chain
+        erro.pilha_semântica = getSnapshotForError().concat(erro.pilha_semântica || []);
         erro.pilha_semântica.push({ endereço: módulo_atual, termo_busca: String(ast.valor), comprimento: String(ast.valor).length });
         throw erro;
       }

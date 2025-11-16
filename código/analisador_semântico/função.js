@@ -1,6 +1,7 @@
 // Function operations - lambda, chamada_função, chamada_função_imediata
 
 import { buscarVariável } from './escopo.js';
+import { pushFrame, popFrame, getSnapshotForError } from './pilha.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -74,15 +75,37 @@ export const avaliarFunção = async (ast, escopo) => {
         const erro = new Error(`Value is not a function, got ${typeof função}`);
         erro.é_erro_semântico = true;
         erro.módulo_endereço = obterEndereçoMódulo(escopo);
+        // Attach current semantic stack snapshot so runner can display full call stack
+        erro.pilha_semântica = getSnapshotForError().concat(erro.pilha_semântica || []);
         // For anonymous function calls, we don't have a good search term
-        // The error will be caught and displayed without specific highlighting
         throw erro;
       }
       if (ast.argumento !== undefined) {
         const arg_value = await avaliar(ast.argumento, escopo);
-        return await função(escopo, arg_value);
+        // Push a frame for this application (anonymous call site)
+        pushFrame({ endereço: obterEndereçoMódulo(escopo), termo_busca: undefined, comprimento: 1 });
+        try {
+          return await função(escopo, arg_value);
+        } catch (err) {
+          if (err && err.é_erro_semântico) {
+            err.pilha_semântica = getSnapshotForError().concat(err.pilha_semântica || []);
+          }
+          throw err;
+        } finally {
+          popFrame();
+        }
       } else {
-        return await função(escopo);
+        pushFrame({ endereço: obterEndereçoMódulo(escopo), termo_busca: undefined, comprimento: 1 });
+        try {
+          return await função(escopo);
+        } catch (err) {
+          if (err && err.é_erro_semântico) {
+            err.pilha_semântica = getSnapshotForError().concat(err.pilha_semântica || []);
+          }
+          throw err;
+        } finally {
+          popFrame();
+        }
       }
     }
 
@@ -93,13 +116,34 @@ export const avaliarFunção = async (ast, escopo) => {
         erro.é_erro_semântico = true;
         erro.termo_busca = ast.nome;
         erro.módulo_endereço = obterEndereçoMódulo(escopo);
+        erro.pilha_semântica = getSnapshotForError().concat(erro.pilha_semântica || []);
         throw erro;
       }
       if (ast.argumento !== undefined) {
         const arg_value = await avaliar(ast.argumento, escopo);
-        return await função(escopo, arg_value);
+        pushFrame({ endereço: obterEndereçoMódulo(escopo), termo_busca: ast.nome, comprimento: ast.nome.length });
+        try {
+          return await função(escopo, arg_value);
+        } catch (err) {
+          if (err && err.é_erro_semântico) {
+            err.pilha_semântica = getSnapshotForError().concat(err.pilha_semântica || []);
+          }
+          throw err;
+        } finally {
+          popFrame();
+        }
       } else {
-        return await função(escopo);
+        pushFrame({ endereço: obterEndereçoMódulo(escopo), termo_busca: ast.nome, comprimento: ast.nome.length });
+        try {
+          return await função(escopo);
+        } catch (err) {
+          if (err && err.é_erro_semântico) {
+            err.pilha_semântica = getSnapshotForError().concat(err.pilha_semântica || []);
+          }
+          throw err;
+        } finally {
+          popFrame();
+        }
       }
     }
 

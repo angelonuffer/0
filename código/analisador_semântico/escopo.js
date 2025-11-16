@@ -15,6 +15,8 @@ export const criarLazyThunk = (avaliarFn) => {
   };
 };
 
+import { getSnapshotForError } from './pilha.js';
+
 export const buscarVariável = async (escopo, nome) => {
   let atualEscopo = escopo;
   while (atualEscopo) {
@@ -60,10 +62,9 @@ export const buscarVariável = async (escopo, nome) => {
   erro.nome_variável = nome;
   erro.nomes_disponíveis = nomesDisponíveis;
   erro.módulo_endereço = módulo_endereço;
+  // Prepend current semantic stack snapshot so runner can display full stack
+  erro.pilha_semântica = getSnapshotForError().concat(erro.pilha_semântica || []);
   // Attach a semantic frame to help the top-level formatter build a stack
-  if (!erro.pilha_semântica) {
-    erro.pilha_semântica = [];
-  }
   erro.pilha_semântica.push({ endereço: módulo_endereço, termo_busca: nome, comprimento: nome.length });
   throw erro;
 };
