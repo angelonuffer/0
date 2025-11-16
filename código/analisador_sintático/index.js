@@ -4,8 +4,9 @@
 // Import basic operations
 import { não, depuração, carregar, valor_constante, chamada_função_imediata, setExpressão as setExpressãoBásico, setOperações } from './básico.js';
 
-// Import object operations
-import { fatia, tamanho, chaves, lista, objeto, atributo, setExpressão as setExpressãoObjeto } from './objeto.js';
+// Import object and list operations
+import { objeto, atributo, setExpressão as setExpressãoObjeto } from './objeto.js';
+import { fatia, tamanho, chaves, lista, setExpressão as setExpressãoLista } from './lista.js';
 
 // Import function operations
 import { lambda, chamada_função, parênteses, setExpressão as setExpressãoFunção, setGetTermo6 as setGetTermo6Função } from './função.js';
@@ -57,6 +58,7 @@ setExpressãoBásico(expressão);
 setExpressãoObjeto(expressão);
 setExpressãoFunção(expressão);
 setExpressãoModule(expressão);
+setExpressãoLista(expressão);
 setDependências(expressão, {
   não,
   depuração,

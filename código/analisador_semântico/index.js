@@ -8,6 +8,7 @@ export { criarEscopo, buscarVariável, definirVariável, criarLazyThunk, INTERNA
 import { avaliarBásico, setAvaliar as setAvaliarBásico } from './básico.js';
 import { avaliarOperações, setAvaliar as setAvaliarOperações } from './operações.js';
 import { avaliarObjeto, setAvaliar as setAvaliarObjeto } from './objeto.js';
+import { avaliarLista, setAvaliar as setAvaliarLista } from './lista.js';
 import { avaliarColeção, setAvaliar as setAvaliarColeção } from './coleção.js';
 import { avaliarFunção, setAvaliar as setAvaliarFunção } from './função.js';
 
@@ -27,6 +28,9 @@ export const avaliar = async (ast, escopo) => {
   result = await avaliarOperações(ast, escopo);
   if (result !== null) return result;
   
+  result = await avaliarLista(ast, escopo);
+  if (result !== null) return result;
+
   result = await avaliarObjeto(ast, escopo);
   if (result !== null) return result;
   
@@ -52,6 +56,7 @@ export const avaliar = async (ast, escopo) => {
 // Wire up recursive references
 setAvaliarBásico(avaliar);
 setAvaliarOperações(avaliar);
+setAvaliarLista(avaliar);
 setAvaliarObjeto(avaliar);
 setAvaliarColeção(avaliar);
 setAvaliarFunção(avaliar);

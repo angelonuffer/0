@@ -1,102 +1,9 @@
-// Object operations - fatia, tamanho, chaves, objeto, atributo
+// Object parser: handles curly-brace object literals and attribute access
 import { alternativa, sequência, opcional, vários, transformar, símbolo } from '../combinadores/index.js';
 import { espaço, nome, texto } from '../analisador_léxico/index.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
-
-const fatia = transformar(
-  sequência(
-    símbolo("["),
-    código => expressão(código),
-    opcional(sequência(
-      símbolo(":"),
-      opcional(código => expressão(código)),
-    )),
-    símbolo("]"),
-  ),
-  valorSeq => {
-    const [, índiceExpr, opcionalFaixa,] = valorSeq;
-    const éFaixa = opcionalFaixa ? opcionalFaixa[0] !== undefined : false;
-    const fimExpr = opcionalFaixa ? opcionalFaixa[1] : undefined;
-
-    return {
-      tipo: 'operação_fatia',
-      índice: índiceExpr,
-      fim: fimExpr,
-      éFaixa: éFaixa
-    };
-  }
-);
-
-const tamanho = transformar(
-  símbolo("[.]"),
-  () => ({
-    tipo: 'operação_tamanho'
-  })
-);
-
-const chaves = transformar(
-  símbolo("[*]"),
-  () => ({
-    tipo: 'operação_chaves'
-  })
-);
-
-const lista = transformar(
-  sequência(
-    símbolo("["),
-    opcional(espaço),
-    vários(
-      alternativa(
-        sequência( // Spread syntax ...expression
-          símbolo("..."),
-          código => expressão(código),
-          opcional(espaço),
-        ),
-        sequência( // Value-only (auto-indexed)
-          código => expressão(código),
-          opcional(espaço),
-        ),
-      ),
-    ),
-    símbolo("]")
-  ),
-  ([, , valores_vários,]) => {
-    if (!valores_vários) {
-      return {
-        tipo: 'objeto',
-        items: [],
-        usarObjeto: false
-      };
-    }
-    
-    // Check if any spread operations exist
-    const hasSpreads = valores_vários.some(v_seq => v_seq[0] === "...");
-    
-    const usarObjeto = hasSpreads;
-    
-    const items = valores_vários.map(v_alt => {
-      const firstEl = v_alt[0];
-      if (firstEl === "...") {
-        return {
-          tipo: 'espalhamento',
-          expressão: v_alt[1]
-        };
-      } else {
-        return {
-          valor: v_alt[0]
-        };
-      }
-    });
-    
-    return {
-      tipo: 'objeto',
-      items: items,
-      usarObjeto: usarObjeto
-    };
-  }
-);
 
 const objeto = transformar(
   sequência(
@@ -128,7 +35,7 @@ const objeto = transformar(
           nome,
           opcional(espaço),
         ),
-        sequência( // Value-only (auto-indexed)
+        sequência( // Value-only (auto-indexed) - parser will reject value-only entries for {} later
           código => expressão(código),
           opcional(espaço),
         ),
@@ -141,33 +48,22 @@ const objeto = transformar(
       return {
         tipo: 'objeto',
         items: [],
-        usarObjeto: false
+        usarObjeto: true
       };
     }
-    
-    // Check if we have any key-value pairs (explicit or shorthand)
-    const hasKeyValuePairs = valores_vários.some(v_alt => 
-      (v_alt.length === 5 && v_alt[1] === ":") || // Explicit key-value pair
-      (v_alt.length === 2 && typeof v_alt[0] === 'string') // Shorthand property
-    );
-    
+
     // Check if we have any value-only items (excluding spread and shorthand)
     const hasValueOnlyItems = valores_vários.some(v_alt => 
       v_alt[0] !== "..." && 
       !(v_alt.length === 5 && v_alt[1] === ":") &&
       !(v_alt.length === 2 && typeof v_alt[0] === 'string')
     );
-    
+
     // Enforce strict separation: {} is ONLY for objects with keys, [] is ONLY for lists
     if (hasValueOnlyItems) {
       throw new Error("Syntax error: Lists must use [] syntax. The {} syntax is only for objects with key-value pairs.");
     }
-    
-    // Check if any spread operations exist
-    const hasSpreads = valores_vários.some(v_seq => v_seq[0] === "...");
-    
-    const usarObjeto = hasKeyValuePairs || hasSpreads;
-    
+
     const items = valores_vários.map(v_alt => {
       const firstEl = v_alt[0];
       if (firstEl === "...") {
@@ -203,11 +99,11 @@ const objeto = transformar(
         };
       }
     });
-    
+
     return {
       tipo: 'objeto',
       items: items,
-      usarObjeto: usarObjeto
+      usarObjeto: true
     };
   }
 );
@@ -228,4 +124,5 @@ const setExpressão = (expr) => {
   expressão = expr;
 };
 
-export { fatia, tamanho, chaves, lista, objeto, atributo, setExpressão };
+export { objeto, atributo, setExpressão };
+

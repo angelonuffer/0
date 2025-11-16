@@ -10,7 +10,7 @@ uniteste.descrever({ nome: "Sintaxe de Lista com Colchetes" testes: [
   uniteste.descrever({ nome: "Lista vazia" testes: [
     uniteste.listas_iguais([
       []
-      {}
+      []
     ])
   ]})
   uniteste.descrever({ nome: "Lista de textos" testes: [
