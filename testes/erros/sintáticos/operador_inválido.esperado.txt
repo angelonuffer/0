@@ -1,0 +1,2 @@
+testes/erros/sintáticos/operador_inválido.0
+2:1: = 5

@@ -1,2 +1,0 @@
-testes/erros/referência_função_indefinida.0
-2:1: funcaoNaoDefinida(42)

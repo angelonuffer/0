@@ -1,2 +1,0 @@
-testes/erros/sintaxe_parêntese.0
-2:16: f = x => (x + 1

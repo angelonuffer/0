@@ -1,0 +1,2 @@
+testes/erros/sintáticos/aninhado_colchete.0
+7:1: }

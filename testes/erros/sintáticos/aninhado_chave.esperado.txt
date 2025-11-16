@@ -1,0 +1,2 @@
+testes/erros/sintáticos/aninhado_chave.0
+8:1: }

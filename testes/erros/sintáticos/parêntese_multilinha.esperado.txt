@@ -1,0 +1,2 @@
+testes/erros/sintáticos/parêntese_multilinha.0
+4:8:   3 + 4

@@ -1,2 +1,0 @@
-testes/erros/referência_uso_antes_definição.0
-3:1: x + 10

@@ -1,0 +1,2 @@
+testes/erros/sintáticos/chave_caractere_inesperado.0
+5:3:   $

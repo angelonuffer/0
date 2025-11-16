@@ -1,0 +1,2 @@
+testes/erros/sintáticos/parêntese_inesperado.0
+5:1: )

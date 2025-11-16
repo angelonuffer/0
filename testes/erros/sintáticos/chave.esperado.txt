@@ -1,0 +1,2 @@
+testes/erros/sintáticos/chave.0
+2:18: obj = { a: 1 b: 2

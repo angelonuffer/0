@@ -1,0 +1,2 @@
+testes/erros/semânticos/propriedade_indefinida.0
+2:1: objetoNaoDefinido["campo"]

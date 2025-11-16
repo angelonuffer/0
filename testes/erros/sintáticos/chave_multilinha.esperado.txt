@@ -1,0 +1,2 @@
+testes/erros/sintáticos/chave_multilinha.0
+4:7:   b: 2

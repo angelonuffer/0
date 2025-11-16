@@ -1,0 +1,2 @@
+testes/erros/sintáticos/colchete_multilinha.0
+5:4:   3

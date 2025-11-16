@@ -3,7 +3,7 @@
 import { execSync } from 'child_process';
 import { readFileSync, readdirSync } from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, basename, relative } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -60,9 +60,23 @@ function compararSaidas(obtida, esperada, caminhoBase) {
 // Função principal de teste
 function executarTestes() {
   const dirTestes = join(__dirname, 'erros');
-  const arquivosTeste = readdirSync(dirTestes)
-    .filter(f => f.endsWith('.0'))
-    .sort();
+
+  // Coleta recursivamente arquivos que terminam com .0 dentro de dirTestes
+  function coletarArquivosRecursivo(dir) {
+    const resultados = [];
+    const entradas = readdirSync(dir, { withFileTypes: true });
+    for (const ent of entradas) {
+      const caminho = join(dir, ent.name);
+      if (ent.isDirectory()) {
+        resultados.push(...coletarArquivosRecursivo(caminho));
+      } else if (ent.isFile() && ent.name.endsWith('.0')) {
+        resultados.push(caminho);
+      }
+    }
+    return resultados;
+  }
+
+  const arquivosTeste = coletarArquivosRecursivo(dirTestes).sort();
   
   let passaram = 0;
   let falharam = 0;
@@ -72,9 +86,10 @@ function executarTestes() {
   console.log('Executando testes de erros...\n');
   
   for (const arquivo of arquivosTeste) {
-    const nomeBase = arquivo.replace('.0', '');
-    const caminhoTeste = join(dirTestes, arquivo);
-    const caminhoEsperado = join(dirTestes, `${nomeBase}.esperado.txt`);
+    const nomeBase = basename(arquivo, '.0');
+    const caminhoTeste = arquivo;
+    const caminhoEsperado = join(dirname(arquivo), `${nomeBase}.esperado.txt`);
+    const caminhoRelativo = relative(dirTestes, caminhoTeste);
     
     try {
       // Verifica se existe arquivo esperado
@@ -82,7 +97,7 @@ function executarTestes() {
       try {
         saidaEsperada = readFileSync(caminhoEsperado, 'utf-8').trim();
       } catch (e) {
-        console.log(`⚠️  ${arquivo}: Arquivo esperado não encontrado`);
+        console.log(`⚠️  ${caminhoRelativo}: Arquivo esperado não encontrado`);
         continue;
       }
       
@@ -103,10 +118,10 @@ function executarTestes() {
       
       // Compara saídas
       if (compararSaidas(saidaObtida, saidaEsperada, caminhoBase)) {
-        console.log(`✓ ${arquivo}`);
+        console.log(`✓ ${caminhoRelativo}`);
         passaram++;
       } else {
-        console.log(`✗ ${arquivo}`);
+        console.log(`✗ ${caminhoRelativo}`);
         console.log(`  Esperado:`);
         console.log(`    ${normalizarSaida(saidaEsperada, null).split('\n').join('\n    ')}`);
         console.log(`  Obtido:`);
@@ -114,7 +129,7 @@ function executarTestes() {
         falharam++;
       }
     } catch (error) {
-      console.log(`✗ ${arquivo}: Erro ao executar teste`);
+      console.log(`✗ ${caminhoRelativo}: Erro ao executar teste`);
       console.log(`  ${error.message}`);
       falharam++;
     }
