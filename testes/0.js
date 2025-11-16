@@ -59,21 +59,22 @@ function compararSaidas(obtida, esperada, caminhoBase) {
 
 // Função principal de teste
 function executarTestes() {
-  const arquivosTeste = readdirSync(__dirname)
+  const dirTestes = join(__dirname, 'erros');
+  const arquivosTeste = readdirSync(dirTestes)
     .filter(f => f.endsWith('.0'))
     .sort();
   
   let passaram = 0;
   let falharam = 0;
   const resultados = [];
-  const caminhoBase = join(__dirname, '../..');
+  const caminhoBase = join(dirTestes, '../..');
   
   console.log('Executando testes de erros...\n');
   
   for (const arquivo of arquivosTeste) {
     const nomeBase = arquivo.replace('.0', '');
-    const caminhoTeste = join(__dirname, arquivo);
-    const caminhoEsperado = join(__dirname, `${nomeBase}.esperado.txt`);
+    const caminhoTeste = join(dirTestes, arquivo);
+    const caminhoEsperado = join(dirTestes, `${nomeBase}.esperado.txt`);
     
     try {
       // Verifica se existe arquivo esperado
@@ -89,7 +90,7 @@ function executarTestes() {
       let saidaObtida;
       try {
         execSync(`node código/0_node.js ${caminhoTeste} node`, {
-          cwd: join(__dirname, '../..'),
+          cwd: caminhoBase,
           encoding: 'utf-8',
           stdio: 'pipe'
         });
@@ -126,8 +127,24 @@ function executarTestes() {
   console.log(`✗ Falharam: ${falharam}`);
   console.log(`${'='.repeat(50)}`);
   
-  // Código de saída
-  process.exit(falharam > 0 ? 1 : 0);
+  // Se todos os testes de erro passaram, executa os testes principais
+  if (falharam === 0) {
+    console.log('\nTodos os testes de erros passaram. Executando os testes principais...');
+    try {
+      execSync('node código/0_node.js testes/0 | node', {
+        cwd: caminhoBase,
+        stdio: 'inherit',
+        shell: true
+      });
+      process.exit(0);
+    } catch (e) {
+      // Se os testes principais falharem, propaga o código de saída
+      process.exit(typeof e.status === 'number' ? e.status : 1);
+    }
+  }
+
+  // Código de saída quando houver falhas nos testes de erro
+  process.exit(1);
 }
 
 // Executar testes

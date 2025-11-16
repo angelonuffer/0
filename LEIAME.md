@@ -34,8 +34,7 @@ O módulo imprime/expõe seu valor final conforme o resultado do interpretador (
 ### Executar os testes
 
 ```bash
-node código/0_node.js testes/0 | node
-node testes/erros/runner.js
+node testes/0.js
 ```
 
 ## Módulos e endereços
