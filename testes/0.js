@@ -61,22 +61,23 @@ function compararSaidas(obtida, esperada, caminhoBase) {
 function executarTestes() {
   const dirTestes = join(__dirname, 'erros');
 
-  // Coleta recursivamente arquivos que terminam com .0 dentro de dirTestes
-  function coletarArquivosRecursivo(dir) {
+  // Coleta recursivamente arquivos que terminam com .esperado.txt dentro de dirTestes
+  // e retorna a lista de caminhos dos arquivos de expectativa.
+  function coletarArquivosEsperadoRecursivo(dir) {
     const resultados = [];
     const entradas = readdirSync(dir, { withFileTypes: true });
     for (const ent of entradas) {
       const caminho = join(dir, ent.name);
       if (ent.isDirectory()) {
-        resultados.push(...coletarArquivosRecursivo(caminho));
-      } else if (ent.isFile() && ent.name.endsWith('.0')) {
+        resultados.push(...coletarArquivosEsperadoRecursivo(caminho));
+      } else if (ent.isFile() && ent.name.endsWith('.esperado.txt')) {
         resultados.push(caminho);
       }
     }
     return resultados;
   }
 
-  const arquivosTeste = coletarArquivosRecursivo(dirTestes).sort();
+  const arquivosEsperado = coletarArquivosEsperadoRecursivo(dirTestes).sort();
   
   let passaram = 0;
   let falharam = 0;
@@ -85,21 +86,22 @@ function executarTestes() {
   
   console.log('Executando testes de erros...\n');
   
-  for (const arquivo of arquivosTeste) {
-    const nomeBase = basename(arquivo, '.0');
-    const caminhoTeste = arquivo;
-    const caminhoEsperado = join(dirname(arquivo), `${nomeBase}.esperado.txt`);
+  for (const caminhoEsperado of arquivosEsperado) {
+    const nomeBase = basename(caminhoEsperado, '.esperado.txt');
+    const caminhoTeste = join(dirname(caminhoEsperado), `${nomeBase}.0`);
     const caminhoRelativo = relative(dirTestes, caminhoTeste);
+
+    // Se o arquivo .0 não existir, avisa e pula
+    try {
+      readFileSync(caminhoTeste, 'utf-8');
+    } catch (e) {
+      console.log(`⚠️  ${caminhoRelativo}: Arquivo de teste '.0' não encontrado para este '.esperado.txt'`);
+      continue;
+    }
     
     try {
-      // Verifica se existe arquivo esperado
-      let saidaEsperada;
-      try {
-        saidaEsperada = readFileSync(caminhoEsperado, 'utf-8').trim();
-      } catch (e) {
-        console.log(`⚠️  ${caminhoRelativo}: Arquivo esperado não encontrado`);
-        continue;
-      }
+      // Lê o arquivo esperado (já sabemos que existe porque o coletamos)
+      const saidaEsperada = readFileSync(caminhoEsperado, 'utf-8').trim();
       
       // Executa o teste
       let saidaObtida;

@@ -360,14 +360,20 @@ const avaliar_módulo = async (endereço) => {
           const head = framesToPrint.filter(f => String(f.termo_busca) !== String(erro.nome_variável));
           framesToPrint = head.concat(tail);
         }
+        let último_endereço_impresso = null;
         for (let i = 0; i < framesToPrint.length; i++) {
           const frame = framesToPrint[i];
           const frame_end = frame.endereço || erro_endereço;
           const infos = (i === framesToPrint.length - 1 && erro.nome_variável) ? (erro.nomes_disponíveis || []) : [];
-          const pos = mostrar_erro_semântico(frame_end, erro.message, frame.termo_busca, infos, i !== 0);
+          // Insert a blank line when switching to a different file frame (for readability)
+          if (i !== 0 && frame_end !== último_endereço_impresso) console.log('');
+          // Only suppress the file header when printing consecutive frames from the same file
+          const suprimirArquivoHeader = (i !== 0 && frame_end === último_endereço_impresso);
+          const pos = mostrar_erro_semântico(frame_end, erro.message, frame.termo_busca, infos, suprimirArquivoHeader);
           if (frame.valor !== undefined) {
             exibir_bloco_erro_com_valor(frame_end, pos.número_linha, pos.número_coluna, frame.comprimento || pos.comprimento_termo, frame.valor, 43);
           }
+          último_endereço_impresso = frame_end;
         }
       } else if (erro.nome_variável) {
         mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
