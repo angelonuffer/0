@@ -1,14 +1,25 @@
 # Linguagem 0
 
-Uma linguagem de programação funcional projetada para ser universal. A 0 está sendo criada com dois valores fundamentais em mente:
+A 0 é uma linguagem funcional com sintaxe inspirada na notação matemática e projetada para integração simples entre módulos locais e remotos.
 
-- **Sintaxe Matemática**: A 0 utiliza uma sintaxe que se assemelha à notação matemática, eliminando a necessidade de comandos em linguagem natural. Isso facilita a compreensão e a escrita de código, independente da língua nativa do desenvolvedor.
+## Exemplo
 
-- **Integração Universal**: A 0 será projetada para se integrar facilmente com outras linguagens de programação e plataformas. Isso permitirá que desenvolvedores utilizem a 0 em uma ampla variedade de ambientes, aproveitando suas capacidades funcionais sem sacrificar a compatibilidade.
+```0
+// calcula factorial usando guards
+fatorial = n =>
+  | n <= 1 = 1
+  | n * fatorial(n - 1)
 
-O nome 0 foi escolhido por sua simplicidade e universalidade. O zero é um conceito fundamental na matemática e é representado da mesma forma em diversos idiomas, refletindo a natureza inclusiva e acessível da linguagem.
+// função simples para demonstrar aplicação
+incrementar = x => x + 1
 
-Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor do mundo, promovendo a eficiência e a clareza no desenvolvimento de software.
+[
+  fatorial(5)
+  incrementar(5)
+]
+
+// [ 120, 6 ]
+```
 
 ## Execução
 
@@ -18,88 +29,86 @@ Esperamos que a 0 se torne uma ferramenta valiosa para desenvolvedores ao redor 
 node código/0_node.js <módulo.0>
 ```
 
-O módulo principal deve exportar um valor do tipo texto, que será enviado para o stdout do processo.
+O módulo imprime/expõe seu valor final conforme o resultado do interpretador (ver `código/0_node.js`).
 
 ### Executar os testes
 
 ```bash
 node código/0_node.js testes/0 | node
+node testes/erros/runner.js
 ```
 
-## Módulo
+## Módulos e endereços
 
-Um módulo na linguagem 0 é um arquivo com extensão `.0` que contém zero ou mais declarações de nível superior seguidas por uma expressão final. As declarações são escritas na forma `identificador = expressão` e são avaliadas sequencialmente. A expressão final do módulo determina o valor exportado, sem necessidade de palavra-chave explícita de exportação. Importações são realizadas através de atribuições de caminhos de arquivo (relativos como `./arquivo.0` ou `../pasta/arquivo.0`) ou URLs HTTPS a identificadores, permitindo que módulos externos sejam referenciados e utilizados no código.
+- Arquivos de módulo têm extensão `.0`.
+- Um módulo contém declarações de topo no formato `identificador = expressão` seguidas por uma expressão final; essa expressão final é o valor exportado do módulo.
+- Endereços literais (ex.: `./mod.0`, `../dir/mod.0`, `https://.../mod.0`, ou `nome.0`) podem aparecer como literais no código e são resolvidos pelo contexto de execução do interpretador.
 
-## Identificador
+## Léxico e comentários
 
-Um identificador na linguagem 0 é um nome usado para referenciar valores, funções, parâmetros e módulos importados. Ele deve iniciar com uma letra Unicode (maiúscula ou minúscula) ou um underscore `_`, seguido por zero ou mais letras, dígitos ou underscores. Identificadores são sensíveis a maiúsculas e minúsculas, o que significa que `variavel`, `Variavel` e `VARIAVEL` são três identificadores distintos. Não existem palavras reservadas na linguagem, portanto qualquer sequência que siga essas regras pode ser usada como identificador. Exemplos válidos incluem: `x`, `soma`, `_temp`, `valor1`, `calcularMédia`, `π` (letra grega pi).
+- Espaços em branco e quebras de linha são ignorados quando apropriado.
+- Comentários de linha: `// comentario` até o fim da linha.
+- Números: sequência de dígitos, suportando negativos (`42`, `-7`).
+- Textos: aspas duplas `"..."`.
+- Identificadores: iniciam com letra Unicode ou `_`, seguidos por letras, dígitos ou `_`. Não existem palavras reservadas.
 
-## Expressão
+## Construções principais
 
-Uma expressão é a unidade fundamental de computação que produz um valor. Pode ser um literal, identificador, operação, chamada de função, acesso a coleção ou definição de função.
+- Literais: números, textos, listas (`[ ... ]`) e objetos (`{ ... }`).
+- Identificadores: nomes que referenciam valores no escopo.
+- Aplicação de função: `f(arg)`; chamadas imediatas sem espaço permitem currying e encadeamento: `f(1)(2)`.
+- Lambda: `param => expressão` ou destructuring `{a b} => ...`.
+- Guards (em corpo de função): após `=>` é possível usar `|` para definir regras condicionais, por exemplo `x => | x > 0 = 1 | x <= 0 = 0`.
+- Parênteses com declarações: `(a = 1 b = 2 a + b)` cria um escopo local para `a` e `b`.
 
-### Literais
+## Coleções e acesso
 
-- **Números**: `42`, `-7`
-- **Textos**: `"olá"`
-- **Listas**: `[1 2 3]`
-- **Objetos**: `{x: 10 y: 20}`
+- Listas: `[` itens separados por espaço `]`, ex.: `[1 2 3]`. Suporta espalhamento `...expr` dentro de `[]`.
+- Objetos: `{ chave: valor }`, suporte a shorthand `{ name }` (equivalente a `{ name: name }`) e espalhamento `...expr`.
+- A gramática diferencia `[]` (listas/valores) e `{}` (objetos com chaves). Itens sem chave devem usar `[]`.
 
-### Identificadores
+Operações de acesso:
 
-Referências a valores previamente definidos: `variavel`, `resultado`
+- Indexação/fatia: `v[i]` ou `v[i:j]`. Para strings `v[i]` retorna o código do caractere (charCode), `v[i:j]` retorna substring.
+- Tamanho: `v[.]` retorna o `length` quando aplicável.
+- Chaves: `v[*]` retorna as chaves/nomes do objeto/coleção.
+- Atributo: `obj.prop` acessa propriedade `prop`.
 
-### Operações
+## Operadores e semântica especial
 
-- **Aritméticas**: `a + b * 2`
-- **Lógicas**: `x > 0 & y < 100`
+- Aritmética e comparação: `* / + - >= <= > < == !=`.
+- Multiplicação `*`: além de produto numérico, quando um operando é lista e o outro é string faz join. Ex.: `['a' 'b'] * ','` → `'a,b'`. O join com `""` converte números em caracteres por código.
+- Divisão `/`: quando ambos operandos são strings, realiza `split`; caso contrário, é divisão numérica.
+- Soma `+` e subtração `-` seguem semântica usual (strings podem ser concatenadas via `+`).
+- Comparadores retornam `1` (verdadeiro) ou `0` (falso).
+- Lógicos: `&` e `|` com curto-circuito. `&` avalia o segundo operando somente se o primeiro for diferente de `0`. `|` retorna o primeiro não-zero ou avalia o segundo.
+- Ternário `condição ? então : senão` implementado como expressão.
+- Negação `!expr` retorna `1` para falso (quando `expr === 0`) e `0` caso contrário.
 
-### Chamadas de Função
+## Funções e aplicação
 
-Aplicação de funções a argumentos: `soma(5 3)`, `filtrar(lista condicao)`
+- Funções são valores de primeira classe e representam closured scopes.
+- Parâmetros podem usar destructuring de objeto: `{a b} => ...` atribui `a` e `b` a partir do objeto-argumento.
+- Guards permitem múltiplos ramos com condições e um ramo default.
+- Chamadas imediatas (`nome(...)`) buscam `nome` no escopo atual; chamar algo que não é função gera erro semântico.
 
-### Indexação e Fatiamento
+## Módulos e carregamento dinâmico
 
-Acesso a elementos de coleções: `lista[0]`, `texto[1:5]`, `objeto[chave]`
+- O operador `@ expr` avalia `expr` como endereço e carrega o conteúdo do módulo resultante usando o contexto interno do interpretador.
+- Literais de endereço no código (`endereço_literal`) são resolvidos em tempo de avaliação e podem disparar avaliação lazy de módulos (o runner pode fornecer um avaliador lazy para módulos não carregados).
+- O runtime mantém um mapa de `valores_módulos` e hooks para `resolve_endereço` e `carregar_conteúdo` — responsáveis por resolver caminhos relativos e efetuar I/O.
 
-### Funções Inline
+## Escopo, avaliação e lazy
 
-Definições de função usando sintaxe de seta: `x => x * 2`
+- O sistema de escopo é baseado em objetos com ponteiros internos.
+- Valores podem ser definidos como thunks preguiçosos (lazy thunks); a primeira vez que são lidos, o thunk é avaliado e cacheado.
 
-### Agrupamento
+## Depuração e mensagens
 
-Parênteses alteram a precedência: `(a + b) * 2`
+- Depuração: escrever `% expr` imprime o valor de `expr` em stderr (JSON) e retorna o valor.
+- Mensagens de erro semântico incluem um rastro de pilha semântica (frames) e informações auxiliares como nomes disponíveis no escopo, endereço do módulo e termo de busca, para ajudar o desenvolvedor a localizar a origem do erro.
 
-## Erros de Sintaxe
+## Erros sintáticos e semânticos
 
-Erros de sintaxe ocorrem quando o código não segue as regras da linguagem. Exemplos comuns incluem:
-
-- **Falta de parênteses**: `soma(5 3` deve ser `soma(5 3)`.
-- **Identificadores inválidos**: `1variavel` não é um identificador válido.
-
-Quando um erro de sintaxe é encontrado, a execução do módulo falhará e uma mensagem de erro será exibida no terminal, indicando a linha e a natureza do erro. A mensagem geralmente segue o formato:
-
-```
-Erro de sintaxe.
-<endereço do arquivo>
-<número da linha>:<número da coluna>: <linha com erro>
-```
-
-Isso ajuda o desenvolvedor a identificar rapidamente onde o problema ocorreu e como corrigí-lo.
-
-## Erros de Referência
-
-Erros de referência ocorrem quando o código tenta acessar um identificador que não foi definido. Exemplos incluem:
-
-- **Uso de identificadores não declarados**: `resultado` se não houver uma declaração anterior como `resultado = 10`.
-- **Importações falhas**: Tentar importar um módulo que não existe resultará em um erro.
-
-Esses erros também gerarão mensagens informativas, como:
-
-```
-Erro: Nome não encontrado: <nome da variável ou função>
-<endereço do arquivo>
-<número da linha>:<número da coluna>: <linha com erro>
-```
-
-Essas mensagens ajudam o desenvolvedor a identificar e corrigir rapidamente o problema.
+- Erros de sintaxe exibem o arquivo, linha e coluna aproximada com a linha em questão.
+- Erros semânticos (ex.: nome não encontrado, aplicação de índice em tipo inválido, tentativa de chamar não-função) incluem possíveis valores no escopo.
