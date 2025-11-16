@@ -33,6 +33,8 @@ export const avaliarOperações = async (ast, escopo) => {
       const erro = new Error(`Unknown logical operator: ${ast.operador}`);
       erro.é_erro_semântico = true;
       erro.módulo_endereço = obterEndereçoMódulo(escopo);
+      erro.pilha_semântica = erro.pilha_semântica || [];
+      erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: String(ast.operador), comprimento: String(ast.operador).length });
       throw erro;
     }
 

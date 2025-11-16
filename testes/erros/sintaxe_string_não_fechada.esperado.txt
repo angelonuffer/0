@@ -1,3 +1,2 @@
-Erro de sintaxe.
 testes/erros/sintaxe_string_não_fechada.0
 2:19: texto = "Olá mundo

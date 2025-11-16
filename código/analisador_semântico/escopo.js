@@ -60,6 +60,11 @@ export const buscarVariável = async (escopo, nome) => {
   erro.nome_variável = nome;
   erro.nomes_disponíveis = nomesDisponíveis;
   erro.módulo_endereço = módulo_endereço;
+  // Attach a semantic frame to help the top-level formatter build a stack
+  if (!erro.pilha_semântica) {
+    erro.pilha_semântica = [];
+  }
+  erro.pilha_semântica.push({ endereço: módulo_endereço, termo_busca: nome, comprimento: nome.length });
   throw erro;
 };
 

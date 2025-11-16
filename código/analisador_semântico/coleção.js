@@ -39,7 +39,9 @@ export const avaliarColeção = async (ast, escopo) => {
           const erro = new Error(`Object key must be a string or number, got type ${typeof índice}`);
           erro.é_erro_semântico = true;
           erro.módulo_endereço = obterEndereçoMódulo(escopo);
-          // No good search term for this error
+          // Attach frame
+          erro.pilha_semântica = erro.pilha_semântica || [];
+          erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: String(índice), comprimento: String(índice).length, valor: índice });
           throw erro;
         }
         if (ast.éFaixa || fim !== undefined) {
@@ -53,6 +55,8 @@ export const avaliarColeção = async (ast, escopo) => {
             const erro = new Error(`Slicing syntax not supported for object property access`);
             erro.é_erro_semântico = true;
             erro.módulo_endereço = obterEndereçoMódulo(escopo);
+            erro.pilha_semântica = erro.pilha_semântica || [];
+            erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: undefined, comprimento: 1 });
             throw erro;
           }
         }
@@ -61,6 +65,8 @@ export const avaliarColeção = async (ast, escopo) => {
         const erro = new Error(`Cannot apply indexing/slicing to type '${typeof valor}'`);
         erro.é_erro_semântico = true;
         erro.módulo_endereço = obterEndereçoMódulo(escopo);
+        erro.pilha_semântica = erro.pilha_semântica || [];
+        try { erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: undefined, comprimento: 1, valor }); } catch(e) { erro.pilha_semântica.push({ endereço: erro.módulo_endereço }); }
         throw erro;
       }
     }
@@ -73,6 +79,8 @@ export const avaliarColeção = async (ast, escopo) => {
       const erro = new Error(`'${ast.valor.nome}' do tipo '${typeof valor}' não tem um tamanho`);
       erro.é_erro_semântico = true;
       erro.módulo_endereço = obterEndereçoMódulo(escopo);
+      erro.pilha_semântica = erro.pilha_semântica || [];
+      erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: ast.valor?.nome, comprimento: String(ast.valor?.nome || '').length, valor });
       throw erro;
 
     case 'chaves': {
@@ -99,6 +107,8 @@ export const avaliarColeção = async (ast, escopo) => {
         erro.é_erro_semântico = true;
         erro.módulo_endereço = obterEndereçoMódulo(escopo);
         erro.termo_busca = String(ast.nome);
+        erro.pilha_semântica = erro.pilha_semântica || [];
+        erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: String(ast.nome), comprimento: String(ast.nome).length, valor: objeto });
         throw erro;
       }
 
@@ -108,6 +118,8 @@ export const avaliarColeção = async (ast, escopo) => {
         erro.é_erro_semântico = true;
         erro.módulo_endereço = obterEndereçoMódulo(escopo);
         erro.termo_busca = String(ast.nome);
+        erro.pilha_semântica = erro.pilha_semântica || [];
+        erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: String(ast.nome), comprimento: String(ast.nome).length, valor: objeto });
         throw erro;
       }
 
@@ -123,6 +135,8 @@ export const avaliarColeção = async (ast, escopo) => {
       erro.nome_variável = ast.nome;
       erro.nomes_disponíveis = nomesDisponíveis;
       erro.módulo_endereço = obterEndereçoMódulo(escopo);
+      erro.pilha_semântica = erro.pilha_semântica || [];
+      erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: ast.nome, comprimento: String(ast.nome).length });
       throw erro;
     }
 

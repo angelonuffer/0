@@ -49,55 +49,70 @@ const carregar_conteúdo = async (endereço) => {
 };
 
 // Helper function to show semantic errors with highlighted code
-const mostrar_erro_semântico = (endereço, mensagem_erro, termo_busca, informações_extras = []) => {
-  const conteúdo = conteúdos[endereço];
+// Helper to print a single error block: endereço + linha:col: código da linha (with ANSI highlight)
+const exibir_bloco_erro = (endereço, número_linha, número_coluna, comprimento = 1, corAnsi = 41) => {
+  const conteúdo = conteúdos[endereço] || '';
   const linhas = conteúdo.split('\n');
-  
-  // Find the first occurrence of the search term in the source
-  let posição_erro = -1;
-  let número_linha = 0;
-  let número_coluna = 0;
-  let comprimento_termo = termo_busca.length;
-  
-  // Create a regex that matches the search term as a whole word
-  const regex = new RegExp(`\\b${termo_busca.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
-  
-  for (let i = 0; i < linhas.length; i++) {
-    const match = linhas[i].match(regex);
-    if (match) {
-      número_linha = i + 1;
-      número_coluna = match.index + 1;
-      posição_erro = conteúdo.split('\n').slice(0, i).join('\n').length + (i > 0 ? 1 : 0) + match.index;
-      break;
+  const linha = linhas[número_linha - 1] ?? '';
+  const start = Math.max(0, número_coluna - 1);
+  const before = linha.substring(0, start);
+  const highlight = linha.substring(start, start + Math.max(1, comprimento));
+  const after = linha.substring(start + Math.max(1, comprimento));
+  const linha_com_erro = `${before}\x1b[${corAnsi}m${highlight}\x1b[0m${after}`;
+  console.log(`${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
+};
+
+// Helper to display a simulated line where the highlighted region is replaced by a value string
+const exibir_bloco_erro_com_valor = (endereço, número_linha, número_coluna, comprimento = 1, valorStr = '', corAnsi = 43) => {
+  const conteúdo = conteúdos[endereço] || '';
+  const linhas = conteúdo.split('\n');
+  const linha = linhas[número_linha - 1] ?? '';
+  const start = Math.max(0, número_coluna - 1);
+  const before = linha.substring(0, start);
+  const after = linha.substring(start + Math.max(1, comprimento));
+  const safeValor = String(valorStr);
+  const linha_simulada = `${before}\x1b[${corAnsi}m${safeValor}\x1b[0m${after}`;
+  console.log(`${endereço}\n${número_linha}:${número_coluna}: ${linha_simulada}`);
+};
+
+// Helper function to show semantic errors with highlighted code (yellow)
+const mostrar_erro_semântico = (endereço, _mensagem_erro, termo_busca, informações_extras = []) => {
+  const conteúdo = conteúdos[endereço] || '';
+  const linhas = conteúdo.split('\n');
+
+  // Try to find the term; fallback to first non-empty line
+  let número_linha = 1;
+  let número_coluna = 1;
+  let comprimento_termo = termo_busca ? termo_busca.length : 1;
+
+  if (termo_busca) {
+    const regex = new RegExp(`\\b${termo_busca.replace(/[.*+?^${}()|[\\]\\]/g, '\\\\$&')}\\b`);
+    for (let i = 0; i < linhas.length; i++) {
+      const match = linhas[i].match(regex);
+      if (match) {
+        número_linha = i + 1;
+        número_coluna = match.index + 1;
+        break;
+      }
+    }
+  } else {
+    // Find first non-empty line
+    for (let i = 0; i < linhas.length; i++) {
+      if ((linhas[i] || '').trim() !== '') { número_linha = i + 1; número_coluna = 1; break; }
     }
   }
-  
-  if (posição_erro === -1) {
-    // Fallback: just show the error without highlighting
-    console.log(`Erro: ${mensagem_erro}\n${endereço}`);
-    for (const info of informações_extras) {
-      console.log(info);
-    }
-    return;
-  }
-  
-  const linha = linhas[número_linha - 1];
-  
-  // Highlight the term with yellow background (ANSI code 43)
-  const linha_com_erro = linha.substring(0, número_coluna - 1) +
-    `\x1b[43m${termo_busca}\x1b[0m` +
-    linha.substring(número_coluna - 1 + comprimento_termo);
-  
-  console.log(`Erro: ${mensagem_erro}\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
-  
-  // Show extra information aligned with the error position
+
+  exibir_bloco_erro(endereço, número_linha, número_coluna, comprimento_termo, 43);
+
+  // Show extra information aligned with the error position (no verbal messages)
   if (informações_extras.length > 0) {
-    // Calculate padding to align with the term position
     const padding = ' '.repeat(`${número_linha}:${número_coluna}: `.length + número_coluna - 1);
     for (const info of informações_extras) {
       console.log(`${padding}${info}`);
     }
   }
+
+  return { número_linha, número_coluna, comprimento_termo };
 };
 
 // Helper function to show undefined variable error with context
@@ -167,7 +182,8 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
   const linha_com_erro = (linha?.substring(0, número_coluna - 1) ?? "") +
     `\x1b[41m${linha?.[número_coluna - 1] ?? ""}\x1b[0m` +
     (linha?.substring(número_coluna) ?? "");
-  console.log(`Erro de sintaxe.\n${endereço}\n${número_linha}:${número_coluna}: ${linha_com_erro}`);
+  // Use unified display helper (red highlight for syntax errors)
+  exibir_bloco_erro(endereço, número_linha, número_coluna, 1, 41);
 };
 
 
@@ -199,7 +215,13 @@ const parsear_módulo = async (endereço) => {
   if (!módulo_bruto.sucesso) {
     // If there's an error with stack trace, it's a transformer error
     if (módulo_bruto.erro && módulo_bruto.erro.stack) {
-      console.log(`Erro: ${módulo_bruto.erro.mensagem || módulo_bruto.erro.message}\n${módulo_bruto.erro.stack}`);
+      // Show only endereço + line:col: code line (no verbal message)
+      const linhas_conteudo = (conteúdos[endereço] || '').split('\n');
+      let ln = 1, col = 1;
+      for (let i = 0; i < linhas_conteudo.length; i++) {
+        if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
+      }
+      exibir_bloco_erro(endereço, ln, col, 1, 41);
     } else {
       // Otherwise show syntax error
       mostrar_erro_sintaxe(endereço, módulo_bruto);
@@ -280,12 +302,26 @@ const avaliar_módulo = async (endereço) => {
           // Check if it's an undefined variable error (special case)
           if (erro.nome_variável) {
             mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+          } else if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
+            // Print each frame in the semantic stack (top -> bottom)
+            for (const frame of erro.pilha_semântica) {
+              const frame_end = frame.endereço || erro_endereço;
+              const pos = mostrar_erro_semântico(frame_end, erro.message, frame.termo_busca);
+              if (frame.valor !== undefined) {
+                exibir_bloco_erro_com_valor(frame_end, pos.número_linha, pos.número_coluna, frame.comprimento || pos.comprimento_termo, frame.valor, 43);
+              }
+            }
           } else if (erro.termo_busca) {
             // Generic semantic error with search term
             mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
           } else {
-            // Semantic error without search term - just show the message
-            console.log(`Erro: ${erro.message}\n${erro_endereço}`);
+            // Semantic error without search term - show endereço + first non-empty line highlighted
+            const linhas_conteudo = (conteúdos[erro_endereço] || '').split('\n');
+            let ln = 1, col = 1;
+            for (let i = 0; i < linhas_conteudo.length; i++) {
+              if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
+            }
+            exibir_bloco_erro(erro_endereço, ln, col, 1, 43);
           }
           
           salvar_cache();
@@ -308,12 +344,25 @@ const avaliar_módulo = async (endereço) => {
       // Check if it's an undefined variable error (special case)
       if (erro.nome_variável) {
         mostrar_erro_variável(erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+      } else if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
+        for (const frame of erro.pilha_semântica) {
+          const frame_end = frame.endereço || erro_endereço;
+          const pos = mostrar_erro_semântico(frame_end, erro.message, frame.termo_busca);
+          if (frame.valor !== undefined) {
+            exibir_bloco_erro_com_valor(frame_end, pos.número_linha, pos.número_coluna, frame.comprimento || pos.comprimento_termo, frame.valor, 43);
+          }
+        }
       } else if (erro.termo_busca) {
         // Generic semantic error with search term
         mostrar_erro_semântico(erro_endereço, erro.message, erro.termo_busca);
       } else {
-        // Semantic error without search term - just show the message
-        console.log(`Erro: ${erro.message}\n${erro_endereço}`);
+        // Semantic error without search term - show endereço + first non-empty line highlighted
+        const linhas_conteudo = (conteúdos[erro_endereço] || '').split('\n');
+        let ln = 1, col = 1;
+        for (let i = 0; i < linhas_conteudo.length; i++) {
+          if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
+        }
+        exibir_bloco_erro(erro_endereço, ln, col, 1, 43);
       }
       
       salvar_cache();

@@ -34,6 +34,8 @@ export const avaliarObjeto = async (ast, escopo) => {
           const erro = new Error(`Object key must be a string or number, got ${typeof chave}`);
           erro.é_erro_semântico = true;
           erro.módulo_endereço = obterEndereçoMódulo(escopo);
+          erro.pilha_semântica = erro.pilha_semântica || [];
+          erro.pilha_semântica.push({ endereço: erro.módulo_endereço, termo_busca: undefined, comprimento: 1, valor: chave });
           throw erro;
         }
         listScope[chave] = undefined;

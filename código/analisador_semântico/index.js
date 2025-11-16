@@ -38,6 +38,8 @@ export const avaliar = async (ast, escopo) => {
 
   const erro = new Error(`Unknown AST node type: ${ast.tipo}`);
   erro.é_erro_semântico = true;
+  erro.pilha_semântica = erro.pilha_semântica || [];
+  erro.pilha_semântica.push({ endereço: null, termo_busca: String(ast.tipo), comprimento: String(ast.tipo).length });
   throw erro;
 };
 

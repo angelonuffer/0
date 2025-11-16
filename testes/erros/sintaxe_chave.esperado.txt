@@ -1,3 +1,2 @@
-Erro de sintaxe.
 testes/erros/sintaxe_chave.0
 2:18: obj = { a: 1 b: 2

@@ -1,3 +1,2 @@
-Erro de sintaxe.
 testes/erros/sintaxe_chave_multilinha.0
 4:7:   b: 2

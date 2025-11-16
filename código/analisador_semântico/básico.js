@@ -43,6 +43,9 @@ export const avaliarBásico = async (ast, escopo) => {
       if (!context || !context.carregar_conteúdo || !context.resolve_endereço || !módulo_atual) {
         const erro = new Error('Content loading context not available');
         erro.é_erro_semântico = true;
+        erro.módulo_endereço = módulo_atual;
+        erro.pilha_semântica = erro.pilha_semântica || [];
+        erro.pilha_semântica.push({ endereço: módulo_atual, termo_busca: undefined, comprimento: 1 });
         throw erro;
       }
       
@@ -90,6 +93,9 @@ export const avaliarBásico = async (ast, escopo) => {
       if (!context || !context.valores_módulos || !context.resolve_endereço || !módulo_atual) {
         const erro = new Error('Module loading context not available');
         erro.é_erro_semântico = true;
+        erro.módulo_endereço = módulo_atual;
+        erro.pilha_semântica = erro.pilha_semântica || [];
+        erro.pilha_semântica.push({ endereço: módulo_atual, termo_busca: undefined, comprimento: 1 });
         throw erro;
       }
       
@@ -106,6 +112,9 @@ export const avaliarBásico = async (ast, escopo) => {
         const erro = new Error(`Module not loaded: ${ast.valor}`);
         erro.é_erro_semântico = true;
         erro.termo_busca = ast.valor;
+        erro.módulo_endereço = módulo_atual;
+        erro.pilha_semântica = erro.pilha_semântica || [];
+        erro.pilha_semântica.push({ endereço: módulo_atual, termo_busca: String(ast.valor), comprimento: String(ast.valor).length });
         throw erro;
       }
       

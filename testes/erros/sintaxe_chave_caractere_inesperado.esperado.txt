@@ -1,3 +1,2 @@
-Erro de sintaxe.
 testes/erros/sintaxe_chave_caractere_inesperado.0
 5:3:   $
