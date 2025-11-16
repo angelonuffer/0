@@ -2,30 +2,31 @@
 
 import { buscarVariável, INTERNAL_CONTEXT } from './escopo.js';
 import { pushFrame, popFrame, getSnapshotForError } from './pilha.js';
+import { ANSI, TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
 
 export const avaliarBásico = async (ast, escopo) => {
   switch (ast.tipo) {
-    case 'número':
-    case 'texto':
+    case TIPO_AST.NÚMERO:
+    case TIPO_AST.TEXTO:
       return ast.valor;
 
-    case 'variável':
+    case TIPO_AST.VARIÁVEL:
       return await buscarVariável(escopo, ast.nome);
 
-    case 'não':
+    case TIPO_AST.NÃO:
       return (await avaliar(ast.expressão, escopo)) === 0 ? 1 : 0;
 
-    case 'depuração': {
+    case TIPO_AST.DEPURAÇÃO: {
       const valor = await avaliar(ast.expressão, escopo);
       // Display debug output to stderr with green background
-      console.error(`\x1b[42m%\x1b[0m ${JSON.stringify(valor)}`);
+      console.error(`${ANSI.VERDE_FUNDO}%${ANSI.RESET} ${JSON.stringify(valor)}`);
       return valor;
     }
 
-    case 'carregar': {
+    case TIPO_AST.CARREGAR: {
       // Evaluate the expression to get the address
       const endereço_expr = await avaliar(ast.expressão, escopo);
       
@@ -67,10 +68,10 @@ export const avaliarBásico = async (ast, escopo) => {
       }
     }
 
-    case 'parênteses':
+    case TIPO_AST.PARÊNTESES:
       return await avaliar(ast.expressão, escopo);
 
-    case 'parênteses_com_declarações': {
+    case TIPO_AST.PARÊNTESES_COM_DECLARAÇÕES: {
       // Create a new scope for the declarations
       const novoEscopo = { __parent__: escopo };
       
