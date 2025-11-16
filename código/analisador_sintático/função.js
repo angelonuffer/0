@@ -1,6 +1,7 @@
 // Function operations - lambda, chamada_função, parênteses
 import { sequência, opcional, transformar, símbolo, alternativa, vários } from '../combinadores/index.js';
 import { espaço, nome } from '../analisador_léxico/index.js';
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
@@ -22,13 +23,13 @@ const objeto_destructuring = transformar(
   ([, , nomes_seq,]) => {
     if (!nomes_seq) {
       return {
-        tipo: 'destructuring',
+        tipo: TIPO_AST.DESTRUCTURING,
         nomes: []
       };
     }
     const nomes = nomes_seq.map(seq => seq[0]);
     return {
-      tipo: 'destructuring',
+      tipo: TIPO_AST.DESTRUCTURING,
       nomes: nomes
     };
   }
@@ -57,14 +58,14 @@ const guardExpression = transformar(
       // This is a guard with condition: | condition = expression
       const [, , , resultExpr] = assignmentOpt;
       return {
-        tipo: 'guard',
+        tipo: TIPO_AST.GUARD,
         condição: conditionOrDefault,
         expressão: resultExpr
       };
     } else {
       // This is the default case: | expression
       return {
-        tipo: 'guard_default',
+        tipo: TIPO_AST.GUARD_DEFAULT,
         expressão: conditionOrDefault
       };
     }
@@ -86,7 +87,7 @@ const guardBody = código => {
   if (guardsResult.sucesso && guardsResult.valor.length > 0) {
     return {
       sucesso: true,
-      valor: { tipo: 'guard_body', guards: guardsResult.valor },
+      valor: { tipo: TIPO_AST.GUARD_BODY, guards: guardsResult.valor },
       resto: guardsResult.resto,
       menor_resto: guardsResult.menor_resto
     };
@@ -138,10 +139,10 @@ const lambda = transformar(
 
     // Check if corpoInfo is guards or regular expression
     let corpo;
-    if (corpoInfo && typeof corpoInfo === 'object' && corpoInfo.tipo === 'guard_body') {
+    if (corpoInfo && typeof corpoInfo === 'object' && corpoInfo.tipo === TIPO_AST.GUARD_BODY) {
       // This is the guards case
       corpo = {
-        tipo: 'guards',
+        tipo: TIPO_AST.GUARDS,
         guards: corpoInfo.guards
       };
     } else if (Array.isArray(corpoInfo) && corpoInfo.length === 2) {
@@ -153,7 +154,7 @@ const lambda = transformar(
     }
 
     return {
-      tipo: 'lambda',
+      tipo: TIPO_AST.LAMBDA,
       parâmetro: nomeParam,
       destructuring: destructuringParam,
       corpo: corpo
@@ -175,7 +176,7 @@ const chamada_função = transformar(
     símbolo(")"),
   ),
   ([, , arg_seq_optional,]) => ({
-    tipo: 'operação_chamada_função',
+    tipo: TIPO_AST.OPERAÇÃO_CHAMADA_FUNÇÃO,
     argumento: arg_seq_optional ? arg_seq_optional[0] : undefined
   })
 );
@@ -210,7 +211,7 @@ const parênteses = transformar(
       }));
       
       return {
-        tipo: 'parênteses_com_declarações',
+        tipo: TIPO_AST.PARÊNTESES_COM_DECLARAÇÕES,
         declarações: declarações,
         expressão: expr
       };
@@ -218,7 +219,7 @@ const parênteses = transformar(
     
     // Otherwise, simple parentheses
     return {
-      tipo: 'parênteses',
+      tipo: TIPO_AST.PARÊNTESES,
       expressão: expr
     };
   }

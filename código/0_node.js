@@ -1,6 +1,7 @@
 import { _0 } from './analisador_sintático/index.js';
 import { importações } from './analisador_sintático/importações.js';
 import { avaliar, criarLazyThunk, INTERNAL_CONTEXT } from './analisador_semântico/index.js';
+import { ANSI } from './constantes.js';
 import fs from 'fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -58,7 +59,7 @@ const exibir_bloco_erro = (endereço, número_linha, número_coluna, comprimento
   const before = linha.substring(0, start);
   const highlight = linha.substring(start, start + Math.max(1, comprimento));
   const after = linha.substring(start + Math.max(1, comprimento));
-  const linha_com_erro = `${before}\x1b[${corAnsi}m${highlight}\x1b[0m${after}`;
+  const linha_com_erro = `${before}\x1b[${corAnsi}m${highlight}${ANSI.RESET}${after}`;
   if (!suprimirArquivoHeader) console.log(`${endereço}`);
   console.log(`${número_linha}:${número_coluna}: ${linha_com_erro}`);
 };
@@ -72,7 +73,7 @@ const exibir_bloco_erro_com_valor = (endereço, número_linha, número_coluna, c
   const before = linha.substring(0, start);
   const after = linha.substring(start + Math.max(1, comprimento));
   const safeValor = String(valorStr);
-  const linha_simulada = `${before}\x1b[${corAnsi}m${safeValor}\x1b[0m${after}`;
+  const linha_simulada = `${before}\x1b[${corAnsi}m${safeValor}${ANSI.RESET}${after}`;
   console.log(`${endereço}\n${número_linha}:${número_coluna}: ${linha_simulada}`);
 };
 
@@ -187,7 +188,7 @@ const mostrar_erro_sintaxe = (endereço, módulo_bruto) => {
   const linha = linhas[número_linha - 1];
   
   const linha_com_erro = (linha?.substring(0, número_coluna - 1) ?? "") +
-    `\x1b[41m${linha?.[número_coluna - 1] ?? ""}\x1b[0m` +
+    `${ANSI.VERMELHO_FUNDO}${linha?.[número_coluna - 1] ?? ""}${ANSI.RESET}` +
     (linha?.substring(número_coluna) ?? "");
   // Use unified display helper (red highlight for syntax errors)
   exibir_bloco_erro(endereço, número_linha, número_coluna, 1, 41);

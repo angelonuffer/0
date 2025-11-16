@@ -1,4 +1,5 @@
 // Object construction and evaluation
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -30,7 +31,7 @@ export const avaliarObjeto = async (ast, escopo) => {
   // Build object by evaluating keys and values, merging spreads
   const result = {};
   for (const item of ast.items) {
-    if (item.tipo === 'espalhamento') {
+    if (item.tipo === TIPO_AST.ESPALHAMENTO) {
       const spreadValue = await avaliar(item.expressão, escopo);
       if (Array.isArray(spreadValue)) {
         // Spread array into numeric keys

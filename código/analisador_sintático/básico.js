@@ -1,6 +1,7 @@
 // Basic operations - não, valor_constante, chamada_função_imediata
 import { alternativa, sequência, opcional, transformar, símbolo, vários } from '../combinadores/index.js';
 import { espaço, nome } from '../analisador_léxico/index.js';
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
@@ -15,7 +16,7 @@ const não = transformar(
     código => expressão(código),
   ),
   ([, , expr]) => ({
-    tipo: 'não',
+    tipo: TIPO_AST.NÃO,
     expressão: expr
   })
 )
@@ -27,7 +28,7 @@ const depuração = transformar(
     código => expressão(código),
   ),
   ([, , expr]) => ({
-    tipo: 'depuração',
+    tipo: TIPO_AST.DEPURAÇÃO,
     expressão: expr
   })
 )
@@ -39,7 +40,7 @@ const carregar = transformar(
     código => expressão(código),
   ),
   ([, , expr]) => ({
-    tipo: 'carregar',
+    tipo: TIPO_AST.CARREGAR,
     expressão: expr
   })
 )
@@ -47,7 +48,7 @@ const carregar = transformar(
 const valor_constante = transformar(
   nome,
   nome_var => ({
-    tipo: 'variável',
+    tipo: TIPO_AST.VARIÁVEL,
     nome: nome_var
   })
 )
@@ -86,7 +87,7 @@ const chamada_função_imediata = transformar(
     
     // Create the initial function call AST
     let ast = {
-      tipo: 'chamada_função_imediata',
+      tipo: TIPO_AST.CHAMADA_FUNÇÃO_IMEDIATA,
       nome: nome_var,
       argumento: arg_seq_optional ? arg_seq_optional[0] : undefined
     };
@@ -97,33 +98,33 @@ const chamada_função_imediata = transformar(
     }
     
     return operações.reduce((currentAst, operação) => {
-      if (operação.tipo === 'operação_fatia') {
+      if (operação.tipo === TIPO_AST.OPERAÇÃO_FATIA) {
         return {
-          tipo: 'fatia',
+          tipo: TIPO_AST.FATIA,
           valor: currentAst,
           índice: operação.índice,
           fim: operação.fim,
           éFaixa: operação.éFaixa
         };
-      } else if (operação.tipo === 'operação_tamanho') {
+      } else if (operação.tipo === TIPO_AST.OPERAÇÃO_TAMANHO) {
         return {
-          tipo: 'tamanho',
+          tipo: TIPO_AST.TAMANHO,
           valor: currentAst
         };
-      } else if (operação.tipo === 'operação_chaves') {
+      } else if (operação.tipo === TIPO_AST.OPERAÇÃO_CHAVES) {
         return {
-          tipo: 'chaves',
+          tipo: TIPO_AST.CHAVES,
           valor: currentAst
         };
-      } else if (operação.tipo === 'operação_atributo') {
+      } else if (operação.tipo === TIPO_AST.OPERAÇÃO_ATRIBUTO) {
         return {
-          tipo: 'atributo',
+          tipo: TIPO_AST.ATRIBUTO,
           objeto: currentAst,
           nome: operação.nome
         };
-      } else if (operação.tipo === 'operação_chamada_função') {
+      } else if (operação.tipo === TIPO_AST.OPERAÇÃO_CHAMADA_FUNÇÃO) {
         return {
-          tipo: 'chamada_função',
+          tipo: TIPO_AST.CHAMADA_FUNÇÃO,
           função: currentAst,
           argumento: operação.argumento
         };

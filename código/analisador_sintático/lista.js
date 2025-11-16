@@ -1,6 +1,7 @@
 // List parser: handles square-bracket lists, slicing and related operations
 import { sequência, opcional, vários, alternativa, transformar, símbolo } from '../combinadores/index.js';
 import { espaço } from '../analisador_léxico/index.js';
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
@@ -21,7 +22,7 @@ const fatia = transformar(
     const fimExpr = opcionalFaixa ? opcionalFaixa[1] : undefined;
 
     return {
-      tipo: 'operação_fatia',
+      tipo: TIPO_AST.OPERAÇÃO_FATIA,
       índice: índiceExpr,
       fim: fimExpr,
       éFaixa: éFaixa
@@ -32,14 +33,14 @@ const fatia = transformar(
 const tamanho = transformar(
   símbolo("[.]"),
   () => ({
-    tipo: 'operação_tamanho'
+    tipo: TIPO_AST.OPERAÇÃO_TAMANHO
   })
 );
 
 const chaves = transformar(
   símbolo("[*]"),
   () => ({
-    tipo: 'operação_chaves'
+    tipo: TIPO_AST.OPERAÇÃO_CHAVES
   })
 );
 
@@ -65,7 +66,7 @@ const lista = transformar(
   ([, , valores_vários,]) => {
     if (!valores_vários) {
       return {
-        tipo: 'lista',
+        tipo: TIPO_AST.LISTA,
         items: [],
         usarObjeto: false
       };
@@ -80,7 +81,7 @@ const lista = transformar(
       const firstEl = v_alt[0];
       if (firstEl === "...") {
         return {
-          tipo: 'espalhamento',
+          tipo: TIPO_AST.ESPALHAMENTO,
           expressão: v_alt[1]
         };
       } else {
@@ -91,7 +92,7 @@ const lista = transformar(
     });
     
     return {
-      tipo: 'lista',
+      tipo: TIPO_AST.LISTA,
       items: items,
       usarObjeto: usarObjeto
     };
