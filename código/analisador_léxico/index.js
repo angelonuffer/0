@@ -1,5 +1,6 @@
 // Lexical analyzer - Tokenization and basic lexical elements
 import { alternativa, sequência, opcional, vários, transformar, inversão, faixa, símbolo } from '../combinadores/index.js';
+import { TIPO_AST } from '../constantes.js';
 
 const espaço_em_branco = alternativa(
   símbolo(" "),
@@ -29,7 +30,7 @@ const número = transformar(
     ),
   ),
   v => ({
-    tipo: 'número',
+    tipo: TIPO_AST.NÚMERO,
     valor: parseInt(v.flat(Infinity).join(""))
   })
 )
@@ -43,7 +44,7 @@ const número_negativo = transformar(
     ),
   ),
   v => ({
-    tipo: 'número',
+    tipo: TIPO_AST.NÚMERO,
     valor: -parseInt(v.slice(1).flat(Infinity).join(""))
   })
 )
@@ -91,7 +92,7 @@ const texto = transformar(
     símbolo('"'),
   ),
   v => ({
-    tipo: 'texto',
+    tipo: TIPO_AST.TEXTO,
     valor: v.flat(Infinity).join("").slice(1, -1)
   })
 )
@@ -151,7 +152,7 @@ const endereço_literal = transformar(
     ),
   ),
   v => ({
-    tipo: 'endereço_literal',
+    tipo: TIPO_AST.ENDEREÇO_LITERAL,
     valor: v.flat(Infinity).join("")
   })
 )

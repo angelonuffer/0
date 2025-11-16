@@ -53,4 +53,5 @@ export const TIPO_AST = {
   // Outros
   CONDICIONAL: 'condicional',
   ESPALHAMENTO: 'espalhamento',
+  ENDEREÇO_LITERAL: 'endereço_literal',
 };

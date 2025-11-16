@@ -1,6 +1,7 @@
 // Object parser: handles curly-brace object literals and attribute access
 import { alternativa, sequência, opcional, vários, transformar, símbolo } from '../combinadores/index.js';
 import { espaço, nome, texto } from '../analisador_léxico/index.js';
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
@@ -46,7 +47,7 @@ const objeto = transformar(
   ([, , valores_vários,]) => {
     if (!valores_vários) {
       return {
-        tipo: 'objeto',
+        tipo: TIPO_AST.OBJETO,
         items: [],
         usarObjeto: true
       };
@@ -68,7 +69,7 @@ const objeto = transformar(
       const firstEl = v_alt[0];
       if (firstEl === "...") {
         return {
-          tipo: 'espalhamento',
+          tipo: TIPO_AST.ESPALHAMENTO,
           expressão: v_alt[1]
         };
       } else if (v_alt.length === 5 && v_alt[1] === ":") {
@@ -91,7 +92,7 @@ const objeto = transformar(
         const nomeProp = v_alt[0];
         return {
           chave: nomeProp,
-          valor: { tipo: 'variável', nome: nomeProp }
+          valor: { tipo: TIPO_AST.VARIÁVEL, nome: nomeProp }
         };
       } else {
         return {
@@ -101,7 +102,7 @@ const objeto = transformar(
     });
 
     return {
-      tipo: 'objeto',
+      tipo: TIPO_AST.OBJETO,
       items: items,
       usarObjeto: true
     };
@@ -114,7 +115,7 @@ const atributo = transformar(
     nome,
   ),
   ([, atributoNome]) => ({
-    tipo: 'operação_atributo',
+    tipo: TIPO_AST.OPERAÇÃO_ATRIBUTO,
     nome: atributoNome
   })
 );

@@ -89,7 +89,7 @@ export const avaliarBásico = async (ast, escopo) => {
       return await avaliar(ast.expressão, novoEscopo);
     }
 
-    case 'endereço_literal': {
+    case TIPO_AST.ENDEREÇO_LITERAL: {
       // Get internal context from scope (check parent chain)
       let context, módulo_atual;
       let current_scope = escopo;

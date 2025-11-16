@@ -2,6 +2,7 @@
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
 import { espaço, nome } from '../analisador_léxico/index.js';
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declarations
 let getTermo6;
@@ -30,7 +31,7 @@ const buildExpressão = () => {
           const operador = valSeq[1];
           const direita = valSeq[3];
           return {
-            tipo: 'operação_lógica',
+            tipo: TIPO_AST.OPERAÇÃO_LÓGICA,
             esquerda: esquerda,
             direita: direita,
             operador: operador
