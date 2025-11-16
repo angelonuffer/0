@@ -2,6 +2,7 @@
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
 import { espaço, número, número_negativo, texto, endereço_literal } from '../analisador_léxico/index.js';
+import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive expressão reference
 let expressão;
@@ -76,33 +77,33 @@ const getTermo1 = () => alternativa(
       
       // Chain operations by creating nested AST nodes
       return operações.reduce((ast, operação) => {
-        if (operação.tipo === 'operação_fatia') {
+        if (operação.tipo === TIPO_AST.OPERAÇÃO_FATIA) {
           return {
-            tipo: 'fatia',
+            tipo: TIPO_AST.FATIA,
             valor: ast,
             índice: operação.índice,
             fim: operação.fim,
             éFaixa: operação.éFaixa
           };
-        } else if (operação.tipo === 'operação_tamanho') {
+        } else if (operação.tipo === TIPO_AST.OPERAÇÃO_TAMANHO) {
           return {
-            tipo: 'tamanho',
+            tipo: TIPO_AST.TAMANHO,
             valor: ast
           };
-        } else if (operação.tipo === 'operação_chaves') {
+        } else if (operação.tipo === TIPO_AST.OPERAÇÃO_CHAVES) {
           return {
-            tipo: 'chaves',
+            tipo: TIPO_AST.CHAVES,
             valor: ast
           };
-        } else if (operação.tipo === 'operação_atributo') {
+        } else if (operação.tipo === TIPO_AST.OPERAÇÃO_ATRIBUTO) {
           return {
-            tipo: 'atributo',
+            tipo: TIPO_AST.ATRIBUTO,
             objeto: ast,
             nome: operação.nome
           };
-        } else if (operação.tipo === 'operação_chamada_função') {
+        } else if (operação.tipo === TIPO_AST.OPERAÇÃO_CHAMADA_FUNÇÃO) {
           return {
-            tipo: 'chamada_função',
+            tipo: TIPO_AST.CHAMADA_FUNÇÃO,
             função: ast,
             argumento: operação.argumento
           };
@@ -221,7 +222,7 @@ const getTermo6 = () => transformar(
 
     const [, , , seVerdadeiro, , , , seFalso] = resto_opcional_val;
     return {
-      tipo: 'condicional',
+      tipo: TIPO_AST.CONDICIONAL,
       condição: condição,
       seVerdadeiro: seVerdadeiro,
       seFalso: seFalso
