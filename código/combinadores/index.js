@@ -116,7 +116,13 @@ const vários = analisador => código => {
 const transformar = (analisador, transformador) => código => {
   const resultado = analisador(código)
   if (!resultado.sucesso) {
-    return resultado
+    return {
+      sucesso: false,
+      valor: undefined,
+      resto: código,
+      menor_resto: resultado.menor_resto || código,
+      erro: resultado.erro
+    }
   }
   try {
     return { 
