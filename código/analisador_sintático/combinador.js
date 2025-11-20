@@ -2,8 +2,8 @@ import dialeto from "./dialeto.js"
 import { TIPO_AST } from '../constantes.js';
 
 export default gramática => entrada => {
-  const resultado = dialeto.analisar({ entrada, gramática })
-  if (resultado.resto.length === entrada.length) return {
+  const análise = dialeto.analisar({ entrada, gramática })
+  if (análise.resto.length === entrada.length) return {
     sucesso: false,
     valor: undefined,
     resto: entrada,
@@ -13,9 +13,9 @@ export default gramática => entrada => {
     sucesso: true,
     valor: {
       tipo: TIPO_AST.NÚMERO,
-      valor: parseInt(resultado.valor, 10),
+      valor: parseInt(análise.valor, 10),
     },
-    resto: resultado.resto,
-    menor_resto: resultado.resto,
+    resto: análise.resto,
+    menor_resto: análise.resto,
   }
 }
