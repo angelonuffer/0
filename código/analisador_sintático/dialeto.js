@@ -1,5 +1,24 @@
 const analisar = ({ entrada, gramática, i = 0 }) => {
   switch (gramática.tipo) {
+    case "sequência": {
+      let iAtual = i
+      const valor = {}
+      for (const parte of gramática.partes) {
+        const análise = analisar({ entrada, gramática: parte.gramática, i: iAtual })
+        valor[parte.nome] = análise.valor
+        iAtual = análise.i
+      }
+      return {
+        valor,
+        i: iAtual,
+      }
+    }
+    case "constante": {
+      return {
+        valor: gramática.valor,
+        i,
+      }
+    }
     case "repetição": {
       const análise = analisar({
         entrada,
