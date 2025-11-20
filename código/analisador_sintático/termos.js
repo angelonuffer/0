@@ -1,8 +1,12 @@
 // Term operations - termo1, termo2, termo3, termo4, termo5, termo6
 import { alternativa, sequência, opcional, vários, transformar, símbolo, operador } from '../combinadores/index.js';
 import { operação } from '../combinadores/avançados.js';
-import { espaço, número, número_negativo, texto, endereço_literal } from '../analisador_léxico/index.js';
+import { espaço, número_negativo, texto, endereço_literal } from '../analisador_léxico/index.js';
+import gramática_número from './número.js';
+import combinador from './combinador.js';
 import { TIPO_AST } from '../constantes.js';
+
+const número = combinador(gramática_número);
 
 // Forward declaration for recursive expressão reference
 let expressão;
