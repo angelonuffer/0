@@ -16,7 +16,7 @@ const número = {
     gramática: número,
   })
   assert.strictEqual(análise.valor, "123")
-  assert.strictEqual(análise.resto, "")
+  assert.strictEqual(análise.i, 3)
 }
 
 {
@@ -25,7 +25,7 @@ const número = {
     gramática: número,
   })
   assert.strictEqual(análise.valor, "0")
-  assert.strictEqual(análise.resto, "")
+  assert.strictEqual(análise.i, 1)
 }
 
 {
@@ -34,7 +34,7 @@ const número = {
     gramática: número,
   })
   assert.strictEqual(análise.valor, "007")
-  assert.strictEqual(análise.resto, "")
+  assert.strictEqual(análise.i, 3)
 }
 
 {
@@ -43,7 +43,7 @@ const número = {
     gramática: número,
   })
   assert.strictEqual(análise.valor, "")
-  assert.strictEqual(análise.resto, "")
+  assert.strictEqual(análise.i, 0)
 }
 
 {
@@ -52,7 +52,7 @@ const número = {
     gramática: número,
   })
   assert.strictEqual(análise.valor, "123")
-  assert.strictEqual(análise.resto, "abc")
+  assert.strictEqual(análise.i, 3)
 }
 
 {
@@ -61,7 +61,7 @@ const número = {
     gramática: número,
   })
   assert.strictEqual(análise.valor, "")
-  assert.strictEqual(análise.resto, "abc")
+  assert.strictEqual(análise.i, 0)
 }
 
 export default número;

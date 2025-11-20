@@ -1,28 +1,40 @@
-const analisar = ({ entrada, gramática }) => {
-  entrada = String(entrada || '');
-  if (entrada.length === 0) return { valor: '', resto: entrada };
+const analisar = ({ entrada, gramática, i = 0 }) => {
   switch (gramática.tipo) {
-    case 'repetição': {
-      let acumulado = '';
-      for (let i = 0; i < entrada.length; i++) {
-        const ch = entrada[i];
-        const sub = analisar({ entrada: ch, gramática: gramática.gramática });
-        if (sub && sub.resto.length !== ch.length) {
-          acumulado += String(sub.valor || '');
-        } else {
-          return { valor: acumulado, resto: entrada.slice(i) };
-        }
+    case "repetição": {
+      const análise = analisar({
+        entrada,
+        gramática: gramática.gramática,
+        i,
+      })
+      if (análise.i === i) return {
+        valor: entrada.slice(0, i),
+        i,
       }
-      return { valor: acumulado, resto: '' };
+      if (análise.i === entrada.length) return {
+        valor: entrada,
+        i: entrada.length,
+      }
+      return analisar({
+        entrada,
+        gramática,
+        i: análise.i,
+      })
     }
-    case 'faixa': {
-      if (entrada.length > 1) return { valor: '', resto: entrada };
-      if (entrada >= gramática.de && entrada <= gramática.até) return { valor: entrada, resto: '' };
-      return { valor: '', resto: entrada };
+    case "faixa": {
+      if (entrada[i] >= gramática.de && entrada[i] <= gramática.até) return {
+        valor: entrada[i],
+        i: i + 1,
+      }
+      return {
+        valor: "",
+        i,
+      }
     }
     default:
-      return { valor: undefined, resto: entrada };
+      return {
+        i,
+      }
   }
-};
+}
 
-export default { analisar };
+export default { analisar }
