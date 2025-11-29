@@ -8,8 +8,11 @@ export const texto = {
   sequência: [
     '"',
     {
-      repetição: {
-        negação: '"',
+      chave: "texto",
+      gramática: {
+        repetição: {
+          negação: '"',
+        },
       },
     },
     '"',
@@ -22,7 +25,7 @@ export function runTests(): number {
     iguais(
       analisar('"olá"', texto),
       {
-        resultado: '"olá"',
+        resultado: { texto: "olá" },
         resto: "",
       }
     );
@@ -32,7 +35,7 @@ export function runTests(): number {
     iguais(
       analisar('""', texto),
       {
-        resultado: '""',
+        resultado: { texto: "" },
         resto: "",
       }
     );
