@@ -8,6 +8,7 @@ if (!filePath) {
     // para permitir prefixar a saída por arquivo ao executá-los).
     const modules = [
       "./gramática/tipos_literais/número.ts",
+      "./gramática/tipos_literais/texto.ts",
       "./gramática/operadores/adição.ts",
       "./gramática/operadores/subtração.ts",
       "./gramática/operadores/multiplicação.ts",
