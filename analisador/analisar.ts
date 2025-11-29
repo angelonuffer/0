@@ -6,6 +6,43 @@ function isObject(x: unknown): x is Record<string, unknown> {
   return typeof x === "object" && x !== null;
 }
 
+function pularEspaçosEComentários(input: string): string {
+  let i = 0;
+  while (i < input.length) {
+    const c = input[i];
+    // Skip whitespace (space, tab, newline, carriage return)
+    if (c === ' ' || c === '\t' || c === '\n' || c === '\r') {
+      i++;
+      continue;
+    }
+    // Skip single-line comment: // ... \n
+    if (c === '/' && input[i + 1] === '/') {
+      i += 2;
+      while (i < input.length && input[i] !== '\n') {
+        i++;
+      }
+      if (i < input.length && input[i] === '\n') {
+        i++;
+      }
+      continue;
+    }
+    // Skip multi-line comment: /* ... */
+    if (c === '/' && input[i + 1] === '*') {
+      i += 2;
+      while (i < input.length - 1 && !(input[i] === '*' && input[i + 1] === '/')) {
+        i++;
+      }
+      if (i < input.length - 1) {
+        i += 2; // skip */
+      }
+      continue;
+    }
+    // Not whitespace or comment, stop
+    break;
+  }
+  return input.slice(i);
+}
+
 type RangeGrammar = { faixa: { de: string; até: string } };
 type KeyedElement = { chave: string; gramática: unknown };
 type SequenceGrammar = { sequência: (unknown | KeyedElement)[] };
@@ -117,14 +154,17 @@ function parseAlternative(input: string, g: AlternativeGrammar): ParseResult {
 }
 
 export default function analisar(input: string, grammar: unknown): ParseResult {
+  // Skip whitespace and comments before parsing
+  const cleanInput = pularEspaçosEComentários(input);
+  
   if (typeof grammar === "string") {
-    if (input.startsWith(grammar)) return { resultado: grammar, resto: input.slice(grammar.length) };
-    return { esperava: [grammar], resto: input };
+    if (cleanInput.startsWith(grammar)) return { resultado: grammar, resto: cleanInput.slice(grammar.length) };
+    return { esperava: [grammar], resto: cleanInput };
   }
 
-  if (isRangeGrammar(grammar)) return parseRange(input, grammar);
-  if (isSequenceGrammar(grammar)) return parseSequence(input, grammar);
-  if (isAlternativeGrammar(grammar)) return parseAlternative(input, grammar);
+  if (isRangeGrammar(grammar)) return parseRange(cleanInput, grammar);
+  if (isSequenceGrammar(grammar)) return parseSequence(cleanInput, grammar);
+  if (isAlternativeGrammar(grammar)) return parseAlternative(cleanInput, grammar);
 
   throw new Error("Gramática não suportada pelo analisador");
 }

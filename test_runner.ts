@@ -74,4 +74,65 @@ tr3.run("expressão - caso inválido '' (string vazia)", () => {
 console.log(`expressão tests: ${tr3.getPassed()} passed, ${tr3.getFailed()} failed`);
 tr3.throwIfFailed();
 
+// Run whitespace tests
+const tr4 = new TestRunner();
+tr4.run("espaços em branco - espaço antes de número", () => {
+  iguais(analisar(" 5", número), { resultado: "5", resto: "" });
+});
+tr4.run("espaços em branco - múltiplos espaços antes de número", () => {
+  iguais(analisar("   5", número), { resultado: "5", resto: "" });
+});
+tr4.run("espaços em branco - tab antes de número", () => {
+  iguais(analisar("\t5", número), { resultado: "5", resto: "" });
+});
+tr4.run("espaços em branco - quebra de linha antes de número", () => {
+  iguais(analisar("\n5", número), { resultado: "5", resto: "" });
+});
+tr4.run("espaços em branco - carriage return antes de número", () => {
+  iguais(analisar("\r5", número), { resultado: "5", resto: "" });
+});
+tr4.run("espaços em branco - mistura de espaços em branco", () => {
+  iguais(analisar("  \t\n\r 5", número), { resultado: "5", resto: "" });
+});
+tr4.run("espaços em branco - adição com espaços '5 + 3'", () => {
+  iguais(analisar("5 + 3", adição), { resultado: { parcela_1: "5", parcela_2: "3" }, resto: "" });
+});
+tr4.run("espaços em branco - adição com tabs '5\t+\t3'", () => {
+  iguais(analisar("5\t+\t3", adição), { resultado: { parcela_1: "5", parcela_2: "3" }, resto: "" });
+});
+tr4.run("espaços em branco - adição com quebras de linha", () => {
+  iguais(analisar("5\n+\n3", adição), { resultado: { parcela_1: "5", parcela_2: "3" }, resto: "" });
+});
+console.log(`espaços em branco tests: ${tr4.getPassed()} passed, ${tr4.getFailed()} failed`);
+tr4.throwIfFailed();
+
+// Run comment tests
+const tr5 = new TestRunner();
+tr5.run("comentários - comentário de linha // antes de número", () => {
+  iguais(analisar("// comentário\n5", número), { resultado: "5", resto: "" });
+});
+tr5.run("comentários - comentário de linha // sem quebra de linha no final", () => {
+  iguais(analisar("// comentário", número), { esperava: [número], resto: "" });
+});
+tr5.run("comentários - comentário de bloco /* */ antes de número", () => {
+  iguais(analisar("/* comentário */5", número), { resultado: "5", resto: "" });
+});
+tr5.run("comentários - comentário de bloco multilinhas", () => {
+  iguais(analisar("/* comentário\nmultilinhas */5", número), { resultado: "5", resto: "" });
+});
+tr5.run("comentários - múltiplos comentários", () => {
+  iguais(analisar("// linha 1\n// linha 2\n5", número), { resultado: "5", resto: "" });
+});
+tr5.run("comentários - comentário de bloco com espaços", () => {
+  iguais(analisar("  /* comentário */  5", número), { resultado: "5", resto: "" });
+});
+tr5.run("comentários - adição com comentários '5 /* soma */ + /* parcela */ 3'", () => {
+  iguais(analisar("5 /* soma */ + /* parcela */ 3", adição), { resultado: { parcela_1: "5", parcela_2: "3" }, resto: "" });
+});
+tr5.run("comentários - comentário de linha no meio da adição", () => {
+  iguais(analisar("5 // parcela 1\n+ // operador\n3", adição), { resultado: { parcela_1: "5", parcela_2: "3" }, resto: "" });
+});
+console.log(`comentários tests: ${tr5.getPassed()} passed, ${tr5.getFailed()} failed`);
+tr5.throwIfFailed();
+
 console.log("Todos os testes executados com sucesso!");
