@@ -7,12 +7,18 @@ if (!filePath) {
     // Importa os módulos de teste e executa suas funções `runTests`.
     const numeroMod = await import("./gramática/tipos_literais/número.ts");
     const adicaoMod = await import("./gramática/operadores/adição.ts");
+    const subtracaoMod = await import("./gramática/operadores/subtração.ts");
+    const multiplicacaoMod = await import("./gramática/operadores/multiplicação.ts");
+    const divisaoMod = await import("./gramática/operadores/divisão.ts");
     const expressaoMod = await import("./gramática/expressão.ts");
     const espacoMod = await import("./gramática/espaço.ts");
 
     let totalPassed = 0;
     if (typeof numeroMod.runTests === "function") totalPassed += numeroMod.runTests();
     if (typeof adicaoMod.runTests === "function") totalPassed += adicaoMod.runTests();
+    if (typeof subtracaoMod.runTests === "function") totalPassed += subtracaoMod.runTests();
+    if (typeof multiplicacaoMod.runTests === "function") totalPassed += multiplicacaoMod.runTests();
+    if (typeof divisaoMod.runTests === "function") totalPassed += divisaoMod.runTests();
     if (typeof expressaoMod.runTests === "function") totalPassed += expressaoMod.runTests();
     if (typeof espacoMod.runTests === "function") totalPassed += espacoMod.runTests();
 
