@@ -8,11 +8,13 @@ if (!filePath) {
     const numeroMod = await import("./gramática/tipos_literais/número.ts");
     const adicaoMod = await import("./gramática/operadores/adição.ts");
     const expressaoMod = await import("./gramática/expressão.ts");
+    const espacoMod = await import("./gramática/espaço.ts");
 
     let totalPassed = 0;
     if (typeof numeroMod.runTests === "function") totalPassed += numeroMod.runTests();
     if (typeof adicaoMod.runTests === "function") totalPassed += adicaoMod.runTests();
     if (typeof expressaoMod.runTests === "function") totalPassed += expressaoMod.runTests();
+    if (typeof espacoMod.runTests === "function") totalPassed += espacoMod.runTests();
 
     console.log(`Todos os testes executados com sucesso. Total passados: ${totalPassed}`);
     Deno.exit(0);

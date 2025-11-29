@@ -3,6 +3,7 @@
 import analisar from "../../analisador/analisar.ts";
 import iguais from "../../analisador/iguais.ts";
 import { número } from "../tipos_literais/número.ts";
+import { espaço } from "../espaço.ts";
 import TestRunner from "../../analisador/runner.ts";
 
 export const adição = {
@@ -11,7 +12,9 @@ export const adição = {
       chave: "parcela_1",
       gramática: número,
     },
+    espaço,
     "+",
+    espaço,
     {
       chave: "parcela_2",
       gramática: número,
