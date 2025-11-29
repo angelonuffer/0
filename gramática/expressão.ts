@@ -61,6 +61,24 @@ export function runTests(): { passed: number; failed: number } {
     );
   });
 
+  tr.run("expressão.ts - caso '3 + 4 + 5' (múltiplos termos)", () => {
+    iguais(
+      analisar("3 + 4 + 5", expressão),
+      {
+        resultado: {
+          parcela_1: { número: "3" },
+          operador: "+",
+          parcela_2: {
+            parcela_1: { número: "4" },
+            operador: "+",
+            parcela_2: { número: "5" },
+          },
+        },
+        resto: "",
+      }
+    );
+  });
+
   const report = tr.report();
   if (report.failed > 0) {
     for (const e of report.errors) console.error(e.message);

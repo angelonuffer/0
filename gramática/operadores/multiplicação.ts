@@ -7,7 +7,19 @@ import { dígito } from "../tipos_literais/dígito.ts";
 import { espaço } from "../espaço.ts";
 import TestRunner from "../../analisador/runner.ts";
 
-export const multiplicação = {
+// Use a mutable object and lazy reference to allow recursive grammar
+export const multiplicação: Record<string, unknown> = {};
+
+// fator_2 can be either another multiplication or a plain number
+const fatorOuMultiplicação = {
+  alternativa: [
+    multiplicação,  // Try multiplication first (to match longest expression)
+    número,         // Fall back to plain number
+  ],
+};
+
+// Define the multiplication grammar with recursive second operand
+Object.assign(multiplicação, {
   sequência: [
     {
       chave: "fator_1",
@@ -21,10 +33,10 @@ export const multiplicação = {
     espaço,
     {
       chave: "fator_2",
-      gramática: número,
+      gramática: fatorOuMultiplicação,
     },
   ],
-};
+});
 export function runTests(): { passed: number; failed: number } {
   const tr = new TestRunner();
 
@@ -61,6 +73,24 @@ export function runTests(): { passed: number; failed: number } {
         esperava: [
           dígito,
         ],
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("multiplicação.ts - caso '2*3*4' (múltiplos termos)", () => {
+    iguais(
+      analisar("2*3*4", multiplicação),
+      {
+        resultado: {
+          fator_1: { número: "2" },
+          operador: "*",
+          fator_2: {
+            fator_1: { número: "3" },
+            operador: "*",
+            fator_2: { número: "4" },
+          },
+        },
         resto: "",
       }
     );

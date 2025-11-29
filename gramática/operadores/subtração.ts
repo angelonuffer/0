@@ -7,7 +7,19 @@ import { dígito } from "../tipos_literais/dígito.ts";
 import { espaço } from "../espaço.ts";
 import TestRunner from "../../analisador/runner.ts";
 
-export const subtração = {
+// Use a mutable object and lazy reference to allow recursive grammar
+export const subtração: Record<string, unknown> = {};
+
+// subtraendo can be either another subtraction or a plain number
+const subtraendoOuSubtração = {
+  alternativa: [
+    subtração,  // Try subtraction first (to match longest expression)
+    número,     // Fall back to plain number
+  ],
+};
+
+// Define the subtraction grammar with recursive second operand
+Object.assign(subtração, {
   sequência: [
     {
       chave: "minuendo",
@@ -21,10 +33,10 @@ export const subtração = {
     espaço,
     {
       chave: "subtraendo",
-      gramática: número,
+      gramática: subtraendoOuSubtração,
     },
   ],
-};
+});
 export function runTests(): { passed: number; failed: number } {
   const tr = new TestRunner();
 
@@ -61,6 +73,24 @@ export function runTests(): { passed: number; failed: number } {
         esperava: [
           dígito,
         ],
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("subtração.ts - caso '10-3-2' (múltiplos termos)", () => {
+    iguais(
+      analisar("10-3-2", subtração),
+      {
+        resultado: {
+          minuendo: { número: "10" },
+          operador: "-",
+          subtraendo: {
+            minuendo: { número: "3" },
+            operador: "-",
+            subtraendo: { número: "2" },
+          },
+        },
         resto: "",
       }
     );
