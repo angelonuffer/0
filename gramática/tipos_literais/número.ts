@@ -9,7 +9,12 @@ export const número = {
   sequência: [
     {
       chave: "número",
-      gramática: dígito,
+      gramática: {
+        sequência: [
+          dígito,
+          { repetição: dígito },
+        ],
+      },
     }
   ]
 };
@@ -45,6 +50,16 @@ export function runTests(): number {
         esperava: [
           dígito,
         ],
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("número.ts - caso múltiplos dígitos '123'", () => {
+    iguais(
+      analisar("123", número),
+      {
+        resultado: { número: "123" },
         resto: "",
       }
     );
