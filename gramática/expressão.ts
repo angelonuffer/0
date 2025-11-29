@@ -4,15 +4,14 @@ import analisar from "../analisador/analisar.ts";
 import iguais from "../analisador/iguais.ts";
 import { número } from "./tipos_literais/número.ts";
 import { dígito } from "./tipos_literais/dígito.ts";
-import { adição } from "./operadores/adição.ts";
-import { subtração } from "./operadores/subtração.ts";
-import { multiplicação } from "./operadores/multiplicação.ts";
-import { divisão } from "./operadores/divisão.ts";
+import { aditivo } from "./operadores/aditivo.ts";
 import TestRunner from "../analisador/runner.ts";
 
-export const expressão = {
-  alternativa: [adição, subtração, multiplicação, divisão, número],
-};
+// expressão uses the aditivo grammar which handles precedence properly:
+// - aditivo handles +/- (lower precedence)
+// - termo (used by aditivo) handles */\/ (higher precedence)
+export const expressão = aditivo;
+
 export function runTests(): { passed: number; failed: number } {
   const tr = new TestRunner();
 
@@ -72,6 +71,108 @@ export function runTests(): { passed: number; failed: number } {
             parcela_1: { número: "4" },
             operador: "+",
             parcela_2: { número: "5" },
+          },
+        },
+        resto: "",
+      }
+    );
+  });
+
+  // New tests for mixed operators with precedence
+  tr.run("expressão.ts - caso '2 + 3 * 4' (precedência: multiplicação primeiro)", () => {
+    // Should parse as 2 + (3 * 4) because * has higher precedence
+    iguais(
+      analisar("2 + 3 * 4", expressão),
+      {
+        resultado: {
+          parcela_1: { número: "2" },
+          operador: "+",
+          parcela_2: {
+            fator_1: { número: "3" },
+            operador: "*",
+            fator_2: { número: "4" },
+          },
+        },
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("expressão.ts - caso '2 * 3 + 4' (precedência: multiplicação primeiro)", () => {
+    // Should parse as (2 * 3) + 4 because * has higher precedence
+    iguais(
+      analisar("2 * 3 + 4", expressão),
+      {
+        resultado: {
+          parcela_1: {
+            fator_1: { número: "2" },
+            operador: "*",
+            fator_2: { número: "3" },
+          },
+          operador: "+",
+          parcela_2: { número: "4" },
+        },
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("expressão.ts - caso '3 + 4 - 5' (adição e subtração misturadas)", () => {
+    iguais(
+      analisar("3 + 4 - 5", expressão),
+      {
+        resultado: {
+          parcela_1: { número: "3" },
+          operador: "+",
+          parcela_2: {
+            parcela_1: { número: "4" },
+            operador: "-",
+            parcela_2: { número: "5" },
+          },
+        },
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("expressão.ts - caso '10 / 2 * 3' (divisão e multiplicação misturadas)", () => {
+    iguais(
+      analisar("10 / 2 * 3", expressão),
+      {
+        resultado: {
+          fator_1: { número: "10" },
+          operador: "/",
+          fator_2: {
+            fator_1: { número: "2" },
+            operador: "*",
+            fator_2: { número: "3" },
+          },
+        },
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("expressão.ts - caso '2 + 3 * 4 - 5 / 1' (expressão complexa)", () => {
+    // Should parse as 2 + (3 * 4) - (5 / 1)
+    iguais(
+      analisar("2 + 3 * 4 - 5 / 1", expressão),
+      {
+        resultado: {
+          parcela_1: { número: "2" },
+          operador: "+",
+          parcela_2: {
+            parcela_1: {
+              fator_1: { número: "3" },
+              operador: "*",
+              fator_2: { número: "4" },
+            },
+            operador: "-",
+            parcela_2: {
+              fator_1: { número: "5" },
+              operador: "/",
+              fator_2: { número: "1" },
+            },
           },
         },
         resto: "",

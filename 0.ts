@@ -13,6 +13,8 @@ if (!filePath) {
       "./gramática/operadores/subtração.ts",
       "./gramática/operadores/multiplicação.ts",
       "./gramática/operadores/divisão.ts",
+      "./gramática/operadores/termo.ts",
+      "./gramática/operadores/aditivo.ts",
       "./gramática/expressão.ts",
       "./gramática/espaço.ts",
     ];
