@@ -3,6 +3,7 @@
 import analisar from "../analisador/analisar.ts";
 import iguais from "../analisador/iguais.ts";
 import { número } from "./tipos_literais/número.ts";
+import { dígito } from "./tipos_literais/dígito.ts";
 import { adição } from "./operadores/adição.ts";
 import { subtração } from "./operadores/subtração.ts";
 import { multiplicação } from "./operadores/multiplicação.ts";
@@ -20,8 +21,8 @@ export function runTests(): number {
       analisar("5+3", expressão),
       {
         resultado: {
-          parcela_1: "5",
-          parcela_2: "3",
+          parcela_1: { número: "5" },
+          parcela_2: { número: "3" },
         },
         resto: "",
       }
@@ -31,7 +32,7 @@ export function runTests(): number {
   tr.run("expressão.ts - caso '5'", () => {
     iguais(
       analisar("5", expressão),
-      { resultado: "5", resto: "" }
+      { resultado: { número: "5" }, resto: "" }
     );
   });
 
@@ -40,7 +41,7 @@ export function runTests(): number {
       analisar("+", expressão),
       {
         esperava: [
-          número,
+          dígito,
         ],
         resto: "+",
       }
@@ -52,7 +53,7 @@ export function runTests(): number {
       analisar("", expressão),
       {
         esperava: [
-          número,
+          dígito,
         ],
         resto: "",
       }

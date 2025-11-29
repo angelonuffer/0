@@ -3,12 +3,15 @@
 import analisar from "../../analisador/analisar.ts";
 import iguais from "../../analisador/iguais.ts";
 import TestRunner from "../../analisador/runner.ts";
+import { dígito } from "./dígito.ts";
 
 export const número = {
-  faixa: {
-    de: "0",
-    até: "9",
-  }
+  sequência: [
+    {
+      chave: "número",
+      gramática: dígito,
+    }
+  ]
 };
 export function runTests(): number {
   const tr = new TestRunner();
@@ -17,7 +20,7 @@ export function runTests(): number {
     iguais(
       analisar("5", número),
       {
-        resultado: "5",
+        resultado: { número: "5" },
         resto: "",
       }
     );
@@ -28,7 +31,7 @@ export function runTests(): number {
       analisar("a", número),
       {
         esperava: [
-          número,
+          dígito,
         ],
         resto: "a",
       }
@@ -40,7 +43,7 @@ export function runTests(): number {
       analisar("", número),
       {
         esperava: [
-          número,
+          dígito,
         ],
         resto: "",
       }

@@ -3,6 +3,7 @@
 import analisar from "../../analisador/analisar.ts";
 import iguais from "../../analisador/iguais.ts";
 import { número } from "../tipos_literais/número.ts";
+import { dígito } from "../tipos_literais/dígito.ts";
 import { espaço } from "../espaço.ts";
 import TestRunner from "../../analisador/runner.ts";
 
@@ -29,8 +30,8 @@ export function runTests(): number {
       analisar("5*3", multiplicação),
       {
         resultado: {
-          fator_1: "5",
-          fator_2: "3",
+          fator_1: { número: "5" },
+          fator_2: { número: "3" },
         },
         resto: "",
       }
@@ -42,7 +43,7 @@ export function runTests(): number {
       analisar("*3", multiplicação),
       {
         esperava: [
-          número,
+          dígito,
         ],
         resto: "*3",
       }
@@ -54,7 +55,7 @@ export function runTests(): number {
       analisar("5*", multiplicação),
       {
         esperava: [
-          número,
+          dígito,
         ],
         resto: "",
       }
