@@ -4,17 +4,47 @@ const [filePath] = Deno.args;
 
 if (!filePath) {
   try {
-    // Importa os módulos de teste e executa suas funções `runTests`.
-    const numeroMod = await import("./gramática/tipos_literais/número.ts");
-    const adicaoMod = await import("./gramática/operadores/adição.ts");
-    const expressaoMod = await import("./gramática/expressão.ts");
-    const espacoMod = await import("./gramática/espaço.ts");
+    // Lista de caminhos dos módulos de teste (mantidos em forma de strings
+    // para permitir prefixar a saída por arquivo ao executá-los).
+    const modules = [
+      "./gramática/tipos_literais/número.ts",
+      "./gramática/operadores/adição.ts",
+      "./gramática/operadores/subtração.ts",
+      "./gramática/operadores/multiplicação.ts",
+      "./gramática/operadores/divisão.ts",
+      "./gramática/expressão.ts",
+      "./gramática/espaço.ts",
+    ];
 
     let totalPassed = 0;
-    if (typeof numeroMod.runTests === "function") totalPassed += numeroMod.runTests();
-    if (typeof adicaoMod.runTests === "function") totalPassed += adicaoMod.runTests();
-    if (typeof expressaoMod.runTests === "function") totalPassed += expressaoMod.runTests();
-    if (typeof espacoMod.runTests === "function") totalPassed += espacoMod.runTests();
+
+    for (const modPath of modules) {
+      try {
+        const mod = await import(modPath);
+
+        if (typeof mod.runTests === "function") {
+          const origLog = console.log;
+          const origError = console.error;
+
+          // Prefixa cada linha de saída com o caminho do módulo atual
+          console.log = (...args: unknown[]) => origLog(`[${modPath}]`, ...args);
+          console.error = (...args: unknown[]) => origError(`[mod:${modPath}]`, ...args);
+
+          try {
+            const passed = mod.runTests();
+            if (typeof passed === "number") totalPassed += passed;
+          } catch (err) {
+            console.error("Falha ao executar os testes:", err instanceof Error ? err.message : String(err));
+          } finally {
+            // Restaura as funções originais para não poluir outros módulos
+            console.log = origLog;
+            console.error = origError;
+          }
+        }
+      } catch (err) {
+        console.error(`Erro ao importar '${modPath}':`, err instanceof Error ? err.message : String(err));
+      }
+    }
 
     console.log(`Todos os testes executados com sucesso. Total passados: ${totalPassed}`);
     Deno.exit(0);

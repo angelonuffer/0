@@ -4,10 +4,13 @@ import analisar from "../analisador/analisar.ts";
 import iguais from "../analisador/iguais.ts";
 import { número } from "./tipos_literais/número.ts";
 import { adição } from "./operadores/adição.ts";
+import { subtração } from "./operadores/subtração.ts";
+import { multiplicação } from "./operadores/multiplicação.ts";
+import { divisão } from "./operadores/divisão.ts";
 import TestRunner from "../analisador/runner.ts";
 
 export const expressão = {
-  alternativa: [adição, número],
+  alternativa: [adição, subtração, multiplicação, divisão, número],
 };
 export function runTests(): number {
   const tr = new TestRunner();
