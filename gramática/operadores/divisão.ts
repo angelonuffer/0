@@ -7,7 +7,19 @@ import { dígito } from "../tipos_literais/dígito.ts";
 import { espaço } from "../espaço.ts";
 import TestRunner from "../../analisador/runner.ts";
 
-export const divisão = {
+// Use a mutable object and lazy reference to allow recursive grammar
+export const divisão: Record<string, unknown> = {};
+
+// divisor can be either another division or a plain number
+const divisorOuDivisão = {
+  alternativa: [
+    divisão,  // Try division first (to match longest expression)
+    número,   // Fall back to plain number
+  ],
+};
+
+// Define the division grammar with recursive second operand
+Object.assign(divisão, {
   sequência: [
     {
       chave: "dividendo",
@@ -21,10 +33,10 @@ export const divisão = {
     espaço,
     {
       chave: "divisor",
-      gramática: número,
+      gramática: divisorOuDivisão,
     },
   ],
-};
+});
 export function runTests(): { passed: number; failed: number } {
   const tr = new TestRunner();
 
@@ -61,6 +73,24 @@ export function runTests(): { passed: number; failed: number } {
         esperava: [
           dígito,
         ],
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("divisão.ts - caso '24/4/2' (múltiplos termos)", () => {
+    iguais(
+      analisar("24/4/2", divisão),
+      {
+        resultado: {
+          dividendo: { número: "24" },
+          operador: "/",
+          divisor: {
+            dividendo: { número: "4" },
+            operador: "/",
+            divisor: { número: "2" },
+          },
+        },
         resto: "",
       }
     );
