@@ -6,6 +6,22 @@ function isObject(x: unknown): x is Record<string, unknown> {
   return typeof x === "object" && x !== null;
 }
 
+type Grammar =
+  | string
+  | RangeGrammar
+  | SequenceGrammar
+  | AlternativeGrammar
+  | RepetitionGrammar
+  | NegationGrammar;
+
+function isSuccess(r: ParseResult): r is { resultado: unknown; resto: string } {
+  return (r as { resultado?: unknown }).resultado !== undefined;
+}
+
+function isFailure(r: ParseResult): r is { esperava: unknown[]; resto: string } {
+  return (r as { esperava?: unknown[] }).esperava !== undefined;
+}
+
 type RangeGrammar = { faixa: { de: string; até: string } };
 type KeyedElement = { chave: string; gramática: unknown };
 type SequenceGrammar = { sequência: (unknown | KeyedElement)[] };
@@ -36,17 +52,11 @@ function isNegationGrammar(g: unknown): g is NegationGrammar {
 function parseNegation(input: string, g: NegationGrammar): ParseResult {
   const inner = (g as Record<string, unknown>)["negação"] as unknown;
   if (input.length === 0) return { esperava: [inner], resto: input };
-
-  // Try to match the inner grammar at the current position. If it matches,
-  // the negation fails. If it does NOT match, consume a single character and
-  // succeed returning that character.
+  // se a gramática interna casa aqui, a negação falha
   const r = analisar(input, inner);
-  if ((r as { resultado?: unknown }).resultado !== undefined) {
-    // inner matched -> negation fails
-    return { esperava: [inner], resto: input };
-  }
+  if (isSuccess(r)) return { esperava: [inner], resto: input };
 
-  // inner did not match -> consume one character
+  // se não casou, consumir um caractere e retornar sucesso
   const ch = input.charAt(0);
   return { resultado: ch, resto: input.slice(1) };
 }
@@ -57,25 +67,21 @@ function parseRepetition(input: string, g: RepetitionGrammar): ParseResult {
   let acc = "";
   while (true) {
     const r = analisar(rest, item);
-    if ((r as { resultado?: unknown }).resultado === undefined) {
-      // If sub-grammar failed after consuming input, it may represent a more
-      // specific parse error (for example an unclosed block comment where the
-      // sub-grammar expects a terminator like '*/'). Propagate that specific
-      // failure when it explicitly expects the terminator string "*/" so the
-      // enclosing sequence can report the correct expectation.
-      if ((r as { esperava?: unknown[] }).esperava !== undefined && (r as { resto: string }).resto !== rest) {
-        const ev = (r as { esperava: unknown[] }).esperava;
-        for (const e of ev) {
-          if (typeof e === "string" && e === "*/") return r as ParseResult;
+    if (isFailure(r)) {
+      // Se a sub-gramática falhou após consumir input, pode ser um erro mais
+      // específico (por exemplo comentário não fechado). Propagar quando a
+      // expectativa incluía o terminador explícito "*/".
+      if (r.resto !== rest) {
+        for (const e of r.esperava) {
+          if (typeof e === "string" && e === "*/") return r;
         }
       }
-      // Normal end of repetition when sub-grammar doesn't match at current position
       break;
     }
-    const newRest = (r as { resto: string }).resto;
+    const newRest = r.resto;
     // Prevent infinite loop if sub-grammar accepts empty string
     if (newRest === rest) break;
-    acc += String((r as { resultado: unknown }).resultado);
+    acc += String(r.resultado);
     rest = newRest;
   }
   return { resultado: acc, resto: rest };
@@ -86,8 +92,8 @@ function parseRange(input: string, g: RangeGrammar): ParseResult {
   if (!isObject(faixa) || typeof faixa.de !== "string" || typeof faixa.até !== "string") {
     throw new Error("Gramática 'faixa' inválida: esperado { de: string, até: string }");
   }
+  if (input.length === 0) return { esperava: [g], resto: input };
   const primeiro = input.charAt(0);
-  if (!primeiro) return { esperava: [g], resto: input };
   const deCode = faixa.de.charCodeAt(0);
   const ateCode = faixa.até.charCodeAt(0);
   const c = primeiro.charCodeAt(0);
@@ -109,19 +115,19 @@ function parseSequence(input: string, g: SequenceGrammar): ParseResult {
         const chave = String(subRec.chave);
         const gram = subRec.gramática as unknown;
         const r = analisar(rest, gram);
-        if ((r as { resultado?: unknown }).resultado !== undefined) {
-          resultObj[chave] = (r as { resultado: unknown }).resultado;
-          rest = (r as { resto: string }).resto;
+        if (isSuccess(r)) {
+          resultObj[chave] = r.resultado;
+          rest = r.resto;
           continue;
         }
-        return { esperava: (r as { esperava: unknown[] }).esperava, resto: rest };
+        return { esperava: r.esperava, resto: rest };
       } else {
         const r = analisar(rest, sub);
-        if ((r as { resultado?: unknown }).resultado !== undefined) {
-          rest = (r as { resto: string }).resto;
+        if (isSuccess(r)) {
+          rest = r.resto;
           continue;
         }
-        return { esperava: (r as { esperava: unknown[] }).esperava, resto: rest };
+        return { esperava: r.esperava, resto: rest };
       }
     }
 
@@ -133,11 +139,9 @@ function parseSequence(input: string, g: SequenceGrammar): ParseResult {
   let acc = "";
   for (const sub of seq) {
     const r = analisar(rest, sub);
-    if ((r as { resultado?: unknown }).resultado === undefined) {
-      return { esperava: (r as { esperava: unknown[] }).esperava, resto: rest };
-    }
-    acc += String((r as { resultado: unknown }).resultado);
-    rest = (r as { resto: string }).resto;
+    if (isFailure(r)) return { esperava: r.esperava, resto: rest };
+    acc += String(r.resultado);
+    rest = r.resto;
   }
   return { resultado: acc, resto: rest };
 }
@@ -149,11 +153,11 @@ function parseAlternative(input: string, g: AlternativeGrammar): ParseResult {
 
   for (const sub of g.alternativa) {
     const r = analisar(input, sub as unknown);
-    if ((r as { resultado?: unknown }).resultado !== undefined) return r;
-    if ((r as { esperava?: unknown[] }).esperava !== undefined) {
-      const ev = (r as { esperava: unknown[] }).esperava;
+    if (isSuccess(r)) return r;
+    if (isFailure(r)) {
+      const ev = r.esperava;
       // compute how many chars were consumed by this attempt
-      const consumed = input.length - (r as { resto: string }).resto.length;
+      const consumed = input.length - r.resto.length;
       if (consumed > bestConsumed) {
         bestConsumed = consumed;
         bestFailure = r as ParseResult;
