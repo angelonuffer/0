@@ -29,10 +29,10 @@ function pularEspaçosEComentários(input: string): string {
     // Skip multi-line comment: /* ... */
     if (c === '/' && input[i + 1] === '*') {
       i += 2;
-      while (i < input.length - 1 && !(input[i] === '*' && input[i + 1] === '/')) {
+      while (i + 1 < input.length && !(input[i] === '*' && input[i + 1] === '/')) {
         i++;
       }
-      if (i < input.length - 1) {
+      if (i + 1 < input.length) {
         i += 2; // skip */
       }
       continue;

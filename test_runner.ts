@@ -132,6 +132,13 @@ tr5.run("comentários - adição com comentários '5 /* soma */ + /* parcela */ 
 tr5.run("comentários - comentário de linha no meio da adição", () => {
   iguais(analisar("5 // parcela 1\n+ // operador\n3", adição), { resultado: { parcela_1: "5", parcela_2: "3" }, resto: "" });
 });
+tr5.run("comentários - comentário de bloco no final do input (resto contém comentário)", () => {
+  iguais(analisar("5/* comentário */", número), { resultado: "5", resto: "/* comentário */" });
+});
+tr5.run("comentários - comentário de bloco não fechado tratado como resto", () => {
+  // Comentário não fechado - o parser trata como conteúdo restante
+  iguais(analisar("/* comentário não fechado", número), { esperava: [número], resto: "o" });
+});
 console.log(`comentários tests: ${tr5.getPassed()} passed, ${tr5.getFailed()} failed`);
 tr5.throwIfFailed();
 
