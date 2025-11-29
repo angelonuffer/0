@@ -128,7 +128,7 @@ export function runTests(): number {
   });
 
   if (tr.getFailed() > 0) tr.throwIfFailed();
-  console.log("espaço: Testes OK");
+  console.log("Testes: OK");
   return tr.getPassed();
 }
 
