@@ -6,50 +6,12 @@ function isObject(x: unknown): x is Record<string, unknown> {
   return typeof x === "object" && x !== null;
 }
 
-function pularEspaçosEComentários(input: string): string {
-  let i = 0;
-  while (i < input.length) {
-    const c = input[i];
-    // Skip whitespace (space, tab, newline, carriage return)
-    if (c === ' ' || c === '\t' || c === '\n' || c === '\r') {
-      i++;
-      continue;
-    }
-    // Skip single-line comment: // ... \n
-    if (c === '/' && i + 1 < input.length && input[i + 1] === '/') {
-      i += 2;
-      while (i < input.length && input[i] !== '\n') {
-        i++;
-      }
-      if (i < input.length && input[i] === '\n') {
-        i++;
-      }
-      continue;
-    }
-    // Skip multi-line comment: /* ... */
-    if (c === '/' && i + 1 < input.length && input[i + 1] === '*') {
-      i += 2;
-      while (i < input.length - 1 && !(input[i] === '*' && input[i + 1] === '/')) {
-        i++;
-      }
-      if (i < input.length - 1) {
-        i += 2; // skip */
-      } else {
-        // Unclosed comment, skip to end
-        i = input.length;
-      }
-      continue;
-    }
-    // Not whitespace or comment, stop
-    break;
-  }
-  return input.slice(i);
-}
-
 type RangeGrammar = { faixa: { de: string; até: string } };
 type KeyedElement = { chave: string; gramática: unknown };
 type SequenceGrammar = { sequência: (unknown | KeyedElement)[] };
 type AlternativeGrammar = { alternativa: unknown[] };
+type RepetitionGrammar = { repetição: unknown };
+type NegationGrammar = { negação: unknown };
 
 function isRangeGrammar(g: unknown): g is RangeGrammar {
   return isObject(g) && "faixa" in g;
@@ -61,6 +23,62 @@ function isSequenceGrammar(g: unknown): g is SequenceGrammar {
 
 function isAlternativeGrammar(g: unknown): g is AlternativeGrammar {
   return isObject(g) && "alternativa" in g && Array.isArray((g as Record<string, unknown>)["alternativa"]);
+}
+
+function isRepetitionGrammar(g: unknown): g is RepetitionGrammar {
+  return isObject(g) && "repetição" in g;
+}
+
+function isNegationGrammar(g: unknown): g is NegationGrammar {
+  return isObject(g) && "negação" in g;
+}
+
+function parseNegation(input: string, g: NegationGrammar): ParseResult {
+  const inner = (g as Record<string, unknown>)["negação"] as unknown;
+  if (input.length === 0) return { esperava: [inner], resto: input };
+
+  // Try to match the inner grammar at the current position. If it matches,
+  // the negation fails. If it does NOT match, consume a single character and
+  // succeed returning that character.
+  const r = analisar(input, inner);
+  if ((r as { resultado?: unknown }).resultado !== undefined) {
+    // inner matched -> negation fails
+    return { esperava: [inner], resto: input };
+  }
+
+  // inner did not match -> consume one character
+  const ch = input.charAt(0);
+  return { resultado: ch, resto: input.slice(1) };
+}
+
+function parseRepetition(input: string, g: RepetitionGrammar): ParseResult {
+  const item = (g as Record<string, unknown>)["repetição"] as unknown;
+  let rest = input;
+  let acc = "";
+  while (true) {
+    const r = analisar(rest, item);
+    if ((r as { resultado?: unknown }).resultado === undefined) {
+      // If sub-grammar failed after consuming input, it may represent a more
+      // specific parse error (for example an unclosed block comment where the
+      // sub-grammar expects a terminator like '*/'). Propagate that specific
+      // failure when it explicitly expects the terminator string "*/" so the
+      // enclosing sequence can report the correct expectation.
+      if ((r as { esperava?: unknown[] }).esperava !== undefined && (r as { resto: string }).resto !== rest) {
+        const ev = (r as { esperava: unknown[] }).esperava;
+        for (const e of ev) {
+          if (typeof e === "string" && e === "*/") return r as ParseResult;
+        }
+      }
+      // Normal end of repetition when sub-grammar doesn't match at current position
+      break;
+    }
+    const newRest = (r as { resto: string }).resto;
+    // Prevent infinite loop if sub-grammar accepts empty string
+    if (newRest === rest) break;
+    acc += String((r as { resultado: unknown }).resultado);
+    rest = newRest;
+  }
+  return { resultado: acc, resto: rest };
 }
 
 function parseRange(input: string, g: RangeGrammar): ParseResult {
@@ -126,11 +144,21 @@ function parseSequence(input: string, g: SequenceGrammar): ParseResult {
 
 function parseAlternative(input: string, g: AlternativeGrammar): ParseResult {
   const collected: unknown[] = [];
+  let bestFailure: ParseResult | null = null;
+  let bestConsumed = -1;
+
   for (const sub of g.alternativa) {
     const r = analisar(input, sub as unknown);
     if ((r as { resultado?: unknown }).resultado !== undefined) return r;
     if ((r as { esperava?: unknown[] }).esperava !== undefined) {
       const ev = (r as { esperava: unknown[] }).esperava;
+      // compute how many chars were consumed by this attempt
+      const consumed = input.length - (r as { resto: string }).resto.length;
+      if (consumed > bestConsumed) {
+        bestConsumed = consumed;
+        bestFailure = r as ParseResult;
+      }
+
       const seen = new Set<string>();
       for (const c of collected) {
         try {
@@ -152,13 +180,16 @@ function parseAlternative(input: string, g: AlternativeGrammar): ParseResult {
       }
     }
   }
+
+  // If some alternative consumed input before failing, return that failure (most specific)
+  if (bestFailure && bestConsumed > 0) return bestFailure;
   if (collected.length > 0) return { esperava: collected, resto: input };
   return { esperava: g.alternativa.slice(), resto: input };
 }
 
 export default function analisar(input: string, grammar: unknown): ParseResult {
-  // Skip whitespace and comments before parsing
-  const cleanInput = pularEspaçosEComentários(input);
+  // Do not skip input globally; grammars should include optional space grammars when needed
+  const cleanInput = input;
   
   if (typeof grammar === "string") {
     if (cleanInput.startsWith(grammar)) return { resultado: grammar, resto: cleanInput.slice(grammar.length) };
@@ -168,6 +199,8 @@ export default function analisar(input: string, grammar: unknown): ParseResult {
   if (isRangeGrammar(grammar)) return parseRange(cleanInput, grammar);
   if (isSequenceGrammar(grammar)) return parseSequence(cleanInput, grammar);
   if (isAlternativeGrammar(grammar)) return parseAlternative(cleanInput, grammar);
+  if (isRepetitionGrammar(grammar)) return parseRepetition(cleanInput, grammar);
+  if (isNegationGrammar(grammar)) return parseNegation(cleanInput, grammar);
 
   throw new Error("Gramática não suportada pelo analisador");
 }
