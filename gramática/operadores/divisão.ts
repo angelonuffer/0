@@ -22,7 +22,7 @@ export const divisão = {
     },
   ],
 };
-export function runTests(): number {
+export function runTests(): { passed: number; failed: number } {
   const tr = new TestRunner();
 
   tr.run("divisão.ts - caso '6/3'", () => {
@@ -62,12 +62,13 @@ export function runTests(): number {
     );
   });
 
-  if (tr.getFailed() > 0) {
-    tr.throwIfFailed();
+  const report = tr.report();
+  if (report.failed > 0) {
+    for (const e of report.errors) console.error(e.message);
   }
 
-  console.log("Testes: OK");
-  return tr.getPassed();
+  console.log(`Testes: total ${report.passed + report.failed}, sucessos ${report.passed}, falhas ${report.failed}`);
+  return { passed: report.passed, failed: report.failed };
 }
 
 if (import.meta.main) {

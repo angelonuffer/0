@@ -18,6 +18,8 @@ if (!filePath) {
     ];
 
     let totalPassed = 0;
+    let totalFailed = 0;
+    let hadFailure = false;
 
     for (const modPath of modules) {
       try {
@@ -32,10 +34,16 @@ if (!filePath) {
           console.error = (...args: unknown[]) => origError(`[mod:${modPath}]`, ...args);
 
           try {
-            const passed = mod.runTests();
-            if (typeof passed === "number") totalPassed += passed;
+            const result = mod.runTests();
+            if (typeof result === "number") {
+              totalPassed += result;
+            } else if (result && typeof result.passed === "number") {
+              totalPassed += result.passed;
+              totalFailed += typeof result.failed === "number" ? result.failed : 0;
+            }
           } catch (err) {
             console.error("Falha ao executar os testes:", err instanceof Error ? err.message : String(err));
+            hadFailure = true;
           } finally {
             // Restaura as funções originais para não poluir outros módulos
             console.log = origLog;
@@ -44,10 +52,17 @@ if (!filePath) {
         }
       } catch (err) {
         console.error(`Erro ao importar '${modPath}':`, err instanceof Error ? err.message : String(err));
+        hadFailure = true;
       }
     }
 
-    console.log(`Todos os testes executados com sucesso. Total passados: ${totalPassed}`);
+    const totalTests = totalPassed + totalFailed;
+    if (hadFailure || totalFailed > 0) {
+      console.error(`Resumo: total ${totalTests}, sucessos ${totalPassed}, falhas ${totalFailed}`);
+      Deno.exit(1);
+    }
+
+    console.log(`Resumo: total ${totalTests}, sucessos ${totalPassed}, falhas ${totalFailed}`);
     Deno.exit(0);
   } catch (err) {
     console.error("Falha ao executar os testes:", err instanceof Error ? err.message : String(err));
