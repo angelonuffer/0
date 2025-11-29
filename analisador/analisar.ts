@@ -16,7 +16,7 @@ function pularEspaçosEComentários(input: string): string {
       continue;
     }
     // Skip single-line comment: // ... \n
-    if (c === '/' && input[i + 1] === '/') {
+    if (c === '/' && i + 1 < input.length && input[i + 1] === '/') {
       i += 2;
       while (i < input.length && input[i] !== '\n') {
         i++;
@@ -27,13 +27,16 @@ function pularEspaçosEComentários(input: string): string {
       continue;
     }
     // Skip multi-line comment: /* ... */
-    if (c === '/' && input[i + 1] === '*') {
+    if (c === '/' && i + 1 < input.length && input[i + 1] === '*') {
       i += 2;
-      while (i + 1 < input.length && !(input[i] === '*' && input[i + 1] === '/')) {
+      while (i < input.length - 1 && !(input[i] === '*' && input[i + 1] === '/')) {
         i++;
       }
-      if (i + 1 < input.length) {
+      if (i < input.length - 1) {
         i += 2; // skip */
+      } else {
+        // Unclosed comment, skip to end
+        i = input.length;
       }
       continue;
     }

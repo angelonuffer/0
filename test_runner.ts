@@ -136,8 +136,8 @@ tr5.run("comentários - comentário de bloco no final do input (resto contém co
   iguais(analisar("5/* comentário */", número), { resultado: "5", resto: "/* comentário */" });
 });
 tr5.run("comentários - comentário de bloco não fechado tratado como resto", () => {
-  // Comentário não fechado - o parser trata como conteúdo restante
-  iguais(analisar("/* comentário não fechado", número), { esperava: [número], resto: "o" });
+  // Comentário não fechado - o parser pula todo o comentário e não encontra número
+  iguais(analisar("/* comentário não fechado", número), { esperava: [número], resto: "" });
 });
 console.log(`comentários tests: ${tr5.getPassed()} passed, ${tr5.getFailed()} failed`);
 tr5.throwIfFailed();
