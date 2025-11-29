@@ -14,7 +14,10 @@ export const subtração = {
       gramática: número,
     },
     espaço,
-    "-",
+    {
+      chave: "operador",
+      gramática: "-",
+    },
     espaço,
     {
       chave: "subtraendo",
@@ -31,6 +34,7 @@ export function runTests(): { passed: number; failed: number } {
       {
         resultado: {
           minuendo: { número: "5" },
+          operador: "-",
           subtraendo: { número: "3" },
         },
         resto: "",

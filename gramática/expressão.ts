@@ -22,6 +22,7 @@ export function runTests(): { passed: number; failed: number } {
       {
         resultado: {
           parcela_1: { número: "5" },
+          operador: "+",
           parcela_2: { número: "3" },
         },
         resto: "",

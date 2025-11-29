@@ -14,7 +14,10 @@ export const multiplicação = {
       gramática: número,
     },
     espaço,
-    "*",
+    {
+      chave: "operador",
+      gramática: "*",
+    },
     espaço,
     {
       chave: "fator_2",
@@ -31,6 +34,7 @@ export function runTests(): { passed: number; failed: number } {
       {
         resultado: {
           fator_1: { número: "5" },
+          operador: "*",
           fator_2: { número: "3" },
         },
         resto: "",

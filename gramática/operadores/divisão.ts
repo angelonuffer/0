@@ -14,7 +14,10 @@ export const divisão = {
       gramática: número,
     },
     espaço,
-    "/",
+    {
+      chave: "operador",
+      gramática: "/",
+    },
     espaço,
     {
       chave: "divisor",
@@ -31,6 +34,7 @@ export function runTests(): { passed: number; failed: number } {
       {
         resultado: {
           dividendo: { número: "6" },
+          operador: "/",
           divisor: { número: "3" },
         },
         resto: "",
