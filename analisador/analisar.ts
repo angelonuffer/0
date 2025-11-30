@@ -248,12 +248,15 @@ function parseLeftAssoc(input: string, g: LeftAssocGrammar): ParseResult {
       rest = afterOp;
     }
 
-    const rRight = analisar(rest, segundo);
-    if (isFailure(rRight)) {
-      // don't consume operator if right fails
-      rest = save;
-      break;
-    }
+      const rRight = analisar(rest, segundo);
+      if (isFailure(rRight)) {
+        // If the grammar requests propagation of the right-hand failure, return it
+        // (used by some higher-level grammars that require the expression to
+        // be complete). Otherwise, do not consume the operator and stop.
+        if (cfg["propagateFailure"]) return rRight;
+        rest = save;
+        break;
+      }
 
     // build left-assoc node
     const node: Record<string, unknown> = {};

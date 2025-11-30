@@ -179,6 +179,55 @@ export function runTests(): { passed: number; failed: number } {
     );
   });
 
+  // Edge-case failure tests
+  tr.run("expressão.ts - caso '2+' (operador no fim, resto esperado)", () => {
+    iguais(
+      analisar("2+", expressão),
+      {
+        esperava: [
+          dígito,
+        ],
+        resto: "",
+      }
+    );
+  });
+
+  tr.run("expressão.ts - caso '2+*3' (operador inesperado após operador)", () => {
+    iguais(
+      analisar("2+*3", expressão),
+      {
+        esperava: [
+          dígito,
+        ],
+        resto: "*3",
+      }
+    );
+  });
+
+  tr.run("expressão.ts - caso 'abc' (identificador inválido no início)", () => {
+    iguais(
+      analisar("abc", expressão),
+      {
+        esperava: [
+          dígito,
+        ],
+        resto: "abc",
+      }
+    );
+  });
+
+  tr.run("expressão.ts - caso '*3' (falta parcela_1)", () => {
+    iguais(
+      analisar("*3", expressão),
+      {
+        esperava: [
+          dígito,
+        ],
+        resto: "*3",
+      }
+    );
+  });
+
   const report = tr.report();
   if (report.failed > 0) {
     for (const e of report.errors) console.error(e.message);

@@ -25,6 +25,10 @@ Object.assign(adiçãoOuSubtração, {
     espaço: espaço,
     operador: operadorAditivo,
     segundo: termo,
+    // When a left-assoc additive expression encounters an operator with a
+    // missing right-hand operand, propagate that failure up so callers can
+    // treat the whole expression as an error (no leftover rest allowed).
+    propagateFailure: true,
     keys: { left: "parcela_1", op: "operador", right: "parcela_2" },
   },
 });
