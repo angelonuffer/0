@@ -1,0 +1,7 @@
+entrada: |
+  1/* comentário não fechado
+
+erro: |
+  1:27: 1/* comentário não fechado
+                                  ^
+                                  */

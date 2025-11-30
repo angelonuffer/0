@@ -1,0 +1,6 @@
+entrada: |
+  3//foo
+  +4
+
+saída: |
+  7

@@ -1,0 +1,5 @@
+entrada: |
+  1/*ignorado*/+2
+
+saída: |
+  3

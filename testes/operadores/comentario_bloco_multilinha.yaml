@@ -1,0 +1,7 @@
+entrada: |
+  10/* comentário
+  multilinha
+  */-3
+
+saída: |
+  7

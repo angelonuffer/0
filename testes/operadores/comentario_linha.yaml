@@ -1,0 +1,6 @@
+entrada: |
+  // comentário de linha
+  5+2
+
+saída: |
+  7
