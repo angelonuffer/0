@@ -2,7 +2,6 @@
 
 import analisar from "../../analisador/analisar.ts";
 import iguais from "../../analisador/iguais.ts";
-import { número } from "../tipos_literais/número.ts";
 import { dígito } from "../tipos_literais/dígito.ts";
 import { espaço } from "../espaço.ts";
 import { termo } from "./termo.ts";
@@ -20,33 +19,18 @@ const operadorAditivo = {
 
 // adiçãoOuSubtração: term with + or - operator
 const adiçãoOuSubtração: Record<string, unknown> = {};
-
 Object.assign(adiçãoOuSubtração, {
-  sequência: [
-    {
-      chave: "parcela_1",
-      gramática: termo,
-    },
-    espaço,
-    {
-      chave: "operador",
-      gramática: operadorAditivo,
-    },
-    espaço,
-    {
-      chave: "parcela_2",
-      gramática: aditivo,
-    },
-  ],
+  esquerda: {
+    primeiro: termo,
+    espaço: espaço,
+    operador: operadorAditivo,
+    segundo: termo,
+    keys: { left: "parcela_1", op: "operador", right: "parcela_2" },
+  },
 });
 
-// aditivo: try additive expression first (longest match), then fall back to termo
-Object.assign(aditivo, {
-  alternativa: [
-    adiçãoOuSubtração,
-    termo,
-  ],
-});
+// aditivo: left-associative additive grammar (also accepts single termo)
+Object.assign(aditivo, adiçãoOuSubtração);
 
 export function runTests(): { passed: number; failed: number } {
   const tr = new TestRunner();
@@ -91,13 +75,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("3+4-5", aditivo),
       {
         resultado: {
-          parcela_1: { número: "3" },
-          operador: "+",
-          parcela_2: {
-            parcela_1: { número: "4" },
-            operador: "-",
-            parcela_2: { número: "5" },
+          parcela_1: {
+            parcela_1: { número: "3" },
+            operador: "+",
+            parcela_2: { número: "4" },
           },
+          operador: "-",
+          parcela_2: { número: "5" },
         },
         resto: "",
       }
@@ -109,13 +93,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("3 - 4 + 5", aditivo),
       {
         resultado: {
-          parcela_1: { número: "3" },
-          operador: "-",
-          parcela_2: {
-            parcela_1: { número: "4" },
-            operador: "+",
-            parcela_2: { número: "5" },
+          parcela_1: {
+            parcela_1: { número: "3" },
+            operador: "-",
+            parcela_2: { número: "4" },
           },
+          operador: "+",
+          parcela_2: { número: "5" },
         },
         resto: "",
       }
@@ -186,17 +170,17 @@ export function runTests(): { passed: number; failed: number } {
       analisar("2 + 3 * 4 - 5", aditivo),
       {
         resultado: {
-          parcela_1: { número: "2" },
-          operador: "+",
-          parcela_2: {
-            parcela_1: {
+          parcela_1: {
+            parcela_1: { número: "2" },
+            operador: "+",
+            parcela_2: {
               fator_1: { número: "3" },
               operador: "*",
               fator_2: { número: "4" },
             },
-            operador: "-",
-            parcela_2: { número: "5" },
           },
+          operador: "-",
+          parcela_2: { número: "5" },
         },
         resto: "",
       }

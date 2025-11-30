@@ -2,7 +2,6 @@
 
 import analisar from "../analisador/analisar.ts";
 import iguais from "../analisador/iguais.ts";
-import { número } from "./tipos_literais/número.ts";
 import { dígito } from "./tipos_literais/dígito.ts";
 import { aditivo } from "./operadores/aditivo.ts";
 import TestRunner from "../analisador/runner.ts";
@@ -65,13 +64,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("3 + 4 + 5", expressão),
       {
         resultado: {
-          parcela_1: { número: "3" },
-          operador: "+",
-          parcela_2: {
-            parcela_1: { número: "4" },
+          parcela_1: {
+            parcela_1: { número: "3" },
             operador: "+",
-            parcela_2: { número: "5" },
+            parcela_2: { número: "4" },
           },
+          operador: "+",
+          parcela_2: { número: "5" },
         },
         resto: "",
       }
@@ -122,13 +121,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("3 + 4 - 5", expressão),
       {
         resultado: {
-          parcela_1: { número: "3" },
-          operador: "+",
-          parcela_2: {
-            parcela_1: { número: "4" },
-            operador: "-",
-            parcela_2: { número: "5" },
+          parcela_1: {
+            parcela_1: { número: "3" },
+            operador: "+",
+            parcela_2: { número: "4" },
           },
+          operador: "-",
+          parcela_2: { número: "5" },
         },
         resto: "",
       }
@@ -140,13 +139,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("10 / 2 * 3", expressão),
       {
         resultado: {
-          fator_1: { número: "10" },
-          operador: "/",
-          fator_2: {
-            fator_1: { número: "2" },
-            operador: "*",
-            fator_2: { número: "3" },
+          fator_1: {
+            fator_1: { número: "10" },
+            operador: "/",
+            fator_2: { número: "2" },
           },
+          operador: "*",
+          fator_2: { número: "3" },
         },
         resto: "",
       }
@@ -159,20 +158,20 @@ export function runTests(): { passed: number; failed: number } {
       analisar("2 + 3 * 4 - 5 / 1", expressão),
       {
         resultado: {
-          parcela_1: { número: "2" },
-          operador: "+",
-          parcela_2: {
-            parcela_1: {
+          parcela_1: {
+            parcela_1: { número: "2" },
+            operador: "+",
+            parcela_2: {
               fator_1: { número: "3" },
               operador: "*",
               fator_2: { número: "4" },
             },
-            operador: "-",
-            parcela_2: {
-              fator_1: { número: "5" },
-              operador: "/",
-              fator_2: { número: "1" },
-            },
+          },
+          operador: "-",
+          parcela_2: {
+            fator_1: { número: "5" },
+            operador: "/",
+            fator_2: { número: "1" },
           },
         },
         resto: "",

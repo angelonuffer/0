@@ -17,35 +17,21 @@ const operadorMultiplicativo = {
   alternativa: ["*", "/"],
 };
 
-// multiplicaçãoOuDivisão: term with * or / operator
+// multiplicaçãoOuDivisão: left-associative multiplicative expressions
 const multiplicaçãoOuDivisão: Record<string, unknown> = {};
 
 Object.assign(multiplicaçãoOuDivisão, {
-  sequência: [
-    {
-      chave: "fator_1",
-      gramática: número,
-    },
-    espaço,
-    {
-      chave: "operador",
-      gramática: operadorMultiplicativo,
-    },
-    espaço,
-    {
-      chave: "fator_2",
-      gramática: termo,
-    },
-  ],
+  esquerda: {
+    primeiro: número,
+    espaço: espaço,
+    operador: operadorMultiplicativo,
+    segundo: número,
+    keys: { left: "fator_1", op: "operador", right: "fator_2" },
+  },
 });
 
-// termo: try multiplicative expression first (longest match), then fall back to número
-Object.assign(termo, {
-  alternativa: [
-    multiplicaçãoOuDivisão,
-    número,
-  ],
-});
+// termo: use left-associative multiplicative grammar (it also accepts single número)
+Object.assign(termo, multiplicaçãoOuDivisão);
 
 export function runTests(): { passed: number; failed: number } {
   const tr = new TestRunner();
@@ -90,13 +76,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("2*3*4", termo),
       {
         resultado: {
-          fator_1: { número: "2" },
-          operador: "*",
-          fator_2: {
-            fator_1: { número: "3" },
+          fator_1: {
+            fator_1: { número: "2" },
             operador: "*",
-            fator_2: { número: "4" },
+            fator_2: { número: "3" },
           },
+          operador: "*",
+          fator_2: { número: "4" },
         },
         resto: "",
       }
@@ -108,13 +94,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("24/4/2", termo),
       {
         resultado: {
-          fator_1: { número: "24" },
-          operador: "/",
-          fator_2: {
-            fator_1: { número: "4" },
+          fator_1: {
+            fator_1: { número: "24" },
             operador: "/",
-            fator_2: { número: "2" },
+            fator_2: { número: "4" },
           },
+          operador: "/",
+          fator_2: { número: "2" },
         },
         resto: "",
       }
@@ -126,13 +112,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("2*3/4", termo),
       {
         resultado: {
-          fator_1: { número: "2" },
-          operador: "*",
-          fator_2: {
-            fator_1: { número: "3" },
-            operador: "/",
-            fator_2: { número: "4" },
+          fator_1: {
+            fator_1: { número: "2" },
+            operador: "*",
+            fator_2: { número: "3" },
           },
+          operador: "/",
+          fator_2: { número: "4" },
         },
         resto: "",
       }
@@ -144,13 +130,13 @@ export function runTests(): { passed: number; failed: number } {
       analisar("10 / 2 * 5", termo),
       {
         resultado: {
-          fator_1: { número: "10" },
-          operador: "/",
-          fator_2: {
-            fator_1: { número: "2" },
-            operador: "*",
-            fator_2: { número: "5" },
+          fator_1: {
+            fator_1: { número: "10" },
+            operador: "/",
+            fator_2: { número: "2" },
           },
+          operador: "*",
+          fator_2: { número: "5" },
         },
         resto: "",
       }

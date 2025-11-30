@@ -28,6 +28,7 @@ type SequenceGrammar = { sequência: (unknown | KeyedElement)[] };
 type AlternativeGrammar = { alternativa: unknown[] };
 type RepetitionGrammar = { repetição: unknown };
 type NegationGrammar = { negação: unknown };
+type LeftAssocGrammar = { esquerda: Record<string, unknown> };
 
 function isRangeGrammar(g: unknown): g is RangeGrammar {
   return isObject(g) && "faixa" in g;
@@ -47,6 +48,10 @@ function isRepetitionGrammar(g: unknown): g is RepetitionGrammar {
 
 function isNegationGrammar(g: unknown): g is NegationGrammar {
   return isObject(g) && "negação" in g;
+}
+
+function isLeftAssocGrammar(g: unknown): g is LeftAssocGrammar {
+  return isObject(g) && "esquerda" in g && isObject((g as Record<string, unknown>)["esquerda"]);
 }
 
 function parseNegation(input: string, g: NegationGrammar): ParseResult {
@@ -205,6 +210,67 @@ export default function analisar(input: string, grammar: unknown): ParseResult {
   if (isAlternativeGrammar(grammar)) return parseAlternative(cleanInput, grammar);
   if (isRepetitionGrammar(grammar)) return parseRepetition(cleanInput, grammar);
   if (isNegationGrammar(grammar)) return parseNegation(cleanInput, grammar);
+  if (isLeftAssocGrammar(grammar)) return parseLeftAssoc(cleanInput, grammar as LeftAssocGrammar);
 
   throw new Error("Gramática não suportada pelo analisador");
+}
+
+function parseLeftAssoc(input: string, g: LeftAssocGrammar): ParseResult {
+  const cfg = (g as Record<string, unknown>)["esquerda"] as Record<string, unknown>;
+  const primeiro = cfg["primeiro"] as unknown;
+  const operador = cfg["operador"] as unknown;
+  const segundo = cfg["segundo"] as unknown;
+  const espaço = cfg["espaço"] as unknown;
+  const keys = (cfg["keys"] as Record<string, string> | undefined) ?? {};
+  const leftKey = keys["left"] ?? "parcela_1";
+  const opKey = keys["op"] ?? "operador";
+  const rightKey = keys["right"] ?? "parcela_2";
+
+  const rFirst = analisar(input, primeiro);
+  if (isFailure(rFirst)) return rFirst;
+  let rest = rFirst.resto;
+  let left: unknown = rFirst.resultado;
+
+  while (true) {
+    const save = rest;
+    // optional espaço before operator
+    if (espaço !== undefined) {
+      const rSpace = analisar(rest, espaço);
+      if (isFailure(rSpace)) return rSpace;
+      rest = rSpace.resto;
+    }
+
+    const rOp = analisar(rest, operador);
+    if (isFailure(rOp)) {
+      rest = save;
+      break;
+    }
+    const afterOp = rOp.resto;
+
+    if (espaço !== undefined) {
+      const rSpace2 = analisar(afterOp, espaço);
+      if (isFailure(rSpace2)) return rSpace2;
+      rest = rSpace2.resto;
+    } else {
+      rest = afterOp;
+    }
+
+    const rRight = analisar(rest, segundo);
+    if (isFailure(rRight)) {
+      // don't consume operator if right fails
+      rest = save;
+      break;
+    }
+
+    // build left-assoc node
+    const node: Record<string, unknown> = {};
+    node[leftKey] = left;
+    node[opKey] = rOp.resultado;
+    node[rightKey] = rRight.resultado;
+
+    left = node;
+    rest = rRight.resto;
+  }
+
+  return { resultado: left, resto: rest };
 }
