@@ -6,6 +6,10 @@ function isObject(x: unknown): x is Record<string, unknown> {
   return typeof x === "object" && x !== null;
 }
 
+function isKeyedElement(g: unknown): g is KeyedElement {
+  return isObject(g) && "chave" in g && "gramática" in g;
+}
+
 type Grammar =
   | string
   | RangeGrammar
@@ -108,32 +112,30 @@ function parseRange(input: string, g: RangeGrammar): ParseResult {
 
 function parseSequence(input: string, g: SequenceGrammar): ParseResult {
   const seq = g["sequência"] as unknown[];
-  const hasChaves = seq.some((s) => isObject(s) && "chave" in (s as Record<string, unknown>));
+  const hasChaves = seq.some((s) => isKeyedElement(s));
 
   if (hasChaves) {
     let rest = input;
     const resultObj: Record<string, unknown> = {};
 
     for (const sub of seq) {
-      if (isObject(sub) && "chave" in sub && "gramática" in sub) {
-        const subRec = sub as Record<string, unknown>;
-        const chave = String(subRec.chave);
-        const gram = subRec.gramática as unknown;
-        const r = analisar(rest, gram);
+      if (isKeyedElement(sub)) {
+        const chave = String(sub.chave);
+        const r = analisar(rest, sub.gramática);
         if (isSuccess(r)) {
           resultObj[chave] = r.resultado;
           rest = r.resto;
           continue;
         }
         return { esperava: r.esperava, resto: rest };
-      } else {
-        const r = analisar(rest, sub);
-        if (isSuccess(r)) {
-          rest = r.resto;
-          continue;
-        }
-        return { esperava: r.esperava, resto: rest };
       }
+
+      const r = analisar(rest, sub);
+      if (isSuccess(r)) {
+        rest = r.resto;
+        continue;
+      }
+      return { esperava: r.esperava, resto: rest };
     }
 
     return { resultado: resultObj, resto: rest };
@@ -153,6 +155,7 @@ function parseSequence(input: string, g: SequenceGrammar): ParseResult {
 
 function parseAlternative(input: string, g: AlternativeGrammar): ParseResult {
   const collected: unknown[] = [];
+  const seen = new Set<string>();
   let bestFailure: ParseResult | null = null;
   let bestConsumed = -1;
 
@@ -160,23 +163,13 @@ function parseAlternative(input: string, g: AlternativeGrammar): ParseResult {
     const r = analisar(input, sub as unknown);
     if (isSuccess(r)) return r;
     if (isFailure(r)) {
-      const ev = r.esperava;
-      // compute how many chars were consumed by this attempt
       const consumed = input.length - r.resto.length;
       if (consumed > bestConsumed) {
         bestConsumed = consumed;
-        bestFailure = r as ParseResult;
+        bestFailure = r;
       }
 
-      const seen = new Set<string>();
-      for (const c of collected) {
-        try {
-          seen.add(JSON.stringify(c));
-        } catch {
-          // ignore
-        }
-      }
-      for (const e of ev) {
+      for (const e of r.esperava) {
         try {
           const key = JSON.stringify(e);
           if (!seen.has(key)) {
