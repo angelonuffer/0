@@ -136,6 +136,73 @@ function executarTestes() {
       falharam++;
     }
   }
+
+  // Executando testes de saída (.saída.txt)
+  const dirSaida = __dirname; // testes/
+
+  function coletarArquivosSaidaRecursivo(dir) {
+    const resultados = [];
+    const entradas = readdirSync(dir, { withFileTypes: true });
+    for (const ent of entradas) {
+      const caminho = join(dir, ent.name);
+      if (ent.isDirectory()) {
+        resultados.push(...coletarArquivosSaidaRecursivo(caminho));
+      } else if (ent.isFile() && ent.name.endsWith('.saída.txt')) {
+        resultados.push(caminho);
+      }
+    }
+    return resultados;
+  }
+
+  const arquivosSaida = coletarArquivosSaidaRecursivo(dirSaida).sort();
+
+  console.log('\nExecutando testes de saída...\n');
+
+  for (const caminhoEsperado of arquivosSaida) {
+    const nomeBase = basename(caminhoEsperado, '.saída.txt');
+    const caminhoTeste = join(dirname(caminhoEsperado), `${nomeBase}.0`);
+    const caminhoRelativo = relative(__dirname, caminhoTeste);
+
+    // Se o arquivo .0 não existir, avisa e pula
+    try {
+      readFileSync(caminhoTeste, 'utf-8');
+    } catch (e) {
+      console.log(`⚠️  ${caminhoRelativo}: Arquivo de teste '.0' não encontrado para este '.saída.txt'`);
+      continue;
+    }
+
+    try {
+      const saidaEsperada = readFileSync(caminhoEsperado, 'utf-8').trim();
+      let saidaObtida;
+      try {
+        // Executa o teste esperando saída em stdout
+        saidaObtida = execSync(`node código/0_node.js ${caminhoTeste} node`, {
+          cwd: caminhoBase,
+          encoding: 'utf-8',
+          stdio: 'pipe'
+        }).trim();
+      } catch (error) {
+        // Se houve erro, captura saída e trata como falha
+        saidaObtida = (error.stdout + error.stderr).trim();
+      }
+
+      if (compararSaidas(saidaObtida, saidaEsperada, caminhoBase)) {
+        console.log(`✓ ${caminhoRelativo}`);
+        passaram++;
+      } else {
+        console.log(`✗ ${caminhoRelativo}`);
+        console.log(`  Esperado:`);
+        console.log(`    ${normalizarSaida(saidaEsperada, null).split('\n').join('\n    ')}`);
+        console.log(`  Obtido:`);
+        console.log(`    ${normalizarSaida(saidaObtida, caminhoBase).split('\n').join('\n    ')}`);
+        falharam++;
+      }
+    } catch (error) {
+      console.log(`✗ ${caminhoRelativo}: Erro ao executar teste`);
+      console.log(`  ${error.message}`);
+      falharam++;
+    }
+  }
   
   // Resumo
   console.log(`\n${'='.repeat(50)}`);

@@ -1,0 +1,2 @@
+frase = "O céu é azul."
+[frase[0:7] " o limite."] * ""

@@ -1,0 +1,2 @@
+frase = "O destino de Hyrule está em suas mãos."
+frase[13:]

@@ -1,0 +1,2 @@
+frase = "Que a força esteja com você."
+frase[0:11]
