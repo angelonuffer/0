@@ -61,7 +61,7 @@ function compararSaidas(obtida, esperada, caminhoBase) {
 function executarTestes() {
   const dirTestes = join(__dirname, 'erros');
 
-  // Coleta recursivamente arquivos que terminam com .esperado.txt dentro de dirTestes
+  // Coleta recursivamente arquivos que terminam com .erro.txt dentro de dirTestes
   // e retorna a lista de caminhos dos arquivos de expectativa.
   function coletarArquivosEsperadoRecursivo(dir) {
     const resultados = [];
@@ -70,7 +70,7 @@ function executarTestes() {
       const caminho = join(dir, ent.name);
       if (ent.isDirectory()) {
         resultados.push(...coletarArquivosEsperadoRecursivo(caminho));
-      } else if (ent.isFile() && ent.name.endsWith('.esperado.txt')) {
+      } else if (ent.isFile() && ent.name.endsWith('.erro.txt')) {
         resultados.push(caminho);
       }
     }
@@ -87,15 +87,15 @@ function executarTestes() {
   console.log('Executando testes de erros...\n');
   
   for (const caminhoEsperado of arquivosEsperado) {
-    const nomeBase = basename(caminhoEsperado, '.esperado.txt');
+    const nomeBase = basename(caminhoEsperado, '.erro.txt');
     const caminhoTeste = join(dirname(caminhoEsperado), `${nomeBase}.0`);
     const caminhoRelativo = relative(dirTestes, caminhoTeste);
 
     // Se o arquivo .0 não existir, avisa e pula
     try {
       readFileSync(caminhoTeste, 'utf-8');
-    } catch (e) {
-      console.log(`⚠️  ${caminhoRelativo}: Arquivo de teste '.0' não encontrado para este '.esperado.txt'`);
+      } catch (e) {
+      console.log(`⚠️  ${caminhoRelativo}: Arquivo de teste '.0' não encontrado para este '.erro.txt'`);
       continue;
     }
     
