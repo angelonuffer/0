@@ -21,7 +21,7 @@ impl Value {
 pub fn evaluate_recursively(pair: Pair<Rule>) -> Value {
     match pair.as_rule() {
         Rule::expressao => expressions::evaluate_expression(pair),
-        Rule::termo_3 => expressions::evaluate_term_3(pair),
+        Rule::operacao_numerica => expressions::evaluate_operacao_numerica(pair),
         Rule::termo_2 => expressions::evaluate_term_2(pair),
         Rule::termo_1 => expressions::evaluate_term_1(pair),
         Rule::parenteses => expressions::evaluate_parentheses(pair),

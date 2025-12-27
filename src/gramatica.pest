@@ -17,6 +17,6 @@ termo_2 = { termo_1 ~ ((multiplicacao | divisao) ~ termo_1)* }
 adicao = { "+" }
 subtracao = { "-" }
 
-termo_3 = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
+operacao_numerica = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
 
-expressao = { termo_3 | texto_literal }
+expressao = { operacao_numerica | texto_literal }
