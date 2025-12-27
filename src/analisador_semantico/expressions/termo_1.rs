@@ -5,7 +5,8 @@ use crate::analisador_semantico::value::Scope;
 use crate::analisador_semantico::value::evaluate_recursively;
 
 pub fn evaluate_term_1(pair: Pair<Rule>, scope: &mut Scope) -> Value {
-    evaluate_recursively(pair.into_inner().next().unwrap(), scope)
+    let inner = pair.into_inner().next().unwrap();
+    evaluate_recursively(inner, scope)
 }
 
 #[cfg(test)]
