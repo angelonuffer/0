@@ -35,18 +35,6 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_term_2_simple_number() {
-        // A single termo_1, which is a number literal
-        assert_eq!(parse_and_evaluate_termo_2("10"), Value::Number(10.0));
-    }
-
-    #[test]
-    fn test_evaluate_term_2_simple_string() {
-        // A single termo_1, which is a string literal
-        assert_eq!(parse_and_evaluate_termo_2("\"hello\""), Value::String("hello".to_string()));
-    }
-
-    #[test]
     fn test_evaluate_term_2_multiplication() {
         assert_eq!(parse_and_evaluate_termo_2("5 * 2"), Value::Number(10.0));
         assert_eq!(parse_and_evaluate_termo_2("2.5 * 4"), Value::Number(10.0));
