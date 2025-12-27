@@ -1,0 +1,26 @@
+WHITESPACE = _{
+    " " | "\t" | "\r" | "\n"
+}
+
+texto_literal = @{
+    "\"" ~ (!"\"" ~ ANY)* ~ "\""
+}
+numero_literal = @{
+    "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+)
+}
+
+parenteses = { "(" ~ expressao ~ ")" }
+
+termo_1 = { parenteses | numero_literal | texto_literal }
+
+multiplicacao = { "*" }
+divisao = { "/" }
+
+termo_2 = { termo_1 ~ ((multiplicacao | divisao) ~ termo_1)* }
+
+adicao = { "+" }
+subtracao = { "-" }
+
+expressao = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
+
+program = { SOI ~ expressao ~ EOI }

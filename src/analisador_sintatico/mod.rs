@@ -1,23 +1,10 @@
+extern crate pest;
+use pest::Parser;
 
-#[derive(Debug)]
-pub enum AstNode {
-    StringLiteral(String),
-}
+#[derive(pest_derive::Parser)]
+#[grammar = "analisador_sintatico/gramatica.pest"]
+pub struct SintaticoParser;
 
-pub fn parse(input: &str) -> Result<AstNode, String> {
-    let trimmed = input.trim();
-    if trimmed.starts_with('"') && trimmed.ends_with('"') {
-        if trimmed.len() >= 2 {
-            let content = &trimmed[1..trimmed.len() - 1];
-            if content.contains('"') {
-                Err("❌ Caractere de aspas duplas inesperado dentro da string.".to_string())
-            } else {
-                Ok(AstNode::StringLiteral(content.to_string()))
-            }
-        } else {
-             Err("❌ String com aspas duplas incompleta.".to_string())
-        }
-    } else {
-        Err("❌ Esperado uma string com aspas duplas.".to_string())
-    }
+pub fn parse(input: &str) -> Result<pest::iterators::Pairs<'_, Rule>, String> {
+    SintaticoParser::parse(Rule::program, input).map_err(|e| format!("❌ Erro de sintaxe: {}", e))
 }
