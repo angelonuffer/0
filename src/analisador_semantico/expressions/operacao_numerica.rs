@@ -1,14 +1,15 @@
 use pest::iterators::Pair;
 use crate::analisador_sintatico::Rule;
 use crate::analisador_semantico::value::Value;
+use crate::analisador_semantico::value::Scope;
 use crate::analisador_semantico::value::evaluate_recursively;
 
-pub fn evaluate_operacao_numerica(pair: Pair<Rule>) -> Value {
+pub fn evaluate_operacao_numerica(pair: Pair<Rule>, scope: &mut Scope) -> Value {
     let mut pairs = pair.into_inner().filter(|p| p.as_rule() != Rule::WHITESPACE);
-    let mut value = evaluate_recursively(pairs.next().unwrap());
+    let mut value = evaluate_recursively(pairs.next().unwrap(), scope);
 
     while let Some(op) = pairs.next() {
-        let rhs = evaluate_recursively(pairs.next().unwrap());
+        let rhs = evaluate_recursively(pairs.next().unwrap(), scope);
         value = match op.as_str() {
             "+" => Value::Number(value.as_number() + rhs.as_number()),
             "-" => Value::Number(value.as_number() - rhs.as_number()),
@@ -25,12 +26,14 @@ mod tests {
     use crate::analisador_sintatico::SintaticoParser;
     use pest::Parser;
     use crate::analisador_sintatico::Rule;
+    use crate::analisador_semantico::value::Scope;
 
     // Helper function to parse and evaluate operacao_numerica
     fn parse_and_evaluate_operacao_numerica(input: &str) -> Value {
         let mut pairs = SintaticoParser::parse(Rule::operacao_numerica, input).unwrap();
         let pair = pairs.next().unwrap();
-        evaluate_operacao_numerica(pair)
+        let mut scope = Scope::new();
+        evaluate_operacao_numerica(pair, &mut scope)
     }
 
     #[test]

@@ -2,11 +2,11 @@ WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 
 arquivo = { SOI ~ expressao ~ EOI }
 
-expressao = { operacao_numerica | texto_literal }
+expressao = { atribuicao* ~ (operacao_numerica | texto_literal) }
 
 operacao_numerica = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
 termo_2           = { termo_1 ~ ((multiplicacao | divisao) ~ termo_1)* }
-termo_1           = { "(" ~ operacao_numerica ~ ")" | numero_literal }
+termo_1           = { "(" ~ operacao_numerica ~ ")" | numero_literal | nome }
 
 adicao        = { "+" }
 subtracao     = { "-" }
@@ -15,3 +15,6 @@ divisao       = { "/" }
 
 numero_literal = @{ "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+) }
 texto_literal  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+
+atribuicao = { nome ~ "=" ~ expressao }
+nome = @{ (LETTER | "_") ~ (LETTER | NUMBER | "_")* }

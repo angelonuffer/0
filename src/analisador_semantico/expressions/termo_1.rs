@@ -1,10 +1,11 @@
 use pest::iterators::Pair;
 use crate::analisador_sintatico::Rule;
 use crate::analisador_semantico::value::Value;
+use crate::analisador_semantico::value::Scope;
 use crate::analisador_semantico::value::evaluate_recursively;
 
-pub fn evaluate_term_1(pair: Pair<Rule>) -> Value {
-    evaluate_recursively(pair.into_inner().next().unwrap())
+pub fn evaluate_term_1(pair: Pair<Rule>, scope: &mut Scope) -> Value {
+    evaluate_recursively(pair.into_inner().next().unwrap(), scope)
 }
 
 #[cfg(test)]
@@ -14,11 +15,13 @@ mod tests {
     use pest::Parser;
     use crate::analisador_sintatico::Rule;
     use crate::analisador_semantico::expressions::termo_2::evaluate_term_2;
+    use crate::analisador_semantico::value::Scope;
 
     fn parse_and_evaluate_termo_2(input: &str) -> Value {
         let mut pairs = SintaticoParser::parse(Rule::termo_2, input).unwrap();
         let pair = pairs.next().unwrap();
-        evaluate_term_2(pair)
+        let mut scope = Scope::new();
+        evaluate_term_2(pair, &mut scope)
     }
 
     #[test]

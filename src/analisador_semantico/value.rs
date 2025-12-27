@@ -2,6 +2,7 @@ use crate::analisador_semantico::literals;
 use crate::analisador_semantico::expressions;
 use pest::iterators::{Pair, Pairs};
 use crate::analisador_sintatico::Rule;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
@@ -18,23 +19,37 @@ impl Value {
     }
 }
 
-pub fn evaluate_recursively(pair: Pair<Rule>) -> Value {
+pub type Scope = HashMap<String, Value>;
+
+pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
     match pair.as_rule() {
-        Rule::expressao => expressions::evaluate_expression(pair),
-        Rule::operacao_numerica => expressions::evaluate_operacao_numerica(pair),
-        Rule::termo_2 => expressions::evaluate_term_2(pair),
-        Rule::termo_1 => expressions::evaluate_term_1(pair),
+        Rule::expressao => expressions::evaluate_expression(pair, scope),
+        Rule::atribuicao => {
+            expressions::evaluate_atribuicao(pair, scope);
+            Value::Number(f64::NAN) // Assignments don't return a value in this logic, or return last value?
+                                    // But expressao calls it. expressao logic handles the flow.
+                                    // If evaluate_recursively is called on atribuicao, it means we are inside expressao loop probably.
+        },
+        Rule::operacao_numerica => expressions::evaluate_operacao_numerica(pair, scope),
+        Rule::termo_2 => expressions::evaluate_term_2(pair, scope),
+        Rule::termo_1 => expressions::evaluate_term_1(pair, scope),
         Rule::numero_literal => literals::evaluate_number_literal(pair),
         Rule::texto_literal => literals::evaluate_string_literal(pair),
+        Rule::nome => {
+            let name = pair.as_str();
+            scope.get(name).cloned().unwrap_or(Value::Number(f64::NAN)) // Return NAN or error if not found
+        }
         _ => unreachable!("Unexpected rule: {:?}", pair.as_rule()),
     }
 }
 
 pub fn evaluate(pairs: Pairs<Rule>) -> Result<String, String> {
     let mut final_result = String::new();
+    let mut scope = Scope::new();
+
     for pair in pairs {
         if pair.as_rule() == Rule::expressao {
-            let value = evaluate_recursively(pair);
+            let value = evaluate_recursively(pair, &mut scope);
             let formatted_value = match value {
                 Value::Number(n) => n.to_string(),
                 Value::String(s) => s,
