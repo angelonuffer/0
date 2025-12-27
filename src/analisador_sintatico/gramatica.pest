@@ -5,7 +5,7 @@ numero_literal = @{ "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_D
 
 parenteses = { "(" ~ expressao ~ ")" }
 
-termo_1 = { parenteses | numero_literal | texto_literal }
+termo_1 = { parenteses | numero_literal }
 
 multiplicacao = { "*" }
 divisao = { "/" }
@@ -15,4 +15,6 @@ termo_2 = { termo_1 ~ ((multiplicacao | divisao) ~ termo_1)* }
 adicao = { "+" }
 subtracao = { "-" }
 
-expressao = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
+termo_3 = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
+
+expressao = { termo_3 | texto_literal }
