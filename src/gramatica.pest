@@ -5,9 +5,7 @@ WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 texto_literal = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
 numero_literal = @{ "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+) }
 
-parenteses = { "(" ~ expressao ~ ")" }
-
-termo_1 = { parenteses | numero_literal }
+termo_1 = { "(" ~ operacao_numerica ~ ")" | numero_literal }
 
 multiplicacao = { "*" }
 divisao = { "/" }

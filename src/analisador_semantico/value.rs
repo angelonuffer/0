@@ -24,7 +24,6 @@ pub fn evaluate_recursively(pair: Pair<Rule>) -> Value {
         Rule::operacao_numerica => expressions::evaluate_operacao_numerica(pair),
         Rule::termo_2 => expressions::evaluate_term_2(pair),
         Rule::termo_1 => expressions::evaluate_term_1(pair),
-        Rule::parenteses => expressions::evaluate_parentheses(pair),
         Rule::numero_literal => literals::evaluate_number_literal(pair),
         Rule::texto_literal => literals::evaluate_string_literal(pair),
         _ => unreachable!("Unexpected rule: {:?}", pair.as_rule()),
