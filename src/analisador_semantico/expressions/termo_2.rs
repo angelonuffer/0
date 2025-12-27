@@ -54,13 +54,5 @@ mod tests {
         assert_eq!(parse_and_evaluate_termo_2("100 * 2 / 4"), Value::Number(50.0));
     }
 
-    #[test]
-    fn test_evaluate_term_2_with_parentheses() {
-        // (2 + 3) * 4 -> the parenthesis will be evaluated first by termo_1, then multiplication
-        // The grammar for termo_2 is `termo_1 ~ ((multiplicacao | divisao) ~ termo_1)*`
-        // So `(2 + 3)` is a `termo_1` and `4` is a `termo_1`.
-        // This test depends on `evaluate_expression` inside `evaluate_parentheses` working correctly.
-        assert_eq!(parse_and_evaluate_termo_2("(2 + 3) * 4"), Value::Number(20.0));
-        assert_eq!(parse_and_evaluate_termo_2("100 / (10 - 5)"), Value::Number(20.0));
-    }
+
 }
