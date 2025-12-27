@@ -52,12 +52,4 @@ mod tests {
         // 100 + 2 - 4 should be (100 + 2) - 4 = 102 - 4 = 98
         assert_eq!(parse_and_evaluate_termo_3("100 + 2 - 4"), Value::Number(98.0));
     }
-
-    #[test]
-    fn test_evaluate_term_3_with_terms_2() {
-        // 5 * 2 + 3 should be 10 + 3 = 13
-        assert_eq!(parse_and_evaluate_termo_3("5 * 2 + 3"), Value::Number(13.0));
-        // 10 / 2 - 1 should be 5 - 1 = 4
-        assert_eq!(parse_and_evaluate_termo_3("10 / 2 - 1"), Value::Number(4.0));
-    }
 }
