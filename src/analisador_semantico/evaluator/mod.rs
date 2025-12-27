@@ -20,18 +20,14 @@ pub fn evaluate_recursively(pair: Pair<Rule>) -> Value {
 pub fn evaluate(pairs: Pairs<Rule>) -> Result<String, String> {
     let mut final_result = String::new();
     for pair in pairs {
-        if pair.as_rule() == Rule::program {
-            for expr_pair in pair.into_inner() {
-                if expr_pair.as_rule() == Rule::expressao {
-                    let value = evaluate_recursively(expr_pair);
-                    let formatted_value = match value {
-                        Value::Number(n) => n.to_string(),
-                        Value::String(s) => s,
-                    };
-                    final_result.push_str(&formatted_value);
-                    final_result.push('\n');
-                }
-            }
+        if pair.as_rule() == Rule::expressao {
+            let value = evaluate_recursively(pair);
+            let formatted_value = match value {
+                Value::Number(n) => n.to_string(),
+                Value::String(s) => s,
+            };
+            final_result.push_str(&formatted_value);
+            final_result.push('\n');
         }
     }
     if !final_result.is_empty() {

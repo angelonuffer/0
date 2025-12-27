@@ -6,5 +6,5 @@ use pest::Parser;
 pub struct SintaticoParser;
 
 pub fn parse(input: &str) -> Result<pest::iterators::Pairs<'_, Rule>, String> {
-    SintaticoParser::parse(Rule::program, input).map_err(|e| format!("❌ Erro de sintaxe: {}", e))
+    SintaticoParser::parse(Rule::expressao, input).map_err(|e| format!("❌ Erro de sintaxe: {}", e))
 }

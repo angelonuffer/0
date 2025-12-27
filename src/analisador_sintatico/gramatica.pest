@@ -16,5 +16,3 @@ adicao = { "+" }
 subtracao = { "-" }
 
 expressao = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
-
-program = { SOI ~ expressao ~ EOI }
