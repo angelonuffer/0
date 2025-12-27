@@ -1,3 +1,5 @@
+arquivo = { SOI ~ expressao ~ EOI }
+
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 
 texto_literal = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
