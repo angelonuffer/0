@@ -8,7 +8,7 @@ pub fn evaluate_term_1(pair: Pair<Rule>) -> Value {
 }
 
 pub fn evaluate_parentheses(pair: Pair<Rule>) -> Value {
-    evaluate_recursively(pair.into_inner().filter(|p| p.as_rule() != Rule::WHITESPACE).next().unwrap())
+    evaluate_recursively(pair.into_inner().find(|p| p.as_rule() != Rule::WHITESPACE).unwrap())
 }
 
 #[cfg(test)]
