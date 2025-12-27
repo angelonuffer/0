@@ -1,13 +1,7 @@
-WHITESPACE = _{
-    " " | "\t" | "\r" | "\n"
-}
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 
-texto_literal = @{
-    "\"" ~ (!"\"" ~ ANY)* ~ "\""
-}
-numero_literal = @{
-    "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+)
-}
+texto_literal = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+numero_literal = @{ "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+) }
 
 parenteses = { "(" ~ expressao ~ ")" }
 
