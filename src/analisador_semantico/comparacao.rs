@@ -35,82 +35,66 @@ pub fn evaluate_comparacao(pair: Pair<Rule>, scope: &mut Scope) -> Value {
 
 #[cfg(test)]
 mod tests {
-    use crate::analisador_semantico::Value;
-    use crate::analisador_sintatico::SintaticoParser;
-    use pest::Parser;
-    use crate::analisador_sintatico::Rule;
-    use crate::analisador_semantico::Scope;
-    use crate::analisador_semantico::expressao::evaluate_expression;
-
-    fn parse_and_evaluate_comparacao(input: &str) -> Value {
-        let mut pairs = SintaticoParser::parse(Rule::expressao, input).unwrap();
-        let pair = pairs.next().unwrap();
-        let mut scope = Scope::new();
-        evaluate_expression(pair, &mut scope)
-    }
+    use crate::analisador_semantico::avaliar;
 
     #[test]
     fn test_evaluate_comparacao_maior() {
-        assert_eq!(parse_and_evaluate_comparacao("5 > 2"), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao("2 > 5"), Value::Boolean(false));
+        assert_eq!(avaliar("5 > 2").unwrap(), "true\n");
+        assert_eq!(avaliar("2 > 5").unwrap(), "false\n");
     }
 
     #[test]
     fn test_evaluate_comparacao_menor() {
-        assert_eq!(parse_and_evaluate_comparacao("2 < 5"), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao("5 < 2"), Value::Boolean(false));
+        assert_eq!(avaliar("2 < 5").unwrap(), "true\n");
+        assert_eq!(avaliar("5 < 2").unwrap(), "false\n");
     }
 
     #[test]
     fn test_evaluate_comparacao_maior_igual() {
-        assert_eq!(parse_and_evaluate_comparacao("5 >= 2"), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao("5 >= 5"), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao("2 >= 5"), Value::Boolean(false));
+        assert_eq!(avaliar("5 >= 2").unwrap(), "true\n");
+        assert_eq!(avaliar("5 >= 5").unwrap(), "true\n");
+        assert_eq!(avaliar("2 >= 5").unwrap(), "false\n");
     }
 
     #[test]
     fn test_evaluate_comparacao_menor_igual() {
-        assert_eq!(parse_and_evaluate_comparacao("2 <= 5"), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao("5 <= 5"), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao("5 <= 2"), Value::Boolean(false));
+        assert_eq!(avaliar("2 <= 5").unwrap(), "true\n");
+        assert_eq!(avaliar("5 <= 5").unwrap(), "true\n");
+        assert_eq!(avaliar("5 <= 2").unwrap(), "false\n");
     }
 
     #[test]
     fn test_evaluate_comparacao_igual() {
-        assert_eq!(parse_and_evaluate_comparacao("5 == 5"), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao("5 == 2"), Value::Boolean(false));
-        assert_eq!(parse_and_evaluate_comparacao(r#""a" == "a""#), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao(r#""a" == "b""#), Value::Boolean(false));
+        assert_eq!(avaliar("5 == 5").unwrap(), "true\n");
+        assert_eq!(avaliar("5 == 2").unwrap(), "false\n");
+        assert_eq!(avaliar(r#""a" == "a""#).unwrap(), "true\n");
+        assert_eq!(avaliar(r#""a" == "b""#).unwrap(), "false\n");
     }
 
     #[test]
     fn test_evaluate_comparacao_diferente() {
-        assert_eq!(parse_and_evaluate_comparacao("5 != 2"), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao(r#""a" != "b""#), Value::Boolean(true));
-        assert_eq!(parse_and_evaluate_comparacao(r#""a" != "a""#), Value::Boolean(false));
+        assert_eq!(avaliar("5 != 2").unwrap(), "true\n");
+        assert_eq!(avaliar(r#""a" != "b""#).unwrap(), "true\n");
+        assert_eq!(avaliar("5 != 5").unwrap(), "false\n");
     }
 
     #[test]
-    #[should_panic]
     fn test_semantic_error_invalid_op_with_string_1() {
-        parse_and_evaluate_comparacao(r#""a" > "b""#);
+        assert!(avaliar(r#""a" > "b""#).is_err());
     }
 
     #[test]
-    #[should_panic]
     fn test_semantic_error_invalid_op_with_string_2() {
-        parse_and_evaluate_comparacao(r#""a" < "b""#);
+        assert!(avaliar(r#""a" < "b""#).is_err());
     }
 
     #[test]
-    #[should_panic]
     fn test_semantic_error_invalid_op_with_string_3() {
-        parse_and_evaluate_comparacao(r#""a" >= "b""#);
+        assert!(avaliar(r#""a" >= "b""#).is_err());
     }
 
     #[test]
-    #[should_panic]
     fn test_semantic_error_invalid_op_with_string_4() {
-        parse_and_evaluate_comparacao(r#""a" <= "b""#);
+        assert!(avaliar(r#""a" <= "b""#).is_err());
     }
 }

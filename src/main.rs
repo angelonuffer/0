@@ -23,18 +23,10 @@ fn main() {
         }
     };
 
-    let ast = match analisador_sintatico::parse(&source_code) {
-        Ok(ast) => ast,
-        Err(e) => {
-            eprintln!("❌ 🧱 {}", e);
-            process::exit(1);
-        }
-    };
-
-    let result = match analisador_semantico::evaluate(ast) {
+    let result = match analisador_semantico::avaliar(&source_code) {
         Ok(value) => value,
         Err(e) => {
-            eprintln!("❌ 💡 {}", e);
+            eprintln!("❌ {}", e);
             process::exit(1);
         }
     };

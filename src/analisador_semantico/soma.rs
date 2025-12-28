@@ -29,58 +29,37 @@ pub fn evaluate_soma(pair: Pair<Rule>, scope: &mut Scope) -> Value {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::analisador_semantico::Value;
-    use crate::analisador_sintatico::SintaticoParser;
-    use pest::Parser;
-    use crate::analisador_sintatico::Rule;
-    use crate::analisador_semantico::Scope;
-    use crate::analisador_semantico::expressao::evaluate_expression;
-
-    // Helper function to parse and evaluate operacao_numerica
-    fn parse_and_evaluate_soma(input: &str) -> Value {
-        let mut pairs = SintaticoParser::parse(Rule::soma, input).unwrap();
-        let pair = pairs.next().unwrap();
-        let mut scope = Scope::new();
-        evaluate_soma(pair, &mut scope)
-    }
-
-    fn evaluate_code(code: &str) {
-        let pairs = SintaticoParser::parse(Rule::expressao, code).unwrap();
-        let mut scope = Scope::new();
-        evaluate_expression(pairs.into_iter().next().unwrap(), &mut scope);
-    }
+    use crate::analisador_semantico::avaliar;
 
     #[test]
     fn test_evaluate_soma_addition() {
-        assert_eq!(parse_and_evaluate_soma("5 + 2"), Value::Number(7.0));
-        assert_eq!(parse_and_evaluate_soma("2.5 + 4"), Value::Number(6.5));
+        assert_eq!(avaliar("5 + 2").unwrap(), "7\n");
+        assert_eq!(avaliar("2.5 + 4").unwrap(), "6.5\n");
     }
 
     #[test]
     fn test_evaluate_soma_subtraction() {
-        assert_eq!(parse_and_evaluate_soma("10 - 2"), Value::Number(8.0));
-        assert_eq!(parse_and_evaluate_soma("10 - 12.5"), Value::Number(-2.5));
+        assert_eq!(avaliar("10 - 2").unwrap(), "8\n");
+        assert_eq!(avaliar("10 - 12.5").unwrap(), "-2.5\n");
     }
 
     #[test]
     fn test_evaluate_soma_left_associativity() {
         // 10 - 2 + 5 should be (10 - 2) + 5 = 8 + 5 = 13
-        assert_eq!(parse_and_evaluate_soma("10 - 2 + 5"), Value::Number(13.0));
+        assert_eq!(avaliar("10 - 2 + 5").unwrap(), "13\n");
         // 100 + 2 - 4 should be (100 + 2) - 4 = 102 - 4 = 98
-        assert_eq!(parse_and_evaluate_soma("100 + 2 - 4"), Value::Number(98.0));
+        assert_eq!(avaliar("100 + 2 - 4").unwrap(), "98\n");
     }
 
     #[test]
-    #[should_panic]
     fn test_semantic_error_string_in_numeric_operation() {
-        let code = r#"x = "texto" x + 1"#;
-        evaluate_code(code);
+        let code = r#"x = "texto"\nx + 1"#;
+        assert!(avaliar(code).is_err());
     }
 
     #[test]
     fn test_semantic_success_numeric_operation() {
-        let code = r#"x = 10 x + 1"#;
-        evaluate_code(code);
+        let code = "x = 10\nx + 1";
+        assert!(avaliar(code).is_ok());
     }
 }

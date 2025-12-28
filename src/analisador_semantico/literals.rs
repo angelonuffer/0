@@ -13,21 +13,15 @@ pub fn evaluate_string_literal(pair: Pair<Rule>) -> Value {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::analisador_sintatico::{SintaticoParser, Rule};
-    use pest::Parser;
+    use crate::analisador_semantico::avaliar;
 
     #[test]
     fn test_evaluate_number_literal_simple() {
-        let mut pairs = SintaticoParser::parse(Rule::numero_literal, "10").unwrap();
-        let pair = pairs.next().unwrap();
-        assert_eq!(evaluate_number_literal(pair), Value::Number(10.0));
+        assert_eq!(avaliar("10").unwrap(), "10\n");
     }
 
     #[test]
     fn test_evaluate_string_literal_simple() {
-        let mut pairs = SintaticoParser::parse(Rule::texto_literal, "\"hello\"").unwrap();
-        let pair = pairs.next().unwrap();
-        assert_eq!(evaluate_string_literal(pair), Value::String("hello".to_string()));
+        assert_eq!(avaliar("\"hello\"").unwrap(), "hello\n");
     }
 }

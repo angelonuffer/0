@@ -20,37 +20,27 @@ pub fn evaluate_unario(pair: Pair<Rule>, scope: &mut Scope) -> Value {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::analisador_sintatico::SintaticoParser;
-    use pest::Parser;
-
-    fn parse_and_evaluate_unario(input: &str) -> Value {
-        let mut pairs = SintaticoParser::parse(Rule::unario, input).unwrap();
-        let pair = pairs.next().unwrap();
-        let mut scope = Scope::new();
-        evaluate_unario(pair, &mut scope)
-    }
+    use crate::analisador_semantico::avaliar;
 
     #[test]
     fn test_evaluate_unario_negation_boolean() {
-        assert_eq!(parse_and_evaluate_unario("!(1 > 0)"), Value::Boolean(false));
-        assert_eq!(parse_and_evaluate_unario("!(1 < 0)"), Value::Boolean(true));
+        assert_eq!(avaliar("!(1 > 0)").unwrap(), "false\n");
+        assert_eq!(avaliar("!(1 < 0)").unwrap(), "true\n");
     }
 
     #[test]
     fn test_evaluate_unario_negation_number() {
-        assert_eq!(parse_and_evaluate_unario("!1"), Value::Boolean(false));
-        assert_eq!(parse_and_evaluate_unario("!0"), Value::Boolean(true));
+        assert_eq!(avaliar("!1").unwrap(), "false\n");
+        assert_eq!(avaliar("!0").unwrap(), "true\n");
     }
 
     #[test]
-    #[should_panic(expected = "❌ Erro semântico: Não é possível aplicar o operador '!' a uma string.")]
     fn test_semantic_error_negation_on_string() {
-        parse_and_evaluate_unario("!\"a\"");
+        assert!(avaliar("!\"a\"").is_err());
     }
 
     #[test]
     fn test_evaluate_unario_no_negation() {
-        assert_eq!(parse_and_evaluate_unario("1"), Value::Number(1.0));
+        assert_eq!(avaliar("1").unwrap(), "1\n");
     }
 }

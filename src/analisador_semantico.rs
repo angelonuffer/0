@@ -11,6 +11,8 @@ pub mod logica;
 use pest::iterators::{Pair, Pairs};
 use crate::analisador_sintatico::Rule;
 use std::collections::HashMap;
+use std::panic;
+use crate::analisador_sintatico;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
@@ -57,24 +59,33 @@ pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
     }
 }
 
+pub fn avaliar(input: &str) -> Result<String, String> {
+    let pairs = analisador_sintatico::parse(input)?;
+    evaluate(pairs)
+}
+
 pub fn evaluate(pairs: Pairs<Rule>) -> Result<String, String> {
     let mut final_result = String::new();
     let mut scope = Scope::new();
 
-    for pair in pairs {
-        if pair.as_rule() == Rule::expressao {
-            let value = evaluate_recursively(pair, &mut scope);
-            let formatted_value = match value {
-                Value::Number(n) => n.to_string(),
-                Value::String(s) => s,
-                Value::Boolean(b) => b.to_string(),
-            };
-            final_result.push_str(&formatted_value);
-            final_result.push('\n');
+    let result = panic::catch_unwind(move || {
+        for pair in pairs {
+            if pair.as_rule() == Rule::expressao {
+                let value = evaluate_recursively(pair, &mut scope);
+                let formatted_value = match value {
+                    Value::Number(n) => n.to_string(),
+                    Value::String(s) => s,
+                    Value::Boolean(b) => b.to_string(),
+                };
+                final_result.push_str(&formatted_value);
+                final_result.push('\n');
+            }
         }
+        final_result
+    });
+
+    match result {
+        Ok(output) => Ok(output),
+        Err(_) => Err("Erro semântico capturado".to_string()),
     }
-    if !final_result.is_empty() {
-        final_result.pop();
-    }
-    Ok(final_result)
 }

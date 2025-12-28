@@ -15,32 +15,17 @@ pub fn evaluate_atribuicao(pair: Pair<Rule>, scope: &mut Scope) {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::analisador_semantico::Value;
-    use crate::analisador_sintatico::{SintaticoParser, Rule};
-    use pest::Parser;
+    use crate::analisador_semantico::avaliar;
 
     #[test]
     fn test_evaluate_atribuicao() {
-        let input = "a = 10";
-        let mut pairs = SintaticoParser::parse(Rule::atribuicao, input).unwrap();
-        let pair = pairs.next().unwrap();
-        let mut scope = Scope::new();
-
-        evaluate_atribuicao(pair, &mut scope);
-
-        assert_eq!(scope.get("a"), Some(&Value::Number(10.0)));
+        let input = "a = 10\na";
+        assert_eq!(avaliar(input).unwrap(), "10\n");
     }
 
     #[test]
     fn test_evaluate_atribuicao_complex() {
-        let input = "b = 5 * 2 + 1";
-        let mut pairs = SintaticoParser::parse(Rule::atribuicao, input).unwrap();
-        let pair = pairs.next().unwrap();
-        let mut scope = Scope::new();
-
-        evaluate_atribuicao(pair, &mut scope);
-
-        assert_eq!(scope.get("b"), Some(&Value::Number(11.0)));
+        let input = "b = 5 * 2 + 1\nb";
+        assert_eq!(avaliar(input).unwrap(), "11\n");
     }
 }
