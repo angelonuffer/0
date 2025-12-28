@@ -5,6 +5,7 @@ pub mod atomo;
 pub mod produto;
 pub mod soma;
 pub mod literals;
+pub mod unario;
 
 use pest::iterators::{Pair, Pairs};
 use crate::analisador_sintatico::Rule;
@@ -41,6 +42,7 @@ pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
         Rule::comparacao => comparacao::evaluate_comparacao(pair, scope),
         Rule::soma => soma::evaluate_soma(pair, scope),
         Rule::produto => produto::evaluate_produto(pair, scope),
+        Rule::unario => unario::evaluate_unario(pair, scope),
         Rule::atomo => atomo::evaluate_atomo(pair, scope),
         Rule::numero_literal => literals::evaluate_number_literal(pair),
         Rule::texto_literal => literals::evaluate_string_literal(pair),

@@ -1,13 +1,15 @@
 use pest::iterators::Pair;
 use crate::analisador_sintatico::Rule;
-use crate::analisador_semantico::{Value, Scope, evaluate_recursively};
+use crate::analisador_semantico::{Value, Scope};
+
+use crate::analisador_semantico::unario::evaluate_unario;
 
 pub fn evaluate_produto(pair: Pair<Rule>, scope: &mut Scope) -> Value {
     let mut pairs = pair.into_inner().filter(|p| p.as_rule() != Rule::WHITESPACE);
-    let mut value = evaluate_recursively(pairs.next().unwrap(), scope);
+    let mut value = evaluate_unario(pairs.next().unwrap(), scope);
 
     while let Some(op) = pairs.next() {
-        let rhs = evaluate_recursively(pairs.next().unwrap(), scope);
+        let rhs = evaluate_unario(pairs.next().unwrap(), scope);
         value = match op.as_str() {
             "*" => Value::Number(value.as_number() * rhs.as_number()),
             "/" => Value::Number(value.as_number() / rhs.as_number()),

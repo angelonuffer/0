@@ -12,7 +12,8 @@ nome = @{ (LETTER | "_") ~ (LETTER | NUMBER | "_")* }
 
 comparacao = { soma ~ ((maior_igual | menor_igual | maior | menor | igual | diferente) ~ soma)* }
 soma       = { produto ~ ((adicao | subtracao) ~ produto)* }
-produto    = { atomo ~ ((multiplicacao | divisao) ~ atomo)* }
+produto    = { unario ~ ((multiplicacao | divisao) ~ unario)* }
+unario     = { negacao? ~ atomo }
 atomo      = { "(" ~ expressao ~ ")" | numero_literal | texto_literal | nome }
 
 maior_igual = { ">=" }
@@ -27,6 +28,8 @@ subtracao = { "-" }
 
 multiplicacao = { "*" }
 divisao       = { "/" }
+
+negacao       = { "!" }
 
 numero_literal = @{ "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+) }
 texto_literal  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
