@@ -1,6 +1,6 @@
 use pest::iterators::Pair;
 use crate::analisador_sintatico::Rule;
-use crate::analisador_semantico::value::{Scope, evaluate_recursively};
+use crate::analisador_semantico::{Scope, evaluate_recursively};
 
 pub fn evaluate_atribuicao(pair: Pair<Rule>, scope: &mut Scope) {
     let mut inner = pair.into_inner();
@@ -16,7 +16,7 @@ pub fn evaluate_atribuicao(pair: Pair<Rule>, scope: &mut Scope) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::analisador_semantico::value::Value;
+    use crate::analisador_semantico::Value;
     use crate::analisador_sintatico::{SintaticoParser, Rule};
     use pest::Parser;
 

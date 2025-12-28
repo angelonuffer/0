@@ -1,8 +1,6 @@
 use pest::iterators::Pair;
 use crate::analisador_sintatico::Rule;
-use crate::analisador_semantico::value::Value;
-use crate::analisador_semantico::value::Scope;
-use crate::analisador_semantico::value::evaluate_recursively;
+use crate::analisador_semantico::{Value, Scope, evaluate_recursively};
 
 pub fn evaluate_expression(pair: Pair<Rule>, scope: &mut Scope) -> Value {
     let mut last_value = Value::Number(f64::NAN);
@@ -15,11 +13,11 @@ pub fn evaluate_expression(pair: Pair<Rule>, scope: &mut Scope) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::analisador_semantico::value::Value;
+    use crate::analisador_semantico::Value;
     use crate::analisador_sintatico::SintaticoParser;
     use pest::Parser;
     use crate::analisador_sintatico::Rule;
-    use crate::analisador_semantico::value::Scope;
+    use crate::analisador_semantico::Scope;
 
     fn parse_and_evaluate_expression(input: &str) -> Value {
         let mut pairs = SintaticoParser::parse(Rule::expressao, input).unwrap();

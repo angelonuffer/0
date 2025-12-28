@@ -1,6 +1,6 @@
 use pest::iterators::Pair;
 use crate::analisador_sintatico::Rule;
-use crate::analisador_semantico::value::Value;
+use crate::analisador_semantico::Value;
 
 pub fn evaluate_number_literal(pair: Pair<Rule>) -> Value {
     Value::Number(pair.as_str().parse().unwrap())

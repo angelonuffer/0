@@ -1,8 +1,6 @@
 use pest::iterators::Pair;
 use crate::analisador_sintatico::Rule;
-use crate::analisador_semantico::value::Value;
-use crate::analisador_semantico::value::Scope;
-use crate::analisador_semantico::value::evaluate_recursively;
+use crate::analisador_semantico::{Value, Scope, evaluate_recursively};
 
 pub fn evaluate_term_2(pair: Pair<Rule>, scope: &mut Scope) -> Value {
     let mut pairs = pair.into_inner().filter(|p| p.as_rule() != Rule::WHITESPACE);
@@ -22,11 +20,11 @@ pub fn evaluate_term_2(pair: Pair<Rule>, scope: &mut Scope) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::analisador_semantico::value::Value;
+    use crate::analisador_semantico::Value;
     use crate::analisador_sintatico::SintaticoParser;
     use pest::Parser;
     use crate::analisador_sintatico::Rule;
-    use crate::analisador_semantico::value::Scope;
+    use crate::analisador_semantico::Scope;
 
 
     // Helper function to parse and evaluate termo_2
