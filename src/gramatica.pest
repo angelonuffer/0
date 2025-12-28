@@ -5,14 +5,10 @@ arquivo = { SOI ~ expressao ~ EOI }
 expressao = { atribuicao* ~ (comparacao | texto_literal) }
 
 comparacao = { fator ~ ((maior_igual | menor_igual | maior | menor | igual | diferente) ~ fator)* }
-fator  = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
-termo_2  = { termo_1 ~ ((multiplicacao | divisao) ~ termo_1)* }
-termo_1  = { "(" ~ comparacao ~ ")" | numero_literal | texto_literal | nome }
+fator      = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
+termo_2    = { termo_1 ~ ((multiplicacao | divisao) ~ termo_1)* }
+termo_1    = { "(" ~ expressao ~ ")" | numero_literal | texto_literal | nome }
 
-adicao        = { "+" }
-subtracao     = { "-" }
-multiplicacao = { "*" }
-divisao       = { "/" }
 
 maior       = { ">" }
 menor       = { "<" }
@@ -21,8 +17,15 @@ menor_igual = { "<=" }
 igual       = { "==" }
 diferente   = { "!=" }
 
-numero_literal = @{ "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+) }
-texto_literal  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+adicao    = { "+" }
+subtracao = { "-" }
+
+multiplicacao = { "*" }
+divisao       = { "/" }
 
 atribuicao = { nome ~ "=" ~ expressao }
+
 nome = @{ (LETTER | "_") ~ (LETTER | NUMBER | "_")* }
+
+numero_literal = @{ "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+) }
+texto_literal  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
