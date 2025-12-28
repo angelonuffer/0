@@ -4,8 +4,8 @@ arquivo = { SOI ~ expressao ~ EOI }
 
 expressao = { atribuicao* ~ (operacao | texto_literal) }
 
-operacao = { termo_3 ~ ((maior_igual | menor_igual | maior | menor | igual | diferente) ~ termo_3)* }
-termo_3  = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
+operacao = { fator ~ ((maior_igual | menor_igual | maior | menor | igual | diferente) ~ fator)* }
+fator  = { termo_2 ~ ((adicao | subtracao) ~ termo_2)* }
 termo_2  = { termo_1 ~ ((multiplicacao | divisao) ~ termo_1)* }
 termo_1  = { "(" ~ operacao ~ ")" | numero_literal | texto_literal | nome }
 
