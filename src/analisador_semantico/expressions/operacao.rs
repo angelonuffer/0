@@ -13,10 +13,13 @@ pub fn evaluate_operacao(pair: Pair<Rule>, scope: &mut Scope) -> Value {
 
         // Type checking for comparison operators
         let op_str = op.as_str();
-        if matches!(value, Value::String(_)) || matches!(rhs, Value::String(_)) {
-            if !matches!(op_str, "==" | "!=") {
-                panic!("❌ 💡 Erro semântico: Operador '{}' não pode ser usado com texto", op_str);
-            }
+        if (matches!(value, Value::String(_)) || matches!(rhs, Value::String(_)))
+            && !matches!(op_str, "==" | "!=")
+        {
+            panic!(
+                "❌ 💡 Erro semântico: Operador '{}' não pode ser usado com texto",
+                op_str
+            );
         }
 
         value = match op_str {
