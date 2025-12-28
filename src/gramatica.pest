@@ -2,17 +2,21 @@ WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 
 arquivo = { SOI ~ expressao ~ EOI }
 
-expressao = { atribuicao* ~ (comparacao | texto_literal) }
+expressao = { atribuicao* ~ comparacao }
+
+atribuicao = { nome ~ "=" ~ expressao }
+
+nome = @{ (LETTER | "_") ~ (LETTER | NUMBER | "_")* }
 
 comparacao = { soma ~ ((maior_igual | menor_igual | maior | menor | igual | diferente) ~ soma)* }
 soma       = { produto ~ ((adicao | subtracao) ~ produto)* }
 produto    = { atomo ~ ((multiplicacao | divisao) ~ atomo)* }
 atomo      = { "(" ~ expressao ~ ")" | numero_literal | texto_literal | nome }
 
-maior       = { ">" }
-menor       = { "<" }
 maior_igual = { ">=" }
 menor_igual = { "<=" }
+maior       = { ">" }
+menor       = { "<" }
 igual       = { "==" }
 diferente   = { "!=" }
 
@@ -21,10 +25,6 @@ subtracao = { "-" }
 
 multiplicacao = { "*" }
 divisao       = { "/" }
-
-atribuicao = { nome ~ "=" ~ expressao }
-
-nome = @{ (LETTER | "_") ~ (LETTER | NUMBER | "_")* }
 
 numero_literal = @{ "-"? ~ (ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? | "." ~ ASCII_DIGIT+) }
 texto_literal  = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
