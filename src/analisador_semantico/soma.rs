@@ -2,7 +2,7 @@ use pest::iterators::Pair;
 use crate::analisador_sintatico::Rule;
 use crate::analisador_semantico::{Value, Scope, evaluate_recursively};
 
-pub fn evaluate_fator(pair: Pair<Rule>, scope: &mut Scope) -> Value {
+pub fn evaluate_soma(pair: Pair<Rule>, scope: &mut Scope) -> Value {
     let mut pairs = pair.into_inner().filter(|p| p.as_rule() != Rule::WHITESPACE);
     let mut value = evaluate_recursively(pairs.next().unwrap(), scope);
 
@@ -38,11 +38,11 @@ mod tests {
     use crate::analisador_semantico::expressao::evaluate_expression;
 
     // Helper function to parse and evaluate operacao_numerica
-    fn parse_and_evaluate_fator(input: &str) -> Value {
-        let mut pairs = SintaticoParser::parse(Rule::fator, input).unwrap();
+    fn parse_and_evaluate_soma(input: &str) -> Value {
+        let mut pairs = SintaticoParser::parse(Rule::soma, input).unwrap();
         let pair = pairs.next().unwrap();
         let mut scope = Scope::new();
-        evaluate_fator(pair, &mut scope)
+        evaluate_soma(pair, &mut scope)
     }
 
     fn evaluate_code(code: &str) {
@@ -52,23 +52,23 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_fator_addition() {
-        assert_eq!(parse_and_evaluate_fator("5 + 2"), Value::Number(7.0));
-        assert_eq!(parse_and_evaluate_fator("2.5 + 4"), Value::Number(6.5));
+    fn test_evaluate_soma_addition() {
+        assert_eq!(parse_and_evaluate_soma("5 + 2"), Value::Number(7.0));
+        assert_eq!(parse_and_evaluate_soma("2.5 + 4"), Value::Number(6.5));
     }
 
     #[test]
-    fn test_evaluate_fator_subtraction() {
-        assert_eq!(parse_and_evaluate_fator("10 - 2"), Value::Number(8.0));
-        assert_eq!(parse_and_evaluate_fator("10 - 12.5"), Value::Number(-2.5));
+    fn test_evaluate_soma_subtraction() {
+        assert_eq!(parse_and_evaluate_soma("10 - 2"), Value::Number(8.0));
+        assert_eq!(parse_and_evaluate_soma("10 - 12.5"), Value::Number(-2.5));
     }
 
     #[test]
-    fn test_evaluate_fator_left_associativity() {
+    fn test_evaluate_soma_left_associativity() {
         // 10 - 2 + 5 should be (10 - 2) + 5 = 8 + 5 = 13
-        assert_eq!(parse_and_evaluate_fator("10 - 2 + 5"), Value::Number(13.0));
+        assert_eq!(parse_and_evaluate_soma("10 - 2 + 5"), Value::Number(13.0));
         // 100 + 2 - 4 should be (100 + 2) - 4 = 102 - 4 = 98
-        assert_eq!(parse_and_evaluate_fator("100 + 2 - 4"), Value::Number(98.0));
+        assert_eq!(parse_and_evaluate_soma("100 + 2 - 4"), Value::Number(98.0));
     }
 
     #[test]

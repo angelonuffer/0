@@ -3,7 +3,7 @@ pub mod expressao;
 pub mod comparacao;
 pub mod termo_1;
 pub mod termo_2;
-pub mod fator;
+pub mod soma;
 pub mod literals;
 
 use pest::iterators::{Pair, Pairs};
@@ -39,7 +39,7 @@ pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
                                     // If evaluate_recursively is called on atribuicao, it means we are inside expressao loop probably.
         },
         Rule::comparacao => comparacao::evaluate_comparacao(pair, scope),
-        Rule::fator => fator::evaluate_fator(pair, scope),
+        Rule::soma => soma::evaluate_soma(pair, scope),
         Rule::termo_2 => termo_2::evaluate_term_2(pair, scope),
         Rule::termo_1 => termo_1::evaluate_term_1(pair, scope),
         Rule::numero_literal => literals::evaluate_number_literal(pair),

@@ -27,7 +27,7 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_fator_with_terms_2() {
+    fn test_evaluate_soma_with_terms_2() {
         // 5 * 2 + 3 should be 10 + 3 = 13
         assert_eq!(parse_and_evaluate_expression("5 * 2 + 3"), Value::Number(13.0));
         // 10 / 2 - 1 should be 5 - 1 = 4
