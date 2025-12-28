@@ -16,9 +16,13 @@ comparacao = { soma ~ ((maior_igual | menor_igual | maior | menor | igual | dife
 soma       = { produto ~ ((adicao | subtracao) ~ produto)* }
 produto    = { unario ~ ((multiplicacao | divisao) ~ unario)* }
 unario     = { negacao? ~ atomo }
-atomo      = { "(" ~ expressao ~ ")" | numero_literal | texto_literal | lista | nome }
+atomo      = { "(" ~ expressao ~ ")" | numero_literal | texto_literal | lista | objeto | nome }
 
 lista = { "[" ~ (expressao ~ ("," ~ expressao)*)? ~ "]" }
+
+objeto = { "{" ~ (par ~ ("," ~ par)*)? ~ "}" }
+
+par = { nome ~ ":" ~ expressao }
 
 ou = { "||" }
 

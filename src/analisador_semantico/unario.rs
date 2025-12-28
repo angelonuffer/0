@@ -13,6 +13,7 @@ pub fn evaluate_unario(pair: Pair<Rule>, scope: &mut Scope) -> Value {
             Value::Number(n) => Value::Boolean(n == 0.0),
             Value::String(_) => panic!("❌ Erro semântico: Não é possível aplicar o operador '!' a uma string."),
             Value::List(_) => panic!("❌ Erro semântico: Não é possível aplicar o operador '!' a uma lista."),
+            Value::Object(_) => panic!("❌ Erro semântico: Não é possível aplicar o operador '!' a um objeto."),
         }
     } else {
         evaluate_recursively(first, scope)

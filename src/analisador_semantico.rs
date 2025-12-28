@@ -8,6 +8,7 @@ pub mod literals;
 pub mod unario;
 pub mod logica;
 pub mod lista;
+pub mod objeto;
 
 use pest::iterators::{Pair, Pairs};
 use crate::analisador_sintatico::Rule;
@@ -21,6 +22,7 @@ pub enum Value {
     String(String),
     Boolean(bool),
     List(Vec<Value>),
+    Object(HashMap<String, Value>),
 }
 
 impl Value {
@@ -30,6 +32,7 @@ impl Value {
             Value::String(s) => s.parse::<f64>().unwrap_or(f64::NAN),
             Value::Boolean(b) => if *b { 1.0 } else { 0.0 },
             Value::List(_) => f64::NAN,
+            Value::Object(_) => f64::NAN,
         }
     }
 }
@@ -53,6 +56,7 @@ pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
         Rule::unario => unario::evaluate_unario(pair, scope),
         Rule::atomo => atomo::evaluate_atomo(pair, scope),
         Rule::lista => lista::evaluate_lista(pair, scope),
+        Rule::objeto => objeto::evaluate_objeto(pair, scope),
         Rule::numero_literal => literals::evaluate_number_literal(pair),
         Rule::texto_literal => literals::evaluate_string_literal(pair),
         Rule::nome => {
@@ -86,8 +90,24 @@ pub fn evaluate(pairs: Pairs<Rule>) -> Result<String, String> {
                             Value::String(s) => format!("\"{}\"", s),
                             Value::Boolean(b) => b.to_string(),
                             Value::List(_) => "[...]".to_string(),
+                            Value::Object(_) => "{...}".to_string(),
                         }
                     }).collect::<Vec<String>>().join(", ")),
+                    Value::Object(o) => {
+                        let mut keys: Vec<_> = o.keys().collect();
+                        keys.sort();
+                        format!("{{{}}}", keys.iter().map(|k| {
+                            let v = o.get(*k).unwrap();
+                            let formatted_v = match v {
+                                Value::Number(n) => n.to_string(),
+                                Value::String(s) => s.to_string(),
+                                Value::Boolean(b) => b.to_string(),
+                                Value::List(_) => "[...]".to_string(),
+                                Value::Object(_) => "{...}".to_string(),
+                            };
+                            format!("{}: {}", k, formatted_v)
+                        }).collect::<Vec<String>>().join(", "))
+                    },
                 };
                 final_result.push_str(&formatted_value);
                 final_result.push('\n');
