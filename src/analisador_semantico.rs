@@ -1,7 +1,7 @@
 pub mod atribuicao;
 pub mod expressao;
 pub mod comparacao;
-pub mod termo_1;
+pub mod atomo;
 pub mod produto;
 pub mod soma;
 pub mod literals;
@@ -41,7 +41,7 @@ pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
         Rule::comparacao => comparacao::evaluate_comparacao(pair, scope),
         Rule::soma => soma::evaluate_soma(pair, scope),
         Rule::produto => produto::evaluate_produto(pair, scope),
-        Rule::termo_1 => termo_1::evaluate_term_1(pair, scope),
+        Rule::atomo => atomo::evaluate_atomo(pair, scope),
         Rule::numero_literal => literals::evaluate_number_literal(pair),
         Rule::texto_literal => literals::evaluate_string_literal(pair),
         Rule::nome => {

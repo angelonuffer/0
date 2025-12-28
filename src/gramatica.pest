@@ -6,8 +6,8 @@ expressao = { atribuicao* ~ (comparacao | texto_literal) }
 
 comparacao = { soma ~ ((maior_igual | menor_igual | maior | menor | igual | diferente) ~ soma)* }
 soma       = { produto ~ ((adicao | subtracao) ~ produto)* }
-produto    = { termo_1 ~ ((multiplicacao | divisao) ~ termo_1)* }
-termo_1    = { "(" ~ expressao ~ ")" | numero_literal | texto_literal | nome }
+produto    = { atomo ~ ((multiplicacao | divisao) ~ atomo)* }
+atomo      = { "(" ~ expressao ~ ")" | numero_literal | texto_literal | nome }
 
 maior       = { ">" }
 menor       = { "<" }
