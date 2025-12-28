@@ -6,6 +6,7 @@ pub mod produto;
 pub mod soma;
 pub mod literals;
 pub mod unario;
+pub mod logica;
 
 use pest::iterators::{Pair, Pairs};
 use crate::analisador_sintatico::Rule;
@@ -39,6 +40,8 @@ pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
                                     // But expressao calls it. expressao logic handles the flow.
                                     // If evaluate_recursively is called on atribuicao, it means we are inside expressao loop probably.
         },
+        Rule::logica_ou => logica::evaluate_logica_ou(pair, scope),
+        Rule::logica_e => logica::evaluate_logica_e(pair, scope),
         Rule::comparacao => comparacao::evaluate_comparacao(pair, scope),
         Rule::soma => soma::evaluate_soma(pair, scope),
         Rule::produto => produto::evaluate_produto(pair, scope),

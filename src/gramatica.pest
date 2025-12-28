@@ -4,17 +4,23 @@ WHITESPACE = _{ " " | "\t" | "\r" | "\n" | comentario_linha | comentario_bloco }
 
 arquivo = { SOI ~ expressao ~ EOI }
 
-expressao = { atribuicao* ~ comparacao }
+expressao = { atribuicao* ~ logica_ou }
 
 atribuicao = { nome ~ "=" ~ expressao }
 
 nome = @{ (LETTER | "_") ~ (LETTER | NUMBER | "_")* }
 
+logica_ou  = { logica_e ~ (ou ~ logica_e)* }
+logica_e   = { comparacao ~ (e ~ comparacao)* }
 comparacao = { soma ~ ((maior_igual | menor_igual | maior | menor | igual | diferente) ~ soma)* }
 soma       = { produto ~ ((adicao | subtracao) ~ produto)* }
 produto    = { unario ~ ((multiplicacao | divisao) ~ unario)* }
 unario     = { negacao? ~ atomo }
 atomo      = { "(" ~ expressao ~ ")" | numero_literal | texto_literal | nome }
+
+ou = { "||" }
+
+e = { "&&" }
 
 maior_igual = { ">=" }
 menor_igual = { "<=" }

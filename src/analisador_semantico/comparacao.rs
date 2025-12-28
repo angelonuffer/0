@@ -35,18 +35,18 @@ pub fn evaluate_comparacao(pair: Pair<Rule>, scope: &mut Scope) -> Value {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::analisador_semantico::Value;
     use crate::analisador_sintatico::SintaticoParser;
     use pest::Parser;
     use crate::analisador_sintatico::Rule;
     use crate::analisador_semantico::Scope;
+    use crate::analisador_semantico::expressao::evaluate_expression;
 
     fn parse_and_evaluate_comparacao(input: &str) -> Value {
-        let mut pairs = SintaticoParser::parse(Rule::comparacao, input).unwrap();
+        let mut pairs = SintaticoParser::parse(Rule::expressao, input).unwrap();
         let pair = pairs.next().unwrap();
         let mut scope = Scope::new();
-        evaluate_comparacao(pair, &mut scope)
+        evaluate_expression(pair, &mut scope)
     }
 
     #[test]
