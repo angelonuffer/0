@@ -1,5 +1,4 @@
-use crate::analisador_semantico::literals;
-use crate::analisador_semantico::expressions;
+use crate::analisador_semantico::{atribuicao, expressao, literals, operacao, termo_1, termo_2, termo_3};
 use pest::iterators::{Pair, Pairs};
 use crate::analisador_sintatico::Rule;
 use std::collections::HashMap;
@@ -25,17 +24,17 @@ pub type Scope = HashMap<String, Value>;
 
 pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
     match pair.as_rule() {
-        Rule::expressao => expressions::evaluate_expression(pair, scope),
+        Rule::expressao => expressao::evaluate_expression(pair, scope),
         Rule::atribuicao => {
-            expressions::evaluate_atribuicao(pair, scope);
+            atribuicao::evaluate_atribuicao(pair, scope);
             Value::Number(f64::NAN) // Assignments don't return a value in this logic, or return last value?
                                     // But expressao calls it. expressao logic handles the flow.
                                     // If evaluate_recursively is called on atribuicao, it means we are inside expressao loop probably.
         },
-        Rule::operacao => expressions::evaluate_operacao(pair, scope),
-        Rule::termo_3 => expressions::evaluate_termo_3(pair, scope),
-        Rule::termo_2 => expressions::evaluate_term_2(pair, scope),
-        Rule::termo_1 => expressions::evaluate_term_1(pair, scope),
+        Rule::operacao => operacao::evaluate_operacao(pair, scope),
+        Rule::termo_3 => termo_3::evaluate_termo_3(pair, scope),
+        Rule::termo_2 => termo_2::evaluate_term_2(pair, scope),
+        Rule::termo_1 => termo_1::evaluate_term_1(pair, scope),
         Rule::numero_literal => literals::evaluate_number_literal(pair),
         Rule::texto_literal => literals::evaluate_string_literal(pair),
         Rule::nome => {
