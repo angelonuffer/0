@@ -1,6 +1,6 @@
 pub mod atribuicao;
 pub mod expressao;
-pub mod operacao;
+pub mod comparacao;
 pub mod termo_1;
 pub mod termo_2;
 pub mod fator;
@@ -38,7 +38,7 @@ pub fn evaluate_recursively(pair: Pair<Rule>, scope: &mut Scope) -> Value {
                                     // But expressao calls it. expressao logic handles the flow.
                                     // If evaluate_recursively is called on atribuicao, it means we are inside expressao loop probably.
         },
-        Rule::operacao => operacao::evaluate_operacao(pair, scope),
+        Rule::comparacao => comparacao::evaluate_comparacao(pair, scope),
         Rule::fator => fator::evaluate_fator(pair, scope),
         Rule::termo_2 => termo_2::evaluate_term_2(pair, scope),
         Rule::termo_1 => termo_1::evaluate_term_1(pair, scope),
