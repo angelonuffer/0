@@ -15,7 +15,7 @@ mod tests {
     use crate::analisador_sintatico::SintaticoParser;
     use pest::Parser;
     use crate::analisador_sintatico::Rule;
-    use crate::analisador_semantico::expressions::termo_2::evaluate_term_2;
+    use crate::analisador_semantico::termo_2::evaluate_term_2;
     use crate::analisador_semantico::value::Scope;
 
     fn parse_and_evaluate_termo_2(input: &str) -> Value {

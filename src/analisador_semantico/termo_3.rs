@@ -37,7 +37,7 @@ mod tests {
     use pest::Parser;
     use crate::analisador_sintatico::Rule;
     use crate::analisador_semantico::value::Scope;
-    use crate::analisador_semantico::expressions::expressao::evaluate_expression;
+    use crate::analisador_semantico::expressao::evaluate_expression;
 
     // Helper function to parse and evaluate operacao_numerica
     fn parse_and_evaluate_termo_3(input: &str) -> Value {
