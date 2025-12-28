@@ -1,4 +1,6 @@
-WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+comentario_bloco = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+comentario_linha = _{ "//" ~ (!("\r" | "\n") ~ ANY)* }
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" | comentario_linha | comentario_bloco }
 
 arquivo = { SOI ~ expressao ~ EOI }
 
