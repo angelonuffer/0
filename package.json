@@ -1,0 +1,7 @@
+{
+  "name": "0",
+  "bin": {
+    "0": "código/0_node.js"
+  },
+  "type": "module"
+}

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { _0 } from './analisador_sintático/index.js';
 import { importações } from './analisador_sintático/importações.js';
 import { avaliar, criarLazyThunk, INTERNAL_CONTEXT } from './analisador_semântico/index.js';
