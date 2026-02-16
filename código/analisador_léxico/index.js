@@ -19,6 +19,27 @@ const espaço = vários(
       ),
       símbolo("\n"),
     ),
+    sequência(
+      símbolo("/"),
+      símbolo("*"),
+      vários(
+        alternativa(
+          sequência(
+            inversão(
+              símbolo("*"),
+            ),
+          ),
+          sequência(
+            símbolo("*"),
+            inversão(
+              símbolo("/"),
+            ),
+          ),
+        ),
+      ),
+      símbolo("*"),
+      símbolo("/"),
+    ),
   ),
 )
 

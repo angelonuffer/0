@@ -1,0 +1,32 @@
+uniteste = ../integração/uniteste.0
+
+uniteste.descrever({ nome: "Comentário em Bloco" testes: [
+  uniteste.iguais([
+    (
+      a = 2 /* comentário em bloco */
+      b = 3 /* outro comentário */
+      a + b
+    )
+    5
+  ])
+  uniteste.iguais([
+    (
+      /* Comentário no início */
+      x = 10
+      y = 20
+      /* Comentário no meio */
+      x + y
+    )
+    30
+  ])
+  uniteste.iguais([
+    (
+      /* Comentário
+         em múltiplas
+         linhas */
+      m = 100
+      m * 2
+    )
+    200
+  ])
+]})

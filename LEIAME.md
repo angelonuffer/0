@@ -47,6 +47,7 @@ node testes/0.js
 
 - Espaços em branco e quebras de linha são ignorados quando apropriado.
 - Comentários de linha: `// comentario` até o fim da linha.
+- Comentários em bloco: `/* comentario */` para comentários que podem span múltiplas linhas.
 - Números: sequência de dígitos, suportando negativos (`42`, `-7`).
 - Textos: aspas duplas `"..."`.
 - Identificadores: iniciam com letra Unicode ou `_`, seguidos por letras, dígitos ou `_`. Não existem palavras reservadas.
