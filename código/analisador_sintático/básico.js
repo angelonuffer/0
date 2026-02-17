@@ -1,6 +1,6 @@
 // Basic operations - não, valor_constante, chamada_função_imediata
 import { alternativa, sequência, opcional, transformar, símbolo, vários } from '../combinadores/index.js';
-import { espaço, nome } from '../analisador_léxico/index.js';
+import { espaço, nome, nulo } from '../analisador_léxico/index.js';
 import { TIPO_AST } from '../constantes.js';
 
 // Forward declaration for recursive expressão reference
@@ -148,4 +148,4 @@ const setOperações = (ops) => {
   chamada_função = ops.chamada_função;
 };
 
-export { não, depuração, carregar, valor_constante, chamada_função_imediata, setExpressão, setOperações };
+export { não, depuração, carregar, nulo, valor_constante, chamada_função_imediata, setExpressão, setOperações };

@@ -1,0 +1,32 @@
+uniteste = ../integração/uniteste.0
+
+uniteste.descrever({ nome: "Nulo" testes: [
+  uniteste.iguais([
+    ~
+    ~
+  ])
+  uniteste.iguais([
+    (a = ~ a)
+    ~
+  ])
+  uniteste.iguais([
+    ~ == ~
+    1
+  ])
+  uniteste.iguais([
+    ~ != ~
+    0
+  ])
+  uniteste.iguais([
+    ~ == 0
+    0
+  ])
+  uniteste.iguais([
+    [~][0]
+    ~
+  ])
+  uniteste.iguais([
+    {a: ~}.a
+    ~
+  ])
+]})

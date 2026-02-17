@@ -2,7 +2,7 @@
 
 import { buscarVariável, INTERNAL_CONTEXT } from './escopo.js';
 import { pushFrame, popFrame, getSnapshotForError } from './pilha.js';
-import { ANSI, TIPO_AST } from '../constantes.js';
+import { ANSI, TIPO_AST, NAO_MANIPULADO } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -12,6 +12,9 @@ export const avaliarBásico = async (ast, escopo) => {
     case TIPO_AST.NÚMERO:
     case TIPO_AST.TEXTO:
       return ast.valor;
+
+    case TIPO_AST.NULO:
+      return null;
 
     case TIPO_AST.VARIÁVEL:
       return await buscarVariável(escopo, ast.nome);
@@ -145,7 +148,7 @@ export const avaliarBásico = async (ast, escopo) => {
     }
 
     default:
-      return null; // Not handled by this module
+      return NAO_MANIPULADO; // Not handled by this module
   }
 };
 

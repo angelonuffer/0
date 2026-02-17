@@ -2,7 +2,7 @@
 
 import { buscarVariável } from './escopo.js';
 import { pushFrame, popFrame, getSnapshotForError } from './pilha.js';
-import { TIPO_AST } from '../constantes.js';
+import { TIPO_AST, NAO_MANIPULADO } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -149,7 +149,7 @@ export const avaliarFunção = async (ast, escopo) => {
     }
 
     default:
-      return null; // Not handled by this module
+      return NAO_MANIPULADO; // Not handled by this module
   }
 };
 

@@ -118,6 +118,13 @@ const texto = transformar(
   })
 )
 
+const nulo = transformar(
+  símbolo("~"),
+  () => ({
+    tipo: TIPO_AST.NULO
+  })
+)
+
 // Parser for address literals (file paths and URLs) as expression values
 // Recognizes patterns like: soma.0, ./soma.0, ../dir/soma.0, https://example.com/soma.0
 const endereço_literal = transformar(
@@ -187,5 +194,6 @@ export {
   nome,
   endereço,
   endereço_literal,
-  texto
+  texto,
+  nulo
 };
