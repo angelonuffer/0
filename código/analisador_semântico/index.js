@@ -3,6 +3,7 @@
 
 // Import scope management
 export { criarEscopo, buscarVariável, definirVariável, criarLazyThunk, INTERNAL_CONTEXT } from './escopo.js';
+import { NAO_MANIPULADO } from '../constantes.js';
 
 // Import evaluation modules
 import { avaliarBásico, setAvaliar as setAvaliarBásico } from './básico.js';
@@ -23,22 +24,22 @@ export const avaliar = async (ast, escopo) => {
   let result;
   
   result = await avaliarBásico(ast, escopo);
-  if (result !== null) return result;
+  if (result !== NAO_MANIPULADO) return result;
   
   result = await avaliarOperações(ast, escopo);
-  if (result !== null) return result;
+  if (result !== NAO_MANIPULADO) return result;
   
   result = await avaliarLista(ast, escopo);
-  if (result !== null) return result;
+  if (result !== NAO_MANIPULADO) return result;
 
   result = await avaliarObjeto(ast, escopo);
-  if (result !== null) return result;
+  if (result !== NAO_MANIPULADO) return result;
   
   result = await avaliarColeção(ast, escopo);
-  if (result !== null) return result;
+  if (result !== NAO_MANIPULADO) return result;
   
   result = await avaliarFunção(ast, escopo);
-  if (result !== null) return result;
+  if (result !== NAO_MANIPULADO) return result;
 
   const erro = new Error(`Unknown AST node type: ${ast.tipo}`);
   erro.é_erro_semântico = true;

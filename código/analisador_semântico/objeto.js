@@ -1,5 +1,5 @@
 // Object construction and evaluation
-import { TIPO_AST } from '../constantes.js';
+import { TIPO_AST, NAO_MANIPULADO } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -18,7 +18,7 @@ const obterEndereçoMódulo = (escopo) => {
 
 export const avaliarObjeto = async (ast, escopo) => {
   if (ast.tipo !== 'objeto') {
-    return null; // Not handled by this module
+    return NAO_MANIPULADO; // Not handled by this module
   }
 
   // Expect object-style semantics (curly braces). Parser enforces no value-only items inside {}.

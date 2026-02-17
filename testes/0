@@ -12,6 +12,7 @@ uniteste.exibir(
     ./sintaxe/declarações_módulo.0
     ./sintaxe/importação_módulo_valor.0
     ./sintaxe/lista.0
+    ./sintaxe/nulo.0
     ./sintaxe/comentário_bloco.0
     ./texto/documentation_examples.0
     ./texto/edge_cases_division.0

@@ -1,5 +1,5 @@
 // List construction and evaluation (handles AST nodes with tipo 'lista')
-import { TIPO_AST } from '../constantes.js';
+import { TIPO_AST, NAO_MANIPULADO } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -18,7 +18,7 @@ const obterEndereçoMódulo = (escopo) => {
 
 export const avaliarLista = async (ast, escopo) => {
   if (ast.tipo !== 'lista') {
-    return null; // Not handled by this module
+    return NAO_MANIPULADO; // Not handled by this module
   }
 
   if (ast.usarObjeto) {

@@ -8,7 +8,7 @@ import { TIPO_AST } from '../constantes.js';
 let expressão;
 
 // Import basic operations
-let não, depuração, carregar, valor_constante, chamada_função_imediata;
+let não, depuração, carregar, nulo, valor_constante, chamada_função_imediata;
 
 // Import object operations
 let fatia, tamanho, chaves, lista, objeto, atributo;
@@ -121,6 +121,7 @@ const getTermo2 = () => alternativa(
   não,
   depuração,
   carregar,
+  nulo,
   valor_constante,
   parênteses
 );
@@ -236,6 +237,7 @@ const setDependências = (expr, deps) => {
   não = deps.não;
   depuração = deps.depuração;
   carregar = deps.carregar;
+  nulo = deps.nulo;
   valor_constante = deps.valor_constante;
   chamada_função_imediata = deps.chamada_função_imediata;
   fatia = deps.fatia;

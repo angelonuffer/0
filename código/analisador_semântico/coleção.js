@@ -1,5 +1,5 @@
 // Collection operations - fatia, tamanho, chaves, atributo
-import { TIPO_AST } from '../constantes.js';
+import { TIPO_AST, NAO_MANIPULADO } from '../constantes.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -142,7 +142,7 @@ export const avaliarColeção = async (ast, escopo) => {
     }
 
     default:
-      return null; // Not handled by this module
+      return NAO_MANIPULADO; // Not handled by this module
   }
 };
 

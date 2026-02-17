@@ -55,4 +55,8 @@ export const TIPO_AST = {
   CONDICIONAL: 'condicional',
   ESPALHAMENTO: 'espalhamento',
   ENDEREÇO_LITERAL: 'endereço_literal',
+  NULO: 'nulo',
 };
+
+// Símbolo para indicar que um nó da AST não foi manipulado por um módulo avaliador
+export const NAO_MANIPULADO = Symbol('NAO_MANIPULADO');
