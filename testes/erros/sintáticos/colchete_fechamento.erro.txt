@@ -1,2 +1,4 @@
+2:5
 testes/erros/sintáticos/colchete_fechamento.0
-2:5: x = ]
+x = ]
+    ^

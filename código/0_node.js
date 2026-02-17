@@ -51,14 +51,69 @@ const carregar_conteúdo = async (endereço) => {
   }
 };
 
-
-
-
-
 // State for module loading and execution
 const conteúdos = {};
 const módulos = {};
 const valores_módulos = {};
+
+const mostrar_erro_e_sair = (erro, endereço) => {
+  if (erro.é_erro_semântico) {
+    const erro_endereço = erro.módulo_endereço || endereço;
+
+    // Prefer printing semantic frames (if present) before handling specific variable error
+    if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
+      let framesToPrint = erro.pilha_semântica.slice().reverse();
+      const seen = new Set();
+      framesToPrint = framesToPrint.filter(f => {
+        const key = `${f.endereço || ''}|${f.termo_busca || ''}|${f.comprimento || ''}|${f.valor || ''}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      // If the error is a missing-variable error, move any frame that targets the missing name
+      // to the end so we print call-sites before the origin frame (which will include suggestions).
+      if (erro.nome_variável) {
+        const tail = framesToPrint.filter(f => String(f.termo_busca) === String(erro.nome_variável));
+        const head = framesToPrint.filter(f => String(f.termo_busca) !== String(erro.nome_variável));
+        framesToPrint = head.concat(tail);
+      }
+      let último_endereço_impresso = null;
+      for (let i = 0; i < framesToPrint.length; i++) {
+        const frame = framesToPrint[i];
+        const frame_end = frame.endereço || erro_endereço;
+        const infos = (i === framesToPrint.length - 1 && erro.nome_variável) ? (erro.nomes_disponíveis || []) : [];
+        // Insert a blank line when switching to a different file frame (for readability)
+        if (i !== 0 && frame_end !== último_endereço_impresso) console.error('');
+        // Only suppress the file header when printing consecutive frames from the same file
+        const suprimirArquivoHeader = (i !== 0 && frame_end === último_endereço_impresso);
+        const pos = mostrar_erro_semântico(conteúdos, frame_end, erro.message, frame.termo_busca, infos, suprimirArquivoHeader);
+        if (frame.valor !== undefined) {
+          exibir_bloco_erro_com_valor(conteúdos, frame_end, pos.número_linha, pos.número_coluna, frame.comprimento || pos.comprimento_termo, frame.valor, 43);
+        }
+        último_endereço_impresso = frame_end;
+      }
+    } else if (erro.nome_variável) {
+      mostrar_erro_variável(conteúdos, erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
+    } else if (erro.termo_busca) {
+      mostrar_erro_semântico(conteúdos, erro_endereço, erro.message, erro.termo_busca, [], false);
+    } else {
+      const linhas_conteudo = (conteúdos[erro_endereço] || '').split('\n');
+      let ln = 1, col = 1;
+      for (let i = 0; i < linhas_conteudo.length; i++) {
+        if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
+      }
+      exibir_bloco_erro(conteúdos, erro_endereço, ln, col, 1, 43);
+    }
+  } else if (erro.módulo_bruto) {
+    mostrar_erro_sintaxe(conteúdos, endereço, erro.módulo_bruto);
+  } else if (erro.stack) {
+    console.error(erro.stack);
+  } else {
+    console.error(erro);
+  }
+  salvar_cache();
+  process.exit(1);
+};
 
 // Helper function to parse a module on demand (async lazy loading)
 const parsear_módulo = async (endereço) => {
@@ -80,27 +135,15 @@ const parsear_módulo = async (endereço) => {
   
   // Check if parsing failed
   if (!módulo_bruto.sucesso) {
-    // If there's an error with stack trace, it's a transformer error
     if (módulo_bruto.erro && módulo_bruto.erro.stack) {
-      // Show only endereço + line:col: code line (no verbal message)
-      const linhas_conteudo = (conteúdos[endereço] || '').split('\n');
-      let ln = 1, col = 1;
-      for (let i = 0; i < linhas_conteudo.length; i++) {
-        if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
-      }
-      exibir_bloco_erro(conteúdos, endereço, ln, col, 1, 41, suprimirArquivoHeader);
+      mostrar_erro_e_sair(módulo_bruto.erro, endereço);
     } else {
-      // Otherwise show syntax error
-      mostrar_erro_sintaxe(conteúdos, endereço, módulo_bruto);
+      mostrar_erro_e_sair({ módulo_bruto }, endereço);
     }
-    salvar_cache();
-    process.exit(1);
   }
   
   if (módulo_bruto.resto.length > 0) {
-    mostrar_erro_sintaxe(conteúdos, endereço, módulo_bruto);
-    salvar_cache();
-    process.exit(1);
+    mostrar_erro_e_sair({ módulo_bruto }, endereço);
   }
   
   const corpo = módulo_bruto.valor.expressão;
@@ -162,35 +205,10 @@ const avaliar_módulo = async (endereço) => {
       try {
         escopo[decl.nome] = await avaliar(decl.valor, escopo);
       } catch (erro) {
-        // Check if it's a semantic analyzer error
-        if (erro.é_erro_semântico) {
-          const erro_endereço = erro.módulo_endereço || endereço;
-
-          // If a semantic stack snapshot is present, defer printing here and rethrow
-          // so the outer (module-body) handler prints the full stack in call-site order.
-          if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
-            throw erro;
-          }
-
-          // Otherwise handle specific semantic errors locally
-          if (erro.nome_variável) {
-            mostrar_erro_variável(conteúdos, erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
-          } else if (erro.termo_busca) {
-            mostrar_erro_semântico(conteúdos, erro_endereço, erro.message, erro.termo_busca, [], false);
-          } else {
-            const linhas_conteudo = (conteúdos[erro_endereço] || '').split('\n');
-            let ln = 1, col = 1;
-            for (let i = 0; i < linhas_conteudo.length; i++) {
-              if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
-            }
-            exibir_bloco_erro(conteúdos, erro_endereço, ln, col, 1, 43);
-          }
-
-          salvar_cache();
-          process.exit(1);
+        if (erro.é_erro_semântico && erro.pilha_semântica && erro.pilha_semântica.length > 0) {
+          throw erro;
         }
-        // Otherwise re-throw
-        throw erro;
+        mostrar_erro_e_sair(erro, endereço);
       }
     }
   }
@@ -199,72 +217,21 @@ const avaliar_módulo = async (endereço) => {
   try {
     valor = corpoAst ? await avaliar(corpoAst, escopo) : undefined;
   } catch (erro) {
-    // Check if it's a semantic analyzer error
-    if (erro.é_erro_semântico) {
-      const erro_endereço = erro.módulo_endereço || endereço;
-      
-      // Prefer printing semantic frames (if present) before handling specific variable error
-      if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
-        let framesToPrint = erro.pilha_semântica.slice().reverse();
-        const seen = new Set();
-        framesToPrint = framesToPrint.filter(f => {
-          const key = `${f.endereço || ''}|${f.termo_busca || ''}|${f.comprimento || ''}|${f.valor || ''}`;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
-        // If the error is a missing-variable error, move any frame that targets the missing name
-        // to the end so we print call-sites before the origin frame (which will include suggestions).
-        if (erro.nome_variável) {
-          const tail = framesToPrint.filter(f => String(f.termo_busca) === String(erro.nome_variável));
-          const head = framesToPrint.filter(f => String(f.termo_busca) !== String(erro.nome_variável));
-          framesToPrint = head.concat(tail);
-        }
-        let último_endereço_impresso = null;
-        for (let i = 0; i < framesToPrint.length; i++) {
-          const frame = framesToPrint[i];
-          const frame_end = frame.endereço || erro_endereço;
-          const infos = (i === framesToPrint.length - 1 && erro.nome_variável) ? (erro.nomes_disponíveis || []) : [];
-          // Insert a blank line when switching to a different file frame (for readability)
-          if (i !== 0 && frame_end !== último_endereço_impresso) console.log('');
-          // Only suppress the file header when printing consecutive frames from the same file
-          const suprimirArquivoHeader = (i !== 0 && frame_end === último_endereço_impresso);
-          const pos = mostrar_erro_semântico(conteúdos, frame_end, erro.message, frame.termo_busca, infos, suprimirArquivoHeader);
-          if (frame.valor !== undefined) {
-            exibir_bloco_erro_com_valor(conteúdos, frame_end, pos.número_linha, pos.número_coluna, frame.comprimento || pos.comprimento_termo, frame.valor, 43);
-          }
-          último_endereço_impresso = frame_end;
-        }
-      } else if (erro.nome_variável) {
-        mostrar_erro_variável(conteúdos, erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
-      } else if (erro.termo_busca) {
-        // Generic semantic error with search term
-        mostrar_erro_semântico(conteúdos, erro_endereço, erro.message, erro.termo_busca, [], false);
-      } else {
-        // Semantic error without search term - show endereço + first non-empty line highlighted
-        const linhas_conteudo = (conteúdos[erro_endereço] || '').split('\n');
-        let ln = 1, col = 1;
-        for (let i = 0; i < linhas_conteudo.length; i++) {
-          if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
-        }
-        exibir_bloco_erro(conteúdos, erro_endereço, ln, col, 1, 43);
-      }
-      
-      salvar_cache();
-      process.exit(1);
+    if (erro.é_erro_semântico && erro.pilha_semântica && erro.pilha_semântica.length > 0) {
+      throw erro;
     }
-    // Otherwise re-throw
-    throw erro;
+    mostrar_erro_e_sair(erro, endereço);
   }
   
   valores_módulos[endereço] = valor;
   return valor;
 };
 
-// Evaluate the main module (will trigger lazy parsing and evaluation of dependencies)
-const main_value = await avaliar_módulo(módulo_principal);
-
-// Save cache
-salvar_cache();
-
-console.log(main_value);
+// Evaluate the main module
+try {
+  const main_value = await avaliar_módulo(módulo_principal);
+  salvar_cache();
+  if (main_value !== undefined) console.log(main_value);
+} catch (erro) {
+  mostrar_erro_e_sair(erro, módulo_principal);
+}

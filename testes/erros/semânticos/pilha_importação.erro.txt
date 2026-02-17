@@ -1,7 +1,13 @@
+5:1
 testes/erros/semânticos/pilha_importação.0
-5:1: d(2)
-3:10: d = e => a(e)
+d(2)
+^
+3:10
+d = e => a(e)
+         ^
 
+1:6
 testes/erros/semânticos/pilha_importação_módulo.0
-1:6: b => c + 1
-          b
+b => c + 1
+     ^
+Opções: b

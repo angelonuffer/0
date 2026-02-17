@@ -1,2 +1,4 @@
+2:1
 testes/erros/semânticos/variável_indefinida.0
-2:1: variavelNaoDefinida
+variavelNaoDefinida
+^^^^^^^^^^^^^^^^^^^

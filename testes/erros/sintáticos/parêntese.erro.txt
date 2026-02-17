@@ -1,2 +1,5 @@
+2:16
 testes/erros/sintáticos/parêntese.0
-2:16: f = x => (x + 1
+f = x => (x + 1
+               ^
+Opções: {, h, ., (, [, 0-9, ", -, !, %, @
