@@ -213,7 +213,17 @@ function executarTestes() {
   
   // Se todos os testes de erro passaram, executa os testes principais
   if (falharam === 0) {
-    console.log('\nTodos os testes de erros passaram. Executando os testes principais...');
+    console.log('\nTodos os testes de erros passaram. Executando testes da documentação...');
+    try {
+      execSync('node testes/documentação.js', {
+        cwd: caminhoBase,
+        stdio: 'inherit'
+      });
+    } catch (e) {
+      process.exit(typeof e.status === 'number' ? e.status : 1);
+    }
+
+    console.log('\nTodos os testes passaram. Executando os testes principais...');
     try {
       execSync('node código/0_node.js testes/0 | node', {
         cwd: caminhoBase,
