@@ -1,5 +1,6 @@
 // Collection operations - fatia, tamanho, chaves, atributo
 import { TIPO_AST } from '../constantes.js';
+import { INTERNAL_CONTEXT } from './escopo.js';
 
 // Forward declaration for recursive avaliar reference
 let avaliar;
@@ -101,6 +102,31 @@ export const avaliarColeção = async (ast, escopo) => {
 
     case TIPO_AST.ATRIBUTO: {
       const objeto = await avaliar(ast.objeto, escopo);
+
+      // Se o objeto for um proxy de diretório, tenta resolver o atributo como módulo ou subdiretório
+      if (objeto && objeto.__é_proxy_diretório__) {
+        let context;
+        let atualEscopo = escopo;
+        while (atualEscopo) {
+          if (atualEscopo[INTERNAL_CONTEXT]) {
+            context = atualEscopo[INTERNAL_CONTEXT];
+            break;
+          }
+          atualEscopo = atualEscopo.__parent__;
+        }
+
+        if (context) {
+          const base = objeto.__caminho__;
+          if (context.existe_módulo && context.existe_módulo(base, ast.nome)) {
+            const endereço_resolvido = context.resolve_endereço(base, ast.nome + ".0");
+            return await context.avaliar_módulo_lazy(endereço_resolvido);
+          }
+          if (context.existe_diretório && context.existe_diretório(base, ast.nome)) {
+            const endereço_resolvido = context.resolve_endereço(base, ast.nome);
+            return { __é_proxy_diretório__: true, __caminho__: endereço_resolvido + "/" };
+          }
+        }
+      }
 
       // If null or undefined, throw semantic error
       if (objeto === null || objeto === undefined) {

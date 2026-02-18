@@ -1,0 +1,1 @@
+(util_teste.soma(1)(2) == 3) & (aritmética_teste.soma(1)(2) == 3) & (util_teste = { soma: a => b => a + 100 } util_teste.soma(1)(2) == 101)

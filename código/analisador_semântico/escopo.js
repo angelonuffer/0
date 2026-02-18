@@ -34,6 +34,30 @@ export const buscarVariável = async (escopo, nome) => {
     }
     atualEscopo = atualEscopo.__parent__;
   }
+
+  // Se não encontrou no escopo, tenta resolver como módulo ou diretório
+  let context, módulo_atual;
+  atualEscopo = escopo;
+  while (atualEscopo) {
+    if (atualEscopo[INTERNAL_CONTEXT]) {
+      context = atualEscopo[INTERNAL_CONTEXT];
+      módulo_atual = atualEscopo.__módulo__;
+      break;
+    }
+    atualEscopo = atualEscopo.__parent__;
+  }
+
+  if (context && context.avaliar_módulo_lazy && context.resolve_endereço && módulo_atual) {
+    if (context.existe_módulo && context.existe_módulo(módulo_atual, nome)) {
+      const endereço_resolvido = context.resolve_endereço(módulo_atual, nome + ".0");
+      return await context.avaliar_módulo_lazy(endereço_resolvido);
+    }
+    if (context.existe_diretório && context.existe_diretório(módulo_atual, nome)) {
+      const endereço_resolvido = context.resolve_endereço(módulo_atual, nome);
+      return { __é_proxy_diretório__: true, __caminho__: endereço_resolvido + "/" };
+    }
+  }
+
   // Collect all available names in scope for error message
   const nomesDisponíveis = [];
   atualEscopo = escopo;
