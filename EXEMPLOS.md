@@ -25,20 +25,6 @@ iguais([ a + b  30 ])
 1
 ```
 
-### Tipos Básicos
-
-```0
-iguais([ 42 42 ])
-```
-
-```0
-iguais([ -7 (-7) ])
-```
-
-```0
-iguais([ "texto" "texto" ])
-```
-
 ## Funções e Lambdas
 
 ### Definição e Aplicação
@@ -49,8 +35,8 @@ iguais([ soma(1)(2)  3 ])
 
 ### Desestruturação (Destructuring)
 ```0
-area = {w h} => w * h
-iguais([ area({w: 10 h: 5})  50 ])
+área = { largura altura } => largura * altura
+iguais([ área({ largura: 10  altura: 5 })  50 ])
 ```
 
 ### Guardas (Guards)
@@ -99,12 +85,12 @@ iguais([ {...obj idade: 26}.idade  26 ])
 v = [10 20 30]
 s = "abc"
 
-iguais([ v[0]     10 ]) &
-iguais([ s[0]     97 ]) &
-iguais([ v[1:3]   [20 30] ]) &
-iguais([ v[.]     3  ]) &
+iguais([ v[0]     10            ]) &
+iguais([ s[0]     97            ]) &
+iguais([ v[1:3]   [20 30]       ]) &
+iguais([ v[.]     3             ]) &
 iguais([ v[*]     ["0" "1" "2"] ]) &
-iguais([ {a:1}.a  1  ])
+iguais([ {a:1}.a  1             ])
 ```
 
 ## Operadores
@@ -120,16 +106,16 @@ iguais([ 10 >= 5     1  ])
 
 ## Operadores Lógicos e Ternário
 ```0
-iguais([ 1 & 0       0  ]) &
-iguais([ 0 | 1       1  ]) &
-iguais([ !1          0  ]) &
+iguais([ 1 & 0          0   ]) &
+iguais([ 0 | 1          1   ]) &
+iguais([ !1             0   ]) &
 iguais([ 1 ? "a" : "b"  "a" ])
 ```
 
 ### Especiais (Join e Split)
 O operador `*` entre lista e texto une a lista. O operador `/` entre textos divide o texto.
 ```0
-iguais([ ["a" "b"] * "-"  "a-b" ]) &
+iguais([ ["a" "b"] * "-"  "a-b"     ]) &
 iguais([ "a-b" / "-"      ["a" "b"] ])
 ```
 
