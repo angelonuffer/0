@@ -46,8 +46,9 @@ async function executar() {
   }
 
   const conteudo = fs.readFileSync('EXEMPLOS.md', 'utf-8');
-  // Captura blocos de código marcados com ```0 ou apenas ```
-  const regex = /```0?\n([\s\S]*?)```/g;
+  // Captura blocos de código marcados com ```0
+  // Usa ^ para garantir que o bloco comece no início da linha
+  const regex = /^```0\n([\s\S]*?)^```/gm;
   let match;
   let falhou = false;
   let total = 0;
