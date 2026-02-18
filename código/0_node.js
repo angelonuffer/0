@@ -188,7 +188,21 @@ const avaliar_módulo = async (endereço) => {
       valores_módulos: valores_módulos,
       resolve_endereço: resolve_endereço,
       avaliar_módulo_lazy: avaliar_módulo,
-      carregar_conteúdo: carregar_conteúdo
+      carregar_conteúdo: carregar_conteúdo,
+      existe_módulo: (base, nome) => {
+        if (base.startsWith('https://')) return false;
+        try {
+          const caminho = resolve_endereço(base, nome + ".0");
+          return fs.existsSync(caminho) && fs.statSync(caminho).isFile();
+        } catch (e) { return false; }
+      },
+      existe_diretório: (base, nome) => {
+        if (base.startsWith('https://')) return false;
+        try {
+          const caminho = resolve_endereço(base, nome);
+          return fs.existsSync(caminho) && fs.statSync(caminho).isDirectory();
+        } catch (e) { return false; }
+      }
     }
   };
   
