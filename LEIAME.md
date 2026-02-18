@@ -1,16 +1,16 @@
 # Linguagem 0
 
-A 0 é uma linguagem funcional com sintaxe inspirada na notação matemática e projetada para integração simples entre módulos locais e remotos.
+A **0** é uma linguagem funcional com sintaxe inspirada na notação matemática, projetada para proporcionar uma integração fluida entre módulos locais e remotos através de uma semântica simples e poderosa.
 
 ## Exemplo
 
 ```0
-// calcula factorial usando guards
+// Calcula fatorial usando guards
 fatorial = n =>
   | n <= 1 = 1
   | n * fatorial(n - 1)
 
-// função simples para demonstrar aplicação
+// Função simples para demonstrar aplicação
 incrementar = x => x + 1
 
 [
@@ -18,97 +18,89 @@ incrementar = x => x + 1
   incrementar(5)
 ]
 
-// [ 120, 6 ]
+// Resultado: [ 120, 6 ]
 ```
 
 ## Execução
 
 ### Executar um módulo
 
+Para executar um arquivo `.0`:
+
 ```bash
-node código/0_node.js <módulo.0>
+npx angelonuffer/0 <módulo.0>
 ```
 
-O módulo imprime/expõe seu valor final conforme o resultado do interpretador (ver `código/0_node.js`).
+O módulo avalia sua expressão final e imprime o resultado.
 
-### Executar os testes
+### Executar os testes do núcleo
 
 ```bash
 node testes/0.js
 ```
 
-## Módulos e endereços
+### Teste de integração com outro repositório
 
-- Arquivos de módulo têm extensão `.0`.
-- Um módulo contém declarações de topo no formato `identificador = expressão` seguidas por uma expressão final; essa expressão final é o valor exportado do módulo.
-- Endereços literais (ex.: `./mod.0`, `../dir/mod.0`, `https://.../mod.0`, ou `nome.0`) podem aparecer como literais no código e são resolvidos pelo contexto de execução do interpretador.
+Para verificar a compatibilidade com módulos em outros repositórios:
 
-## Léxico e comentários
+```bash
+node testes/integração.js <repositório> <caminho>
+```
 
-- Espaços em branco e quebras de linha são ignorados quando apropriado.
-- Comentários de linha: `// comentario` até o fim da linha.
-- Comentários em bloco: `/* comentario */` para comentários que podem span múltiplas linhas.
-- Números: sequência de dígitos, suportando negativos (`42`, `-7`).
-- Textos: aspas duplas `"..."`.
-- Identificadores: iniciam com letra Unicode ou `_`, seguidos por letras, dígitos ou `_`. Não existem palavras reservadas.
+Exemplo: `node testes/integração.js angelonuffer/antlr.0 tests/0`
 
-## Construções principais
+## Sintaxe e Estrutura
 
-- Literais: números, textos, listas (`[ ... ]`) e objetos (`{ ... }`).
-- Identificadores: nomes que referenciam valores no escopo.
-- Aplicação de função: `f(arg)`; chamadas imediatas sem espaço permitem currying e encadeamento: `f(1)(2)`.
-- Lambda: `param => expressão` ou destructuring `{a b} => ...`.
-- Guards (em corpo de função): após `=>` é possível usar `|` para definir regras condicionais, por exemplo `x => | x > 0 = 1 | x <= 0 = 0`.
-- Parênteses com declarações: `(a = 1 b = 2 a + b)` cria um escopo local para `a` e `b`.
+### Módulos e Endereços
 
-## Coleções e acesso
+- **Arquivos**: Possuem extensão `.0`.
+- **Estrutura**: Um módulo contém declarações de topo (`identificador = expressão`) seguidas por uma expressão final, que é o valor exportado.
+- **Endereços**: Caminhos locais (`./mod.0`) ou URLs (`https://...`) são tratados como literais e resolvidos dinamicamente pelo interpretador.
 
-- Listas: `[` itens separados por espaço `]`, ex.: `[1 2 3]`. Suporta espalhamento `...expr` dentro de `[]`.
-- Objetos: `{ chave: valor }`, suporte a shorthand `{ name }` (equivalente a `{ name: name }`) e espalhamento `...expr`.
-- A gramática diferencia `[]` (listas/valores) e `{}` (objetos com chaves). Itens sem chave devem usar `[]`.
+### Léxico
 
-Operações de acesso:
+- **Comentários**: `// linha` ou `/* bloco */`.
+- **Números**: Suporta inteiros e negativos (ex.: `42`, `-7`).
+- **Textos**: Delimitados por aspas duplas (`"exemplo"`).
+- **Identificadores**: Iniciam com letra Unicode ou `_`.
 
-- Indexação/fatia: `v[i]` ou `v[i:j]`. Para strings `v[i]` retorna o código do caractere (charCode), `v[i:j]` retorna substring.
-- Tamanho: `v[.]` retorna o `length` quando aplicável.
-- Chaves: `v[*]` retorna as chaves/nomes do objeto/coleção.
-- Atributo: `obj.prop` acessa propriedade `prop`.
+### Construções Principais
 
-## Operadores e semântica especial
+- **Literais**: Números, textos, listas (`[1 2 3]`) e objetos (`{ chave: valor }`).
+- **Funções**:
+  - **Lambda**: `param => expressão` ou destructuring `{a b} => ...`.
+  - **Aplicação**: `f(arg)`. Suporta currying: `f(1)(2)`.
+  - **Guards**: Condicionais internas: `x => | x > 0 = 1 | 0`.
+- **Escopo Local**: `(a = 1 b = 2 a + b)` cria um contexto temporário.
+- **Avaliação Lazy**: Valores podem ser definidos como **thunks preguiçosos (lazy thunks)**, que são avaliados apenas quando acessados e seus resultados são cacheados.
 
-- Aritmética e comparação: `* / + - >= <= > < == !=`.
-- Multiplicação `*`: além de produto numérico, quando um operando é lista e o outro é string faz join. Ex.: `['a' 'b'] * ','` → `'a,b'`. O join com `""` converte números em caracteres por código.
-- Divisão `/`: quando ambos operandos são strings, realiza `split`; caso contrário, é divisão numérica.
-- Soma `+` e subtração `-` seguem semântica usual (strings podem ser concatenadas via `+`).
-- Comparadores retornam `1` (verdadeiro) ou `0` (falso).
-- Lógicos: `&` e `|` com curto-circuito. `&` avalia o segundo operando somente se o primeiro for diferente de `0`. `|` retorna o primeiro não-zero ou avalia o segundo.
-- Ternário `condição ? então : senão` implementado como expressão.
-- Negação `!expr` retorna `1` para falso (quando `expr === 0`) e `0` caso contrário.
+### Coleções e Acesso
 
-## Funções e aplicação
+- **Listas**: `[item1 item2]`. Suporta espalhamento: `[...lista]`.
+- **Objetos**: `{ chave: valor }`. Suporta shorthand `{ nome }` e espalhamento `{...obj}`.
+- **Operações**:
+  - `v[i]`: Indexação (em strings, retorna o charCode).
+  - `v[i:j]`: Fatiamento (slice).
+  - `v[.]`: Tamanho (length).
+  - `v[*]`: Chaves (objetos) ou índices (listas).
+  - `obj.prop`: Acesso a atributo.
 
-- Funções são valores de primeira classe e representam closured scopes.
-- Parâmetros podem usar destructuring de objeto: `{a b} => ...` atribui `a` e `b` a partir do objeto-argumento.
-- Guards permitem múltiplos ramos com condições e um ramo default.
-- Chamadas imediatas (`nome(...)`) buscam `nome` no escopo atual; chamar algo que não é função gera erro semântico.
+### Operadores
 
-## Módulos e carregamento dinâmico
+- **Aritmética e Comparação**: `+ - * / == != > < >= <=`.
+- **Lógicos**: `&` (E) e `|` (OU) com curto-circuito; `!expr` (negação).
+- **Ternário**: `condição ? então : senão`.
+- **Especiais**:
+  - **Join**: `lista * string` une elementos da lista.
+  - **Split**: `string / string` divide a string.
 
-- O operador `@ expr` avalia `expr` como endereço e carrega o conteúdo do módulo resultante usando o contexto interno do interpretador.
-- Literais de endereço no código (`endereço_literal`) são resolvidos em tempo de avaliação e podem disparar avaliação lazy de módulos (o runner pode fornecer um avaliador lazy para módulos não carregados).
-- O runtime mantém um mapa de `valores_módulos` e hooks para `resolve_endereço` e `carregar_conteúdo` — responsáveis por resolver caminhos relativos e efetuar I/O.
+## Módulos e Carregamento
 
-## Escopo, avaliação e lazy
+- **Operador `@`**: Avalia uma expressão como endereço e carrega o módulo correspondente.
+- **Resolução**: O runtime gerencia o cache de módulos e hooks para resolução de caminhos e I/O.
 
-- O sistema de escopo é baseado em objetos com ponteiros internos.
-- Valores podem ser definidos como thunks preguiçosos (lazy thunks); a primeira vez que são lidos, o thunk é avaliado e cacheado.
+## Diagnóstico e Erros
 
-## Depuração e mensagens
-
-- Depuração: escrever `% expr` imprime o valor de `expr` em stderr (JSON) e retorna o valor.
-- Mensagens de erro semântico incluem um rastro de pilha semântica (frames) e informações auxiliares como nomes disponíveis no escopo, endereço do módulo e termo de busca, para ajudar o desenvolvedor a localizar a origem do erro.
-
-## Erros sintáticos e semânticos
-
-- Erros de sintaxe exibem o arquivo, linha e coluna aproximada com a linha em questão.
-- Erros semânticos (ex.: nome não encontrado, aplicação de índice em tipo inválido, tentativa de chamar não-função) incluem possíveis valores no escopo.
+- **Depuração**: O operador `% expressão` imprime o valor em stderr (JSON) e o retorna, facilitando a inspeção.
+- **Erros de Sintaxe**: Exibem arquivo, linha e coluna com o trecho de código afetado.
+- **Erros Semânticos**: Fornecem um **rastro de pilha semântica (frames)** e informações sobre nomes disponíveis no escopo no momento do erro.
