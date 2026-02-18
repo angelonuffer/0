@@ -30,7 +30,11 @@ const deepEqual = (a, b) => {
 
 const iguais = (escopo, args) => {
   if (Array.isArray(args) && args.length === 2) {
-    return deepEqual(args[0], args[1]) ? 1 : 0;
+    return deepEqual(args[0], args[1]) ? 1 :
+      "Esperava que:\n"
+    + `  ${JSON.stringify(args[0])}\n`
+    + "Fosse igual a:\n"
+    + `  ${JSON.stringify(args[1])}\n`
   }
   return 0;
 };
@@ -62,6 +66,7 @@ async function executar() {
       // Se parsed.sucesso for true mas tiver resto, pode ser erro de sintaxe parcial
       if (!parsed.sucesso || (parsed.resto && parsed.resto.trim() !== '')) {
         console.error(`✗ Bloco ${total} falhou: Erro de sintaxe`);
+        console.error(codigo);
         if (parsed.erro) {
            console.error(`  Esperado: ${parsed.erro.esperado.join(', ')}`);
         }
@@ -97,8 +102,9 @@ async function executar() {
       const resultado = ast.expressão ? await avaliar(ast.expressão, escopo) : 1;
 
       if (typeof resultado === 'string') {
-        console.log(`✗ Bloco ${total} falhou: Retornou texto`);
-        console.log(`  Texto retornado: ${resultado}`);
+        console.log(`✗ Bloco ${total} falhou.`);
+        console.error(codigo);
+        console.log(resultado);
         falhou = true;
       } else if (typeof resultado === 'number') {
         if (resultado !== 0) {
@@ -106,6 +112,7 @@ async function executar() {
           passaram++;
         } else {
           console.error(`✗ Bloco ${total} falhou: Retornou 0 (falso)`);
+          console.error(codigo);
           falhou = true;
         }
       } else {
@@ -113,10 +120,12 @@ async function executar() {
         // consideramos sucesso se não forem nulos (mas a regra diz número != 0).
         // A regra é estrita: deve retornar número != 0.
         console.error(`✗ Bloco ${total} falhou: Retornou tipo inesperado: ${typeof resultado}`);
+        console.error(codigo);
         falhou = true;
       }
     } catch (erro) {
       console.error(`✗ Bloco ${total} falhou com erro semântico: ${erro.message}`);
+      console.error(codigo);
       falhou = true;
     }
   }
