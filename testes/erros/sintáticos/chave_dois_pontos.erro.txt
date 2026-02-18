@@ -1,2 +1,4 @@
 testes/erros/sintáticos/chave_dois_pontos.0
-4:3:   : 2
+4:3
+  : 2
+  ^

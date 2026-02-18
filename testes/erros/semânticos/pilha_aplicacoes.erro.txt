@@ -1,7 +1,11 @@
 testes/erros/semânticos/pilha_aplicacoes.0
-6:1: d(2)
-4:10: d = e => a(e)
-2:10: a = b => c + 1
-               b
-               a
-               d
+6:1
+d(2)
+^
+4:10
+d = e => a(e)
+         ^
+2:10
+a = b => c + 1
+         ^
+Opções: b, a, d

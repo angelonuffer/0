@@ -12,13 +12,13 @@ const símbolo = símbolo_esperado => código => {
     valor: undefined,
     resto: código, 
     menor_resto: código,
-    erro: { mensagem: `Esperado "${símbolo_esperado}"`, posição: código }
+    erro: { esperado: [símbolo_esperado], posição: código }
   }
 }
 
 const alternativa = (...analisadores) => código => {
   let menor_resto = código
-  let melhor_erro = null
+  let melhor_erros = []
   
   for (const analisador of analisadores) {
     const resultado = analisador(código)
@@ -30,16 +30,20 @@ const alternativa = (...analisadores) => código => {
     const resto_atual = resultado.menor_resto || resultado.resto
     if (resto_atual.length < menor_resto.length) {
       menor_resto = resto_atual
-      melhor_erro = resultado.erro
+      melhor_erros = resultado.erro ? [resultado.erro] : []
+    } else if (resto_atual.length === menor_resto.length) {
+      if (resultado.erro) melhor_erros.push(resultado.erro)
     }
   }
   
+  const esperado = [...new Set(melhor_erros.flatMap(e => e.esperado || []))]
+
   return { 
     sucesso: false,
     valor: undefined,
     resto: código, 
     menor_resto,
-    erro: melhor_erro || { mensagem: "Nenhuma alternativa corresponde", posição: código }
+    erro: { esperado, posição: código }
   }
 }
 
@@ -47,6 +51,7 @@ const sequência = (...analisadores) => código => {
   const valores = []
   let resto = código
   let menor_resto_global = código
+  let erro_global = null
 
   for (const analisador of analisadores) {
     const resultado = analisador(resto)
@@ -55,6 +60,7 @@ const sequência = (...analisadores) => código => {
     const resto_atual = resultado.menor_resto || resultado.resto
     if (resto_atual.length < menor_resto_global.length) {
       menor_resto_global = resto_atual
+      erro_global = resultado.erro
     }
     
     if (!resultado.sucesso) {
@@ -63,7 +69,7 @@ const sequência = (...analisadores) => código => {
         valor: undefined,
         resto: código,
         menor_resto: menor_resto_global,
-        erro: resultado.erro
+        erro: resultado.erro || erro_global
       }
     }
 
@@ -90,6 +96,7 @@ const vários = analisador => código => {
   const valores = []
   let resto = código
   let menor_resto_global = código
+  let último_erro = null
 
   while (true) {
     const resultado = analisador(resto)
@@ -98,6 +105,7 @@ const vários = analisador => código => {
     const resto_atual = resultado.menor_resto || resultado.resto
     if (resto_atual.length < menor_resto_global.length) {
       menor_resto_global = resto_atual
+      último_erro = resultado.erro
     }
     
     if (!resultado.sucesso || resultado.resto === resto) break
@@ -110,7 +118,7 @@ const vários = analisador => código => {
     }
   }
 
-  return { sucesso: true, valor: valores, resto, menor_resto: menor_resto_global }
+  return { sucesso: true, valor: valores, resto, menor_resto: menor_resto_global, erro: último_erro }
 }
 
 const transformar = (analisador, transformador) => código => {
@@ -129,7 +137,8 @@ const transformar = (analisador, transformador) => código => {
       sucesso: true,
       valor: transformador(resultado.valor), 
       resto: resultado.resto, 
-      menor_resto: resultado.menor_resto || resultado.resto
+      menor_resto: resultado.menor_resto || resultado.resto,
+      erro: resultado.erro
     }
   } catch (erro) {
     return { 
@@ -158,7 +167,7 @@ const inversão = analisador => código => {
     valor: undefined,
     resto: código, 
     menor_resto: resultado.menor_resto || código,
-    erro: { mensagem: "Inversão falhou", posição: código }
+    erro: { esperado: [], posição: código }
   }
 }
 
@@ -169,7 +178,7 @@ const faixa = (inicial, final) => código => {
       valor: undefined,
       resto: código, 
       menor_resto: código,
-      erro: { mensagem: `Esperado caractere entre '${inicial}' e '${final}'`, posição: código }
+      erro: { esperado: [`${inicial}-${final}`], posição: código }
     }
   }
   return {

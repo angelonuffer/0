@@ -1,2 +1,5 @@
 testes/erros/sintáticos/operador_inválido.0
-2:1: = 5
+2:1
+= 5
+^
+Opções: {, h, ., (, [, 0-9, ", -, !, %, @

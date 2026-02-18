@@ -1,2 +1,4 @@
 testes/erros/sintáticos/colchete.0
-2:11: x = [1 2 3
+2:11
+x = [1 2 3
+          ^
