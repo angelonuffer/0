@@ -5,10 +5,10 @@ export const exibir_bloco_erro = (conteúdos, endereço, número_linha, número_
   const linhas = conteúdo.split('\n');
   const linha = linhas[número_linha - 1] ?? '';
 
-  console.error(`${número_linha}:${número_coluna}`);
   if (!suprimirArquivoHeader) {
     console.error(`${endereço}`);
   }
+  console.error(`${número_linha}:${número_coluna}`);
 
   console.error(linha);
   const marcador = ' '.repeat(Math.max(0, número_coluna - 1)) + '^'.repeat(Math.max(1, comprimento));
@@ -24,8 +24,8 @@ export const exibir_bloco_erro_com_valor = (conteúdos, endereço, número_linha
   const after = linha.substring(start + Math.max(1, comprimento));
   const safeValor = String(valorStr);
 
-  console.error(`${número_linha}:${número_coluna}`);
   console.error(endereço);
+  console.error(`${número_linha}:${número_coluna}`);
 
   const linha_simulada = `${before}${safeValor}${after}`;
   console.error(linha_simulada);

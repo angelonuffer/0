@@ -1,4 +1,4 @@
-3:1
 testes/erros/semânticos/uso_antes_definição.0
+3:1
 x + 10
 ^

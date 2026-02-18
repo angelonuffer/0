@@ -1,4 +1,4 @@
-2:19
 testes/erros/sintáticos/string_não_fechada.0
+2:19
 texto = "Olá mundo
                   ^
