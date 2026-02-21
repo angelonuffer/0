@@ -106,7 +106,7 @@ function executarTestes() {
       // Executa o teste
       let saidaObtida;
       try {
-        execSync(`node código/0_node.js ${caminhoTeste} node`, {
+        execSync(`node 0.js ${caminhoTeste} node`, {
           cwd: caminhoBase,
           encoding: 'utf-8',
           stdio: 'pipe'
@@ -176,7 +176,7 @@ function executarTestes() {
       let saidaObtida;
       try {
         // Executa o teste esperando saída em stdout
-        saidaObtida = execSync(`node código/0_node.js ${caminhoTeste} node`, {
+        saidaObtida = execSync(`node 0.js ${caminhoTeste} node`, {
           cwd: caminhoBase,
           encoding: 'utf-8',
           stdio: 'pipe'
@@ -215,7 +215,7 @@ function executarTestes() {
   if (falharam === 0) {
     console.log('\nTodos os testes de erros passaram. Executando testes da documentação...');
     try {
-      execSync('node código/0_node.js EXEMPLOS.md', {
+      execSync('node 0.js EXEMPLOS.md', {
         cwd: caminhoBase,
         stdio: 'inherit'
       });
@@ -225,7 +225,7 @@ function executarTestes() {
 
     console.log('\nTodos os testes passaram. Executando os testes principais...');
     try {
-      execSync('node código/0_node.js testes/0 | node', {
+      execSync('node 0.js testes/0 | node', {
         cwd: caminhoBase,
         stdio: 'inherit',
         shell: true

@@ -1,16 +1,16 @@
 #!/usr/bin/env node
-import { _0 } from './analisador_sintático/index.js';
-import { importações } from './analisador_sintático/importações.js';
-import { avaliar, criarLazyThunk, INTERNAL_CONTEXT } from './analisador_semântico/index.js';
-import { ANSI } from './constantes.js';
-import { exibir_bloco_erro, exibir_bloco_erro_com_valor, mostrar_erro_semântico, mostrar_erro_variável, mostrar_erro_sintaxe } from './erros.js';
+import { _0 } from './código/analisador_sintático/index.js';
+import { importações } from './código/analisador_sintático/importações.js';
+import { avaliar, criarLazyThunk, INTERNAL_CONTEXT } from './código/analisador_semântico/index.js';
+import { ANSI } from './código/constantes.js';
+import { exibir_bloco_erro, exibir_bloco_erro_com_valor, mostrar_erro_semântico, mostrar_erro_variável, mostrar_erro_sintaxe } from './código/erros.js';
 import fs from 'fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const módulo_principal = process.argv[2];
 
-// Caminho absoluto do arquivo de cache no mesmo diretório deste 0_node.js
+// Caminho absoluto do arquivo de cache no mesmo diretório deste 0.js
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const CAMINHO_CACHE = path.join(__dirname, '0_cache.json');

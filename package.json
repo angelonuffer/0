@@ -1,7 +1,7 @@
 {
   "name": "0",
   "bin": {
-    "0": "código/0_node.js"
+    "0": "0.js"
   },
   "type": "module"
 }
