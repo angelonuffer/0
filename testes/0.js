@@ -215,7 +215,7 @@ function executarTestes() {
   if (falharam === 0) {
     console.log('\nTodos os testes de erros passaram. Executando testes da documentação...');
     try {
-      execSync('node testes/documentação.js', {
+      execSync('node código/0_node.js EXEMPLOS.md', {
         cwd: caminhoBase,
         stdio: 'inherit'
       });
