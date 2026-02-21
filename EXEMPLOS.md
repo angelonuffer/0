@@ -12,7 +12,7 @@ a = 10
 b = 20
 
 // Verificação (a expressão final é o resultado do módulo)
-iguais([ a + b  30 ])
+iguais([ a + b, 30 ])
 ```
 
 ## Léxico
@@ -30,13 +30,13 @@ iguais([ a + b  30 ])
 ### Definição e Aplicação
 ```0
 soma = a => b => a + b
-iguais([ soma(1)(2)  3 ])
+iguais([ soma(1)(2), 3 ])
 ```
 
 ### Desestruturação (Destructuring)
 ```0
 área = { largura altura } => largura * altura
-iguais([ área({ largura: 10  altura: 5 })  50 ])
+iguais([ área({ largura: 10,  altura: 5 }), 50 ])
 ```
 
 ### Guardas (Guards)
@@ -46,7 +46,7 @@ fatorial = n =>
   | n <= 1 = 1
   | n * fatorial(n - 1)
 
-iguais([ fatorial(5)  120 ])
+iguais([ fatorial(5), 120 ])
 ```
 
 ## Escopo Local
@@ -58,15 +58,15 @@ resultado = (
   y = x * 2
   y + 1
 )
-iguais([ resultado  11 ])
+iguais([ resultado, 11 ])
 ```
 
 ## Coleções
 
 ### Listas
 ```0
-lista = [1 2 3]
-iguais([ [0 ...lista 4]  [0 1 2 3 4] ])
+lista = [ 1, 2, 3 ]
+iguais([ [ 0, ...lista, 4 ],  [ 0, 1, 2, 3, 4 ] ])
 ```
 
 ### Objetos
@@ -76,17 +76,16 @@ obj = {
   nome
   idade: 25
 }
-iguais([ {...obj idade: 26}.idade  26 ])
+iguais([ { ...obj, idade: 26 }.idade, 26 ])
 ```
 
 ### Vírgulas Opcionais
 As vírgulas são opcionais entre os itens de listas e objetos.
 ```0
-lista = [1, 2, 3]
-objeto = { a: 1, b: 2, }
-
-iguais([ lista[.]  3 ]) &
-iguais([ objeto.b  2 ])
+iguais([ [ 1, 2, 3 ], [ 1 2 3 ] ])
+```
+```0
+iguais([ { a: 1, b: 2 }, { a: 1 b: 2 } ])
 ```
 
 ## Acesso e Operações
