@@ -79,6 +79,16 @@ obj = {
 iguais([ {...obj idade: 26}.idade  26 ])
 ```
 
+### Vírgulas Opcionais
+As vírgulas são opcionais entre os itens de listas e objetos.
+```0
+lista = [1, 2, 3]
+objeto = { a: 1, b: 2, }
+
+iguais([ lista[.]  3 ]) &
+iguais([ objeto.b  2 ])
+```
+
 ## Acesso e Operações
 
 ```0
