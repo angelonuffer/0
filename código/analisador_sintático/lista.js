@@ -54,10 +54,12 @@ const lista = transformar(
           símbolo("..."),
           código => expressão(código),
           opcional(espaço),
+          opcional(sequência(símbolo(","), opcional(espaço))),
         ),
         sequência( // Value-only (auto-indexed)
           código => expressão(código),
           opcional(espaço),
+          opcional(sequência(símbolo(","), opcional(espaço))),
         ),
       ),
     ),

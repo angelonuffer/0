@@ -26,19 +26,23 @@ const objeto = transformar(
           opcional(espaço),
           código => expressão(código),
           opcional(espaço),
+          opcional(sequência(símbolo(","), opcional(espaço))),
         ),
         sequência( // Spread syntax ...expression
           símbolo("..."),
           código => expressão(código),
           opcional(espaço),
+          opcional(sequência(símbolo(","), opcional(espaço))),
         ),
         sequência( // Shorthand property: { name } equivalent to { name: name }
           nome,
           opcional(espaço),
+          opcional(sequência(símbolo(","), opcional(espaço))),
         ),
         sequência( // Value-only (auto-indexed) - parser will reject value-only entries for {} later
           código => expressão(código),
           opcional(espaço),
+          opcional(sequência(símbolo(","), opcional(espaço))),
         ),
       ),
     ),
@@ -56,8 +60,8 @@ const objeto = transformar(
     // Check if we have any value-only items (excluding spread and shorthand)
     const hasValueOnlyItems = valores_vários.some(v_alt => 
       v_alt[0] !== "..." && 
-      !(v_alt.length === 5 && v_alt[1] === ":") &&
-      !(v_alt.length === 2 && typeof v_alt[0] === 'string')
+      !(v_alt.length === 6 && v_alt[1] === ":") &&
+      !(v_alt.length === 3 && typeof v_alt[0] === 'string')
     );
 
     // Enforce strict separation: {} is ONLY for objects with keys, [] is ONLY for lists
@@ -72,7 +76,7 @@ const objeto = transformar(
           tipo: TIPO_AST.ESPALHAMENTO,
           expressão: v_alt[1]
         };
-      } else if (v_alt.length === 5 && v_alt[1] === ":") {
+      } else if (v_alt.length === 6 && v_alt[1] === ":") {
         const key_alt_result = v_alt[0];
         let chave;
         if (typeof key_alt_result === "string") {
@@ -87,7 +91,7 @@ const objeto = transformar(
           chave: chave,
           valor: v_alt[3]
         };
-      } else if (v_alt.length === 2 && typeof v_alt[0] === 'string') {
+      } else if (v_alt.length === 3 && typeof v_alt[0] === 'string') {
         // Shorthand property: { name } equivalent to { name: name }
         const nomeProp = v_alt[0];
         return {
