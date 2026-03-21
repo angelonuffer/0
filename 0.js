@@ -7,6 +7,7 @@ import { exibir_bloco_erro, exibir_bloco_erro_com_valor, mostrar_erro_semântico
 import fs from 'fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import util from 'node:util';
 
 const módulo_principal = process.argv[2];
 
@@ -381,15 +382,91 @@ const avaliar_módulo = async (endereço) => {
   return valor;
 };
 
-// Evaluate the main module
-try {
-  if (módulo_principal && módulo_principal.endsWith('.md')) {
-    await executar_testes_documentação(módulo_principal);
-  } else {
-    const main_value = await avaliar_módulo(módulo_principal);
+export const interpretar = async (codigo, endereço = '<eval>') => {
+  const oldLog = console.log;
+  const oldError = console.error;
+  const oldExit = process.exit;
+  
+  let saída = "";
+  let erro = "";
+  let código_saída = 0;
+  
+  class ExecutionExit extends Error {
+    constructor(code) {
+      super(`Exited with code ${code}`);
+      this.code = code;
+    }
+  }
+
+  console.log = (...args) => {
+    saída += util.format(...args) + '\n';
+  };
+  
+  console.error = (...args) => {
+    erro += util.format(...args) + '\n';
+  };
+  
+  process.exit = (code) => {
+    throw new ExecutionExit(code);
+  };
+  
+  try {
+    conteúdos[endereço] = codigo;
+    delete módulos[endereço];
+    delete valores_módulos[endereço];
+    
+    const main_value = await avaliar_módulo(endereço);
     salvar_cache();
     if (main_value !== undefined) console.log(main_value);
+  } catch (e) {
+    if (e instanceof ExecutionExit) {
+      código_saída = e.code;
+    } else {
+      try {
+        mostrar_erro_e_sair(e, endereço);
+      } catch (errExit) {
+        if (errExit instanceof ExecutionExit) {
+          código_saída = errExit.code;
+        } else {
+          código_saída = 1;
+          erro += (errExit.stack || errExit) + '\n';
+        }
+      }
+    }
+  } finally {
+    console.log = oldLog;
+    console.error = oldError;
+    process.exit = oldExit;
   }
-} catch (erro) {
-  mostrar_erro_e_sair(erro, módulo_principal);
+  
+  return { código_saída, saída, erro };
+};
+
+let é_principal = false;
+try {
+  if (process.argv[1]) {
+    é_principal = fs.realpathSync(process.argv[1]) === fs.realpathSync(__filename);
+  }
+} catch (e) { }
+
+if (é_principal) {
+  if (módulo_principal && módulo_principal.endsWith('.md')) {
+    try {
+      await executar_testes_documentação(módulo_principal);
+    } catch (e) {
+      console.error(e);
+      process.exit(1);
+    }
+  } else if (módulo_principal) {
+    try {
+      const codigo_fonte = fs.readFileSync(módulo_principal, 'utf-8');
+      const resultado = await interpretar(codigo_fonte, módulo_principal);
+      if (resultado.saída) process.stdout.write(resultado.saída);
+      if (resultado.erro) process.stderr.write(resultado.erro);
+      process.exit(resultado.código_saída);
+    } catch (e) {
+      console.error(e.message || e);
+      process.exit(1);
+    }
+  }
 }
