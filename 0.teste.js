@@ -57,7 +57,10 @@ const testes = [
     "entrada": "@ \"./arquivos_teste/utf8.txt\"",
     "saída": "conteúdo UTF-8: café ☕"
   }, {
-    "entrada": "(\n  caminho = \"./arquivos_teste/saudacao.txt\"\n  @ caminho\n)",
+    "entrada": `(
+  caminho = "./arquivos_teste/saudacao.txt"
+  @ caminho
+)`,
     "saída": "Olá mundo"
   }, {
     "entrada": "(@ \"./arquivos_teste/numero.txt\")[.]",
@@ -123,13 +126,23 @@ const testes = [
     "entrada": "% 2 + 3",
     "saída": "5"
   }, {
-    "entrada": "(\n  a = 10\n  % a * 2\n)",
+    "entrada": `(
+  a = 10
+  % a * 2
+)`,
     "saída": "20"
   }, {
-    "entrada": "(\n  lista = [1 2 3]\n  % lista[1]\n)",
+    "entrada": `(
+  lista = [1 2 3]
+  % lista[1]
+)`,
     "saída": "2"
   }, {
-    "entrada": "(\n  x = 5\n  y = 3\n  % x + % y\n)",
+    "entrada": `(
+  x = 5
+  y = 3
+  % x + % y
+)`,
     "saída": "8"
   }, {
     "entrada": "% \"teste\"",
@@ -138,7 +151,10 @@ const testes = [
     "entrada": "(% [1 2 3])[1]",
     "saída": "2"
   }, {
-    "entrada": "(\n  obj = {nome: \"João\" idade: 30}\n  (% obj).nome\n)",
+    "entrada": `(
+  obj = {nome: "João" idade: 30}
+  (% obj).nome
+)`,
     "saída": "João"
   }, {
     "entrada": "0 & 0",
@@ -171,34 +187,89 @@ const testes = [
     "entrada": "! 1",
     "saída": "0"
   }, {
-    "entrada": "(\n      a = 5\n      b = 8\n      a + b\n    )",
+    "entrada": `(
+      a = 5
+      b = 8
+      a + b
+    )`,
     "saída": "13"
   }, {
-    "entrada": "(\n      função1 = y => y == 42\n      função2 = _ => (\n        x = 42\n        função1 = y => y == 42\n        x = 42\n        função1(x)\n      )\n      função2 = _ => (\n        x = 42\n        função1 = y => y == 42\n        x = 42\n        função1(x)\n      )\n      função2(0)\n    )",
+    "entrada": `(
+      função1 = y => y == 42
+      função2 = _ => (
+        x = 42
+        função1 = y => y == 42
+        x = 42
+        função1(x)
+      )
+      função2 = _ => (
+        x = 42
+        função1 = y => y == 42
+        x = 42
+        função1(x)
+      )
+      função2(0)
+    )`,
     "saída": "1"
   }, {
-    "entrada": "(\n      a = 2\n      b = 3\n      a + b\n    )",
+    "entrada": `(
+      a = 2
+      b = 3
+      a + b
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      x = 4\n      y = 5\n      x * y\n    )",
+    "entrada": `(
+      x = 4
+      y = 5
+      x * y
+    )`,
     "saída": "20"
   }, {
-    "entrada": "(\n      valor = 10\n      valor + 5\n    )",
+    "entrada": `(
+      valor = 10
+      valor + 5
+    )`,
     "saída": "15"
   }, {
-    "entrada": "(\n      a = 2\n      b = 3\n      c = 4\n      a + b * c\n    )",
+    "entrada": `(
+      a = 2
+      b = 3
+      c = 4
+      a + b * c
+    )`,
     "saída": "14"
   }, {
-    "entrada": "(\n      a = 5\n      b = a * 2\n      b + 3\n    )",
+    "entrada": `(
+      a = 5
+      b = a * 2
+      b + 3
+    )`,
     "saída": "13"
   }, {
-    "entrada": "(\n      a = 2\n      b = (\n        x = 3\n        y = 4\n        x + y\n      )\n      a * b\n    )",
+    "entrada": `(
+      a = 2
+      b = (
+        x = 3
+        y = 4
+        x + y
+      )
+      a * b
+    )`,
     "saída": "14"
   }, {
-    "entrada": "(\n      a = 5\n      b = 10\n      a < b\n    )",
+    "entrada": `(
+      a = 5
+      b = 10
+      a < b
+    )`,
     "saída": "1"
   }, {
-    "entrada": "(\n      nome = \"João\"\n      sobrenome = \"Silva\"\n      [ nome \" \" sobrenome ] * \"\"\n    )",
+    "entrada": `(
+      nome = "João"
+      sobrenome = "Silva"
+      [ nome " " sobrenome ] * ""
+    )`,
     "saída": "João Silva"
   }, {
     "entrada": "(2 + 3)",
@@ -207,27 +278,52 @@ const testes = [
     "entrada": "((2 + 3) * 4)",
     "saída": "20"
   }, {
-    "entrada": "(\n      a = 2\n      (a + 3) * 4\n    )",
+    "entrada": `(
+      a = 2
+      (a + 3) * 4
+    )`,
     "saída": "20"
   }, {
-    "entrada": "(\n      x = 4\n      y = 5\n      z = 10\n      x * y + z\n    )",
+    "entrada": `(
+      x = 4
+      y = 5
+      z = 10
+      x * y + z
+    )`,
     "saída": "30"
   }, {
-    "entrada": "(\n      x = 10\n      resultado = (\n        x = 6\n        x * 2\n      )\n      x\n    )",
+    "entrada": `(
+      x = 10
+      resultado = (
+        x = 6
+        x * 2
+      )
+      x
+    )`,
     "saída": "10"
   }, {
-    "entrada": "(\n      nome_teste = \"João\"\n      sobrenome_teste = \"Silva\"\n      nome_teste + \" \" + sobrenome_teste\n    )",
+    "entrada": `(
+      nome_teste = "João"
+      sobrenome_teste = "Silva"
+      nome_teste + " " + sobrenome_teste
+    )`,
     "saída": "João Silva"
   }, {
     "entrada": "(importação_módulo_valor_helper.0)",
     "saída": "5",
     "arquivo": "testes/sintaxe/importação_módulo_valor.0"
   }, {
-    "entrada": "(\n      valor = importação_módulo_valor_helper.0\n      valor\n    )",
+    "entrada": `(
+      valor = importação_módulo_valor_helper.0
+      valor
+    )`,
     "saída": "5",
     "arquivo": "testes/sintaxe/importação_módulo_valor.0"
   }, {
-    "entrada": "(\n      função = importação_módulo_valor_função.0\n      função({ a: 10 b: 20 })\n    )",
+    "entrada": `(
+      função = importação_módulo_valor_função.0
+      função({ a: 10 b: 20 })
+    )`,
     "saída": "30",
     "arquivo": "testes/sintaxe/importação_módulo_valor.0"
   }, {
@@ -262,19 +358,39 @@ const testes = [
     "entrada": "[1 2 3][.]",
     "saída": "3"
   }, {
-    "entrada": "(\n      a = 2 /* comentário em bloco */\n      b = 3 /* outro comentário */\n      a + b\n    )",
+    "entrada": `(
+      a = 2 /* comentário em bloco */
+      b = 3 /* outro comentário */
+      a + b
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      /* Comentário no início */\n      x = 10\n      y = 20\n      /* Comentário no meio */\n      x + y\n    )",
+    "entrada": `(
+      /* Comentário no início */
+      x = 10
+      y = 20
+      /* Comentário no meio */
+      x + y
+    )`,
     "saída": "30"
   }, {
-    "entrada": "(\n      /* Comentário\n         em múltiplas\n         linhas */\n      m = 100\n      m * 2\n    )",
+    "entrada": `(
+      /* Comentário
+         em múltiplas
+         linhas */
+      m = 100
+      m * 2
+    )`,
     "saída": "200"
   }, {
     "entrada": "\"apple,banana,cherry\"",
     "saída": "apple,banana,cherry"
   }, {
-    "entrada": "(\n        frase = \"João Silva Santos\"\n        nomes = (frase = \"João Silva Santos\" frase / \" \")\n        nomes[0] // Primeiro nome\n      )",
+    "entrada": `(
+        frase = "João Silva Santos"
+        nomes = (frase = "João Silva Santos" frase / " ")
+        nomes[0] // Primeiro nome
+      )`,
     "saída": "João"
   }, {
     "entrada": "\"abc\"",
@@ -298,40 +414,104 @@ const testes = [
     "entrada": "15",
     "saída": "15"
   }, {
-    "entrada": "(\n        objeto_com_chaves = {\n          nome: \"João\"\n          idade: 30\n          profissao: \"Desenvolvedor\"\n        }\n        objeto_com_chaves.nome\n      )",
+    "entrada": `(
+        objeto_com_chaves = {
+          nome: "João"
+          idade: 30
+          profissao: "Desenvolvedor"
+        }
+        objeto_com_chaves.nome
+      )`,
     "saída": "João"
   }, {
-    "entrada": "(\n        objeto_com_chaves = {\n          nome: \"João\"\n          idade: 30\n          profissao: \"Desenvolvedor\"\n        }\n        objeto_com_chaves.idade\n      )",
+    "entrada": `(
+        objeto_com_chaves = {
+          nome: "João"
+          idade: 30
+          profissao: "Desenvolvedor"
+        }
+        objeto_com_chaves.idade
+      )`,
     "saída": "30"
   }, {
-    "entrada": "(\n        objeto_com_chaves = {\n          nome: \"João\"\n          idade: 30\n          profissao: \"Desenvolvedor\"\n        }\n        objeto_com_chaves.profissao\n      )",
+    "entrada": `(
+        objeto_com_chaves = {
+          nome: "João"
+          idade: 30
+          profissao: "Desenvolvedor"
+        }
+        objeto_com_chaves.profissao
+      )`,
     "saída": "Desenvolvedor"
   }, {
-    "entrada": "(\n        obj = { \"someKey\": \"test\" }\n        obj.someKey\n      )",
+    "entrada": `(
+        obj = { "someKey": "test" }
+        obj.someKey
+      )`,
     "saída": "test"
   }, {
-    "entrada": "(\n      a = 5\n      b = a + 2\n      b\n    )",
+    "entrada": `(
+      a = 5
+      b = a + 2
+      b
+    )`,
     "saída": "7"
   }, {
-    "entrada": "(\n      x = 10\n      y = x * 2\n      y\n    )",
+    "entrada": `(
+      x = 10
+      y = x * 2
+      y
+    )`,
     "saída": "20"
   }, {
-    "entrada": "(\n      nome = \"João\"\n      sobrenome = \"Silva\"\n      nome + \" \" + sobrenome\n    )",
+    "entrada": `(
+      nome = "João"
+      sobrenome = "Silva"
+      nome + " " + sobrenome
+    )`,
     "saída": "João Silva"
   }, {
-    "entrada": "(\n      a = 2\n      b = (\n        x = 3\n        y = 4\n        x + y\n      )\n      a * b\n    )",
+    "entrada": `(
+      a = 2
+      b = (
+        x = 3
+        y = 4
+        x + y
+      )
+      a * b
+    )`,
     "saída": "14"
   }, {
-    "entrada": "(\n      x = 5\n      y = (\n        a = 2\n        b = 3\n        a + b\n      )\n      x + y\n    )",
+    "entrada": `(
+      x = 5
+      y = (
+        a = 2
+        b = 3
+        a + b
+      )
+      x + y
+    )`,
     "saída": "10"
   }, {
-    "entrada": "(\n      x = 2\n      y = 3\n      x + y\n    )",
+    "entrada": `(
+      x = 2
+      y = 3
+      x + y
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      nome = \"Alice\"\n      sobrenome = \"Silva\"\n      nome + \" \" + sobrenome\n    )",
+    "entrada": `(
+      nome = "Alice"
+      sobrenome = "Silva"
+      nome + " " + sobrenome
+    )`,
     "saída": "Alice Silva"
   }, {
-    "entrada": "(\n      a = 0\n      b = 1\n      a | b\n    )",
+    "entrada": `(
+      a = 0
+      b = 1
+      a | b
+    )`,
     "saída": "1"
   }, {
     "entrada": "[ 2 3 ][0]",
@@ -340,10 +520,16 @@ const testes = [
     "entrada": "[ 2 3 ][1]",
     "saída": "3"
   }, {
-    "entrada": "(\n      a = 4\n      a + 5\n    )",
+    "entrada": `(
+      a = 4
+      a + 5
+    )`,
     "saída": "9"
   }, {
-    "entrada": "(\n      a = 4\n      a + 5\n    )",
+    "entrada": `(
+      a = 4
+      a + 5
+    )`,
     "saída": "9"
   }, {
     "entrada": "[[1 2] [3 4]][0][1]",
@@ -358,100 +544,250 @@ const testes = [
     "entrada": "[ 10 20 30 ][1 + 1]",
     "saída": "30"
   }, {
-    "entrada": "(\n      x = 7\n      x * 2\n    )",
+    "entrada": `(
+      x = 7
+      x * 2
+    )`,
     "saída": "14"
   }, {
-    "entrada": "(\n      lista = [1 2 3]\n      lista * \",\"\n    )",
+    "entrada": `(
+      lista = [1 2 3]
+      lista * ","
+    )`,
     "saída": "1,2,3"
   }, {
-    "entrada": "(\n      lista = [\"a\" \"b\" \"c\"]\n      lista * \"-\"\n    )",
+    "entrada": `(
+      lista = ["a" "b" "c"]
+      lista * "-"
+    )`,
     "saída": "a-b-c"
   }, {
-    "entrada": "(\n        nome = \"Maria\"\n        pessoa = { nome }\n        pessoa.nome\n      )",
+    "entrada": `(
+        nome = "Maria"
+        pessoa = { nome }
+        pessoa.nome
+      )`,
     "saída": "Maria"
   }, {
-    "entrada": "(\n      quadrado = x => x * x\n      quadrado(5)\n    )",
+    "entrada": `(
+      quadrado = x => x * x
+      quadrado(5)
+    )`,
     "saída": "25"
   }, {
-    "entrada": "(\n      iniciais = [\n        _ => \"Bulbasaur\"\n        _ => \"Charmander\"\n        _ => \"Squirtle\"\n      ]\n      iniciais[1](0)\n    )",
+    "entrada": `(
+      iniciais = [
+        _ => "Bulbasaur"
+        _ => "Charmander"
+        _ => "Squirtle"
+      ]
+      iniciais[1](0)
+    )`,
     "saída": "Charmander"
   }, {
-    "entrada": "(\n      soma = { a b } => a + b\n      soma({\n        a: 2\n        b: 3\n      })\n    )",
+    "entrada": `(
+      soma = { a b } => a + b
+      soma({
+        a: 2
+        b: 3
+      })
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      calc = { x y z } => x + y * z\n      calc({\n        x: 2\n        y: 3\n        z: 4\n      })\n    )",
+    "entrada": `(
+      calc = { x y z } => x + y * z
+      calc({
+        x: 2
+        y: 3
+        z: 4
+      })
+    )`,
     "saída": "14"
   }, {
-    "entrada": "(\n      subtrair = { a b } => a - b\n      subtrair({\n        b: 5\n        a: 10\n      })\n    )",
+    "entrada": `(
+      subtrair = { a b } => a - b
+      subtrair({
+        b: 5
+        a: 10
+      })
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      juntar = { primeiro segundo } => [primeiro \" \" segundo] * \"\"\n      juntar({\n        primeiro: \"Hello\"\n        segundo: \"World\"\n      })\n    )",
+    "entrada": `(
+      juntar = { primeiro segundo } => [primeiro " " segundo] * ""
+      juntar({
+        primeiro: "Hello"
+        segundo: "World"
+      })
+    )`,
     "saída": "Hello World"
   }, {
-    "entrada": "(\n      soma = { a b } => a + b\n      soma({\n        a: 2\n        b: 3\n      })\n    )",
+    "entrada": `(
+      soma = { a b } => a + b
+      soma({
+        a: 2
+        b: 3
+      })
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      multiplicar_e_somar = { x y base } => x * y + base\n      multiplicar_e_somar({\n        x: 5\n        y: 3\n        base: 10\n      })\n    )",
+    "entrada": `(
+      multiplicar_e_somar = { x y base } => x * y + base
+      multiplicar_e_somar({
+        x: 5
+        y: 3
+        base: 10
+      })
+    )`,
     "saída": "25"
   }, {
-    "entrada": "(\n      obter_valor = { valor } => valor\n      obter_valor({\n        valor: 42\n      })\n    )",
+    "entrada": `(
+      obter_valor = { valor } => valor
+      obter_valor({
+        valor: 42
+      })
+    )`,
     "saída": "42"
   }, {
-    "entrada": "(\n      abs = x =>\n        | x < 0 = 0 - x\n        | x\n      abs(-5)\n    )",
+    "entrada": `(
+      abs = x =>
+        | x < 0 = 0 - x
+        | x
+      abs(-5)
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      sign = x =>\n        | x > 0 = 1\n        | x < 0 = 0 - 1\n        | 0\n      sign(5)\n    )",
+    "entrada": `(
+      sign = x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      sign(5)
+    )`,
     "saída": "1"
   }, {
-    "entrada": "(\n      sign = x =>\n        | x > 0 = 1\n        | x < 0 = 0 - 1\n        | 0\n      sign(-3)\n    )",
+    "entrada": `(
+      sign = x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      sign(-3)
+    )`,
     "saída": "-1"
   }, {
-    "entrada": "(\n      sign = x =>\n        | x > 0 = 1\n        | x < 0 = 0 - 1\n        | 0\n      sign(0)\n    )",
+    "entrada": `(
+      sign = x =>
+        | x > 0 = 1
+        | x < 0 = 0 - 1
+        | 0
+      sign(0)
+    )`,
     "saída": "0"
   }, {
-    "entrada": "(\n      classify = x =>\n        | x > 10 = \"grande\"\n        | x > 5 = \"médio\"\n        | \"pequeno\"\n      classify(15)\n    )",
+    "entrada": `(
+      classify = x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      classify(15)
+    )`,
     "saída": "grande"
   }, {
-    "entrada": "(\n      classify = x =>\n        | x > 10 = \"grande\"\n        | x > 5 = \"médio\"\n        | \"pequeno\"\n      classify(7)\n    )",
+    "entrada": `(
+      classify = x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      classify(7)
+    )`,
     "saída": "médio"
   }, {
-    "entrada": "(\n      classify = x =>\n        | x > 10 = \"grande\"\n        | x > 5 = \"médio\"\n        | \"pequeno\"\n      classify(3)\n    )",
+    "entrada": `(
+      classify = x =>
+        | x > 10 = "grande"
+        | x > 5 = "médio"
+        | "pequeno"
+      classify(3)
+    )`,
     "saída": "pequeno"
   }, {
-    "entrada": "(\n      abs = x => | x < 0 = 0 - x | x\n      abs(-5)\n    )",
+    "entrada": `(
+      abs = x => | x < 0 = 0 - x | x
+      abs(-5)
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      max = { a b } => | a > b = a | b\n      max({ a: 10 b: 5 })\n    )",
+    "entrada": `(
+      max = { a b } => | a > b = a | b
+      max({ a: 10 b: 5 })
+    )`,
     "saída": "10"
   }, {
-    "entrada": "(\n      max = { a b } => | a > b = a | b\n      max({ a: 3 b: 8 })\n    )",
+    "entrada": `(
+      max = { a b } => | a > b = a | b
+      max({ a: 3 b: 8 })
+    )`,
     "saída": "8"
   }, {
-    "entrada": "(\n      a = x => x * 2\n      a(5)\n    )",
+    "entrada": `(
+      a = x => x * 2
+      a(5)
+    )`,
     "saída": "10"
   }, {
-    "entrada": "(\n      funcs = [\n        _ => x => x + 1\n        _ => x => x * 2\n      ]\n      funcs[0]()(3)  // Should work: funcs[0] returns function, then () calls it, then (3) calls result\n    )",
+    "entrada": `(
+      funcs = [
+        _ => x => x + 1
+        _ => x => x * 2
+      ]
+      funcs[0]()(3)  // Should work: funcs[0] returns function, then () calls it, then (3) calls result
+    )`,
     "saída": "4"
   }, {
-    "entrada": "(\n      soma = n1 => n2 => n1 + n2\n      soma(2)(3)\n    )",
+    "entrada": `(
+      soma = n1 => n2 => n1 + n2
+      soma(2)(3)
+    )`,
     "saída": "5"
   }, {
-    "entrada": "(\n      soma3 = a => b => c => a + b + c\n      soma3(1)(2)(3)\n    )",
+    "entrada": `(
+      soma3 = a => b => c => a + b + c
+      soma3(1)(2)(3)
+    )`,
     "saída": "6"
   }, {
-    "entrada": "(\n      soma4 = a => b => c => d => a + b + c + d\n      soma4(1)(2)(3)(4)\n    )",
+    "entrada": `(
+      soma4 = a => b => c => d => a + b + c + d
+      soma4(1)(2)(3)(4)
+    )`,
     "saída": "10"
   }, {
-    "entrada": "(\n      multiplica = x => y => x * y\n      dobro = multiplica(2)\n      dobro(5)\n    )",
+    "entrada": `(
+      multiplica = x => y => x * y
+      dobro = multiplica(2)
+      dobro(5)
+    )`,
     "saída": "10"
   }, {
-    "entrada": "(\n      soma = n1 => n2 => n1 + n2\n      funcs = [soma]\n      funcs[0](10)(20)\n    )",
+    "entrada": `(
+      soma = n1 => n2 => n1 + n2
+      funcs = [soma]
+      funcs[0](10)(20)
+    )`,
     "saída": "30"
   }, {
-    "entrada": "(\n      cria_objeto = x => y => { a: x b: y }\n      obj = cria_objeto(5)(10)\n      obj.a + obj.b\n    )",
+    "entrada": `(
+      cria_objeto = x => y => { a: x b: y }
+      obj = cria_objeto(5)(10)
+      obj.a + obj.b
+    )`,
     "saída": "15"
   }, {
-    "entrada": "(\n      a = 2 // comentário\n      b = 3 // outro comentário\n      a + b\n    )",
+    "entrada": `(
+      a = 2 // comentário
+      b = 3 // outro comentário
+      a + b
+    )`,
     "saída": "5"
   }
 ];
