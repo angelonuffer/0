@@ -789,7 +789,15 @@ const testes = [
       a + b
     )`,
     "saída": "5"
-  }
+  }, {
+    "entrada": "a.b.c == 42",
+    "saída": "1",
+    "arquivo": "testes/teste_aninhado.0"
+  }, {
+    "entrada": "(util_teste.soma(1)(2) == 3) & (aritmética_teste.soma(1)(2) == 3) & (util_teste = { soma: a => b => a + 100 } util_teste.soma(1)(2) == 101)",
+    "saída": "1",
+    "arquivo": "testes/módulos_locais.0"
+  },
 ];
 
 import { interpretar } from "./0.js";
