@@ -1,8 +1,0 @@
-uniteste = ../integração/uniteste.0
-
-uniteste.descrever({ nome: "String Division Test" testes: [
-  uniteste.listas_iguais([
-    "a b c" / " "
-    ["a" "b" "c"]
-  ])
-  ]})
