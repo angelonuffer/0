@@ -717,3 +717,5 @@ for (const teste of testes) {
 process.stdout.write(`✓ ${passaram}/${total}\n`);
 
 if (passaram !== total) process.exit(1);
+
+await import("./testes/0.js");

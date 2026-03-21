@@ -223,18 +223,8 @@ function executarTestes() {
       process.exit(typeof e.status === 'number' ? e.status : 1);
     }
 
-    console.log('\nTodos os testes passaram. Executando os testes principais...');
-    try {
-      execSync('node 0.teste.js', {
-        cwd: caminhoBase,
-        stdio: 'inherit',
-        shell: true
-      });
-      process.exit(0);
-    } catch (e) {
-      // Se os testes principais falharem, propaga o código de saída
-      process.exit(typeof e.status === 'number' ? e.status : 1);
-    }
+    // Se chegou aqui, todos os testes passaram
+    process.exit(0);
   }
 
   // Código de saída quando houver falhas nos testes de erro
