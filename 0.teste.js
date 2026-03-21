@@ -63,6 +63,170 @@ const testes = [
     "entrada": "10 - (6 / 2)",
     "saída": "7"
   },
+  {
+    "entrada": "@ \"./arquivos_teste/saudacao.txt\"",
+    "saída": "Olá mundo"
+  },
+  {
+    "entrada": "@ \"./arquivos_teste/numero.txt\"",
+    "saída": "123"
+  },
+  {
+    "entrada": "@ \"./arquivos_teste/utf8.txt\"",
+    "saída": "conteúdo UTF-8: café ☕"
+  },
+  {
+    "entrada": "(\n  caminho = \"./arquivos_teste/saudacao.txt\"\n  @ caminho\n)",
+    "saída": "Olá mundo"
+  },
+  {
+    "entrada": "(@ \"./arquivos_teste/numero.txt\")[.]",
+    "saída": "3"
+  },
+  {
+    "entrada": "2 > 8",
+    "saída": "0"
+  },
+  {
+    "entrada": "8 > 2",
+    "saída": "1"
+  },
+  {
+    "entrada": "8 > 8",
+    "saída": "0"
+  },
+  {
+    "entrada": "2 < 8",
+    "saída": "1"
+  },
+  {
+    "entrada": "8 < 2",
+    "saída": "0"
+  },
+  {
+    "entrada": "8 < 8",
+    "saída": "0"
+  },
+  {
+    "entrada": "2 == 8",
+    "saída": "0"
+  },
+  {
+    "entrada": "8 == 2",
+    "saída": "0"
+  },
+  {
+    "entrada": "8 == 8",
+    "saída": "1"
+  },
+  {
+    "entrada": "2 != 8",
+    "saída": "1"
+  },
+  {
+    "entrada": "8 != 2",
+    "saída": "1"
+  },
+  {
+    "entrada": "8 != 8",
+    "saída": "0"
+  },
+  {
+    "entrada": "2 >= 8",
+    "saída": "0"
+  },
+  {
+    "entrada": "8 >= 2",
+    "saída": "1"
+  },
+  {
+    "entrada": "8 >= 8",
+    "saída": "1"
+  },
+  {
+    "entrada": "2 <= 8",
+    "saída": "1"
+  },
+  {
+    "entrada": "8 <= 2",
+    "saída": "0"
+  },
+  {
+    "entrada": "8 <= 8",
+    "saída": "1"
+  },
+  {
+    "entrada": "% 5",
+    "saída": "5"
+  },
+  {
+    "entrada": "% 2 + 3",
+    "saída": "5"
+  },
+  {
+    "entrada": "(\n  a = 10\n  % a * 2\n)",
+    "saída": "20"
+  },
+  {
+    "entrada": "(\n  lista = [1 2 3]\n  % lista[1]\n)",
+    "saída": "2"
+  },
+  {
+    "entrada": "(\n  x = 5\n  y = 3\n  % x + % y\n)",
+    "saída": "8"
+  },
+  {
+    "entrada": "% \"teste\"",
+    "saída": "teste"
+  },
+  {
+    "entrada": "(% [1 2 3])[1]",
+    "saída": "2"
+  },
+  {
+    "entrada": "(\n  obj = {nome: \"João\" idade: 30}\n  (% obj).nome\n)",
+    "saída": "João"
+  },
+  {
+    "entrada": "0 & 0",
+    "saída": "0"
+  },
+  {
+    "entrada": "0 & 1",
+    "saída": "0"
+  },
+  {
+    "entrada": "1 & 0",
+    "saída": "0"
+  },
+  {
+    "entrada": "1 & 2",
+    "saída": "2"
+  },
+  {
+    "entrada": "0 | 0",
+    "saída": "0"
+  },
+  {
+    "entrada": "0 | 1",
+    "saída": "1"
+  },
+  {
+    "entrada": "1 | 0",
+    "saída": "1"
+  },
+  {
+    "entrada": "1 | 2",
+    "saída": "1"
+  },
+  {
+    "entrada": "! 0",
+    "saída": "1"
+  },
+  {
+    "entrada": "! 1",
+    "saída": "0"
+  }
 ];
 
 import { interpretar } from "./0.js";
