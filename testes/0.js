@@ -225,7 +225,7 @@ function executarTestes() {
 
     console.log('\nTodos os testes passaram. Executando os testes principais...');
     try {
-      execSync('node 0.js testes/0 | node', {
+      execSync('node 0.teste.js', {
         cwd: caminhoBase,
         stdio: 'inherit',
         shell: true
