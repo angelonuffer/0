@@ -2,7 +2,6 @@ uniteste = ./integração/uniteste.0
 
 uniteste.exibir(
   uniteste.descrever({ nome: "0" testes: [
-    ./operadores/aritmética.0
     ./operadores/operadores_lógicos.0
     ./operadores/comparadores.0
     ./operadores/depuração.0

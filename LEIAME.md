@@ -19,7 +19,7 @@ O módulo avalia sua expressão final e imprime o resultado.
 ### Executar os testes do núcleo
 
 ```bash
-node testes/0.js
+node 0.teste.js
 ```
 
 ### Teste de integração com outro repositório
