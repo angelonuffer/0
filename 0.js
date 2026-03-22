@@ -212,7 +212,7 @@ const executar_testes_documentação = async (caminho) => {
   let total = 0;
   let passaram = 0;
 
-  console.log(`Executando testes da documentação (${caminho})...\n`);
+  console.log(`${caminho}:`);
 
   while ((match = regex.exec(conteudo)) !== null) {
     total++;
@@ -224,7 +224,7 @@ const executar_testes_documentação = async (caminho) => {
 
       // Se parsed.sucesso for true mas tiver resto, pode ser erro de sintaxe parcial
       if (!parsed.sucesso || (parsed.resto && parsed.resto.trim() !== '')) {
-        console.error(`✗ Bloco ${total} falhou: Erro de sintaxe`);
+        console.error(`✗ ${total}`);
         console.error(codigo);
         if (parsed.erro) {
            console.error(`  Esperado: ${parsed.erro.esperado.join(', ')}`);
@@ -261,16 +261,15 @@ const executar_testes_documentação = async (caminho) => {
       const resultado = ast.expressão ? await avaliar(ast.expressão, escopo) : 1;
 
       if (typeof resultado === 'string') {
-        console.log(`✗ Bloco ${total} falhou.`);
+        console.log(`✗ ${total}`);
         console.error(codigo);
         console.log(resultado);
         falhou = true;
       } else if (typeof resultado === 'number') {
         if (resultado !== 0) {
-          console.log(`✓ Bloco ${total}`);
           passaram++;
         } else {
-          console.error(`✗ Bloco ${total} falhou: Retornou 0 (falso)`);
+          console.error(`✗ ${total}`);
           console.error(codigo);
           falhou = true;
         }
@@ -283,17 +282,13 @@ const executar_testes_documentação = async (caminho) => {
         falhou = true;
       }
     } catch (erro) {
-      console.error(`✗ Bloco ${total} falhou com erro semântico: ${erro.message}`);
+      console.error(`✗ ${total}`);
       console.error(codigo);
       falhou = true;
     }
   }
 
-  console.log(`\n${'='.repeat(50)}`);
-  console.log(`Total: ${total} blocos testados`);
-  console.log(`✓ Passaram: ${passaram}`);
-  console.log(`✗ Falharam: ${total - passaram}`);
-  console.log(`${'='.repeat(50)}\n`);
+  console.log(`✓ ${passaram}/${total}`);
 
   if (falhou) {
     process.exit(1);

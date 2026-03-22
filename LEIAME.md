@@ -27,10 +27,10 @@ node 0.teste.js
 Para verificar a compatibilidade com módulos em outros repositórios:
 
 ```bash
-node testes/integração.js <repositório> <caminho>
+node arquivos_teste/integração.js <repositório> <caminho>
 ```
 
-Exemplo: `node testes/integração.js angelonuffer/antlr.0 tests/0`
+Exemplo: `node arquivos_teste/integração.js angelonuffer/antlr.0 tests/0`
 
 ## Módulos e Carregamento
 

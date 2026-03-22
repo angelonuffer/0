@@ -309,27 +309,23 @@ const testes = [
     )`,
     "saída": "João Silva"
   }, {
-    "entrada": "(importação_módulo_valor_helper.0)",
+    "entrada": "(./arquivos_teste/importação_módulo_valor_helper.0)",
     "saída": "5",
-    "arquivo": "testes/sintaxe/importação_módulo_valor.0"
   }, {
     "entrada": `(
-      valor = importação_módulo_valor_helper.0
+      valor = ./arquivos_teste/importação_módulo_valor_helper.0
       valor
     )`,
     "saída": "5",
-    "arquivo": "testes/sintaxe/importação_módulo_valor.0"
   }, {
     "entrada": `(
-      função = importação_módulo_valor_função.0
+      função = ./arquivos_teste/importação_módulo_valor_função.0
       função({ a: 10 b: 20 })
     )`,
     "saída": "30",
-    "arquivo": "testes/sintaxe/importação_módulo_valor.0"
   }, {
-    "entrada": "(importação_módulo_valor_função.0)({ a: 7 b: 3 })",
+    "entrada": "(./arquivos_teste/importação_módulo_valor_função.0)({ a: 7 b: 3 })",
     "saída": "10",
-    "arquivo": "testes/sintaxe/importação_módulo_valor.0"
   }, {
     "entrada": "[1 2 3]",
     "saída": "[ 1, 2, 3 ]"
@@ -790,13 +786,8 @@ const testes = [
     )`,
     "saída": "5"
   }, {
-    "entrada": "a.b.c == 42",
+    "entrada": "arquivos_teste.a.b.c == 42",
     "saída": "1",
-    "arquivo": "testes/teste_aninhado.0"
-  }, {
-    "entrada": "(util_teste.soma(1)(2) == 3) & (aritmética_teste.soma(1)(2) == 3) & (util_teste = { soma: a => b => a + 100 } util_teste.soma(1)(2) == 101)",
-    "saída": "1",
-    "arquivo": "testes/módulos_locais.0"
   }, {
     "entrada": "= 5",
     "arquivo": "operador_inválido.0",
@@ -1015,6 +1006,7 @@ texto = "Olá mundo
 ];
 
 import { interpretar } from "./0.js";
+import { execSync } from 'child_process';
 
 let passaram = 0;
 let total = 0;
@@ -1049,8 +1041,10 @@ for (const teste of testes) {
   }
 }
 
-process.stdout.write(`✓ ${passaram}/${total}\n`);
+process.stdout.write(`✓ ${passaram}/${total}\n\n`);
 
 if (passaram !== total) process.exit(1);
 
-await import("./testes/0.js");
+execSync("node 0.js EXEMPLOS.md", {
+  stdio: "inherit",
+})
