@@ -1,7 +1,0 @@
-// Teste de erro de sintaxe: colchete não fechado dentro de objeto
-obj = {
-  a: 1
-  b: [
-    1
-    2
-}

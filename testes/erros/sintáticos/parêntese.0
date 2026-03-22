@@ -1,2 +1,0 @@
-// Teste de erro de sintaxe: parêntese não fechado
-f = x => (x + 1

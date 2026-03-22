@@ -1,2 +1,0 @@
-// Teste de erro de referência: função não definida
-funcaoNaoDefinida(42)

@@ -805,6 +805,212 @@ const testes = [
 = 5
 ^
 Opções: {, h, ., (, [, 0-9, ", -, !, %, @`
+  }, {
+    "entrada": `// Teste de erro de referência: função não definida
+funcaoNaoDefinida(42)`,
+    "arquivo": "função_indefinida.0",
+    "erro": `função_indefinida.0
+2:1
+funcaoNaoDefinida(42)
+^^^^^^^^^^^^^^^^^`
+  }, {
+    "entrada": `// Teste: pilha de chamadas com aplicações
+a = b => c + 1
+
+d = e => a(e)
+
+d(2)`,
+    "arquivo": "pilha_aplicacoes.0",
+    "erro": `pilha_aplicacoes.0
+6:1
+d(2)
+^
+4:10
+d = e => a(e)
+         ^
+2:10
+a = b => c + 1
+         ^
+Opções: b, a, d`
+  }, {
+    "entrada": `a = ./arquivos_teste/pilha_importação_módulo.0
+
+d = e => a(e)
+
+d(2)`,
+    "arquivo": "pilha_importação.0",
+    "erro": `pilha_importação.0
+5:1
+d(2)
+^
+3:10
+d = e => a(e)
+         ^
+
+arquivos_teste/pilha_importação_módulo.0
+1:6
+b => c + 1
+     ^
+Opções: b`
+  }, {
+    "entrada": `// Teste de erro de referência: acesso a campo em objeto não definido
+objetoNaoDefinido["campo"]`,
+    "arquivo": "propriedade_indefinida.0",
+    "erro": `propriedade_indefinida.0
+2:1
+objetoNaoDefinido["campo"]
+^^^^^^^^^^^^^^^^^`
+  }, {
+    "entrada": `// Teste de erro de referência: uso de variável antes da definição
+// Na expressão principal (última linha), a variável não está definida
+x + 10`,
+    "arquivo": "uso_antes_definição.0",
+    "erro": `uso_antes_definição.0
+3:1
+x + 10
+^`
+  }, {
+    "entrada": `// Teste de erro de referência: variável não definida
+variavelNaoDefinida`,
+    "arquivo": "variável_indefinida.0",
+    "erro": `variável_indefinida.0
+2:1
+variavelNaoDefinida
+^^^^^^^^^^^^^^^^^^^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: chave não fechada dentro de outro objeto
+obj = {
+  a: 1
+  b: {
+    x: 1
+    y: 2
+  c: 3
+}`,
+    "arquivo": "aninhado_chave.0",
+    "erro": `aninhado_chave.0
+8:1
+}
+^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: colchete não fechado dentro de objeto
+obj = {
+  a: 1
+  b: [
+    1
+    2
+}`,
+    "arquivo": "aninhado_colchete.0",
+    "erro": `aninhado_colchete.0
+7:1
+}
+^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: chave não fechada
+obj = { a: 1 b: 2`,
+    "arquivo": "chave.0",
+    "erro": `chave.0
+2:18
+obj = { a: 1 b: 2
+                 ^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: caractere inesperado dentro de chaves
+obj = {
+  a: 1
+  b: 2
+  $
+}`,
+    "arquivo": "chave_caractere_inesperado.0",
+    "erro": `chave_caractere_inesperado.0
+5:3
+  $
+  ^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: dois pontos inesperados dentro de chaves
+obj = {
+  a: 1
+  : 2
+}`,
+    "arquivo": "chave_dois_pontos.0",
+    "erro": `chave_dois_pontos.0
+4:3
+  : 2
+  ^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: chave não fechada em múltiplas linhas
+obj = {
+  a: 1
+  b: 2`,
+    "arquivo": "chave_multilinha.0",
+    "erro": `chave_multilinha.0
+4:7
+  b: 2
+      ^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: colchete não fechado
+x = [1 2 3`,
+    "arquivo": "colchete.0",
+    "erro": `colchete.0
+2:11
+x = [1 2 3
+          ^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: colchete de fechamento sem abertura
+x = ]`,
+    "arquivo": "colchete_fechamento.0",
+    "erro": `colchete_fechamento.0
+2:5
+x = ]
+    ^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: colchete não fechado em múltiplas linhas
+lista = [
+  1
+  2
+  3`,
+    "arquivo": "colchete_multilinha.0",
+    "erro": `colchete_multilinha.0
+5:4
+  3
+   ^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: parêntese não fechado
+f = x => (x + 1`,
+    "arquivo": "parêntese.0",
+    "erro": `parêntese.0
+2:16
+f = x => (x + 1
+               ^
+Opções: {, h, ., (, [, 0-9, ", -, !, %, @`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: parêntese de fechamento inesperado
+lista = [
+  1
+  2
+)
+`,
+    "arquivo": "parêntese_inesperado.0",
+    "erro": `parêntese_inesperado.0
+5:1
+)
+^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: parêntese não fechado em múltiplas linhas
+result = (
+  1 + 2 +
+  3 + 4`,
+    "arquivo": "parêntese_multilinha.0",
+    "erro": `parêntese_multilinha.0
+4:8
+  3 + 4
+       ^`
+  }, {
+    "entrada": `// Teste de erro de sintaxe: string não fechada
+texto = "Olá mundo`,
+    "arquivo": "string_não_fechada.0",
+    "erro": `string_não_fechada.0
+2:19
+texto = "Olá mundo
+                  ^`
   },
 ];
 

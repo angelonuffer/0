@@ -59,83 +59,11 @@ function compararSaidas(obtida, esperada, caminhoBase) {
 
 // Função principal de teste
 function executarTestes() {
-  const dirTestes = join(__dirname, 'erros');
+  // Diretório de execução base (projeto raiz)
+  const caminhoBase = join(__dirname, '..');
 
-  // Coleta recursivamente arquivos que terminam com .erro.txt dentro de dirTestes
-  // e retorna a lista de caminhos dos arquivos de expectativa.
-  function coletarArquivosEsperadoRecursivo(dir) {
-    const resultados = [];
-    const entradas = readdirSync(dir, { withFileTypes: true });
-    for (const ent of entradas) {
-      const caminho = join(dir, ent.name);
-      if (ent.isDirectory()) {
-        resultados.push(...coletarArquivosEsperadoRecursivo(caminho));
-      } else if (ent.isFile() && ent.name.endsWith('.erro.txt')) {
-        resultados.push(caminho);
-      }
-    }
-    return resultados;
-  }
-
-  const arquivosEsperado = coletarArquivosEsperadoRecursivo(dirTestes).sort();
-  
   let passaram = 0;
   let falharam = 0;
-  const resultados = [];
-  const caminhoBase = join(dirTestes, '../..');
-  
-  console.log('Executando testes de erros...\n');
-  
-  for (const caminhoEsperado of arquivosEsperado) {
-    const nomeBase = basename(caminhoEsperado, '.erro.txt');
-    const caminhoTeste = join(dirname(caminhoEsperado), `${nomeBase}.0`);
-    const caminhoRelativo = relative(dirTestes, caminhoTeste);
-
-    // Se o arquivo .0 não existir, avisa e pula
-    try {
-      readFileSync(caminhoTeste, 'utf-8');
-      } catch (e) {
-      console.log(`⚠️  ${caminhoRelativo}: Arquivo de teste '.0' não encontrado para este '.erro.txt'`);
-      continue;
-    }
-    
-    try {
-      // Lê o arquivo esperado (já sabemos que existe porque o coletamos)
-      const saidaEsperada = readFileSync(caminhoEsperado, 'utf-8').trim();
-      
-      // Executa o teste
-      let saidaObtida;
-      try {
-        execSync(`node 0.js ${caminhoTeste} node`, {
-          cwd: caminhoBase,
-          encoding: 'utf-8',
-          stdio: 'pipe'
-        });
-        // Se não lançou erro, algo está errado
-        saidaObtida = '';
-      } catch (error) {
-        // Erro esperado
-        saidaObtida = (error.stdout + error.stderr).trim();
-      }
-      
-      // Compara saídas
-      if (compararSaidas(saidaObtida, saidaEsperada, caminhoBase)) {
-        console.log(`✓ ${caminhoRelativo}`);
-        passaram++;
-      } else {
-        console.log(`✗ ${caminhoRelativo}`);
-        console.log(`  Esperado:`);
-        console.log(`    ${normalizarSaida(saidaEsperada, null).split('\n').join('\n    ')}`);
-        console.log(`  Obtido:`);
-        console.log(`    ${normalizarSaida(saidaObtida, caminhoBase).split('\n').join('\n    ')}`);
-        falharam++;
-      }
-    } catch (error) {
-      console.log(`✗ ${caminhoRelativo}: Erro ao executar teste`);
-      console.log(`  ${error.message}`);
-      falharam++;
-    }
-  }
 
   // Executando testes de saída (.saída.txt)
   const dirSaida = __dirname; // testes/

@@ -1,5 +1,0 @@
-a = pilha_importação_módulo.0
-
-d = e => a(e)
-
-d(2)
