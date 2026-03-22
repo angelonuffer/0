@@ -797,6 +797,14 @@ const testes = [
     "entrada": "(util_teste.soma(1)(2) == 3) & (aritmética_teste.soma(1)(2) == 3) & (util_teste = { soma: a => b => a + 100 } util_teste.soma(1)(2) == 101)",
     "saída": "1",
     "arquivo": "testes/módulos_locais.0"
+  }, {
+    "entrada": "= 5",
+    "arquivo": "operador_inválido.0",
+    "erro": `operador_inválido.0
+1:1
+= 5
+^
+Opções: {, h, ., (, [, 0-9, ", -, !, %, @`
   },
 ];
 
@@ -807,17 +815,31 @@ let total = 0;
 
 for (const teste of testes) {
   total++;
-  const { saída, } = await interpretar(teste.entrada, teste.arquivo || "0.teste.js");
-  if (saída.trim() === teste.saída.trim()) {
-    passaram++;
-  } else {
-    process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
+  const { saída, erro } = await interpretar(teste.entrada, teste.arquivo || "0.teste.js");
+  if (teste.erro !== undefined) {
+    if (erro.trim() === teste.erro.trim()) {
+      passaram++;
+    } else {
+      process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
 
-📝 ${teste.saída.trim().replaceAll('\n', '\n   ')}
+⚠️ ${teste.erro.trim().replaceAll('\n', '\n   ')}
+
+🚨 ${erro.trim().replaceAll('\n', '\n   ')}
+
+    `);
+    }
+  } else {
+    if (saída.trim() === teste.saída.trim()) {
+      passaram++;
+    } else {
+      process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
+
+🎯 ${teste.saída.trim().replaceAll('\n', '\n   ')}
 
 🚨 ${saída.trim().replaceAll('\n', '\n   ')}
 
 `);
+    }
   }
 }
 
