@@ -336,9 +336,6 @@ const testes = [
     "entrada": "[\"a\" \"b\" \"c\"]",
     "saída": "[ 'a', 'b', 'c' ]"
   }, {
-    "entrada": "[\"a\" \"b\" \"c\"]",
-    "saída": "[ 'a', 'b', 'c' ]"
-  }, {
     "entrada": "[\"1\" \"2\" \"3\"]",
     "saída": "[ '1', '2', '3' ]"
   }, {
@@ -522,12 +519,6 @@ const testes = [
     )`,
     "saída": "9"
   }, {
-    "entrada": `(
-      a = 4
-      a + 5
-    )`,
-    "saída": "9"
-  }, {
     "entrada": "[[1 2] [3 4]][0][1]",
     "saída": "2"
   }, {
@@ -617,15 +608,6 @@ const testes = [
       })
     )`,
     "saída": "Hello World"
-  }, {
-    "entrada": `(
-      soma = { a b } => a + b
-      soma({
-        a: 2
-        b: 3
-      })
-    )`,
-    "saída": "5"
   }, {
     "entrada": `(
       multiplicar_e_somar = { x y base } => x * y + base
@@ -1002,7 +984,51 @@ texto = "Olá mundo`,
 2:19
 texto = "Olá mundo
                   ^`
-  },
+  }, {
+    "entrada": "% 0",
+    "saída": "0"
+  }, {
+    "entrada": "[1 2][5]",
+    "saída": ""
+  }, {
+    "entrada": "[][-1]",
+    "saída": ""
+  }, {
+    "entrada": "[1:100]",
+    "erro": `0.teste.js
+1:3
+[1:100]
+  ^
+Opções: ]
+`
+  }, {
+    "entrada": "2147483647 + 1",
+    "saída": "2147483648"
+  }, {
+    "entrada": "- -5",
+    "erro": `0.teste.js
+1:2
+- -5
+ ^
+Opções: 0-9
+`
+  }, {
+    "entrada": "3.14 * 2",
+    "erro": `0.teste.js
+1:3
+3.14 * 2
+  ^
+`
+  }, {
+    "entrada": "1 + 2 * 3 - 4 / 2",
+    "saída": "5"
+  }, {
+    "entrada": "! ! 0",
+    "saída": "0"
+  }, {
+    "entrada": "0 & (1 / 0)",
+    "saída": "0"
+  }
 ];
 
 import { interpretar } from "./0.js";
