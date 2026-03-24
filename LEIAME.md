@@ -31,14 +31,3 @@ node arquivos_teste/integração.js <repositório> <caminho>
 ```
 
 Exemplo: `node arquivos_teste/integração.js angelonuffer/antlr.0 tests/0`
-
-## Módulos e Carregamento
-
-- **Operador `@`**: Avalia uma expressão como endereço e carrega o módulo correspondente.
-- **Resolução**: O runtime gerencia o cache de módulos e hooks para resolução de caminhos e I/O.
-
-## Diagnóstico e Erros
-
-- **Depuração**: O operador `% expressão` imprime o valor em stderr (JSON) e o retorna, facilitando a inspeção.
-- **Erros de Sintaxe**: Exibem arquivo, linha e coluna com o trecho de código afetado.
-- **Erros Semânticos**: Fornecem um **rastro de pilha semântica (frames)** e informações sobre nomes disponíveis no escopo no momento do erro.
