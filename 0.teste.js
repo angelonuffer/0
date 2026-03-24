@@ -133,7 +133,7 @@ const testes = [
     "saída": "20"
   }, {
     "entrada": `(
-  lista = [1 2 3]
+  lista = [1, 2, 3]
   % lista[1]
 )`,
     "saída": "2"
@@ -148,7 +148,7 @@ const testes = [
     "entrada": "% \"teste\"",
     "saída": "teste"
   }, {
-    "entrada": "(% [1 2 3])[1]",
+    "entrada": "(% [1, 2, 3])[1]",
     "saída": "2"
   }, {
     "entrada": `(
@@ -268,7 +268,7 @@ const testes = [
     "entrada": `(
       nome = "João"
       sobrenome = "Silva"
-      [ nome " " sobrenome ] * ""
+      [ nome, " ", sobrenome ] * ""
     )`,
     "saída": "João Silva"
   }, {
@@ -327,28 +327,28 @@ const testes = [
     "entrada": "(./arquivos_teste/importação_módulo_valor_função.0)({ a: 7 b: 3 })",
     "saída": "10",
   }, {
-    "entrada": "[1 2 3]",
+    "entrada": "[1, 2, 3]",
     "saída": "[ 1, 2, 3 ]"
   }, {
     "entrada": "[]",
     "saída": "[]"
   }, {
-    "entrada": "[\"a\" \"b\" \"c\"]",
+    "entrada": "[\"a\", \"b\", \"c\"]",
     "saída": "[ 'a', 'b', 'c' ]"
   }, {
-    "entrada": "[\"1\" \"2\" \"3\"]",
+    "entrada": "[\"1\", \"2\", \"3\"]",
     "saída": "[ '1', '2', '3' ]"
   }, {
-    "entrada": "[65 66 67]",
+    "entrada": "[65, 66, 67]",
     "saída": "[ 65, 66, 67 ]"
   }, {
-    "entrada": "[\"Alice\" \"Bob\" \"Charlie\"]",
+    "entrada": "[\"Alice\", \"Bob\", \"Charlie\"]",
     "saída": "[ 'Alice', 'Bob', 'Charlie' ]"
   }, {
-    "entrada": "[\"Alice\" \"Bob\" \"Charlie\"][1]",
+    "entrada": "[\"Alice\", \"Bob\", \"Charlie\"][1]",
     "saída": "Bob"
   }, {
-    "entrada": "[1 2 3][.]",
+    "entrada": "[1, 2, 3][.]",
     "saída": "3"
   }, {
     "entrada": `(
@@ -507,10 +507,10 @@ const testes = [
     )`,
     "saída": "1"
   }, {
-    "entrada": "[ 2 3 ][0]",
+    "entrada": "[ 2, 3 ][0]",
     "saída": "2"
   }, {
-    "entrada": "[ 2 3 ][1]",
+    "entrada": "[ 2, 3 ][1]",
     "saída": "3"
   }, {
     "entrada": `(
@@ -519,16 +519,16 @@ const testes = [
     )`,
     "saída": "9"
   }, {
-    "entrada": "[[1 2] [3 4]][0][1]",
+    "entrada": "[[1, 2], [3, 4]][0][1]",
     "saída": "2"
   }, {
-    "entrada": "[ 1 2 3 ][.]",
+    "entrada": "[ 1, 2, 3 ][.]",
     "saída": "3"
   }, {
-    "entrada": "[ 1 2 3 4 5 ][1:3]",
+    "entrada": "[ 1, 2, 3, 4, 5 ][1:3]",
     "saída": "[ 2, 3 ]"
   }, {
-    "entrada": "[ 10 20 30 ][1 + 1]",
+    "entrada": "[ 10, 20, 30 ][1 + 1]",
     "saída": "30"
   }, {
     "entrada": `(
@@ -538,13 +538,13 @@ const testes = [
     "saída": "14"
   }, {
     "entrada": `(
-      lista = [1 2 3]
+      lista = [1, 2, 3]
       lista * ","
     )`,
     "saída": "1,2,3"
   }, {
     "entrada": `(
-      lista = ["a" "b" "c"]
+      lista = ["a", "b", "c"]
       lista * "-"
     )`,
     "saída": "a-b-c"
@@ -564,8 +564,8 @@ const testes = [
   }, {
     "entrada": `(
       iniciais = [
-        _ => "Bulbasaur"
-        _ => "Charmander"
+        _ => "Bulbasaur",
+        _ => "Charmander",
         _ => "Squirtle"
       ]
       iniciais[1](0)
@@ -601,7 +601,7 @@ const testes = [
     "saída": "5"
   }, {
     "entrada": `(
-      juntar = { primeiro segundo } => [primeiro " " segundo] * ""
+      juntar = { primeiro segundo } => [primeiro, " ", segundo] * ""
       juntar({
         primeiro: "Hello"
         segundo: "World"
@@ -920,12 +920,12 @@ obj = {
       ^`
   }, {
     "entrada": `// Teste de erro de sintaxe: colchete não fechado
-x = [1 2 3`,
+  x = [1, 2, 3`,
     "arquivo": "colchete.0",
     "erro": `colchete.0
-2:11
-x = [1 2 3
-          ^`
+2:15
+  x = [1, 2, 3
+              ^`
   }, {
     "entrada": `// Teste de erro de sintaxe: colchete de fechamento sem abertura
 x = ]`,
@@ -988,7 +988,7 @@ texto = "Olá mundo
     "entrada": "% 0",
     "saída": "0"
   }, {
-    "entrada": "[1 2][5]",
+    "entrada": "[1, 2][5]",
     "saída": ""
   }, {
     "entrada": "[][-1]",
