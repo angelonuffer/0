@@ -133,15 +133,10 @@ iguais([ "a-b" / "-",        [ "a", "b" ] ])
 ## Módulos e Endereços
 
 O carregamento de módulos usa endereços literais ou o operador `@`.
-*Nota: Estes exemplos são apenas para demonstração de sintaxe e não são executados aqui.*
 
-```syntax
-// Endereço literal (relativo ou URL)
-util = ./util.0
-math = https://exemplo.com/math.0
-
-// Operador @ para endereços dinâmicos
-carregar = caminho => @caminho
+```0
+iguais([ ./arquivos_teste/a/b/c.0,        42    ]) &
+iguais([ @ "./arquivos_teste/numero.txt", "123" ])
 ```
 
 ## Depuração

@@ -134,13 +134,14 @@ const endereço_literal = transformar(
       símbolo("/"),
       vários(
         inversão(
-          alternativa(
-            espaço_em_branco,
-            símbolo(")"),
-            símbolo("]"),
-            símbolo("}"),
+            alternativa(
+              espaço_em_branco,
+              símbolo(")"),
+              símbolo("]"),
+              símbolo("}"),
+              símbolo(","),
+            )
           )
-        )
       )
     ),
     // Relative path pattern: ./... or ../... (must have at least one character after the dot)
@@ -150,13 +151,14 @@ const endereço_literal = transformar(
       símbolo("/"),
       vários(
         inversão(
-          alternativa(
-            espaço_em_branco,
-            símbolo(")"),
-            símbolo("]"),
-            símbolo("}"),
+            alternativa(
+              espaço_em_branco,
+              símbolo(")"),
+              símbolo("]"),
+              símbolo("}"),
+              símbolo(","),
+            )
           )
-        )
       )
     ),
     // Simple file pattern: something.0

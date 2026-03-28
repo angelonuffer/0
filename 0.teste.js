@@ -1067,6 +1067,7 @@ while ((match = regex.exec(exemplos)) !== null) {
     entrada: código,
     saída: "1",
     escopo,
+    arquivo: "EXEMPLOS.md",
   });
 }
 
