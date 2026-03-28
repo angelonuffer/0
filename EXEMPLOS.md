@@ -135,8 +135,8 @@ iguais([ "a-b" / "-",        [ "a", "b" ] ])
 O carregamento de módulos usa endereços literais ou o operador `@`.
 
 ```0
-iguais([ @ "./arquivos_teste/pergunta.txt", "O que você obtém se multiplicar seis por nove?" ]) &
-iguais([ ./arquivos_teste/resposta.0,       42                                               ])
+iguais([ @ "./fontes/pergunta.txt", "O que você obtém se multiplicar seis por nove?" ]) &
+iguais([ ./fontes/resposta.0,       42                                               ])
 ```
 
 ## Depuração

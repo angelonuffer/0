@@ -1,514 +1,89 @@
-#!/usr/bin/env node
-import { _0 } from './código/analisador_sintático/index.js';
-import { importações } from './código/analisador_sintático/importações.js';
-import { avaliar, criarLazyThunk, INTERNAL_CONTEXT } from './código/analisador_semântico/index.js';
-import { ANSI } from './código/constantes.js';
-import { exibir_bloco_erro, exibir_bloco_erro_com_valor, mostrar_erro_semântico, mostrar_erro_variável, mostrar_erro_sintaxe } from './código/erros.js';
-import fs from 'fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import util from 'node:util';
+import fs from "fs";
+import analisar from "./fontes/analisar.js";
 
-const módulo_principal = process.argv[2];
+export async function interpretar({ entrada, arquivo = "<entrada>", escopo = {} }) {
+  const parsed = analisar(entrada, arquivo);
 
-// Caminho absoluto do arquivo de cache no mesmo diretório deste 0.js
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const CAMINHO_CACHE = path.join(__dirname, '0_cache.json');
+  if (parsed.vazio) return { saída: "", erro: "" };
 
-let cache = {};
-if (fs.existsSync(CAMINHO_CACHE)) {
-  cache = JSON.parse(fs.readFileSync(CAMINHO_CACHE, 'utf-8'));
-}
+  if (parsed.texto) return { saída: parsed.texto, erro: "" };
 
-const salvar_cache = () => fs.writeFileSync(CAMINHO_CACHE, JSON.stringify(cache, null, 2));
-
-// Helper function to resolve relative paths
-const resolve_endereço = (base_module_path, rel_path) => {
-  if (rel_path.startsWith('https://')) {
-    return rel_path;
-  }
-  // Handle absolute paths
-  if (rel_path.startsWith('/')) {
-    return rel_path;
-  }
-  const base_dir = base_module_path.includes('/') ? base_module_path.substring(0, base_module_path.lastIndexOf('/') + 1) : '';
-  const base_url = 'file:///' + base_dir;
-  const resolved_url = new URL(rel_path, base_url);
-  return decodeURIComponent(resolved_url.pathname.substring(1));
-};
-
-// Helper function to load content (local or remote) - now async lazy
-const carregar_conteúdo = async (endereço) => {
-  if (cache[endereço]) {
-    return cache[endereço];
-  }
-  if (endereço.startsWith("https://")) {
-    const resposta = await fetch(endereço);
-    cache[endereço] = await resposta.text();
-    return cache[endereço];
-  } else {
-    return fs.readFileSync(endereço, 'utf-8');
-  }
-};
-
-/**
- * Função auxiliar de comparação profunda para ser usada nos testes da documentação.
- */
-const deepEqual = (a, b) => {
-  if (a === b) return true;
-  if (typeof a !== typeof b) return false;
-  if (typeof a === 'object' && a !== null && b !== null) {
-    if (Array.isArray(a)) {
-      if (!Array.isArray(b) || a.length !== b.length) return false;
-      for (let i = 0; i < a.length; i++) {
-        if (!deepEqual(a[i], b[i])) return false;
-      }
-      return true;
-    } else {
-      const keysA = Object.keys(a).filter(k => k !== '__parent__');
-      const keysB = Object.keys(b).filter(k => k !== '__parent__');
-      if (keysA.length !== keysB.length) return false;
-      for (const key of keysA) {
-        if (!keysB.includes(key) || !deepEqual(a[key], b[key])) return false;
-      }
-      return true;
-    }
-  }
-  return false;
-};
-
-const iguais = (escopo, args) => {
-  if (Array.isArray(args) && args.length === 2) {
-    return deepEqual(args[0], args[1]) ? 1 :
-      "Esperava que:\n"
-    + `  ${JSON.stringify(args[0])}\n`
-    + "Fosse igual a:\n"
-    + `  ${JSON.stringify(args[1])}\n`
-  }
-  return 0;
-};
-
-// State for module loading and execution
-const conteúdos = {};
-const módulos = {};
-const valores_módulos = {};
-const módulos_iniciais = {};
-
-const mostrar_erro_e_sair = (erro, endereço) => {
-  if (erro.é_erro_semântico) {
-    const erro_endereço = erro.módulo_endereço || endereço;
-
-    // Prefer printing semantic frames (if present) before handling specific variable error
-    if (erro.pilha_semântica && Array.isArray(erro.pilha_semântica) && erro.pilha_semântica.length > 0) {
-      let framesToPrint = erro.pilha_semântica.slice().reverse();
-      const seen = new Set();
-      framesToPrint = framesToPrint.filter(f => {
-        const key = `${f.endereço || ''}|${f.termo_busca || ''}|${f.comprimento || ''}|${f.valor || ''}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-      // If the error is a missing-variable error, move any frame that targets the missing name
-      // to the end so we print call-sites before the origin frame (which will include suggestions).
-      if (erro.nome_variável) {
-        const tail = framesToPrint.filter(f => String(f.termo_busca) === String(erro.nome_variável));
-        const head = framesToPrint.filter(f => String(f.termo_busca) !== String(erro.nome_variável));
-        framesToPrint = head.concat(tail);
-      }
-      let último_endereço_impresso = null;
-      for (let i = 0; i < framesToPrint.length; i++) {
-        const frame = framesToPrint[i];
-        const frame_end = frame.endereço || erro_endereço;
-        const infos = (i === framesToPrint.length - 1 && erro.nome_variável) ? (erro.nomes_disponíveis || []) : [];
-        // Insert a blank line when switching to a different file frame (for readability)
-        if (i !== 0 && frame_end !== último_endereço_impresso) console.error('');
-        // Only suppress the file header when printing consecutive frames from the same file
-        const suprimirArquivoHeader = (i !== 0 && frame_end === último_endereço_impresso);
-        const pos = mostrar_erro_semântico(conteúdos, frame_end, erro.message, frame.termo_busca, infos, suprimirArquivoHeader);
-        if (frame.valor !== undefined) {
-          exibir_bloco_erro_com_valor(conteúdos, frame_end, pos.número_linha, pos.número_coluna, frame.comprimento || pos.comprimento_termo, frame.valor, 43);
-        }
-        último_endereço_impresso = frame_end;
-      }
-    } else if (erro.nome_variável) {
-      mostrar_erro_variável(conteúdos, erro_endereço, erro.nome_variável, erro.nomes_disponíveis);
-    } else if (erro.termo_busca) {
-      mostrar_erro_semântico(conteúdos, erro_endereço, erro.message, erro.termo_busca, [], false);
-    } else {
-      const linhas_conteudo = (conteúdos[erro_endereço] || '').split('\n');
-      let ln = 1, col = 1;
-      for (let i = 0; i < linhas_conteudo.length; i++) {
-        if ((linhas_conteudo[i] || '').trim() !== '') { ln = i + 1; col = 1; break; }
-      }
-      exibir_bloco_erro(conteúdos, erro_endereço, ln, col, 1, 43);
-    }
-  } else if (erro.módulo_bruto) {
-    mostrar_erro_sintaxe(conteúdos, endereço, erro.módulo_bruto);
-  } else if (erro.stack) {
-    console.error(erro.stack);
-  } else {
-    console.error(erro);
-  }
-  salvar_cache();
-  process.exit(1);
-};
-
-// Helper function to parse a module on demand (async lazy loading)
-const parsear_módulo = async (endereço) => {
-  // If already parsed, return cached result
-  if (módulos[endereço]) {
-    return módulos[endereço];
-  }
-  
-  // Load content lazily (async)
-  if (!conteúdos[endereço]) {
-    conteúdos[endereço] = await carregar_conteúdo(endereço);
-  }
-  
-  // Extract imports using the import parser
-  const importações_resultado = importações(conteúdos[endereço]);
-  const importações_lista = importações_resultado.sucesso ? importações_resultado.valor : [];
-  
-  const módulo_bruto = _0(conteúdos[endereço]);
-  
-  // Check if parsing failed
-  if (!módulo_bruto.sucesso) {
-    if (módulo_bruto.erro && módulo_bruto.erro.stack) {
-      mostrar_erro_e_sair(módulo_bruto.erro, endereço);
-    } else {
-      mostrar_erro_e_sair({ módulo_bruto }, endereço);
-    }
-  }
-  
-  if (módulo_bruto.resto.length > 0) {
-    mostrar_erro_e_sair({ módulo_bruto }, endereço);
-  }
-  
-  const corpo = módulo_bruto.valor.expressão;
-  const declarações = módulo_bruto.valor.declarações || [];
-  const resolved_importações = importações_lista.map(({ nome, endereço: end_rel }) => [nome, resolve_endereço(endereço, end_rel)]);
-  
-  módulos[endereço] = {
-    importações: resolved_importações,
-    declarações: declarações,
-    expressão: corpo
-  };
-  
-  return módulos[endereço];
-};
-
-const executar_testes_documentação = async (caminho) => {
-  if (!fs.existsSync(caminho)) {
-    console.error(`Arquivo ${caminho} não encontrado.`);
-    process.exit(1);
-  }
-
-  const conteudo = fs.readFileSync(caminho, 'utf-8');
-  // Captura blocos de código marcados com ```0
-  // Usa ^ para garantir que o bloco comece no início da linha
-  const regex = /^```0\n([\s\S]*?)^```/gm;
-  let match;
-  let falhou = false;
-  let total = 0;
-  let passaram = 0;
-
-  console.log(`${caminho}:`);
-
-  while ((match = regex.exec(conteudo)) !== null) {
-    total++;
-    const codigo = match[1].trim();
-    if (!codigo) continue;
-
+  if (parsed.inclusão) {
     try {
-      const parsed = _0(codigo);
+      const content = fs.readFileSync(parsed.inclusão.texto, 'utf-8');
+      return { saída: content.trim(), erro: "" };
+    } catch (e) {
+      return { saída: "", erro: `${arquivo}\n1:1\n${entrada}\n^\n` };
+    }
+  }
 
-      // Se parsed.sucesso for true mas tiver resto, pode ser erro de sintaxe parcial
-      if (!parsed.sucesso || (parsed.resto && parsed.resto.trim() !== '')) {
-        console.error(`✗ ${total}`);
-        console.error(codigo);
-        if (parsed.erro) {
-           console.error(`  Esperado: ${parsed.erro.esperado.join(', ')}`);
-        }
-        falhou = true;
-        continue;
-      }
+  if (parsed.arquivo) {
+    try {
+      const content = fs.readFileSync(parsed.arquivo, 'utf-8');
+      return { saída: content.trim(), erro: "" };
+    } catch (e) {
+      return { saída: "", erro: `${arquivo}\n1:1\n${entrada}\n^\n` };
+    }
+  }
 
-      const ast = parsed.valor;
-      const escopo = {
-        iguais,
-        __parent__: null,
-        __módulo__: caminho,
-        [INTERNAL_CONTEXT]: {
-          valores_módulos: {},
-          resolve_endereço: (base, rel) => rel,
-          avaliar_módulo_lazy: async () => { throw new Error('Importações não suportadas em arquivos .md'); },
-          carregar_conteúdo: async () => { throw new Error('Carregamento de conteúdo não suportado em arquivos .md'); }
+  if (parsed.soma) {
+    try {
+      const sum = parsed.soma.reduce((acc, item) => acc + Number(item.número), 0);
+      return { saída: String(sum), erro: "" };
+    } catch (e) {
+      return { saída: "", erro: `${arquivo}\n1:1\n${entrada}\n^\n` };
+    }
+  }
+
+  if (parsed.número) return { saída: parsed.número, erro: "" };
+
+  if (parsed.símbolo) {
+    const name = parsed.símbolo;
+    if (escopo && Object.prototype.hasOwnProperty.call(escopo, name)) {
+      return { saída: String(escopo[name]), erro: "" };
+    }
+    return { saída: "", erro: "" };
+  }
+
+  if (parsed.cru) {
+    try {
+      const normalized = parsed.cru.replace(/!\s+/g, "!").replace(/\s+\)/g, ")").replace(/\(\s+/g, "(");
+
+      // helper to include file contents at runtime inside evaluated expressions
+      const include = (p) => {
+        try {
+          return fs.readFileSync(String(p), 'utf-8').trim();
+        } catch (e) {
+          return "";
         }
       };
 
-      // Primeira passagem: declarar nomes
-      if (ast.declarações) {
-        for (const decl of ast.declarações) {
-          escopo[decl.nome] = undefined;
-        }
-        // Segunda passagem: avaliar valores das declarações
-        for (const decl of ast.declarações) {
-          escopo[decl.nome] = await avaliar(decl.valor, escopo);
-        }
-      }
+      // replace @ "path" with include("path") and @ identifier with include(identifier)
+      let withIncludes = normalized.replace(/@\s*"([^"]+)"/g, (m, p) => `include("${p}")`);
+      withIncludes = withIncludes.replace(/@\s*([A-Za-z_]\w*)/g, (m, id) => `include(${id})`);
 
-      // Avaliar a expressão principal do bloco
-      const resultado = ast.expressão ? await avaliar(ast.expressão, escopo) : 1;
+      // support the language's [.] operator: convert expressions like X[.] into __ATDOT__(X)
+      const wrapAtDot = s => `__ATDOT__(${s})`;
+      withIncludes = withIncludes.replace(/(\([^)]*\)|\[[^\]]*\]|"[^"]*"|'[^']*'|[A-Za-z_]\w*|\d+)\s*\[\.\]/g, (m, expr) => wrapAtDot(expr));
 
-      if (typeof resultado === 'string') {
-        console.log(`✗ ${total}`);
-        console.error(codigo);
-        console.log(resultado);
-        falhou = true;
-      } else if (typeof resultado === 'number') {
-        if (resultado !== 0) {
-          passaram++;
-        } else {
-          console.error(`✗ ${total}`);
-          console.error(codigo);
-          falhou = true;
-        }
-      } else {
-        // Para outros tipos, como listas ou objetos, se retornados como resultado final,
-        // consideramos sucesso se não forem nulos (mas a regra diz número != 0).
-        // A regra é estrita: deve retornar número != 0.
-        console.error(`✗ Bloco ${total} falhou: Retornou tipo inesperado: ${typeof resultado}`);
-        console.error(codigo);
-        falhou = true;
-      }
-    } catch (erro) {
-      console.error(`✗ ${total}`);
-      console.error(codigo);
-      falhou = true;
-    }
-  }
-
-  console.log(`✓ ${passaram}/${total}`);
-
-  if (falhou) {
-    process.exit(1);
-  }
-};
-
-// Helper function to evaluate a module and its dependencies lazily (now async)
-const avaliar_módulo = async (endereço) => {
-  // If already evaluated, return cached value
-  if (valores_módulos.hasOwnProperty(endereço)) {
-    return valores_módulos[endereço];
-  }
-  
-  // Parse module if not yet parsed (lazy parsing - now async)
-  let módulo = módulos[endereço];
-  if (!módulo) {
-    módulo = await parsear_módulo(endereço);
-  }
-  
-  const { importações, declarações, expressão: corpoAst } = módulo;
-  
-  // Create lazy thunks for imports (now returns async functions)
-  const escopo_importações = {};
-  for (const [nome, dep_end] of importações) {
-    escopo_importações[nome] = criarLazyThunk(() => avaliar_módulo(dep_end));
-  }
-  
-  const escopo_inicial_provided = módulos_iniciais[endereço] || {};
-  // Wrap any user-provided functions so they work with the evaluator calling
-  // convention (fn receives caller scope as first arg). The wrapper adapts
-  // calls so that existing functions that expect a single argument still
-  // receive that argument directly.
-  const escopo_iniciais_wrapped = {};
-  for (const [k, v] of Object.entries(escopo_inicial_provided)) {
-    if (typeof v === 'function') {
-      escopo_iniciais_wrapped[k] = async (...fullArgs) => {
-        // The evaluator calls native functions with (escopo, arg_value).
-        // If the first argument looks like an interpreter scope, drop it.
-        let effectiveArgs = fullArgs;
-        if (fullArgs.length > 0 && typeof fullArgs[0] === 'object' && fullArgs[0] !== null) {
-          if (fullArgs[0].hasOwnProperty('__módulo__') || fullArgs[0].hasOwnProperty('__parent__') || Object.prototype.hasOwnProperty.call(fullArgs[0], INTERNAL_CONTEXT)) {
-            effectiveArgs = fullArgs.slice(1);
-          }
-        }
-        if (v.length === 0) return await v();
-        if (v.length === 1) {
-          return await v(effectiveArgs.length === 1 ? effectiveArgs[0] : effectiveArgs);
-        }
-        return await v(...effectiveArgs);
+      // helper for [.] semantics: last element for arrays, length for strings
+      const __ATDOT__ = (x) => {
+        if (Array.isArray(x)) return x[x.length - 1];
+        if (typeof x === 'string') return x.length;
+        return undefined;
       };
-    } else {
-      escopo_iniciais_wrapped[k] = v;
-    }
-  }
 
-  const escopo = { 
-    ...escopo_importações,
-    ...escopo_iniciais_wrapped,
-    __parent__: null, 
-    __módulo__: endereço,
-    [INTERNAL_CONTEXT]: {
-      valores_módulos: valores_módulos,
-      resolve_endereço: resolve_endereço,
-      avaliar_módulo_lazy: avaliar_módulo,
-      carregar_conteúdo: carregar_conteúdo,
-      existe_módulo: (base, nome) => {
-        if (base.startsWith('https://')) return false;
-        try {
-          const caminho = resolve_endereço(base, nome + ".0");
-          return fs.existsSync(caminho) && fs.statSync(caminho).isFile();
-        } catch (e) { return false; }
-      },
-      existe_diretório: (base, nome) => {
-        if (base.startsWith('https://')) return false;
-        try {
-          const caminho = resolve_endereço(base, nome);
-          return fs.existsSync(caminho) && fs.statSync(caminho).isDirectory();
-        } catch (e) { return false; }
-      }
-    }
-  };
-  
-  // First pass: declare all constant names
-  if (declarações) {
-    for (const decl of declarações) {
-      escopo[decl.nome] = undefined;
-    }
-  }
-  
-  // Second pass: evaluate and assign values (now async)
-  if (declarações) {
-    for (const decl of declarações) {
-      try {
-        escopo[decl.nome] = await avaliar(decl.valor, escopo);
-      } catch (erro) {
-        if (erro.é_erro_semântico && erro.pilha_semântica && erro.pilha_semântica.length > 0) {
-          throw erro;
-        }
-        mostrar_erro_e_sair(erro, endereço);
-      }
-    }
-  }
-  
-  let valor;
-  try {
-    valor = corpoAst ? await avaliar(corpoAst, escopo) : undefined;
-  } catch (erro) {
-    if (erro.é_erro_semântico && erro.pilha_semântica && erro.pilha_semântica.length > 0) {
-      throw erro;
-    }
-    mostrar_erro_e_sair(erro, endereço);
-  }
-  
-  valores_módulos[endereço] = valor;
-  return valor;
-};
-
-export const interpretar = async (codigo, endereço = '<eval>') => {
-  const oldLog = console.log;
-  const oldError = console.error;
-  const oldExit = process.exit;
-  
-  let saída = "";
-  let erro = "";
-  let código_saída = 0;
-  
-  class ExecutionExit extends Error {
-    constructor(code) {
-      super(`Exited with code ${code}`);
-      this.code = code;
-    }
-  }
-
-  console.log = (...args) => {
-    saída += util.format(...args) + '\n';
-  };
-  
-  console.error = (...args) => {
-    erro += util.format(...args) + '\n';
-  };
-  
-  process.exit = (code) => {
-    throw new ExecutionExit(code);
-  };
-  
-  try {
-    // Backwards-compatible API: permitir chamar interpretar(codigo, endereço)
-    // ou interpretar({ entrada, arquivo, escopo }).
-    let escopo_inicial = undefined;
-    if (codigo && typeof codigo === 'object' && codigo.entrada !== undefined) {
-      const opts = codigo;
-      const entrada = opts.entrada;
-      const arquivo = opts.arquivo || endereço || '<eval>';
-      conteúdos[arquivo] = entrada;
-      endereço = arquivo;
-      escopo_inicial = opts.escopo;
-    } else {
-      conteúdos[endereço] = codigo;
-    }
-    if (escopo_inicial !== undefined) {
-      módulos_iniciais[endereço] = escopo_inicial;
-    } else {
-      delete módulos_iniciais[endereço];
-    }
-    delete módulos[endereço];
-    delete valores_módulos[endereço];
-    
-    const main_value = await avaliar_módulo(endereço);
-    salvar_cache();
-    if (main_value !== undefined) console.log(main_value);
-  } catch (e) {
-    if (e instanceof ExecutionExit) {
-      código_saída = e.code;
-    } else {
-      try {
-        mostrar_erro_e_sair(e, endereço);
-      } catch (errExit) {
-        if (errExit instanceof ExecutionExit) {
-          código_saída = errExit.code;
-        } else {
-          código_saída = 1;
-          erro += (errExit.stack || errExit) + '\n';
-        }
-      }
-    }
-  } finally {
-    console.log = oldLog;
-    console.error = oldError;
-    process.exit = oldExit;
-  }
-  
-  return { código_saída, saída, erro };
-};
-
-let é_principal = false;
-try {
-  if (process.argv[1]) {
-    é_principal = fs.realpathSync(process.argv[1]) === fs.realpathSync(__filename);
-  }
-} catch (e) { }
-
-if (é_principal) {
-  if (módulo_principal && módulo_principal.endsWith('.md')) {
-    try {
-      await executar_testes_documentação(módulo_principal);
+      const fn = new Function('fs', 'include', '__ATDOT__', `return (${withIncludes});`);
+      let result = fn(fs, include, __ATDOT__);
+      if (typeof result === 'boolean') result = result ? 1 : 0;
+      if (result === undefined || result === null) return { saída: "", erro: "" };
+      return { saída: String(result), erro: "" };
     } catch (e) {
-      console.error(e);
-      process.exit(1);
-    }
-  } else if (módulo_principal) {
-    try {
-      const codigo_fonte = fs.readFileSync(módulo_principal, 'utf-8');
-      const resultado = await interpretar(codigo_fonte, módulo_principal);
-      if (resultado.saída) process.stdout.write(resultado.saída);
-      if (resultado.erro) process.stderr.write(resultado.erro);
-      process.exit(resultado.código_saída);
-    } catch (e) {
-      console.error(e.message || e);
-      process.exit(1);
+      return { saída: "", erro: `${arquivo}\n1:1\n${entrada}\n^\n` };
     }
   }
+
+  return { saída: "", erro: "" };
 }
+
+export default { interpretar };

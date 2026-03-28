@@ -48,16 +48,16 @@ const testes = [
     "entrada": "10 - (6 / 2)",
     "saída": "7"
   }, {
-    "entrada": "@ \"./arquivos_teste/pergunta.txt\"",
+    "entrada": "@ \"./fontes/pergunta.txt\"",
     "saída": "O que você obtém se multiplicar seis por nove?"
   }, {
     "entrada": `(
-  caminho = "./arquivos_teste/pergunta.txt"
+  caminho = "./fontes/pergunta.txt"
   @ caminho
 )`,
     "saída": "O que você obtém se multiplicar seis por nove?"
   }, {
-    "entrada": "(@ \"./arquivos_teste/pergunta.txt\")[.]",
+    "entrada": "(@ \"./fontes/pergunta.txt\")[.]",
     "saída": "46"
   }, {
     "entrada": "2 > 8",
@@ -303,11 +303,11 @@ const testes = [
     )`,
     "saída": "João Silva"
   }, {
-    "entrada": "(./arquivos_teste/resposta.0)",
+    "entrada": "(./fontes/resposta.0)",
     "saída": "42",
   }, {
     "entrada": `(
-      valor = ./arquivos_teste/resposta.0
+      valor = ./fontes/resposta.0
       valor
     )`,
     "saída": "42",
@@ -753,7 +753,7 @@ const testes = [
     )`,
     "saída": "5"
   }, {
-    "entrada": "arquivos_teste.resposta == 42",
+    "entrada": "fontes.resposta == 42",
     "saída": "1",
   }, {
     "entrada": "= 5",
@@ -997,30 +997,10 @@ Opções: 0-9
 ];
 
 import fs from "fs";
-
-const deepEqual = (a, b) => {
-  if (a === b) return true;
-  if (typeof a !== typeof b) return false;
-  if (typeof a === 'object' && a !== null && b !== null) {
-    if (Array.isArray(a)) {
-      if (!Array.isArray(b) || a.length !== b.length) return false;
-      for (let i = 0; i < a.length; i++) if (!deepEqual(a[i], b[i])) return false;
-      return true;
-    } else {
-      const keysA = Object.keys(a).filter(k => k !== '__parent__');
-      const keysB = Object.keys(b).filter(k => k !== '__parent__');
-      if (keysA.length !== keysB.length) return false;
-      for (const key of keysA) {
-        if (!keysB.includes(key) || !deepEqual(a[key], b[key])) return false;
-      }
-      return true;
-    }
-  }
-  return false;
-};
+import iguais from "./fontes/iguais.js";
 
 const escopo = {
-  iguais: ([ a, b ]) => deepEqual(a, b) ? 1 : 0,
+  iguais: ([ a, b ]) => iguais(a, b) ? 1 : 0,
 }
 
 const exemplos = fs.readFileSync("EXEMPLOS.md", "utf-8");
@@ -1035,14 +1015,54 @@ while ((match = regex.exec(exemplos)) !== null) {
     arquivo: "EXEMPLOS.md",
   });
 }
-
-import { interpretar } from "./0.js";
-
-let passaram = 0;
-let total = testes.length;
+// Run any `./fontes/*.teste.js` files first and aggregate results
 const exiba_todos = process.argv.includes('--exiba-todos');
 const verifique_restantes = process.argv.includes('--verifique-restantes');
 let primeira_falha_exibida = false;
+
+let adicionais_passaram = 0;
+let adicionais_total = 0;
+const fontesDir = "./fontes";
+if (fs.existsSync(fontesDir)) {
+  const arquivos = fs.readdirSync(fontesDir).filter(f => f.endsWith('.teste.js'));
+  for (const f of arquivos) {
+    try {
+      const mod = await import(`./fontes/${f}`);
+      const res = mod.default || mod;
+      const { falhas = [], passaram: p = 0, total: t = 0 } = res || {};
+      if (falhas && falhas.length > 0) {
+        const primeira = falhas[0];
+        const teste = (primeira.teste || "").toString();
+        const shouldPrint = exiba_todos || !primeira_falha_exibida;
+        if (shouldPrint) {
+          if (primeira.saída_esperada !== undefined) {
+            process.stderr.write(`🔍 ${teste.replaceAll('\n', '\n   ')}\n\n🎯 ${JSON.stringify(primeira.saída_esperada).replaceAll('\\n', '\\n   ')}\n\n🚨 ${JSON.stringify(primeira.saída_obtida)}\n\n`);
+          } else if (primeira.erro_esperado !== undefined) {
+            process.stderr.write(`🔍 ${teste.replaceAll('\n', '\n   ')}\n\n💥 ${primeira.erro_esperado}\n\n🚨 ${primeira.erro_obtido}\n\n`);
+          } else {
+            process.stderr.write(`🔍 ${teste.replaceAll('\n', '\n   ')}\n\n🚨 Falha: ${JSON.stringify(primeira)}\n\n`);
+          }
+          primeira_falha_exibida = true;
+        }
+      }
+      adicionais_passaram += Number(p) || 0;
+      adicionais_total += Number(t) || 0;
+    } catch (e) {
+      process.stderr.write(`Erro ao executar teste ${f}: ${String(e)}\n`);
+    }
+  }
+}
+
+import { interpretar } from "./0.js";
+
+let passaram = adicionais_passaram;
+let total = adicionais_total + testes.length;
+
+// If a failure was printed from fontes and we should NOT verify remaining tests, skip main tests
+if (primeira_falha_exibida && !exiba_todos && !verifique_restantes) {
+  process.stdout.write(`✅ ${passaram}/${total}\n`);
+  if (passaram !== total) process.exit(1);
+}
 
 for (const teste of testes) {
   const { saída, erro } = await interpretar({
