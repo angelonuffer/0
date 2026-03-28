@@ -1073,10 +1073,12 @@ while ((match = regex.exec(exemplos)) !== null) {
 import { interpretar } from "./0.js";
 
 let passaram = 0;
-let total = 0;
+let total = testes.length;
+const exiba_todos = process.argv.includes('--exiba-todos');
+const verifique_restantes = process.argv.includes('--verifique-restantes');
+let primeira_falha_exibida = false;
 
 for (const teste of testes) {
-  total++;
   const { saída, erro } = await interpretar({
     entrada: teste.entrada,
     arquivo: teste.arquivo || "0.teste.js",
@@ -1086,25 +1088,39 @@ for (const teste of testes) {
     if (erro.trim() === teste.erro.trim()) {
       passaram++;
     } else {
-      process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
+        const shouldPrint = exiba_todos || !primeira_falha_exibida;
+        if (shouldPrint) {
+          process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
 
 💥 ${teste.erro.trim().replaceAll('\n', '\n   ')}
 
 🚨 ${erro.trim().replaceAll('\n', '\n   ')}
 
 `);
+          primeira_falha_exibida = true;
+        }
+        if (!exiba_todos) {
+          if (!verifique_restantes) break;
+        }
     }
   } else {
     if (saída.trim() === teste.saída.trim()) {
       passaram++;
     } else {
-      process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
+        const shouldPrint = exiba_todos || !primeira_falha_exibida;
+        if (shouldPrint) {
+          process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
 
 🎯 ${teste.saída.trim().replaceAll('\n', '\n   ')}
 
 🚨 ${saída.trim().replaceAll('\n', '\n   ')}
 
 `);
+          primeira_falha_exibida = true;
+        }
+        if (!exiba_todos) {
+          if (!verifique_restantes) break;
+        }
     }
   }
 }
