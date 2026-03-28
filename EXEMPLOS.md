@@ -25,6 +25,11 @@ iguais([ a + b, 30 ])
 1
 ```
 
+### Números negativos
+```0
+iguais([ -5 + 2, -3 ])
+```
+
 ## Funções e Lambdas
 
 ### Definição e Aplicação
@@ -73,59 +78,56 @@ iguais([ [ 0, ...lista, 4 ],  [ 0, 1, 2, 3, 4 ] ])
 ```0
 nome = "João"
 obj = {
-  nome
+  nome,
   idade: 25
 }
 iguais([ { ...obj, idade: 26 }.idade, 26 ])
 ```
 
-### Vírgulas Opcionais
-As vírgulas são opcionais entre os itens de listas e objetos.
-```0
-iguais([ [ 1, 2, 3 ], [ 1 2 3 ] ])
-```
-```0
-iguais([ { a: 1, b: 2 }, { a: 1 b: 2 } ])
-```
-
 ## Acesso e Operações
 
 ```0
-v = [10 20 30]
+v = [ 10, 20, 30 ]
 s = "abc"
 
-iguais([ v[0]     10            ]) &
-iguais([ s[0]     97            ]) &
-iguais([ v[1:3]   [20 30]       ]) &
-iguais([ v[.]     3             ]) &
-iguais([ v[*]     ["0" "1" "2"] ]) &
-iguais([ {a:1}.a  1             ])
+iguais([ v[0],    10                ]) &
+iguais([ s[0],    97                ]) &
+iguais([ v[1:3],  [ 20, 30 ]        ]) &
+iguais([ v[.],    3                 ]) &
+iguais([ v[*],    [ "0", "1", "2" ] ]) &
+iguais([ {a:1}.a, 1                 ])
+```
+
+```0
+// Chaves de objeto/array e tamanho em string
+iguais([ { a: 1, b: 2 }[*], [ "a", "b" ] ]) &
+iguais([ "abc"[.],          3            ])
 ```
 
 ## Operadores
 
 ### Aritmética e Comparação
 ```0
-iguais([ 1 + 2 * 3   7  ]) &
-iguais([ 10 / 2      5  ]) &
-iguais([ 5 == 5      1  ]) &
-iguais([ 5 != 4      1  ]) &
-iguais([ 10 >= 5     1  ])
+iguais([ 1 + 2 * 3, 7 ]) &
+iguais([ 10 / 2,    5 ]) &
+iguais([ 5 == 5,    1 ]) &
+iguais([ 5 != 4,    1 ]) &
+iguais([ 10 >= 5,   1 ])
 ```
 
 ## Operadores Lógicos e Ternário
 ```0
-iguais([ 1 & 0          0   ]) &
-iguais([ 0 | 1          1   ]) &
-iguais([ !1             0   ]) &
-iguais([ 1 ? "a" : "b"  "a" ])
+iguais([ 1 & 0,         0   ]) &
+iguais([ 0 | 1,         1   ]) &
+iguais([ !1,            0   ]) &
+iguais([ 1 ? "a" : "b", "a" ])
 ```
 
 ### Especiais (Join e Split)
 O operador `*` entre lista e texto une a lista. O operador `/` entre textos divide o texto.
 ```0
-iguais([ ["a" "b"] * "-"  "a-b"     ]) &
-iguais([ "a-b" / "-"      ["a" "b"] ])
+iguais([ [ "a", "b" ] * "-", "a-b"        ]) &
+iguais([ "a-b" / "-",        [ "a", "b" ] ])
 ```
 
 ## Módulos e Endereços
@@ -146,5 +148,5 @@ carregar = caminho => @caminho
 
 O operador `%` imprime o valor em `stderr` (JSON) e o retorna.
 ```0
-iguais([ % 42  42 ])
+iguais([ % 42, 42 ])
 ```
