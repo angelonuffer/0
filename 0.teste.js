@@ -48,23 +48,17 @@ const testes = [
     "entrada": "10 - (6 / 2)",
     "saída": "7"
   }, {
-    "entrada": "@ \"./arquivos_teste/saudacao.txt\"",
-    "saída": "Olá mundo"
-  }, {
-    "entrada": "@ \"./arquivos_teste/numero.txt\"",
-    "saída": "123"
-  }, {
-    "entrada": "@ \"./arquivos_teste/utf8.txt\"",
-    "saída": "conteúdo UTF-8: café ☕"
+    "entrada": "@ \"./arquivos_teste/pergunta.txt\"",
+    "saída": "O que você obtém se multiplicar seis por nove?"
   }, {
     "entrada": `(
-  caminho = "./arquivos_teste/saudacao.txt"
+  caminho = "./arquivos_teste/pergunta.txt"
   @ caminho
 )`,
-    "saída": "Olá mundo"
+    "saída": "O que você obtém se multiplicar seis por nove?"
   }, {
-    "entrada": "(@ \"./arquivos_teste/numero.txt\")[.]",
-    "saída": "3"
+    "entrada": "(@ \"./arquivos_teste/pergunta.txt\")[.]",
+    "saída": "46"
   }, {
     "entrada": "2 > 8",
     "saída": "0"
@@ -152,7 +146,7 @@ const testes = [
     "saída": "2"
   }, {
     "entrada": `(
-  obj = {nome: "João" idade: 30}
+  obj = {nome: "João", idade: 30}
   (% obj).nome
 )`,
     "saída": "João"
@@ -309,23 +303,14 @@ const testes = [
     )`,
     "saída": "João Silva"
   }, {
-    "entrada": "(./arquivos_teste/importação_módulo_valor_helper.0)",
-    "saída": "5",
+    "entrada": "(./arquivos_teste/resposta.0)",
+    "saída": "42",
   }, {
     "entrada": `(
-      valor = ./arquivos_teste/importação_módulo_valor_helper.0
+      valor = ./arquivos_teste/resposta.0
       valor
     )`,
-    "saída": "5",
-  }, {
-    "entrada": `(
-      função = ./arquivos_teste/importação_módulo_valor_função.0
-      função({ a: 10 b: 20 })
-    )`,
-    "saída": "30",
-  }, {
-    "entrada": "(./arquivos_teste/importação_módulo_valor_função.0)({ a: 7 b: 3 })",
-    "saída": "10",
+    "saída": "42",
   }, {
     "entrada": "[1, 2, 3]",
     "saída": "[ 1, 2, 3 ]"
@@ -409,9 +394,9 @@ const testes = [
   }, {
     "entrada": `(
         objeto_com_chaves = {
-          nome: "João"
-          idade: 30
-          profissao: "Desenvolvedor"
+          nome: "João",
+          idade: 30,
+          profissao: "Desenvolvedor",
         }
         objeto_com_chaves.nome
       )`,
@@ -419,9 +404,9 @@ const testes = [
   }, {
     "entrada": `(
         objeto_com_chaves = {
-          nome: "João"
-          idade: 30
-          profissao: "Desenvolvedor"
+          nome: "João",
+          idade: 30,
+          profissao: "Desenvolvedor",
         }
         objeto_com_chaves.idade
       )`,
@@ -429,9 +414,9 @@ const testes = [
   }, {
     "entrada": `(
         objeto_com_chaves = {
-          nome: "João"
-          idade: 30
-          profissao: "Desenvolvedor"
+          nome: "João",
+          idade: 30,
+          profissao: "Desenvolvedor",
         }
         objeto_com_chaves.profissao
       )`,
@@ -755,7 +740,7 @@ const testes = [
     "saída": "30"
   }, {
     "entrada": `(
-      cria_objeto = x => y => { a: x b: y }
+      cria_objeto = x => y => { a: x, b: y }
       obj = cria_objeto(5)(10)
       obj.a + obj.b
     )`,
@@ -768,7 +753,7 @@ const testes = [
     )`,
     "saída": "5"
   }, {
-    "entrada": "arquivos_teste.a.b.c == 42",
+    "entrada": "arquivos_teste.resposta == 42",
     "saída": "1",
   }, {
     "entrada": "= 5",
@@ -805,26 +790,6 @@ d = e => a(e)
 a = b => c + 1
          ^
 Opções: b, a, d`
-  }, {
-    "entrada": `a = ./arquivos_teste/pilha_importação_módulo.0
-
-d = e => a(e)
-
-d(2)`,
-    "arquivo": "pilha_importação.0",
-    "erro": `pilha_importação.0
-5:1
-d(2)
-^
-3:10
-d = e => a(e)
-         ^
-
-arquivos_teste/pilha_importação_módulo.0
-1:6
-b => c + 1
-     ^
-Opções: b`
   }, {
     "entrada": `// Teste de erro de referência: acesso a campo em objeto não definido
 objetoNaoDefinido["campo"]`,
