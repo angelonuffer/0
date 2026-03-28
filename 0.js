@@ -93,6 +93,7 @@ const iguais = (escopo, args) => {
 const conteúdos = {};
 const módulos = {};
 const valores_módulos = {};
+const módulos_iniciais = {};
 
 const mostrar_erro_e_sair = (erro, endereço) => {
   if (erro.é_erro_semântico) {
@@ -316,8 +317,37 @@ const avaliar_módulo = async (endereço) => {
     escopo_importações[nome] = criarLazyThunk(() => avaliar_módulo(dep_end));
   }
   
+  const escopo_inicial_provided = módulos_iniciais[endereço] || {};
+  // Wrap any user-provided functions so they work with the evaluator calling
+  // convention (fn receives caller scope as first arg). The wrapper adapts
+  // calls so that existing functions that expect a single argument still
+  // receive that argument directly.
+  const escopo_iniciais_wrapped = {};
+  for (const [k, v] of Object.entries(escopo_inicial_provided)) {
+    if (typeof v === 'function') {
+      escopo_iniciais_wrapped[k] = async (...fullArgs) => {
+        // The evaluator calls native functions with (escopo, arg_value).
+        // If the first argument looks like an interpreter scope, drop it.
+        let effectiveArgs = fullArgs;
+        if (fullArgs.length > 0 && typeof fullArgs[0] === 'object' && fullArgs[0] !== null) {
+          if (fullArgs[0].hasOwnProperty('__módulo__') || fullArgs[0].hasOwnProperty('__parent__') || Object.prototype.hasOwnProperty.call(fullArgs[0], INTERNAL_CONTEXT)) {
+            effectiveArgs = fullArgs.slice(1);
+          }
+        }
+        if (v.length === 0) return await v();
+        if (v.length === 1) {
+          return await v(effectiveArgs.length === 1 ? effectiveArgs[0] : effectiveArgs);
+        }
+        return await v(...effectiveArgs);
+      };
+    } else {
+      escopo_iniciais_wrapped[k] = v;
+    }
+  }
+
   const escopo = { 
-    ...escopo_importações, 
+    ...escopo_importações,
+    ...escopo_iniciais_wrapped,
     __parent__: null, 
     __módulo__: endereço,
     [INTERNAL_CONTEXT]: {
@@ -406,7 +436,24 @@ export const interpretar = async (codigo, endereço = '<eval>') => {
   };
   
   try {
-    conteúdos[endereço] = codigo;
+    // Backwards-compatible API: permitir chamar interpretar(codigo, endereço)
+    // ou interpretar({ entrada, arquivo, escopo }).
+    let escopo_inicial = undefined;
+    if (codigo && typeof codigo === 'object' && codigo.entrada !== undefined) {
+      const opts = codigo;
+      const entrada = opts.entrada;
+      const arquivo = opts.arquivo || endereço || '<eval>';
+      conteúdos[arquivo] = entrada;
+      endereço = arquivo;
+      escopo_inicial = opts.escopo;
+    } else {
+      conteúdos[endereço] = codigo;
+    }
+    if (escopo_inicial !== undefined) {
+      módulos_iniciais[endereço] = escopo_inicial;
+    } else {
+      delete módulos_iniciais[endereço];
+    }
     delete módulos[endereço];
     delete valores_módulos[endereço];
     

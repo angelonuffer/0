@@ -1031,26 +1031,68 @@ Opções: 0-9
   }
 ];
 
+import fs from "fs";
+
+const deepEqual = (a, b) => {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (typeof a === 'object' && a !== null && b !== null) {
+    if (Array.isArray(a)) {
+      if (!Array.isArray(b) || a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) if (!deepEqual(a[i], b[i])) return false;
+      return true;
+    } else {
+      const keysA = Object.keys(a).filter(k => k !== '__parent__');
+      const keysB = Object.keys(b).filter(k => k !== '__parent__');
+      if (keysA.length !== keysB.length) return false;
+      for (const key of keysA) {
+        if (!keysB.includes(key) || !deepEqual(a[key], b[key])) return false;
+      }
+      return true;
+    }
+  }
+  return false;
+};
+
+const escopo = {
+  iguais: ([ a, b ]) => deepEqual(a, b) ? 1 : 0,
+}
+
+const exemplos = fs.readFileSync("EXEMPLOS.md", "utf-8");
+const regex = /```0([\s\S]*?)```/g;
+let match;
+while ((match = regex.exec(exemplos)) !== null) {
+  const código = match[1].trim();
+  testes.push({
+    entrada: código,
+    saída: "1",
+    escopo,
+  });
+}
+
 import { interpretar } from "./0.js";
-import { execSync } from 'child_process';
 
 let passaram = 0;
 let total = 0;
 
 for (const teste of testes) {
   total++;
-  const { saída, erro } = await interpretar(teste.entrada, teste.arquivo || "0.teste.js");
+  const { saída, erro } = await interpretar({
+    entrada: teste.entrada,
+    arquivo: teste.arquivo || "0.teste.js",
+    escopo: teste.escopo || {},
+  });
   if (teste.erro !== undefined) {
     if (erro.trim() === teste.erro.trim()) {
       passaram++;
     } else {
       process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
 
-⚠️ ${teste.erro.trim().replaceAll('\n', '\n   ')}
+💥 ${teste.erro.trim().replaceAll('\n', '\n   ')}
 
 🚨 ${erro.trim().replaceAll('\n', '\n   ')}
 
-    `);
+`);
     }
   } else {
     if (saída.trim() === teste.saída.trim()) {
@@ -1067,10 +1109,6 @@ for (const teste of testes) {
   }
 }
 
-process.stdout.write(`✓ ${passaram}/${total}\n\n`);
+process.stdout.write(`✅ ${passaram}/${total}\n`);
 
 if (passaram !== total) process.exit(1);
-
-execSync("node 0.js EXEMPLOS.md", {
-  stdio: "inherit",
-})
