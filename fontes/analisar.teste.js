@@ -4,7 +4,7 @@ import testar from "./testar.js";
 export default testar(analisar, [
   {
     entrada: "",
-    esperado: { vazio: 1 },
+    esperado: { erro: {} },
   },
   {
     entrada: "-0",
@@ -12,11 +12,11 @@ export default testar(analisar, [
   },
   {
     entrada: "@ \"./fontes/pergunta.txt\"",
-    esperado: { inclusão: { texto: "./fontes/pergunta.txt" } },
+    esperado: { carregamento: { texto: "./fontes/pergunta.txt" } },
   },
   {
     entrada: "./fontes/resposta.0",
-    esperado: { arquivo: "./fontes/resposta.0" },
+    esperado: { endereço: "./fontes/resposta.0" },
   },
   {
     entrada: '"hello"',
@@ -43,6 +43,6 @@ export default testar(analisar, [
   },
   {
     entrada: '( @ "./fontes/pergunta.txt" )[.]',
-    esperado: { tamanho: { inclusão: { texto: "./fontes/pergunta.txt" } } },
+    esperado: { tamanho: { carregamento: { texto: "./fontes/pergunta.txt" } } },
   },
 ]);
