@@ -1,6 +1,6 @@
 import iguais from './iguais.js';
 
-export default function testar(função, casos) {
+export default async function testar(função, casos) {
   const falhas = [];
   let passaram = 0;
   const total = casos.length;
@@ -8,7 +8,7 @@ export default function testar(função, casos) {
   for (const c of casos) {
     const { entrada, esperado } = c;
     try {
-      const obtido = função(entrada);
+      const obtido = await função(entrada, c.escopo || {});
       const ok = iguais(obtido, esperado);
       if (ok) {
         passaram++;

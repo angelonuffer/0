@@ -1029,18 +1029,19 @@ if (fs.existsSync(fontesDir)) {
     try {
       const mod = await import(`./fontes/${f}`);
       const res = mod.default || mod;
-      const { falhas = [], passaram: p = 0, total: t = 0 } = res || {};
+      const { falhas = [], passaram: p = 0, total: t = 0 } = await res || {};
       if (falhas && falhas.length > 0) {
         const primeira = falhas[0];
         const teste = (primeira.teste || "").toString();
         const shouldPrint = exiba_todos || !primeira_falha_exibida;
         if (shouldPrint) {
+          process.stderr.write(`📄 ./fontes/${f}\n\n🔍 ${teste.replaceAll('\n', '\n   ')}\n\n`)
           if (primeira.saída_esperada !== undefined) {
-            process.stderr.write(`🔍 ${teste.replaceAll('\n', '\n   ')}\n\n🎯 ${JSON.stringify(primeira.saída_esperada).replaceAll('\\n', '\\n   ')}\n\n🚨 ${JSON.stringify(primeira.saída_obtida)}\n\n`);
+            process.stderr.write(`🎯 ${JSON.stringify(primeira.saída_esperada).replaceAll('\\n', '\\n   ')}\n\n🚨 ${JSON.stringify(primeira.saída_obtida)}\n\n`);
           } else if (primeira.erro_esperado !== undefined) {
-            process.stderr.write(`🔍 ${teste.replaceAll('\n', '\n   ')}\n\n💥 ${primeira.erro_esperado}\n\n🚨 ${primeira.erro_obtido}\n\n`);
+            process.stderr.write(`💥 ${primeira.erro_esperado}\n\n🚨 ${primeira.erro_obtido}\n\n`);
           } else {
-            process.stderr.write(`🔍 ${teste.replaceAll('\n', '\n   ')}\n\n🚨 Falha: ${JSON.stringify(primeira)}\n\n`);
+            process.stderr.write(`🚨 Falha: ${JSON.stringify(primeira)}\n\n`);
           }
           primeira_falha_exibida = true;
         }
