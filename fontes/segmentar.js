@@ -48,9 +48,11 @@ export default function segmentar(s) {
       out.push({ número: src.slice(i, j) }); i = j; continue;
     }
 
-    // Identifiers: letters or underscore, followed by letters/digits/underscore
-    if (/[A-Za-z_]/.test(ch)) {
-      let j = i + 1; while (j < len && /[A-Za-z0-9_]/.test(src[j])) j++;
+    // Identifiers: accept Unicode letters (including accents) or underscore,
+    // followed by letters/digits/underscore. Use the Unicode flag to match
+    // characters like 'ã', 'ç' and other non-ASCII letters.
+    if (/[\p{L}_]/u.test(ch)) {
+      let j = i + 1; while (j < len && /[\p{L}0-9_]/u.test(src[j])) j++;
       out.push({ identificador: src.slice(i, j) }); i = j; continue;
     }
 
