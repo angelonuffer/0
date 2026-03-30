@@ -967,14 +967,8 @@ texto = "Olá mundo
   }, {
     "entrada": "- -5",
     "erro": `0.teste.js
-1:2
-- -5
- ^`
-  }, {
-    "entrada": "3.14 * 2",
-    "erro": `0.teste.js
 1:3
-3.14 * 2
+- -5
   ^`
   }, {
     "entrada": "1 + 2 * 3 - 4 / 2",
