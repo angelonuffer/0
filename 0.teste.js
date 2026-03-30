@@ -761,8 +761,7 @@ const testes = [
     "erro": `operador_inválido.0
 1:1
 = 5
-^
-Opções: {, h, ., (, [, 0-9, ", -, !, %, @`
+^`
   }, {
     "entrada": `// Teste de erro de referência: função não definida
 funcaoNaoDefinida(42)`,
@@ -788,8 +787,7 @@ d = e => a(e)
          ^
 2:10
 a = b => c + 1
-         ^
-Opções: b, a, d`
+         ^`
   }, {
     "entrada": `// Teste de erro de referência: acesso a campo em objeto não definido
 objetoNaoDefinido["campo"]`,
@@ -917,8 +915,7 @@ f = x => (x + 1`,
     "erro": `parêntese.0
 2:16
 f = x => (x + 1
-               ^
-Opções: {, h, ., (, [, 0-9, ", -, !, %, @`
+               ^`
   }, {
     "entrada": `// Teste de erro de sintaxe: parêntese de fechamento inesperado
 lista = [
@@ -963,9 +960,7 @@ texto = "Olá mundo
     "erro": `0.teste.js
 1:3
 [1:100]
-  ^
-Opções: ]
-`
+  ^`
   }, {
     "entrada": "2147483647 + 1",
     "saída": "2147483648"
@@ -974,16 +969,13 @@ Opções: ]
     "erro": `0.teste.js
 1:2
 - -5
- ^
-Opções: 0-9
-`
+ ^`
   }, {
     "entrada": "3.14 * 2",
     "erro": `0.teste.js
 1:3
 3.14 * 2
-  ^
-`
+  ^`
   }, {
     "entrada": "1 + 2 * 3 - 4 / 2",
     "saída": "5"
