@@ -1,78 +1,59 @@
 import segmentar from './segmentar.js';
 
-export default function analisar(entrada = "") {
+export default function analisar(entrada = '') {
   const src = String(entrada);
-  const trimmed = src.trim();
-  const tokens = segmentar(trimmed);
+  const tokens = segmentar(src.trim());
   let pos = 0;
-  function peek() { return tokens[pos] || { EOF: true }; }
-  function consume(key) { const t = peek(); if (t && Object.prototype.hasOwnProperty.call(t, key)) { pos++; return t; } return null; }
+  const peek = () => tokens[pos] || { EOF: true };
+  const expect = (key) => {
+    const t = peek();
+    if (t && Object.prototype.hasOwnProperty.call(t, key)) { pos++; return t; }
+    return null;
+  };
 
   function parseInner() {
+    // Parse a single atomic expression (no top-level EOF requirement)
     const t = peek();
-    if (t && t.número !== undefined) {
-      const n = consume('número').número;
+    if (!t || t.EOF) return { error: true };
+
+    if (t.número !== undefined) {
+      const n = expect('número').número;
       if (peek().soma !== undefined) {
-        consume('soma');
-        const r = consume('número');
-        if (r) return { soma: [ { número: n }, { número: r.número } ] };
-        return { error: true };
+        expect('soma');
+        const r = expect('número');
+        if (!r) return { error: true };
+        return { soma: [ { número: n }, { número: r.número } ] };
       }
       return { número: n };
     }
-    if (t && t.identificador !== undefined) {
-      const id = consume('identificador').identificador;
-      if (peek().tamanho !== undefined) { consume('tamanho'); return { tamanho: { símbolo: id } }; }
+
+    if (t.identificador !== undefined) {
+      const id = expect('identificador').identificador;
+      if (peek().tamanho !== undefined) { expect('tamanho'); return { tamanho: { símbolo: id } }; }
       return { símbolo: id };
     }
-    if (t && t.texto !== undefined) { const s = consume('texto').texto; return { texto: s }; }
-    if (t && t.abre_parênteses !== undefined) { return parsePrimary(); }
-    if (t && t.carregamento !== undefined) { consume('carregamento'); const s = consume('texto'); if (s) return { carregamento: { texto: s.texto } }; return { error: true }; }
-    if (t && t.endereço !== undefined) { consume('endereço'); return { endereço: t.endereço }; }
-    return { error: true };
-  }
 
-  function parsePrimary() {
-    const t = peek();
-    if (t && t.carregamento !== undefined) {
-      consume('carregamento');
-      const s = consume('texto');
-      if (!s) return { error: true };
-      if (peek().EOF) return { carregamento: { texto: s.texto } };
-      return { error: true };
-    }
-    if (t && t.endereço !== undefined) { consume('endereço'); if (peek().EOF) return { endereço: t.endereço }; return { error: true }; }
-    if (t && t.texto !== undefined) { consume('texto'); if (peek().EOF) return { texto: t.texto }; return { error: true }; }
-    if (t && t.número !== undefined) {
-      const n = consume('número').número;
-      if (peek().soma !== undefined) {
-        consume('soma');
-        const r = consume('número');
-        if (r && peek().EOF) return { soma: [ { número: n }, { número: r.número } ] };
-        return { error: true };
-      }
-      if (peek().EOF) return { número: n };
-      return { error: true };
-    }
-    if (t && t.identificador !== undefined) {
-      const id = consume('identificador').identificador;
-      if (peek().tamanho !== undefined) { consume('tamanho'); if (peek().EOF) return { tamanho: { símbolo: id } }; return { error: true }; }
-      if (peek().EOF) return { símbolo: id };
-      return { error: true };
-    }
-    if (t && t.abre_parênteses !== undefined) {
-      consume('abre_parênteses');
+    if (t.texto !== undefined) { const s = expect('texto').texto; return { texto: s }; }
+
+    if (t.carregamento !== undefined) { expect('carregamento'); const s = expect('texto'); if (!s) return { error: true }; return { carregamento: { texto: s.texto } }; }
+
+    if (t.endereço !== undefined) { const a = expect('endereço'); return { endereço: a.endereço }; }
+
+    if (t.abre_parênteses !== undefined) {
+      // parenthesized expression: parse inner expression (no EOF) and allow optional tamanho
+      expect('abre_parênteses');
       const inner = parseInner();
       if (!inner || inner.error) return { error: true };
-      if (!consume('fecha_parênteses')) return { error: true };
-      if (peek().tamanho !== undefined) { consume('tamanho'); if (peek().EOF) return { tamanho: inner }; return { error: true }; }
-      if (peek().EOF) return inner;
-      return { error: true };
+      if (!expect('fecha_parênteses')) return { error: true };
+      if (peek().tamanho !== undefined) { expect('tamanho'); return { tamanho: inner }; }
+      return inner;
     }
+
     return { error: true };
   }
 
-  const result = parsePrimary();
-  if (result && !result.error) return result;
+  // top-level parse requires that the parsed node consumes all tokens
+  const out = parseInner();
+  if (out && !out.error && peek().EOF) return out;
   return { erro: {} };
 }
