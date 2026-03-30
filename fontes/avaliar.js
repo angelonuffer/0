@@ -4,21 +4,19 @@ import analisar from "./analisar.js";
 export async function avaliar(arg, maybeEscopo) {
   // normalizar argumento: aceitar string, { conteúdo, endereço } ou { entrada, arquivo, escopo }
   let entrada, arquivo = "<entrada>", escopo = {};
-  const calledWithWrapper = arg && typeof arg === 'object' && !Array.isArray(arg) && (
-    Object.prototype.hasOwnProperty.call(arg, 'entrada') ||
-    Object.prototype.hasOwnProperty.call(arg, 'arquivo') ||
-    Object.prototype.hasOwnProperty.call(arg, 'escopo')
-  );
+  const calledWithWrapper = !!(arg && typeof arg === 'object' && !Array.isArray(arg) && (
+    'entrada' in arg || 'arquivo' in arg || 'escopo' in arg
+  ));
+
   if (arg && typeof arg === 'object' && !Array.isArray(arg)) {
-    if (Object.prototype.hasOwnProperty.call(arg, 'conteúdo') || Object.prototype.hasOwnProperty.call(arg, 'endereço')) {
-      entrada = arg.conteúdo !== undefined ? arg.conteúdo : '';
-      arquivo = arg.endereço !== undefined ? arg.endereço : arquivo;
-    } else if (Object.prototype.hasOwnProperty.call(arg, 'entrada') || Object.prototype.hasOwnProperty.call(arg, 'arquivo') || Object.prototype.hasOwnProperty.call(arg, 'escopo')) {
+    if ('conteúdo' in arg || 'endereço' in arg) {
+      entrada = arg['conteúdo'] !== undefined ? arg['conteúdo'] : '';
+      arquivo = arg['endereço'] !== undefined ? arg['endereço'] : arquivo;
+    } else if ('entrada' in arg || 'arquivo' in arg || 'escopo' in arg) {
       entrada = arg.entrada !== undefined ? arg.entrada : '';
       arquivo = arg.arquivo !== undefined ? arg.arquivo : arquivo;
       escopo = arg.escopo !== undefined ? arg.escopo : escopo;
     } else {
-      // fallback: stringify object
       entrada = String(arg);
     }
   } else {
@@ -34,27 +32,30 @@ export async function avaliar(arg, maybeEscopo) {
 
   if (parsed.texto) return { saída: parsed.texto };
 
+  const errLocationString = () => `${arquivo}\n1:1\n${entrada}\n^\n`;
+  const errObject = () => {
+    const e = { linha: 1, coluna: 1, conteúdo: entrada };
+    if (arquivo && arquivo !== '<entrada>') e.endereço = arquivo;
+    return e;
+  };
+
   if (parsed.carregamento) {
     try {
-      const content = fs.readFileSync(parsed.carregamento.texto, 'utf-8');
-      return calledWithWrapper ? { saída: content.trim(), erro: "" } : { saída: content.trim(), erro: {} };
+      const content = fs.readFileSync(parsed.carregamento.texto, 'utf-8').trim();
+      return calledWithWrapper ? { saída: content, erro: "" } : { saída: content, erro: {} };
     } catch (e) {
-      if (calledWithWrapper) return { saída: "", erro: `${arquivo}\n1:1\n${entrada}\n^\n` };
-      const err = { linha: 1, coluna: 1, conteúdo: entrada };
-      if (arquivo && arquivo !== '<entrada>') err.endereço = arquivo;
-      return { saída: "", erro: err };
+      if (calledWithWrapper) return { saída: "", erro: errLocationString() };
+      return { saída: "", erro: errObject() };
     }
   }
 
   if (parsed.endereço) {
     try {
-      const content = fs.readFileSync(parsed.endereço, 'utf-8');
-      return calledWithWrapper ? { saída: content.trim(), erro: "" } : { saída: content.trim() };
+      const content = fs.readFileSync(parsed.endereço, 'utf-8').trim();
+      return calledWithWrapper ? { saída: content, erro: "" } : { saída: content };
     } catch (e) {
-      if (calledWithWrapper) return { saída: "", erro: `${arquivo}\n1:1\n${entrada}\n^\n` };
-      const err = { linha: 1, coluna: 1, conteúdo: entrada };
-      if (arquivo && arquivo !== '<entrada>') err.endereço = arquivo;
-      return { saída: "", erro: err };
+      if (calledWithWrapper) return { saída: "", erro: errLocationString() };
+      return { saída: "", erro: errObject() };
     }
   }
 
@@ -63,10 +64,8 @@ export async function avaliar(arg, maybeEscopo) {
       const sum = parsed.soma.reduce((acc, item) => acc + Number(item.número), 0);
       return calledWithWrapper ? { saída: String(sum), erro: "" } : { saída: String(sum) };
     } catch (e) {
-      if (calledWithWrapper) return { saída: "", erro: `${arquivo}\n1:1\n${entrada}\n^\n` };
-      const err = { linha: 1, coluna: 1, conteúdo: entrada };
-      if (arquivo && arquivo !== '<entrada>') err.endereço = arquivo;
-      return { saída: "", erro: err };
+      if (calledWithWrapper) return { saída: "", erro: errLocationString() };
+      return { saída: "", erro: errObject() };
     }
   }
 
@@ -77,8 +76,8 @@ export async function avaliar(arg, maybeEscopo) {
     if (escopo && Object.prototype.hasOwnProperty.call(escopo, name)) {
       return calledWithWrapper ? { saída: String(escopo[name]), erro: "" } : { saída: String(escopo[name]) };
     }
-    if (calledWithWrapper) return { saída: "", erro: `${arquivo}\n1:1\n${entrada}\n^\n` };
-    return { erro: { linha: 1, coluna: 1, conteúdo: entrada } };
+    if (calledWithWrapper) return { saída: "", erro: errLocationString() };
+    return { erro: errObject() };
   }
 
   if (parsed.erro) {
