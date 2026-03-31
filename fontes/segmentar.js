@@ -14,10 +14,32 @@ export default function segmentar(s) {
     const ch = src[i];
     if (/\s/.test(ch)) { i++; continue; }
 
+    // comments: // to end-of-line, or /* ... */
+    if (ch === '/' && src[i+1] === '/') {
+      i += 2;
+      while (i < len && src[i] !== '\n') i++;
+      continue;
+    }
+    if (ch === '/' && src[i+1] === '*') {
+      i += 2;
+      while (i < len && !(src[i] === '*' && src[i+1] === '/')) i++;
+      if (i < len) i += 2; // skip closing */
+      continue;
+    }
+
     if (ch === '@') { out.push({ carregamento: '@' }); i++; continue; }
     if (ch === '+') { out.push({ soma: '+' }); i++; continue; }
     if (ch === '(') { out.push({ abre_parênteses: '(' }); i++; continue; }
     if (ch === ')') { out.push({ fecha_parênteses: ')' }); i++; continue; }
+
+    // endereco literal starting with ./ inside expressions
+    if (ch === '.' && src[i+1] === '/') {
+      let j = i + 2;
+      while (j < len && /[-_./A-Za-z0-9]/.test(src[j])) j++;
+      out.push({ endereço: src.slice(i, j) });
+      i = j;
+      continue;
+    }
 
     if (ch === '[') {
       if (src.slice(i, i + 3) === '[.]') { out.push({ tamanho: '[.]' }); i += 3; continue; }

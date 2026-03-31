@@ -1,6 +1,13 @@
 import fs from "fs";
 import analisar from "./analisar.js";
 
+// Cache compiled dynamic evaluators to avoid rebuilding identical functions
+const __evalCache = new Map();
+// Reused regexes to avoid recompiling frequently-used patterns
+const RE_SPLIT_STMTS = /\n|;/;
+const RE_ASSIGN_LOCAL = /^([A-Za-z_]\w*)\s*=/;
+const RE_TRAILING_COMMA = /,$/;
+
 export async function avaliar(arg, maybeEscopo) {
   // normalizar argumento: aceitar string, { conteúdo, endereço } ou { entrada, arquivo, escopo }
   let entrada, arquivo = "<entrada>", escopo = {};
@@ -27,9 +34,12 @@ export async function avaliar(arg, maybeEscopo) {
   // suportar assinatura `(entrada, escopo)` usada pelos testes unitários
   if (maybeEscopo && typeof maybeEscopo === 'object') escopo = maybeEscopo;
 
+  // Avoid expensive work for empty input and handle top-level `%` early.
+  const entradaTrim = String(entrada).trim();
+  if (entradaTrim === "") return { saída: "" };
+
   // Handle top-level `%` operator: evaluate the inner expression and return it.
   // This prints to stderr in the real runtime, but for tests we just return the value.
-  const entradaTrim = String(entrada).trim();
   if (entradaTrim.startsWith('%')) {
     const inner = entradaTrim.slice(1).trim();
     const innerRes = await avaliar({ entrada: inner, arquivo, escopo });
@@ -38,8 +48,6 @@ export async function avaliar(arg, maybeEscopo) {
   }
 
   const parsed = analisar(entrada, arquivo);
-
-  if (!entrada || String(entrada).trim() === "") return { saída: "" };
 
   if (parsed.texto) return { saída: parsed.texto };
 
@@ -131,7 +139,10 @@ export async function avaliar(arg, maybeEscopo) {
 
   if (parsed.erro) {
     try {
-      const normalized = String(entrada).replace(/!\s+/g, "!").replace(/\s+\)/g, ")").replace(/\(\s+/g, "(");
+      let normalized = String(entrada).replace(/!\s+/g, "!").replace(/\s+\)/g, ")").replace(/\(\s+/g, "(");
+      // Strip line and block comments before dynamic evaluation
+      normalized = normalized.replace(/\/\/.*$/gm, '');
+      normalized = normalized.replace(/\/\*[\s\S]*?\*\//g, '');
 
       const include = (p) => {
         try {
@@ -143,6 +154,8 @@ export async function avaliar(arg, maybeEscopo) {
 
       let withIncludes = normalized.replace(/@\s*"([^\"]+)"/g, (m, p) => `include("${p}")`);
       withIncludes = withIncludes.replace(/@\s*([A-Za-z_]\w*)/g, (m, id) => `include(${id})`);
+      // Inline path literals like ./foo/bar -> include("./foo/bar")
+      withIncludes = withIncludes.replace(/(\.\/[-_\.\/A-Za-z0-9]+)/g, (m, p) => `include("${p}")`);
 
       const wrapAtDot = s => `__ATDOT__(${s})`;
       withIncludes = withIncludes.replace(/(\([^)]*\)|\[[^\]]*\]|"[^\"]*"|'[^']*'|[A-Za-z_]\w*|\d+)\s*\[\.\]/g, (m, expr) => wrapAtDot(expr));
@@ -154,6 +167,19 @@ export async function avaliar(arg, maybeEscopo) {
       };
 
       let expr = withIncludes.trim();
+      // Allow '%' used inside parenthesized expressions to mean 'evaluate inner'
+      // (the top-level '%' is handled earlier). Remove stray '%' so JS eval works.
+      expr = expr.replace(/%/g, '');
+      // Provide logical-and/or semantics used by the language: '&' returns
+      // right if left truthy else 0; '|' returns left if left truthy else right.
+      // Replace tokens with unique identifiers that will be provided to the
+      // dynamic function as helpers (__AND__, __OR__). This avoids complex
+      // parsing here.
+      // Map language logical operators to JS '&&' and '||' which return
+      // one of the operands (matching the language semantics expected
+      // by the tests: e.g. `1 & 2` -> 2, `0 & 1` -> 0).
+      expr = expr.replace(/\s*&\s*/g, ' && ');
+      expr = expr.replace(/\s*\|\s*/g, ' || ');
       // Transform common list/string operations into JS equivalents so the
       // dynamic evaluator produces the intended semantics instead of NaN.
       // Examples handled:
@@ -161,12 +187,79 @@ export async function avaliar(arg, maybeEscopo) {
       //   [1,2] * ","     -> ([1,2]).join(",")
       //   "a-b" / "-"  -> ("a-b").split("-")
       expr = expr.replace(/(\[[^\]]*\]|[A-Za-z_]\w*|\([^)]*\))\s*\*\s*("[^"]*"|'[^']*')/g, '($1).join($2)');
-      expr = expr.replace(/("[^"]*"|'[^']*')\s*\/\s*("[^"]*"|'[^']*')/g, '($1).split($2)');
+      expr = expr.replace(/("[^"]*"|'[^']*'|\[[^\]]*\]|[A-Za-z_]\w*|\([^)]*\))\s*\/\s*("[^"]*"|'[^']*')/g, '($1).split($2)');
       if (expr.startsWith('(') && expr.endsWith(')')) expr = expr.slice(1, -1);
-      const parts = expr.split(/\n/).map(l => l.trim()).filter(l => l.length > 0);
+      // Convert newline-separated array/object entries into comma-separated
+      // lists so they become valid JS (the source language allows line
+      // separated items inside [ ] and { }). Use non-greedy matches to
+      // reduce risk with nested structures.
+      expr = expr.replace(/\[([^\]]*?)\]/gs, (m, inner) => '[' + inner.split(/\n/).map(l => l.trim().replace(/,$/, '')).filter(Boolean).join(', ') + ']');
+      expr = expr.replace(/\{([^\}]*?)\}/gs, (m, inner) => '{' + inner.split(/\n/).map(l => l.trim().replace(/,$/, '')).filter(Boolean).join(', ') + '}');
+      // Insert semicolons between adjacent expressions that are separated
+      // only by whitespace (e.g. `"str" id` -> `"str"; id`) so the
+      // later splitting into statements works correctly.
+      expr = expr.replace(/(["'\)\]\d])\s+([A-Za-z_\(\[\u00C0-\u017F])/g, '$1; $2');
+      // Convert parenthesized multiline blocks into IIFEs so statements
+      // inside parentheses become valid JS (they create a local scope and
+      // return the last expression). Process innermost parentheses first.
+      // Replace innermost parentheses that contain semicolons (i.e. multiple
+      // statements) with IIFEs. Use a stack-based scan so nested parentheses
+      // with inner parentheses are handled correctly.
+      // Non-recursive parenthesis block replacer: collect all matching
+      // parentheses pairs then replace from innermost to outermost. This
+      // reduces repeated rescans and allocations compared to the previous
+      // recursive approach.
+      {
+        const pairs = [];
+        const stack = [];
+        for (let i = 0; i < expr.length; i++) {
+          const ch = expr[i];
+          if (ch === '(') { stack.push(i); continue; }
+          if (ch === ')') {
+            const start = stack.pop();
+            if (start === undefined) continue;
+            pairs.push([start, i]);
+          }
+        }
+        if (pairs.length > 0) {
+          // Apply replacements from last pair to first so indices remain valid
+          for (let pi = pairs.length - 1; pi >= 0; pi--) {
+            const [start, end] = pairs[pi];
+            const inner = expr.slice(start + 1, end);
+            if (inner.indexOf(';') === -1 && inner.indexOf('\n') === -1) continue;
+            const parts = inner.split(RE_SPLIT_STMTS).map(l => l.trim().replace(RE_TRAILING_COMMA, '')).filter(Boolean);
+            const last = parts.pop();
+            const locals = new Set();
+            for (let p of parts) {
+              const mm = p.match(RE_ASSIGN_LOCAL);
+              if (mm) locals.add(mm[1]);
+            }
+            const decl = locals.size ? `let ${Array.from(locals).join(', ')};\n` : '';
+            const body = decl + (parts.length ? parts.map(l => l + ';').join('\n') + '\n' : '') + `return (${last});`;
+            const newText = `(function(){\n${body}\n})()`;
+            expr = expr.slice(0, start) + newText + expr.slice(end + 1);
+          }
+        }
+      }
+      // Handle slice expressions like `arr[1:3]` -> `arr.slice(1,3)` for JS
+      expr = expr.replace(/(\[[^\]]*\]|\([^)]*\)|[A-Za-z_]\w*)\s*\[\s*([0-9]+)\s*:\s*([0-9]+)\s*\]/g, '($1).slice($2,$3)');
+      // Normalize newlines into statement separators so inner parenthesized
+      // blocks with multiple lines become valid JS statements separated by
+      // semicolons.
+      expr = expr.replace(/\n+/g, ';');
+      const parts = expr.split(/;+/).map(l => l.trim()).filter(l => l.length > 0);
       const last = parts.pop();
       const body = (parts.length ? parts.map(l => l + ';').join('\n') + '\n' : '') + `return (${last});`;
-      const fn = new Function('fs', 'include', '__ATDOT__', body);
+      // (debug prints removed)
+      let fn;
+      // Reuse previously compiled evaluators when possible
+      if (__evalCache.has(body)) {
+        fn = __evalCache.get(body);
+      } else {
+        fn = new Function('fs', 'include', '__ATDOT__', body);
+        __evalCache.set(body, fn);
+        
+      }
       let result = fn(fs, include, __ATDOT__);
       if (typeof result === 'boolean') result = result ? 1 : 0;
       if (result === undefined || result === null) {
@@ -197,6 +290,7 @@ export async function avaliar(arg, maybeEscopo) {
       } else {
         saída = formatValue(result);
       }
+      
 
       return calledWithWrapper ? { saída: String(saída), erro: "" } : { saída: String(saída) };
     } catch (e) {
