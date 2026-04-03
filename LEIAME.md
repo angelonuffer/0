@@ -17,7 +17,7 @@ Avalia a expressão final do módulo e imprime o resultado.
 ## Executar os testes do núcleo
 
 ```bash
-node 0.teste.js
+node testar.js
 ```
 
 Opções úteis para execução dos testes:
@@ -29,13 +29,13 @@ Exemplos:
 
 ```bash
 # modo padrão: para na primeira falha
-node 0.teste.js
+node testar.js
 
 # ver todas as falhas
-node 0.teste.js --exiba-todos
+node testar.js --exiba-todos
 
 # exibe só a primeira falha, mas verifica silenciosamente o restante para contagem precisa
-node 0.teste.js --verifique-restantes
+node testar.js --verifique-restantes
 ```
 
 ## Teste de integração com outro repositório
