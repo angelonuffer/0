@@ -751,17 +751,17 @@ const escopo = {
    },
 }
 
-const exemplos = fs.readFileSync("EXEMPLOS.md", "utf-8");
+const exemplos = fs.readFileSync("LEIAME.md", "utf-8");
 const regex = /```0([\s\S]*?)```/g;
 let match;
 while ((match = regex.exec(exemplos)) !== null) {
   const código = match[1].trim();
-  testes.push({
-    entrada: código,
-    saída: "1",
-    escopo,
-    arquivo: "EXEMPLOS.md",
-  });
+   testes.push({
+      entrada: código,
+      saída: "1",
+      escopo,
+      arquivo: "LEIAME.md",
+   });
 }
 
 const lines = testes_txt.split(/\r?\n/);
