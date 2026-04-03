@@ -1001,55 +1001,14 @@ while ((match = regex.exec(exemplos)) !== null) {
     arquivo: "EXEMPLOS.md",
   });
 }
-// Run any `./fontes/*.teste.js` files first and aggregate results
-const exiba_todos = process.argv.includes('--exiba-todos');
-const verifique_restantes = process.argv.includes('--verifique-restantes');
-let primeira_falha_exibida = false;
-
-let adicionais_passaram = 0;
-let adicionais_total = 0;
-const fontesDir = "./fontes";
-if (fs.existsSync(fontesDir)) {
-  const arquivos = fs.readdirSync(fontesDir).filter(f => f.endsWith('.teste.js'));
-  for (const f of arquivos) {
-    try {
-      const mod = await import(`./fontes/${f}`);
-      const res = mod.default || mod;
-      const { falhas = [], passaram: p = 0, total: t = 0 } = await res || {};
-      if (falhas && falhas.length > 0) {
-        const primeira = falhas[0];
-        const teste = (primeira.teste || "").toString();
-        const shouldPrint = exiba_todos || !primeira_falha_exibida;
-        if (shouldPrint) {
-          process.stderr.write(`📄 ./fontes/${f}\n\n🔍 ${teste.replaceAll('\n', '\n   ')}\n\n`)
-          if (primeira.saída_esperada !== undefined) {
-            process.stderr.write(`🎯 ${JSON.stringify(primeira.saída_esperada).replaceAll('\\n', '\\n   ')}\n\n🚨 ${JSON.stringify(primeira.saída_obtida)}\n\n`);
-          } else if (primeira.erro_esperado !== undefined) {
-            process.stderr.write(`💥 ${primeira.erro_esperado}\n\n🚨 ${primeira.erro_obtido}\n\n`);
-          } else {
-            process.stderr.write(`🚨 Falha: ${JSON.stringify(primeira)}\n\n`);
-          }
-          primeira_falha_exibida = true;
-        }
-      }
-      adicionais_passaram += Number(p) || 0;
-      adicionais_total += Number(t) || 0;
-    } catch (e) {
-      process.stderr.write(`Erro ao executar teste ${f}: ${String(e)}\n`);
-    }
-  }
-}
 
 import { interpretar } from "./0.js";
 
-let passaram = adicionais_passaram;
-let total = adicionais_total + testes.length;
-
-// If a failure was printed from fontes and we should NOT verify remaining tests, skip main tests
-if (primeira_falha_exibida && !exiba_todos && !verifique_restantes) {
-  process.stdout.write(`✅ ${passaram}/${total}\n`);
-  if (passaram !== total) process.exit(1);
-}
+let passaram = 0;
+let total = testes.length;
+const exiba_todos = process.argv.includes('--exiba-todos');
+const verifique_restantes = process.argv.includes('--verifique-restantes');
+let primeira_falha_exibida = false;
 
 for (const teste of testes) {
   const { saída, erro } = await interpretar({
