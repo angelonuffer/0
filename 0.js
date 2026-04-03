@@ -392,13 +392,45 @@ async function avaliar(arg, maybeEscopo) {
         return '[' + inner.split(/\n/).map(l => l.trim().replace(/,$/, '')).filter(Boolean).join(', ') + ']';
       });
       expr = expr.replace(/\{([^\}]*?)\}/gs, (m, inner) => {
-        if (inner.indexOf('\n') === -1) return m;
-        return '{' + inner.split(/\n/).map(l => l.trim().replace(/,$/, '')).filter(Boolean).join(', ') + '}';
+        // If block contains newlines, join entries with commas (multiline object
+        // literal). For single-line objects that omit commas (e.g. `a: 1 b: 2`)
+        // insert commas between a value and the next key so the expression
+        // becomes a valid JS object literal.
+        if (inner.indexOf('\n') !== -1) {
+          return '{' + inner.split(/\n/).map(l => l.trim().replace(/,$/, '')).filter(Boolean).join(', ') + '}';
+        }
+        // single-line: insert commas between a trailing value and the next key
+        const fixed = inner.replace(/([\]"'\)\w\d])\s+([A-Za-z_]\w*\s*:)/g, '$1, $2');
+        return '{' + fixed + '}';
       });
       // Wrap destructuring parameter objects used directly before =>
       expr = expr.replace(/\{\s*([^\}]*?)\s*\}\s*=>/gs, (m, inner) => {
         const parts = inner.split(/[\s,]+/).map(s => s.trim()).filter(Boolean);
         return `({${parts.join(', ')}}) =>`;
+      });
+      // Transform guard-style branches after arrow functions early so the
+      // subsequent direct-eval attempt can succeed on guard syntax.
+      expr = expr.replace(/=>\s*((?:\s*\|[^\n]+\n?)+)/g, (m, guards) => {
+        // Split on '|' tokens so single-line and multi-line guards are handled
+        // uniformly. Trim and ignore empty tokens.
+        const tokens = guards.split('|').map(t => t.trim()).filter(Boolean);
+        const clauses = [];
+        let fallback = null;
+        for (let tk of tokens) {
+          if (tk.includes('=')) {
+            const parts = tk.split('=').map(s => s.trim());
+            clauses.push({ cond: parts[0], res: parts[1] });
+          } else {
+            fallback = tk;
+          }
+        }
+        if (clauses.length === 0) return m;
+        let out = '';
+        for (let i = 0; i < clauses.length; i++) {
+          out += `(${clauses[i].cond}) ? (${clauses[i].res}) : `;
+        }
+        out += fallback !== null ? `(${fallback})` : 'undefined';
+        return '=> (' + out + ');';
       });
       // Insert semicolons between adjacent expressions that are separated
       // only by whitespace (e.g. `"str" id` -> `"str"; id`) so the
@@ -431,6 +463,11 @@ async function avaliar(arg, maybeEscopo) {
           for (let pi = pairs.length - 1; pi >= 0; pi--) {
             const [start, end] = pairs[pi];
             const inner = expr.slice(start + 1, end);
+            // Skip replacing parenthesized blocks that are actually object or
+            // array literals (e.g. `({...})` or `([...])`) since converting
+            // them into IIFEs breaks their literal semantics.
+            const innerTrim = inner.trim();
+            if (innerTrim.startsWith('{') || innerTrim.startsWith('[')) continue;
             if (inner.indexOf(';') === -1 && inner.indexOf('\n') === -1) continue;
             const parts = inner.split(RE_SPLIT_STMTS).map(l => l.trim().replace(RE_TRAILING_COMMA, '')).filter(Boolean);
             const last = parts.pop();
@@ -448,6 +485,50 @@ async function avaliar(arg, maybeEscopo) {
       }
       // Handle slice expressions like `arr[1:3]` -> `arr.slice(1,3)` for JS
       expr = expr.replace(/(\[[^\]]*\]|\([^)]*\)|[A-Za-z_]\w*)\s*\[\s*([0-9]+)\s*:\s*([0-9]+)\s*\]/g, '($1).slice($2,$3)');
+      // Handle general index access: attempt direct evaluation first — many
+      // bracketed expressions are valid JS already (including nested
+      // indexing such as [[1,2],[3,4]][0][1]). If direct evaluation works
+      // we'll use the result; otherwise fall back to the regexp-based
+      // __INDEX__ transformation below.
+      
+      try {
+        const testFn = new Function('fs', 'include', '__ATDOT__', '__INDEX__', 'return (' + expr + ');');
+        const __INDEX__ = (a, b) => {
+          try {
+            if (a == null) return undefined;
+            if (Array.isArray(a)) return a[b];
+            if (typeof a === 'string') {
+              const n = Number(b);
+              return Number.isNaN(n) ? undefined : a.charCodeAt(n);
+            }
+            if (typeof a === 'object') return a[b];
+            return undefined;
+          } catch (e) { return undefined; }
+        };
+        let testResult = testFn(fs, include, __ATDOT__, __INDEX__);
+        if (typeof testResult === 'boolean') testResult = testResult ? 1 : 0;
+        if (testResult !== undefined) {
+          const formatValue = (v) => {
+            if (Array.isArray(v)) {
+              if (v.length === 0) return '[]';
+              return '[ ' + v.map(formatValue).join(', ') + ' ]';
+            }
+            if (typeof v === 'string') {
+              return '"' + v.replace(/"/g, '\\"') + '"';
+            }
+            if (v === null || v === undefined) return '';
+            return String(v);
+          };
+          let saída;
+          if (Array.isArray(testResult)) saída = formatValue(testResult);
+          else if (typeof testResult === 'string') saída = testResult;
+          else saída = formatValue(testResult);
+          return ok(String(saída));
+        }
+      } catch (e) {
+        // ignore and fall back to regex-based index transformation
+      }
+
       // Handle general index access: a[b] -> __INDEX__(a,b), but skip string-literal property access and slices
       const indexRe = /(\[[^\]]*\]|\([^)]*\)|"[^"]*"|'[^']*'|[A-Za-z_]\w*|\d+)\s*\[\s*([^\]]+?)\s*\]/g;
       const indexReplacer = (m, left, idx) => {
@@ -466,17 +547,16 @@ async function avaliar(arg, maybeEscopo) {
       expr = expr.replace(/=>\s*\{([^\}]*?)\}/gs, (m, inner) => `=> ({${inner}})`);
 
       // Transform guard-style branches after arrow functions: `=> | cond = res | fallback` -> conditional chain
-      expr = expr.replace(/=>\s*((?:\|[^\n]+\n?)+)/g, (m, guards) => {
-        const lines = guards.split(/\n/).map(l => l.trim()).filter(Boolean);
+      expr = expr.replace(/=>\s*((?:\s*\|[^\n]+\n?)+)/g, (m, guards) => {
+        const tokens = guards.split('|').map(t => t.trim()).filter(Boolean);
         const clauses = [];
         let fallback = null;
-        for (let ln of lines) {
-          if (ln.startsWith('|')) ln = ln.slice(1).trim();
-          if (ln.includes('=')) {
-            const parts = ln.split('=').map(s => s.trim());
+        for (let tk of tokens) {
+          if (tk.includes('=')) {
+            const parts = tk.split('=').map(s => s.trim());
             clauses.push({ cond: parts[0], res: parts[1] });
           } else {
-            fallback = ln;
+            fallback = tk;
           }
         }
         if (clauses.length === 0) return m;
@@ -485,7 +565,7 @@ async function avaliar(arg, maybeEscopo) {
           out += `(${clauses[i].cond}) ? (${clauses[i].res}) : `;
         }
         out += fallback !== null ? `(${fallback})` : 'undefined';
-        return '=> (' + out + ')';
+        return '=> (' + out + ');';
       });
       // Normalize newlines into statement separators so inner parenthesized
       // blocks with multiple lines become valid JS statements separated by
@@ -493,7 +573,27 @@ async function avaliar(arg, maybeEscopo) {
       expr = expr.replace(/\n+/g, ';');
       const parts = expr.split(/;+/).map(l => l.trim()).filter(l => l.length > 0);
       const last = parts.pop();
-      const body = (parts.length ? parts.map(l => l + ';').join('\n') + '\n' : '') + `return (${last});`;
+      // Inject directory module objects for any identifier that matches an
+      // existing directory in the workspace (e.g. `testar` -> folder `testar/`).
+      // The injected variables are consts that map file basenames to file
+      // contents (strings). This makes expressions like `testar.resposta`
+      // work in the dynamic evaluator.
+      let injectionDecls = '';
+      try {
+        const idMatches = expr.match(/[A-Za-z_]\w*/g) || [];
+        const seen = new Set();
+        for (const nm of idMatches) {
+          if (seen.has(nm)) continue; seen.add(nm);
+          try {
+            const st = fs.statSync(nm);
+            if (st && st.isDirectory()) {
+              injectionDecls += `const ${nm} = (function(){ try { const obj = {}; const files = fs.readdirSync(${JSON.stringify(nm)}); for (const f of files) { const key = f.replace(/\\.[^\\/.]+$/, ''); try { const content = fs.readFileSync(${JSON.stringify(nm + '/')} + f, 'utf-8').trim(); obj[key] = content; } catch(e) { obj[key] = ''; } } return obj; } catch(e) { return {}; } })();\n`;
+            }
+          } catch (e) { /* ignore not found */ }
+        }
+      } catch (e) { injectionDecls = ''; }
+
+      const body = injectionDecls + (parts.length ? parts.map(l => l + ';').join('\n') + '\n' : '') + `return (${last});`;
       // (debug prints removed)
       let fn;
       // Reuse previously compiled evaluators when possible
