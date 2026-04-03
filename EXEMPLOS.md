@@ -40,7 +40,7 @@ iguais([ soma(1)(2), 3 ])
 
 ### Desestruturação (Destructuring)
 ```0
-área = { largura altura } => largura * altura
+área = { largura, altura } => largura * altura
 iguais([ área({ largura: 10,  altura: 5 }), 50 ])
 ```
 
