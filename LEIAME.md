@@ -275,11 +275,11 @@ O operador `*` entre lista e texto une a lista. O operador `/` entre textos divi
 O carregamento de módulos usa endereços literais ou o operador `@`.
 
 ```0
-🔍 @ "./fontes/pergunta.txt"
+🔍 @ "./testar/pergunta.txt"
 
 🎯 O que você obtém se multiplicar seis por nove?
 
-🔍 ./fontes/resposta.0
+🔍 ./testar/resposta.0
 
 🎯 42
 ```

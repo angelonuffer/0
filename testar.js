@@ -64,16 +64,16 @@ const testes_txt = `
 
 🎯 7
 
-🔍 @ "./fontes/pergunta.txt"
+🔍 @ "./testar/pergunta.txt"
 
 🎯 O que você obtém se multiplicar seis por nove?
 
-🔍 caminho = "./fontes/pergunta.txt"
+🔍 caminho = "./testar/pergunta.txt"
    @ caminho
 
 🎯 O que você obtém se multiplicar seis por nove?
 
-🔍 (@ "./fontes/pergunta.txt")[.]
+🔍 (@ "./testar/pergunta.txt")[.]
 
 🎯 46
 
@@ -515,7 +515,7 @@ const testes_txt = `
 
 🎯 5
 
-🔍 fontes.resposta == 42
+🔍 testar.resposta == 42
 
 🎯 1
 
