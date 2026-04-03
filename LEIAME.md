@@ -57,127 +57,217 @@ Este arquivo serve como guia de sintaxe e repositório de exemplos para a **0**.
 Um módulo é composto por declarações opcionais seguidas por uma expressão final.
 
 ```0
-// Declarações: nome = expressão
-a = 10
-b = 20
+🔍 // Declarações: nome = expressão
+   a = 10
+   b = 20
 
-// Verificação (a expressão final é o resultado do módulo)
-iguais([ a + b, 30 ])
+   // Verificação (a expressão final é o resultado do módulo)
+   a + b
+
+🎯 30
 ```
 
 ### Léxico
 
 #### Comentários
+
 ```0
-// Comentário de linha
-/* Comentário
-	 de bloco */
-1
+🔍 // Comentário de linha
+   /* Comentário
+      de bloco */
+   1
+
+🎯 1
 ```
 
 #### Números negativos
+
 ```0
-iguais([ -5 + 2, -3 ])
+🔍 -5 + 2
+
+🎯 -3
 ```
 
 ### Funções e Lambdas
 
 #### Definição e Aplicação
+
 ```0
-soma = a => b => a + b
-iguais([ soma(1)(2), 3 ])
+🔍 soma = a => b => a + b
+   soma(1)(2)
+
+🎯 3
 ```
 
 #### Desestruturação (Destructuring)
+
 ```0
-área = { largura, altura } => largura * altura
-iguais([ área({ largura: 10,  altura: 5 }), 50 ])
+🔍 área = { largura, altura } => largura * altura
+   área({ largura: 10,  altura: 5 })
+
+🎯 50
 ```
 
 #### Guardas (Guards)
-As guardas permitem condicionais concisas. O primeiro `=` marca o resultado para a condição. Um `|` sem `=` é o caso padrão.
-```0
-fatorial = n =>
-	| n <= 1 = 1
-	| n * fatorial(n - 1)
 
-iguais([ fatorial(5), 120 ])
+As guardas permitem condicionais concisas. O primeiro `=` marca o resultado para a condição. Um `|` sem `=` é o caso padrão.
+
+```0
+🔍 fatorial = n =>
+      | n <= 1 = 1
+      | n * fatorial(n - 1)
+   fatorial(5)
+
+🎯 120
 ```
 
 ### Escopo Local
 
 Você pode criar escopos temporários usando parênteses.
+
 ```0
-resultado = (
-	x = 5
-	y = x * 2
-	y + 1
-)
-iguais([ resultado, 11 ])
+🔍 resultado = (
+      x = 5
+      y = x * 2
+      y + 1
+   )
+   resultado
+
+🎯 11
 ```
 
 ### Coleções
 
 #### Listas
+
 ```0
-lista = [ 1, 2, 3 ]
-iguais([ [ 0, ...lista, 4 ],  [ 0, 1, 2, 3, 4 ] ])
+🔍 lista = [ 1, 2, 3 ]
+   [ 0, ...lista, 4 ]
+
+🎯 [ 0, 1, 2, 3, 4 ]
 ```
 
 #### Objetos
+
 ```0
-nome = "João"
-obj = {
-	nome,
-	idade: 25
-}
-iguais([ { ...obj, idade: 26 }.idade, 26 ])
+🔍 nome = "João"
+   obj = {
+      nome,
+      idade: 25
+   }
+   { ...obj, idade: 26 }.idade
+
+🎯 26
 ```
 
 ### Acesso e Operações
 
 ```0
-v = [ 10, 20, 30 ]
-s = "abc"
+🔍 v = [ 10, 20, 30 ]
+   s = "abc"
+   v[0]
 
-iguais([ v[0],    10                ]) &
-iguais([ s[0],    97                ]) &
-iguais([ v[1:3],  [ 20, 30 ]        ]) &
-iguais([ v[.],    3                 ]) &
-iguais([ v[*],    [ "0", "1", "2" ] ]) &
-iguais([ {a:1}.a, 1                 ])
-```
+🎯 10
 
-```0
-// Chaves de objeto/array e tamanho em string
-iguais([ { a: 1, b: 2 }[*], [ "a", "b" ] ]) &
-iguais([ "abc"[.],          3            ])
+🔍 v = [ 10, 20, 30 ]
+   s = "abc"
+   s[0]
+
+🎯 97
+
+🔍 v = [ 10, 20, 30 ]
+   s = "abc"
+   v[1:3]
+
+🎯 [ 20, 30 ]
+
+🔍 v = [ 10, 20, 30 ]
+   s = "abc"
+   v[.]
+
+🎯 3
+
+🔍 v = [ 10, 20, 30 ]
+   s = "abc"
+   v[*]
+
+🎯 [ "0", "1", "2" ]
+
+🔍 v = [ 10, 20, 30 ]
+   s = "abc"
+   {a:1}.a
+
+🎯 1
+
+🔍 // Chaves de objeto/array e tamanho em string
+   { a: 1, b: 2 }[*]
+
+🎯 [ "a", "b" ]
+
+🔍 // Chaves de objeto/array e tamanho em string
+   "abc"[.]
+
+🎯 3
 ```
 
 ### Operadores
 
 #### Aritmética e Comparação
+
 ```0
-iguais([ 1 + 2 * 3, 7 ]) &
-iguais([ 10 / 2,    5 ]) &
-iguais([ 5 == 5,    1 ]) &
-iguais([ 5 != 4,    1 ]) &
-iguais([ 10 >= 5,   1 ])
+🔍 1 + 2 * 3
+
+🎯 7
+
+🔍 10 / 2
+
+🎯 5
+
+🔍 5 == 5
+
+🎯 1
+
+🔍 5 != 4
+
+🎯 1
+
+🔍 10 >= 5
+
+🎯 1
 ```
 
 ### Operadores Lógicos e Ternário
+
 ```0
-iguais([ 1 & 0,         0   ]) &
-iguais([ 0 | 1,         1   ]) &
-iguais([ !1,            0   ]) &
-iguais([ 1 ? "a" : "b", "a" ])
+🔍 1 & 0
+
+🎯 0
+
+🔍 0 | 1
+
+🎯 1
+
+🔍 !1
+
+🎯 0
+
+🔍 1 ? "a" : "b"
+
+🎯 a
 ```
 
 #### Especiais (Join e Split)
+
 O operador `*` entre lista e texto une a lista. O operador `/` entre textos divide o texto.
+
 ```0
-iguais([ [ "a", "b" ] * "-", "a-b"        ]) &
-iguais([ "a-b" / "-",        [ "a", "b" ] ])
+🔍 [ "a", "b" ] * "-"
+
+🎯 a-b
+
+🔍 "a-b" / "-"
+
+🎯 [ "a", "b" ]
 ```
 
 ### Módulos e Endereços
@@ -185,13 +275,21 @@ iguais([ "a-b" / "-",        [ "a", "b" ] ])
 O carregamento de módulos usa endereços literais ou o operador `@`.
 
 ```0
-iguais([ @ "./fontes/pergunta.txt", "O que você obtém se multiplicar seis por nove?" ]) &
-iguais([ ./fontes/resposta.0,       42                                               ])
+🔍 @ "./fontes/pergunta.txt"
+
+🎯 O que você obtém se multiplicar seis por nove?
+
+🔍 ./fontes/resposta.0
+
+🎯 42
 ```
 
 ### Depuração
 
 O operador `%` imprime o valor em `stderr` (JSON) e o retorna.
+
 ```0
-iguais([ % 42, 42 ])
+🔍 % 42
+
+🎯 42
 ```

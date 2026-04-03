@@ -741,80 +741,76 @@ const testes_txt = `
 
 const testes = [];
 
-import fs from "fs";
-import iguais from "./fontes/iguais.js";
-
-const escopo = {
-   iguais: ([ a, b ]) => {
-      const norm = x => (typeof x === 'boolean' ? (x ? 1 : 0) : x);
-      return iguais(norm(a), norm(b)) ? 1 : 0;
-   },
+function parseTestes(texto) {
+   const resultados = [];
+   const lines = texto.split(/\r?\n/);
+   let i = 0;
+   let tipo = "nenhum";
+   let bloco_entrada = "";
+   let bloco_saida = "";
+   let bloco_erro = "";
+   while (i < lines.length) {
+      if (lines[i].trim() === "") {
+         i++;
+         continue;
+      }
+      if (lines[i].startsWith("🔍 ")) {
+         if (bloco_entrada.trim() || bloco_saida.trim() || bloco_erro.trim()) {
+            resultados.push({
+               entrada: bloco_entrada.trim(),
+               saída: bloco_saida.trim() || undefined,
+               erro: bloco_erro.trim() || undefined,
+            });
+         }
+         tipo = "entrada";
+         bloco_entrada = lines[i].slice(3);
+         bloco_saida = "";
+         bloco_erro = "";
+      }
+      if (lines[i].startsWith("🎯 ")) {
+         tipo = "saída";
+         bloco_saida = lines[i].slice(3);
+      }
+      if (lines[i].startsWith("💥 ")) {
+         tipo = "erro";
+         bloco_erro = lines[i].slice(3);
+      }
+      if (lines[i].startsWith("   ")) {
+         if (tipo === "entrada") {
+            bloco_entrada += "\n" + lines[i].slice(3);
+         }
+         if (tipo === "saída") {
+            bloco_saida += "\n" + lines[i].slice(3);
+         }
+         if (tipo === "erro") {
+            bloco_erro += "\n" + lines[i].slice(3);
+         }
+      }
+      i++;
+   }
+   // push last block if present
+   if (bloco_entrada.trim() || bloco_saida.trim() || bloco_erro.trim()) {
+      resultados.push({
+         entrada: bloco_entrada.trim(),
+         saída: bloco_saida.trim() || undefined,
+         erro: bloco_erro.trim() || undefined,
+      });
+   }
+   return resultados;
 }
+
+// Add tests parsed from the `testes_txt` variable
+testes.push(...parseTestes(testes_txt));
+
+import fs from "fs";
 
 const exemplos = fs.readFileSync("LEIAME.md", "utf-8");
 const regex = /```0([\s\S]*?)```/g;
 let match;
 while ((match = regex.exec(exemplos)) !== null) {
-  const código = match[1].trim();
-   testes.push({
-      entrada: código,
-      saída: "1",
-      escopo,
-      arquivo: "LEIAME.md",
-   });
+   const código = match[1].trim();
+   testes.push(...parseTestes(código));
 }
-
-const lines = testes_txt.split(/\r?\n/);
-let i = 0;
-let tipo = "nenhum";
-let bloco_entrada = "";
-let bloco_saida = "";
-let bloco_erro = "";
-while (i < lines.length) {
-   if (lines[i].trim() === "") {
-      i++;
-      continue;
-   }
-   if (lines[i].startsWith("🔍 ")) {
-      // Only push a previous block if it contains something (avoid empty tests)
-      if (bloco_entrada.trim() || bloco_saida.trim() || bloco_erro.trim()) {
-         testes.push({
-            entrada: bloco_entrada.trim(),
-            saída: bloco_saida.trim() || undefined,
-            erro: bloco_erro.trim() || undefined,
-         });
-      }
-      tipo = "entrada";
-      bloco_entrada = lines[i].slice(3);
-      bloco_saida = "";
-      bloco_erro = "";
-   }
-   if (lines[i].startsWith("🎯 ")) {
-      tipo = "saída";
-      bloco_saida = lines[i].slice(3);
-   }
-   if (lines[i].startsWith("💥 ")) {
-      tipo = "erro";
-      bloco_erro = lines[i].slice(3);
-   }
-   if (lines[i].startsWith("   ")) {
-      if (tipo === "entrada") {
-         bloco_entrada += "\n" + lines[i].slice(3);
-      }
-      if (tipo === "saída") {
-         bloco_saida += "\n" + lines[i].slice(3);
-      }
-      if (tipo === "erro") {
-         bloco_erro += "\n" + lines[i].slice(3);
-      }
-   }
-   i++;
-}
-testes.push({
-  entrada: bloco_entrada.trim(),
-  saída: bloco_saida.trim() || undefined,
-  erro: bloco_erro.trim() || undefined,
-});
 
 import { interpretar } from "./0.js";
 
@@ -827,8 +823,7 @@ let primeira_falha_exibida = false;
 for (const teste of testes) {
    const { saída, erro } = await interpretar({
       entrada: teste.entrada,
-      arquivo: teste.arquivo || "0.teste.js",
-      escopo: teste.escopo || escopo,
+      arquivo: teste.arquivo || "testar.js",
    });
   if (teste.erro !== undefined) {
     if (erro.trim() === teste.erro.trim()) {
