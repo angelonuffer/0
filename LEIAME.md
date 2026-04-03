@@ -283,13 +283,3 @@ O carregamento de módulos usa endereços literais ou o operador `@`.
 
 🎯 42
 ```
-
-### Depuração
-
-O operador `%` imprime o valor em `stderr` (JSON) e o retorna.
-
-```0
-🔍 % 42
-
-🎯 42
-```

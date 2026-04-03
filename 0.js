@@ -269,13 +269,6 @@ async function avaliar(arg, maybeEscopo) {
     // ignore
   }
 
-  // Handle top-level `%` operator: evaluate the inner expression and return it.
-  // This prints to stderr in the real runtime, but for tests we just return the value.
-  if (entradaTrim.startsWith('%')) {
-    const inner = entradaTrim.slice(1).trim();
-    const innerRes = await avaliar({ entrada: inner, arquivo, escopo });
-    return ok(innerRes.saída);
-  }
 
   const parsed = analisar(entrada, arquivo);
 
@@ -371,9 +364,6 @@ async function avaliar(arg, maybeEscopo) {
       };
 
       let expr = withIncludes.trim();
-      // Allow '%' used inside parenthesized expressions to mean 'evaluate inner'
-      // (the top-level '%' is handled earlier). Remove stray '%' so JS eval works.
-      expr = expr.replace(/%/g, '');
       // Provide logical-and/or semantics used by the language: '&' returns
       // right if left truthy else 0; '|' returns left if left truthy else right.
       // Replace tokens with unique identifiers that will be provided to the
