@@ -731,7 +731,14 @@ export { findBracketIssue };
 export { transformAndEval };
 
 // If executed directly (node 0.js), read stdin or argv and call interpretar
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+// Use realpath to tolerate execution via symlink (e.g., npx/.bin link)
+let _argvScript = process.argv[1];
+let _mainScript = fileURLToPath(import.meta.url);
+try {
+  if (_argvScript) _argvScript = fs.realpathSync(_argvScript);
+  _mainScript = fs.realpathSync(_mainScript);
+} catch (e) {}
+if (_argvScript === _mainScript) {
   (async () => {
     const input = fs.readFileSync(process.argv[2], 'utf8');
     try {
