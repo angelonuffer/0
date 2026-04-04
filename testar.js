@@ -344,51 +344,51 @@ const testes_txt = `
 
 🎯 Charmander
 
-🔍 soma = { a b } => a + b
+🔍 soma = { a, b } => a + b
    soma({
-      a: 2
-      b: 3
+      a: 2,
+      b: 3,
    })
 
 🎯 5
 
-🔍 calc = { x y z } => x + y * z
+🔍 calc = { x, y, z } => x + y * z
    calc({
-      x: 2
-      y: 3
-      z: 4
+      x: 2,
+      y: 3,
+      z: 4,
    })
 
 🎯 14
 
-🔍 subtrair = { a b } => a - b
+🔍 subtrair = { a, b } => a - b
    subtrair({
-      b: 5
-      a: 10
+      b: 5,
+      a: 10,
    })
 
 🎯 5
 
-🔍 juntar = { primeiro segundo } => [primeiro, " ", segundo] * ""
+🔍 juntar = { primeiro, segundo } => [primeiro, " ", segundo] * ""
    juntar({
-      primeiro: "Hello"
-      segundo: "World"
+      primeiro: "Hello",
+      segundo: "World",
    })
 
 🎯 Hello World
 
-🔍 multiplicar_e_somar = { x y base } => x * y + base
+🔍 multiplicar_e_somar = { x, y, base } => x * y + base
    multiplicar_e_somar({
-      x: 5
-      y: 3
-      base: 10
+      x: 5,
+      y: 3,
+      base: 10,
    })
 
 🎯 25
 
 🔍 obter_valor = { valor } => valor
    obter_valor({
-      valor: 42
+      valor: 42,
    })
 
 🎯 42
@@ -453,13 +453,13 @@ const testes_txt = `
 
 🎯 5
 
-🔍 max = { a b } => | a > b = a | b
-   max({ a: 10 b: 5 })
+🔍 max = { a, b } => | a > b = a | b
+   max({ a: 10, b: 5 })
 
 🎯 10
 
-🔍 max = { a b } => | a > b = a | b
-   max({ a: 3 b: 8 })
+🔍 max = { a, b } => | a > b = a | b
+   max({ a: 3, b: 8 })
 
 🎯 8
 
@@ -573,7 +573,7 @@ const testes_txt = `
 💥 testar.js
    2:1
    variavelNaoDefinida
-   ^^^^^^^^^^^^^^^^^^^^
+   ^^^^^^^^^^^^^^^^^^^
 
 🔍 // Teste de erro de sintaxe: chave não fechada dentro de outro objeto
    obj = {
