@@ -35,9 +35,8 @@ try {
   const caminhoAbsolutoTeste = path.join(tempDir, caminhoRelativo);
 
   // Como os testes do "0" geralmente geram código JS para ser executado via pipe.
-  // O comando npx . executa o interpretador do repositório atual.
-  const comando = `npx . "${caminhoAbsolutoTeste}" | node`;
-  console.log(`Executando: ${comando}`);
+  // Executar explicitamente o `0.js` local para garantir uso do bin local.
+  const comando = `node "${path.join(rootDir, '0.js')}" "${caminhoAbsolutoTeste}" | node`;
 
   execSync(comando, {
     cwd: rootDir,

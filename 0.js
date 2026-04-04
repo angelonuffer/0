@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 // A safer, transformation-based evaluator that does not scan or read test
 // files automatically. It only reads files explicitly requested by the
@@ -726,3 +727,22 @@ export async function interpretar({ entrada, arquivo = 'testar.js', escopo = {} 
 export default { interpretar };
 export { findBracketIssue };
 export { transformAndEval };
+
+// If executed directly (node 0.js), read stdin or argv and call interpretar
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  (async () => {
+    const input = fs.readFileSync(process.argv[2], 'utf8');
+    try {
+      const res = await interpretar({ entrada: input, arquivo: process.argv[2] || 'testar.js' });
+      if (res.erro) {
+        process.stderr.write(String(res.erro));
+        process.exitCode = 1;
+      } else {
+        process.stdout.write(String(res.saída));
+      }
+    } catch (e) {
+      process.stderr.write(String(e && e.stack ? e.stack : e));
+      process.exitCode = 1;
+    }
+  })();
+}
