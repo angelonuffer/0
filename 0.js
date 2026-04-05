@@ -104,8 +104,21 @@ const parênteses = entrada => {
   return número(entrada)
 }
 
+const unário = entrada => {
+  if (entrada[0] === "!") {
+    const resto_1 = passe(espaço)(entrada.slice(1))
+    const { valor, resto } = unário(resto_1)
+    if (valor instanceof Error) return { valor, resto }
+    return {
+      valor: Number(valor) === 0 ? 1 : 0,
+      resto,
+    }
+  }
+  return parênteses(entrada)
+}
+
 const produto = operação(
-  parênteses,
+  unário,
   {
     "*": (a, b) => a * b,
     "/": (a, b) => a / b,
