@@ -120,7 +120,7 @@ const soma = operação(
   },
 )
 
-const comparacao = operação(
+const comparação = operação(
   soma,
   {
     ">=": (a, b) => a >= b ? 1 : 0,
@@ -132,11 +132,12 @@ const comparacao = operação(
   },
 )
 
-const e = operação(
-  comparacao,
+const comparação_lógica = operação(
+  comparação,
   {
     "&": (a, b) => a && b,
+    "|": (a, b) => a || b,
   },
 )
 
-const expressão = e
+const expressão = comparação_lógica
