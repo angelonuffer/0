@@ -63,7 +63,6 @@ Um módulo é composto por declarações opcionais seguidas por uma expressão f
 
    // Verificação (a expressão final é o resultado do módulo)
    a + b
-
 🎯 30
 ```
 
@@ -76,7 +75,6 @@ Um módulo é composto por declarações opcionais seguidas por uma expressão f
    /* Comentário
       de bloco */
    1
-
 🎯 1
 ```
 
@@ -84,7 +82,6 @@ Um módulo é composto por declarações opcionais seguidas por uma expressão f
 
 ```0
 🔍 -5 + 2
-
 🎯 -3
 ```
 
@@ -95,7 +92,6 @@ Um módulo é composto por declarações opcionais seguidas por uma expressão f
 ```0
 🔍 soma = a => b => a + b
    soma(1)(2)
-
 🎯 3
 ```
 
@@ -104,7 +100,6 @@ Um módulo é composto por declarações opcionais seguidas por uma expressão f
 ```0
 🔍 área = { largura, altura } => largura * altura
    área({ largura: 10,  altura: 5 })
-
 🎯 50
 ```
 
@@ -117,7 +112,6 @@ As guardas permitem condicionais concisas. O primeiro `=` marca o resultado para
       | n <= 1 = 1
       | n * fatorial(n - 1)
    fatorial(5)
-
 🎯 120
 ```
 
@@ -132,7 +126,6 @@ Você pode criar escopos temporários usando parênteses.
       y + 1
    )
    resultado
-
 🎯 11
 ```
 
@@ -143,7 +136,6 @@ Você pode criar escopos temporários usando parênteses.
 ```0
 🔍 lista = [ 1, 2, 3 ]
    [ 0, ...lista, 4 ]
-
 🎯 [ 0, 1, 2, 3, 4 ]
 ```
 
@@ -156,7 +148,6 @@ Você pode criar escopos temporários usando parênteses.
       idade: 25
    }
    { ...obj, idade: 26 }.idade
-
 🎯 26
 ```
 
@@ -166,47 +157,39 @@ Você pode criar escopos temporários usando parênteses.
 🔍 v = [ 10, 20, 30 ]
    s = "abc"
    v[0]
-
 🎯 10
 
 🔍 v = [ 10, 20, 30 ]
    s = "abc"
    s[0]
-
 🎯 97
 
 🔍 v = [ 10, 20, 30 ]
    s = "abc"
    v[1:3]
-
 🎯 [ 20, 30 ]
 
 🔍 v = [ 10, 20, 30 ]
    s = "abc"
    v[.]
-
 🎯 3
 
 🔍 v = [ 10, 20, 30 ]
    s = "abc"
    v[*]
-
 🎯 [ "0", "1", "2" ]
 
 🔍 v = [ 10, 20, 30 ]
    s = "abc"
    {a:1}.a
-
 🎯 1
 
 🔍 // Chaves de objeto/array e tamanho em string
    { a: 1, b: 2 }[*]
-
 🎯 [ "a", "b" ]
 
 🔍 // Chaves de objeto/array e tamanho em string
    "abc"[.]
-
 🎯 3
 ```
 
@@ -216,23 +199,18 @@ Você pode criar escopos temporários usando parênteses.
 
 ```0
 🔍 1 + 2 * 3
-
 🎯 7
 
 🔍 10 / 2
-
 🎯 5
 
 🔍 5 == 5
-
 🎯 1
 
 🔍 5 != 4
-
 🎯 1
 
 🔍 10 >= 5
-
 🎯 1
 ```
 
@@ -240,19 +218,15 @@ Você pode criar escopos temporários usando parênteses.
 
 ```0
 🔍 1 & 0
-
 🎯 0
 
 🔍 0 | 1
-
 🎯 1
 
 🔍 !1
-
 🎯 0
 
 🔍 1 ? "a" : "b"
-
 🎯 a
 ```
 
@@ -262,11 +236,9 @@ O operador `*` entre lista e texto une a lista. O operador `/` entre textos divi
 
 ```0
 🔍 [ "a", "b" ] * "-"
-
 🎯 a-b
 
 🔍 "a-b" / "-"
-
 🎯 [ "a", "b" ]
 ```
 
@@ -276,10 +248,8 @@ O carregamento de módulos usa endereços literais ou o operador `@`.
 
 ```0
 🔍 @ "./testar/pergunta.txt"
-
 🎯 O que você obtém se multiplicar seis por nove?
 
 🔍 ./testar/resposta.0
-
 🎯 42
 ```
