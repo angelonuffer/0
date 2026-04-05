@@ -3,15 +3,9 @@
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
-// A safer, transformation-based evaluator that does not scan or read test
-// files automatically. It only reads files explicitly requested by the
-// source using the `@ "path"` include form.
-
 function findBracketIssue(txt) {
   const stack = [];
   let inStr = null;
-  let lastTokType = null; // 'value' | 'ident' | null
-  let missingCommaPos = null;
   for (let i = 0; i < txt.length; ) {
     const ch = txt[i];
     if (inStr) {
@@ -19,77 +13,26 @@ function findBracketIssue(txt) {
       if (ch === inStr) { inStr = null; i++; continue; }
       i++; continue;
     }
-    if (ch === '"' || ch === "'") { inStr = ch; i++; lastTokType = 'value'; continue; }
+    if (ch === '"' || ch === "'") { inStr = ch; i++; continue; }
     if (ch === '/' && txt[i+1] === '/') { while (i < txt.length && txt[i] !== '\n') i++; i++; continue; }
     if (ch === '/' && txt[i+1] === '*') { i += 2; while (i < txt.length && !(txt[i] === '*' && txt[i+1] === '/')) i++; i += 2; continue; }
     if (/\s/.test(ch)) { i++; continue; }
-    if (ch === '{' || ch === '[' || ch === '(') { stack.push({ ch, pos: i }); i++; lastTokType = null; continue; }
+    if (ch === '{' || ch === '[' || ch === '(') { stack.push({ ch, pos: i }); i++; continue; }
     if (ch === '}' || ch === ']' || ch === ')') {
-      const top = stack[stack.length-1];
+      const top = stack.pop();
       if (!top) return i;
       const ok = (top.ch === '{' && ch === '}') || (top.ch === '[' && ch === ']') || (top.ch === '(' && ch === ')');
       if (!ok) return i;
-      stack.pop(); i++; lastTokType = 'value'; continue;
+      i++; continue;
     }
-    // identifier
-    if (/[A-Za-z_\u00C0-\u017F]/.test(ch)) {
-      let j = i + 1; while (j < txt.length && /[A-Za-z0-9_\u00C0-\u017F]/.test(txt[j])) j++;
-      const top = stack[stack.length-1];
-        if (top && top.ch === '{' && lastTokType === 'value') {
-          // inside object: found identifier after a value without comma => record
-          // candidate position but don't immediately return because there may be
-          // an unmatched opener later that the test expects to point to instead.
-          missingCommaPos = i;
-          // advance past the identifier
-          lastTokType = 'ident';
-          i = j;
-          continue;
-        }
-      lastTokType = 'ident';
-      i = j; continue;
-    }
-    // number
-    if (/[0-9]/.test(ch)) { let j = i + 1; while (j < txt.length && /[0-9]/.test(txt[j])) j++; lastTokType = 'value'; i = j; continue; }
-    // punctuation tokens
-    if (ch === ':') {
-      const top = stack[stack.length - 1];
-      if (top && top.ch === '[') {
-        // slices like [1:3] allow ':' after a value/number
-        lastTokType = null; i++; continue;
-      }
-      if (top && top.ch === '{') {
-        // inside object literal, ':' must follow an identifier (key)
-        if (lastTokType !== 'ident') return i;
-        lastTokType = null; i++; continue;
-      }
-      // otherwise allow ':' (e.g. ternary operator `cond ? a : b`)
-      lastTokType = null; i++; continue;
-    }
-    if (ch === ',') { lastTokType = null; i++; continue; }
-    // other non-space characters: allow common operator/punctuation chars,
-    // otherwise treat as unexpected and report the position.
-    if (/[@+\-*/=<>!&|.%\?]/.test(ch)) { i++; lastTokType = null; continue; }
-    return i;
+    i++; // ignore other chars
   }
   if (inStr) {
-    // For an unclosed string, point to the end of the input (just after
-    // the last non-whitespace character) so the caret indicates where the
-    // closing quote is expected.
     let k = txt.length - 1; while (k >= 0 && /\s/.test(txt[k])) k--; if (k >= 0) return Math.min(txt.length, k + 1); return 0;
   }
   if (stack.length) {
-    // prefer to point near the end of the input where the parser actually failed:
-    // return the position just after the last non-whitespace character. Some
-    // tests expect the caret to appear a little past the line end for missing
-    // closing brackets (e.g., '['), so add a small padding for those cases.
-    let k = txt.length - 1; while (k >= 0 && /\s/.test(txt[k])) k--;
-    if (k >= 0) {
-      return Math.min(txt.length, k + 1);
-    }
-    return stack[stack.length-1].pos;
+    let k = txt.length - 1; while (k >= 0 && /\s/.test(txt[k])) k--; if (k >= 0) return Math.min(txt.length, k + 1); return stack[stack.length-1].pos;
   }
-  // if no unmatched openers but we recorded a missing-comma position, return it
-  if (missingCommaPos !== null) return missingCommaPos;
   return null;
 }
 
@@ -98,22 +41,17 @@ function formatErrorString(arquivo, entrada, pos) {
   if (pos === undefined || pos === null) pos = 0;
   if (pos < 0) pos = 0;
   const lines = txt.split(/\r?\n/);
-  // compute line start offsets
   const lineStarts = new Array(lines.length);
   let acc = 0;
   for (let i = 0; i < lines.length; i++) { lineStarts[i] = acc; acc += lines[i].length + 1; }
-  // choose the line that contains the position; if pos is beyond the end,
-  // use the last line so we can draw the caret after the line end.
   let lineIndex = lines.length - 1;
   for (let i = 0; i < lines.length; i++) { if (pos <= lineStarts[i] + lines[i].length) { lineIndex = i; break; } }
   const lineStart = lineStarts[lineIndex];
   const col = Math.max(1, pos - lineStart + 1);
   const lineText = lines[lineIndex] || '';
-  // underline the identifier-like token at the position (letters/digits/underscore/extended)
   const startInLine = Math.max(0, col - 1);
   const isIdentChar = (ch) => /[A-Za-z0-9_\u00C0-\u017F]/.test(ch);
   let caret;
-  // If the position is beyond the end of the line, draw a single caret
   if (startInLine >= lineText.length) {
     caret = ' '.repeat(startInLine) + '^';
   } else {
@@ -124,19 +62,11 @@ function formatErrorString(arquivo, entrada, pos) {
       const len = Math.max(1, tokenEnd - tokenStart);
       caret = ' '.repeat(Math.max(0, tokenStart)) + '^'.repeat(len);
     } else {
-      // punctuation or other symbol: point exactly at the position
       const tokenStart = startInLine;
       caret = ' '.repeat(Math.max(0, tokenStart)) + '^';
     }
   }
-  // In some single-line unclosed-bracket cases the test expectations place
-  // the numeric column a couple characters after the caret; adjust display
-  // column for those situations to match the harness.
-  let displayCol = col;
-  if (pos > lineStart + lineText.length - 1) {
-    if (lineText.indexOf('[') !== -1) displayCol = col + 2;
-  }
-  return `${arquivo}\n${lineIndex + 1}:${displayCol}\n${lineText}\n${caret}\n`;
+  return `${arquivo}\n${lineIndex + 1}:${col}\n${lineText}\n${caret}\n`;
 }
 
 function formatValue(v, inArray = false) {
@@ -149,473 +79,616 @@ function formatValue(v, inArray = false) {
   return String(v);
 }
 
+// Parser-combinator based evaluator
 function transformAndEval(src, escopo) {
-  // Replace explicit includes @ "path" and @ id -> __INCLUDE__(...)
-  let code = src.replace(/@\s*"([^"]+)"/g, (m,p) => `__INCLUDE__("${p.replace(/\\/g,'\\\\')}")`)
-                .replace(/@\s*([A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*)/g, (m,id) => `__INCLUDE__(${id})`);
+  let text = String(src || '')
+    .replace(/@\s*"([^\"]+)"/g, (m,p) => `__INCLUDE__("${p.replace(/\\/g,'\\\\')}")`)
+    .replace(/@\s*([A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*)/g, (m,id) => `__INCLUDE__(${id})`);
+  // normalize trailing commas in arrays/objects (allow trailing commas across lines)
+  text = text.replace(/,\s*([\]\}])/g, '$1');
 
-  // destructuring params { a b } => -> ({a,b}) =>
-  code = code.replace(/\{\s*([A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*(?:[\s,]+[A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*)*)\s*\}\s*=>/g,
-    (m, inner) => `({${inner.split(/[,\s]+/).filter(Boolean).join(',')}}) =>`);
-
-  // slices and length (handle array/object or parenthesized expressions or identifiers to the left)
-  code = code.replace(/(\[[^\]]*\]|\([^)]*\)|[A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*)\s*\[\s*([0-9]+)\s*:\s*([0-9]+)\s*\]/g, '($1).slice($2,$3)');
-  code = code.replace(/(\[[^\]]*\]|\([^)]*\)|[A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*)\s*\[\s*\.\s*\]/g, '($1).length');
-
-  // handle [.] occurrences where the left expression may contain nested parens/brackets
-  (function replaceDotLength() {
-    const occs = [];
-    function findClosingIn(str, idx) {
-      let depth = 1; let j = idx + 1; let inS = null;
-      while (j < str.length && depth > 0) {
-        const ch = str[j];
-        if (inS) { if (ch === '\\') { j += 2; continue; } if (ch === inS) inS = null; j++; continue; }
-        if (ch === '"' || ch === "'") { inS = ch; j++; continue; }
-        if (ch === '[') depth++; else if (ch === ']') depth--; j++;
-      }
-      return depth === 0 ? j - 1 : -1;
+  function skip(pos) {
+    let i = pos;
+    while (i < text.length) {
+      const ch = text[i];
+      if (/\s/.test(ch)) { i++; continue; }
+      if (text[i] === '/' && text[i+1] === '/') { i += 2; while (i < text.length && text[i] !== '\n') i++; continue; }
+      if (text[i] === '/' && text[i+1] === '*') { i += 2; while (i < text.length && !(text[i] === '*' && text[i+1] === '/')) i++; i += 2; continue; }
+      break;
     }
-    function findExprStartIn(str, idx) {
-      let kk = idx - 1; while (kk >= 0 && /\s/.test(str[kk])) kk--; if (kk < 0) return 0;
-      let exprStart = kk;
-      // handle string literal to the left
-      if (str[kk] === '"' || str[kk] === "'") {
-        let q = kk - 1; let inS = str[kk];
-        while (q >= 0) {
-          if (str[q] === '\\') { q -= 2; continue; }
-          if (str[q] === inS) { exprStart = q; break; }
-          q--;
-        }
-        return exprStart;
+    return i;
+  }
+
+  const isIdentStart = ch => /[A-Za-z_\u00C0-\u017F]/.test(ch);
+  const isIdentChar = ch => /[A-Za-z0-9_\u00C0-\u017F]/.test(ch);
+
+  function parseNumber(pos) {
+    pos = skip(pos);
+    const m = /^[+-]?(?:\d+)(?:\.\d+)?/.exec(text.slice(pos));
+    if (!m) return null;
+    const start = pos;
+    const end = pos + m[0].length;
+    return { node: { type: 'number', value: Number(m[0]), start, end }, pos: end };
+  }
+
+  function parseString(pos) {
+    pos = skip(pos);
+    const q = text[pos]; if (q !== '"' && q !== "'") return null;
+    let i = pos + 1; let out = '';
+    const start = pos;
+    while (i < text.length) {
+      const ch = text[i];
+      if (ch === '\\') {
+        const nxt = text[i+1] || '';
+        if (nxt === 'n') out += '\n'; else if (nxt === 't') out += '\t'; else if (nxt === 'r') out += '\r'; else out += nxt;
+        i += 2; continue;
       }
-      // handle string literal to the left
-      if (str[kk] === '"' || str[kk] === "'") {
-        let q = kk - 1; let inS = str[kk];
-        while (q >= 0) {
-          if (str[q] === '\\') { q -= 2; continue; }
-          if (str[q] === inS) { exprStart = q; break; }
-          q--;
-        }
-        return exprStart;
-      }
-      // handle string literal to the left
-      if (str[kk] === '"' || str[kk] === "'") {
-        let q = kk - 1; let inS = str[kk];
-        while (q >= 0) {
-          if (str[q] === '\\') { q -= 2; continue; }
-          if (str[q] === inS) { exprStart = q; break; }
-          q--;
-        }
-        return exprStart;
-      }
-      if (str[kk] === ']') {
-        let d = 1; let m = kk - 1; let inSB = null;
-        while (m >= 0 && d > 0) {
-          const ch = str[m];
-          if (inSB) { if (ch === '\\') { m -= 2; continue; } if (ch === inSB) inSB = null; m--; continue; }
-          if (ch === '"' || ch === "'") { inSB = ch; m--; continue; }
-          if (ch === ']') d++; else if (ch === '[') d--; m--;
-        }
-        exprStart = m + 1;
-      } else if (str[kk] === '}') {
-        let d = 1; let m = kk - 1; let inSB = null;
-        while (m >= 0 && d > 0) {
-          const ch = str[m];
-          if (inSB) { if (ch === '\\') { m -= 2; continue; } if (ch === inSB) inSB = null; m--; continue; }
-          if (ch === '"' || ch === "'") { inSB = ch; m--; continue; }
-          if (ch === '}') d++; else if (ch === '{') d--; m--;
-        }
-        exprStart = m + 1;
-      } else if (str[kk] === ')') {
-        let d = 1; let m = kk - 1; let inSB = null;
-        while (m >= 0 && d > 0) {
-          const ch = str[m];
-          if (inSB) { if (ch === '\\') { m -= 2; continue; } if (ch === inSB) inSB = null; m--; continue; }
-          if (ch === '"' || ch === "'") { inSB = ch; m--; continue; }
-          if (ch === ')') d++; else if (ch === '(') d--; m--;
-        }
-        exprStart = m + 1;
+      if (ch === q) { i++; return { node: { type: 'string', value: out, start, end: i }, pos: i }; }
+      out += ch; i++;
+    }
+    return null;
+  }
+
+  function parseIdent(pos) {
+    pos = skip(pos);
+    if (pos >= text.length) return null;
+    if (!isIdentStart(text[pos])) return null;
+    let i = pos + 1; while (i < text.length && isIdentChar(text[i])) i++;
+    const start = pos; const end = i;
+    return { node: { type: 'ident', name: text.slice(pos, i), start, end }, pos: i };
+  }
+
+  function parseParen(pos) {
+    pos = skip(pos);
+    if (text[pos] !== '(') return null;
+    const start = pos;
+    const prog = parseProgram(pos + 1);
+    if (!prog) return null;
+    const p = skip(prog.pos);
+    if (text[p] !== ')') return null;
+    // if single expression inside parens, return that expression node
+    if (prog.stmts.length === 1 && prog.stmts[0].type === 'expr') {
+      const enode = prog.stmts[0].expr;
+      enode.start = enode.start ?? start; enode.end = enode.end ?? (p + 1);
+      return { node: enode, pos: p + 1 };
+    }
+    return { node: { type: 'block', stmts: prog.stmts, start, end: p + 1 }, pos: p + 1 };
+  }
+
+  function parseArray(pos) {
+    pos = skip(pos);
+    if (text[pos] !== '[') return null;
+    let i = skip(pos + 1);
+    const elems = [];
+    if (text[i] === ']') return { node: { type: 'array', elements: [], start: pos, end: i + 1 }, pos: i + 1 };
+    while (i < text.length) {
+      // support spread operator '...expr'
+      if (text.startsWith('...', i)) {
+        const vr = parseExpression(i + 3);
+        if (!vr) return null;
+        elems.push({ type: 'spread', expr: vr.node });
+        i = skip(vr.pos);
       } else {
-        let m = kk; while (m >= 0 && /[A-Za-z0-9_\u00C0-\u017F]/.test(str[m])) m--; exprStart = m + 1;
+        const v = parseExpression(i);
+        if (!v) return null;
+        elems.push(v.node);
+        i = skip(v.pos);
       }
-      return exprStart;
+      if (text[i] === ',') { i = skip(i + 1); continue; }
+      if (text[i] === ']') return { node: { type: 'array', elements: elems, start: pos, end: i + 1 }, pos: i + 1 };
+      i = skip(i);
     }
-    for (let i = 0; i < code.length; i++) {
-      if (code[i] === '[' && code[i+1] === '.' ) {
-        const j = i+2; if (j < code.length && code[j] === ']') {
-          const exprStart = findExprStartIn(code, i);
-          occs.push({ exprStart, i, j });
-        }
-      }
-    }
-    if (occs.length === 0) return;
-    // apply replacements right-to-left to avoid offset issues
-    let newCode = code; let offset = 0;
-    for (let k = occs.length - 1; k >= 0; k--) {
-      const o = occs[k];
-      const a = o.exprStart + offset; const c = o.i + offset; const d = o.j + offset;
-      const rep = '(' + newCode.slice(a, o.i + offset) + ').length';
-      newCode = newCode.slice(0, a) + rep + newCode.slice(d + 1);
-      offset += rep.length - (d + 1 - a);
-    }
-    code = newCode;
-  })();
+    return null;
+  }
 
-  // keys operator [*] -> Object.keys(obj)
-  (function replaceStarKeys() {
-    const occs = [];
-    function findExprStartIn(str, idx) {
-      let kk = idx - 1; while (kk >= 0 && /\s/.test(str[kk])) kk--; if (kk < 0) return 0;
-      let exprStart = kk;
-      if (str[kk] === ']') {
-        let d = 1; let m = kk - 1; let inSB = null;
-        while (m >= 0 && d > 0) {
-          const ch = str[m];
-          if (inSB) { if (ch === '\\') { m -= 2; continue; } if (ch === inSB) inSB = null; m--; continue; }
-          if (ch === '"' || ch === "'") { inSB = ch; m--; continue; }
-          if (ch === ']') d++; else if (ch === '[') d--; m--;
+  function parseObject(pos) {
+    pos = skip(pos);
+    if (text[pos] !== '{') return null;
+    const start = pos;
+    let i = skip(pos + 1);
+    const props = [];
+    if (text[i] === '}') return { node: { type: 'object', props: [], start, end: i + 1 }, pos: i + 1 };
+    while (i < text.length) {
+      // support spread in objects
+      if (text.startsWith('...', i)) {
+        const sp = parseExpression(i + 3);
+        if (!sp) return null;
+        props.push({ spread: true, expr: sp.node });
+        i = skip(sp.pos);
+        i = skip(i);
+        if (text[i] === ',') { i = skip(i + 1); continue; }
+        if (text[i] === '}') return { node: { type: 'object', props, start, end: i + 1 }, pos: i + 1 };
+        continue;
+      }
+      const keyStr = parseString(i);
+      let key;
+      if (keyStr) { key = keyStr.node.value; i = skip(keyStr.pos); }
+      else {
+        const id = parseIdent(i);
+        if (id) { key = id.node.name; i = skip(id.pos); }
+        else {
+          const num = parseNumber(i);
+          if (num) { key = String(num.node.value); i = skip(num.pos); }
+          else return null;
         }
-        exprStart = m + 1;
-      } else if (str[kk] === '}') {
-        let d = 1; let m = kk - 1; let inSB = null;
-        while (m >= 0 && d > 0) {
-          const ch = str[m];
-          if (inSB) { if (ch === '\\') { m -= 2; continue; } if (ch === inSB) inSB = null; m--; continue; }
-          if (ch === '"' || ch === "'") { inSB = ch; m--; continue; }
-          if (ch === '}') d++; else if (ch === '{') d--; m--;
-        }
-        exprStart = m + 1;
-      } else if (str[kk] === ')') {
-        let d = 1; let m = kk - 1; let inSB = null;
-        while (m >= 0 && d > 0) {
-          const ch = str[m];
-          if (inSB) { if (ch === '\\') { m -= 2; continue; } if (ch === inSB) inSB = null; m--; continue; }
-          if (ch === '"' || ch === "'") { inSB = ch; m--; continue; }
-          if (ch === ')') d++; else if (ch === '(') d--; m--;
-        }
-        exprStart = m + 1;
+      }
+      i = skip(i);
+      if (text[i] === ':') {
+        const v = parseExpression(i + 1);
+        if (!v) return null;
+        props.push({ key, value: v.node });
+        i = skip(v.pos);
       } else {
-        let m = kk; while (m >= 0 && /[A-Za-z0-9_\u00C0-\u017F]/.test(str[m])) m--; exprStart = m + 1;
+        // shorthand property: { nome } -> { nome: nome }
+        props.push({ key, value: { type: 'ident', name: key } });
       }
-      return exprStart;
+      if (text[i] === ',') { i = skip(i + 1); continue; }
+      if (text[i] === '}') return { node: { type: 'object', props, start, end: i + 1 }, pos: i + 1 };
+      i = skip(i);
     }
-    for (let i = 0; i < code.length; i++) {
-      if (code[i] === '[' && code[i+1] === '*' && code[i+2] === ']') {
-        const exprStart = findExprStartIn(code, i);
-        occs.push({ exprStart, i, j: i+2 });
-      }
-    }
-    if (occs.length === 0) return;
-    const original = code;
-    let newCode = code; let offset = 0;
-    
-    for (let k = occs.length - 1; k >= 0; k--) {
-      const o = occs[k];
-      const a = o.exprStart + offset;
-      const c = o.j + offset;
-      const left = original.slice(o.exprStart, o.i);
-      const rep = 'Object.keys(' + left + ')';
-      newCode = newCode.slice(0, a) + rep + newCode.slice(c + 1);
-      offset += rep.length - (c + 1 - a);
-    }
-    code = newCode;
-    // debug helper for problematic case
-    
-  })();
+    return null;
+  }
 
-  // numeric index: replace occurrences of <expr>[N] with __IDX__(<expr>,N)
-  // implement a scanner to correctly handle nested bracket/paren expressions
-  (function replaceNumericIndex() {
-      // first collect all numeric index occurrences in the original code
-      const occurrences = [];
-      function findClosingIn(str, idx) {
-        let depth = 1; let j = idx + 1; let inS = null;
-        while (j < str.length && depth > 0) {
-          const ch = str[j];
+  // parse parameter pattern for lambdas (identifier or object destructuring)
+  function parseParamPattern(pos) {
+    pos = skip(pos);
+    if (text[pos] === '{') {
+      const start = pos;
+      let i = skip(pos + 1);
+      const props = [];
+      if (text[i] === '}') return { node: { type: 'param_pattern_obj', props: [], start, end: i + 1 }, pos: i + 1 };
+      while (i < text.length) {
+        const id = parseIdent(i);
+        if (!id) return null;
+        props.push(id.node.name);
+        i = skip(id.pos);
+        if (text[i] === ',') { i = skip(i + 1); continue; }
+        if (text[i] === '}') return { node: { type: 'param_pattern_obj', props, start, end: i + 1 }, pos: i + 1 };
+        i = skip(i);
+      }
+      return null;
+    }
+    const id = parseIdent(pos);
+    if (id) return { node: { type: 'ident', name: id.node.name, start: id.node.start, end: id.node.end }, pos: id.pos };
+    return null;
+  }
+
+  function parseGuards(pos) {
+    pos = skip(pos);
+    if (text[pos] !== '|') return null;
+    const branches = [];
+    while (true) {
+      pos = skip(pos);
+      if (text[pos] !== '|') break;
+      pos = skip(pos + 1);
+      // try condition = expr
+      const leftRes = parseExpression(pos);
+      if (leftRes) {
+        const afterLeft = skip(leftRes.pos);
+        if (text[afterLeft] === '=') {
+          // temporarily disable pipe operator so RHS doesn't swallow subsequent '|' guards
+          let saved = null;
+          for (let bi = 0; bi < BINOPS.length; bi++) {
+            if (BINOPS[bi].indexOf('|') !== -1) { saved = BINOPS[bi].slice(); BINOPS[bi] = BINOPS[bi].filter(op => op !== '|'); break; }
+          }
+          try {
+            const exprRes = parseExpression(afterLeft + 1);
+            if (!exprRes) return null;
+            branches.push({ cond: leftRes.node, expr: exprRes.node });
+            pos = skip(exprRes.pos);
+            continue;
+          } finally {
+            if (saved) {
+              // restore
+              for (let bi = 0; bi < BINOPS.length; bi++) {
+                if (BINOPS[bi].indexOf('|') === -1 && saved.indexOf('|') !== -1) { BINOPS[bi] = saved; break; }
+              }
+            }
+          }
+        }
+      }
+      // bare expression branch: parse but do not let pipe operator join into next guard
+      let saved2 = null;
+      for (let bi2 = 0; bi2 < BINOPS.length; bi2++) {
+        if (BINOPS[bi2].indexOf('|') !== -1) { saved2 = BINOPS[bi2].slice(); BINOPS[bi2] = BINOPS[bi2].filter(op => op !== '|'); break; }
+      }
+      try {
+        const bare = parseExpression(pos);
+        if (!bare) return null;
+        branches.push({ cond: null, expr: bare.node });
+        pos = skip(bare.pos);
+      } finally {
+        if (saved2) {
+          for (let bi2 = 0; bi2 < BINOPS.length; bi2++) {
+            if (BINOPS[bi2].indexOf('|') === -1 && saved2.indexOf('|') !== -1) { BINOPS[bi2] = saved2; break; }
+          }
+        }
+      }
+    }
+    return { node: { type: 'guards', branches }, pos };
+  }
+
+  function parseLambda(pos) {
+    pos = skip(pos);
+    const p = parseParamPattern(pos);
+    if (!p) return null;
+    let q = skip(p.pos);
+    if (!(text[q] === '=' && text[q+1] === '>')) return null;
+    const bodyStart = q + 2;
+    let bodyRes = null;
+    const ps = skip(bodyStart);
+    if (text[ps] === '|') {
+      bodyRes = parseGuards(ps);
+      if (!bodyRes) return null;
+    } else if (text[ps] === '(') {
+      bodyRes = parseParen(ps);
+      if (!bodyRes) return null;
+    } else {
+      bodyRes = parseExpression(bodyStart);
+      if (!bodyRes) return null;
+    }
+    const start = p.node && p.node.start != null ? p.node.start : pos;
+    const node = { type: 'lambda', params: p.node, body: bodyRes.node, start, end: bodyRes.pos };
+    return { node, pos: bodyRes.pos };
+  }
+
+  function parsePrimary(pos) {
+    pos = skip(pos);
+    if (pos >= text.length) return null;
+    // lambda has low binding and should be attempted first here
+    const lam = parseLambda(pos);
+    if (lam) return lam;
+    const ch = text[pos];
+    if (ch === '(') return parseParen(pos);
+    if (ch === '[') return parseArray(pos);
+    if (ch === '{') return parseObject(pos);
+    const s = parseString(pos); if (s) return s;
+    const n = parseNumber(pos); if (n) return n;
+    const id = parseIdent(pos); if (id) return id;
+    return null;
+  }
+
+  function parsePostfix(pos) {
+    let cur = parsePrimary(pos);
+    if (!cur) return null;
+    let node = cur.node; let p = skip(cur.pos);
+    while (true) {
+      if (text[p] === '.') {
+        const id = parseIdent(p + 1);
+        if (!id) return null;
+        node = { type: 'prop', obj: node, prop: id.node.name, start: (node && node.start) || cur.node.start, end: id.node.end };
+        p = skip(id.pos);
+        continue;
+      }
+      if (text[p] === '[') {
+        let j = p + 1; let depth = 1; let inS = null;
+        while (j < text.length && depth > 0) {
+          const ch = text[j];
           if (inS) { if (ch === '\\') { j += 2; continue; } if (ch === inS) inS = null; j++; continue; }
           if (ch === '"' || ch === "'") { inS = ch; j++; continue; }
           if (ch === '[') depth++; else if (ch === ']') depth--; j++;
         }
-        return depth === 0 ? j - 1 : -1;
+        if (depth !== 0) return null;
+        const innerStart = p + 1; const innerEnd = j - 1;
+        const innerTxt = text.slice(innerStart, innerEnd).trim();
+        if (innerTxt === '.') { node = { type: 'length', obj: node }; p = skip(j); continue; }
+        if (innerTxt === '*') { node = { type: 'keys', obj: node }; p = skip(j); continue; }
+        const m = /^\s*([+-]?\d+)\s*:\s*([+-]?\d+)\s*$/.exec(innerTxt);
+        if (m) { node = { type: 'slice', obj: node, start: Number(m[1]), end: Number(m[2]) }; p = skip(j); continue; }
+        const idxRes = parseExpression(innerStart);
+        if (idxRes && idxRes.pos === innerEnd) { node = { type: 'index', obj: node, index: idxRes.node }; p = skip(j); continue; }
+        const num = /^\s*([+-]?\d+)\s*$/.exec(innerTxt);
+        if (num) { node = { type: 'index', obj: node, index: { type: 'number', value: Number(num[1]) } }; p = skip(j); continue; }
+        return null;
       }
-      function findExprStartIn(str, idx) {
-        let kk = idx - 1; while (kk >= 0 && /\s/.test(str[kk])) kk--; if (kk < 0) return 0;
-        let exprStart = kk;
-        if (str[kk] === ']') {
-          let d = 1; let m = kk - 1; let inSB = null;
-          while (m >= 0 && d > 0) {
-            const ch = str[m];
-            if (inSB) { if (ch === '\\') { m -= 2; continue; } if (ch === inSB) inSB = null; m--; continue; }
-            if (ch === '"' || ch === "'") { inSB = ch; m--; continue; }
-            if (ch === ']') d++; else if (ch === '[') d--; m--;
+      if (text[p] === '(') {
+        // find matching closing paren
+        let j = p + 1; let depth = 1; let inS = null;
+        while (j < text.length && depth > 0) {
+          const ch = text[j];
+          if (inS) { if (ch === '\\') { j += 2; continue; } if (ch === inS) inS = null; j++; continue; }
+          if (ch === '"' || ch === "'") { inS = ch; j++; continue; }
+          if (ch === '(') depth++; else if (ch === ')') depth--; j++;
+        }
+        if (depth !== 0) return null;
+        const innerStart = p + 1; const innerEnd = j - 1;
+        const args = [];
+        // empty args
+        if (innerStart > innerEnd) { node = { type: 'call', callee: node, args: [], start: (node && node.start) || cur.node.start, end: j }; p = skip(j); continue; }
+        // split top-level commas and parse each arg; if any arg fails, treat this as NOT a call
+        let k = innerStart; let tokStart = innerStart; let d = 0; let ins = null; let parseFailed = false;
+        while (k <= innerEnd) {
+          const ch = text[k];
+          if (ins) { if (ch === '\\') { k += 2; continue; } if (ch === ins) ins = null; k++; continue; }
+          if (ch === '"' || ch === "'") { ins = ch; k++; continue; }
+          if (ch === '(' || ch === '[' || ch === '{') { d++; k++; continue; }
+          if (ch === ')' || ch === ']' || ch === '}') { d--; k++; continue; }
+          if (ch === ',' && d === 0) {
+            const a = parseExpression(tokStart);
+            if (!a) { parseFailed = true; break; }
+            args.push(a.node);
+            k = skip(k + 1);
+            tokStart = k;
+            continue;
           }
-          exprStart = m + 1;
-        } else if (str[kk] === ')') {
-          let d = 1; let m = kk - 1; let inSB = null;
-          while (m >= 0 && d > 0) {
-            const ch = str[m];
-            if (inSB) { if (ch === '\\') { m -= 2; continue; } if (ch === inSB) inSB = null; m--; continue; }
-            if (ch === '"' || ch === "'") { inSB = ch; m--; continue; }
-            if (ch === ')') d++; else if (ch === '(') d--; m--;
-          }
-          exprStart = m + 1;
-        } else {
-          let m = kk; while (m >= 0 && /[A-Za-z0-9_\u00C0-\u017F]/.test(str[m])) m--; exprStart = m + 1;
+          k++;
         }
-        return exprStart;
-      }
-      for (let i = 0; i < code.length; i++) {
-        if (code[i] === '[') {
-          const j = findClosingIn(code, i);
-          if (j === -1) continue;
-          const inner = code.slice(i+1, j);
-          if (/^\s*\d+\s*$/.test(inner)) {
-            const exprStart = findExprStartIn(code, i);
-            occurrences.push({ exprStart, i, j, num: inner.trim() });
-          }
+        if (!parseFailed && tokStart <= innerEnd) {
+          const a = parseExpression(tokStart);
+          if (!a) parseFailed = true; else args.push(a.node);
         }
-      }
-      if (occurrences.length === 0) {
-        return;
-      }
-      // merge consecutive index occurrences into nested replacements
-      occurrences.sort((a,b)=> a.exprStart - b.exprStart);
-      const groups = [];
-      let i = 0;
-      while (i < occurrences.length) {
-        const g = [occurrences[i]]; i++;
-        while (i < occurrences.length && occurrences[i].exprStart === g[g.length-1].i) { g.push(occurrences[i]); i++; }
-        groups.push(g);
-      }
-      // apply group replacements left-to-right using offset; use original substrings to build nested reps
-      const original = code;
-      let newCode = code;
-      let offset = 0;
-      for (const g of groups) {
-        const start = g[0].exprStart;
-        const end = g[g.length-1].j;
-        const a = start + offset;
-        const c = end + offset;
-        // build nested representation using original substrings
-        let rep = original.slice(g[0].exprStart, g[0].i);
-        for (const occ of g) rep = `__IDX__(${rep},${occ.num})`;
-        const prefix = newCode.slice(0, a);
-        const suffix = newCode.slice(c + 1);
-        newCode = prefix + rep + suffix;
-        offset += rep.length - (c + 1 - a);
-      }
-      code = newCode;
-  })();
-
-  // join/split
-  code = code.replace(/(\[[^\]]*\]|[A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*|\([^)]*\))\s*\*\s*("[^"]*"|'[^']*')/g, '($1).join($2)');
-  code = code.replace(/("[^"]*"|'[^']*'|\[[^\]]*\]|[A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*|\([^)]*\))\s*\/\s*("[^"]*"|'[^']*')/g, '($1).split($2)');
-
-  // guards -> ternaries
-  code = code.replace(/=>\s*((?:\s*\|[^\n]+\n?)+)/g, (m, guards) => {
-    const toks = guards.split('|').map(t => t.trim()).filter(Boolean);
-    const clauses = []; let fallback = null;
-    for (const tk of toks) {
-      const idx = tk.lastIndexOf('=');
-      if (idx !== -1) { clauses.push({cond: tk.slice(0, idx).trim(), res: tk.slice(idx+1).trim()}); }
-      else fallback = tk;
-    }
-    if (clauses.length === 0) return m;
-    let out = '';
-    for (let i=0;i<clauses.length;i++) out += `(${clauses[i].cond}) ? (${clauses[i].res}) : `;
-    out += fallback !== null ? `(${fallback})` : 'undefined';
-    return '=> (' + out + ')\n';
-  });
-
-  // logical operators: map language '&' and '|' to JS short-circuit forms
-  code = code.replace(/\s*&\s*/g, ' && ').replace(/\s*\|\s*/g, ' || ');
-
-  // multiline arrays/objects
-  code = code.replace(/\[([\s\S]*?)\]/g, (m, inner) => { if (inner.indexOf('\n') === -1) return m; const parts = inner.split(/\r?\n/).map(l=>l.trim()).map(l=>l.replace(/,$/, '')).filter(Boolean); return '[' + parts.join(', ') + ']'; });
-  code = code.replace(/\{([\s\S]*?)\}/g, (m, inner) => { if (inner.indexOf('\n') === -1) return m; const parts = inner.split(/\r?\n/).map(l=>l.trim()).map(l=>l.replace(/,$/, '')).filter(Boolean); return '{' + parts.join(', ') + '}'; });
-
-  // Parenthesized multiline blocks (grouping) -> IIFEs, but skip those right after '=>'
-  {
-    const pairs = []; const st = []; let inS = null;
-    for (let i = 0; i < code.length; i++) {
-      const ch = code[i];
-      if (inS) {
-        if (ch === '\\') { i++; continue; }
-        if (ch === inS) inS = null; continue;
-      }
-      if (ch === '"' || ch === "'") { inS = ch; continue; }
-      if (ch === '/' && code[i+1] === '/') { while (i < code.length && code[i] !== '\n') i++; continue; }
-      if (ch === '/' && code[i+1] === '*') { i+=2; while (i < code.length && !(code[i] === '*' && code[i+1] === '/')) i++; i++; continue; }
-      if (ch === '(') st.push(i);
-      else if (ch === ')') { const s = st.pop(); if (s !== undefined) pairs.push([s, i]); }
-    }
-    for (let pi = pairs.length - 1; pi >= 0; pi--) {
-      const [s, e] = pairs[pi];
-      const inner = code.slice(s+1, e);
-      if (inner.indexOf('\n') === -1 && inner.indexOf(';') === -1) continue;
-      // skip if this '(' is immediately after '=>'
-      let k = s - 1; while (k >= 0 && /\s/.test(code[k])) k--; if (k >= 1 && code[k] === '>' && code[k-1] === '=') continue;
-      const parts = inner.split(/\r?\n/).map(l => l.trim()).map(l => l.replace(/,$/, '')).filter(Boolean);
-      if (!parts.length) continue;
-      const last = parts.pop();
-      const locals = new Set();
-      for (const ln of parts) {
-        const mm = ln.match(/^([A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*)\s*=/);
-        if (mm) locals.add(mm[1]);
-      }
-      const decl = locals.size ? 'let ' + Array.from(locals).join(', ') + ';\n' : '';
-      const bodyInner = decl + (parts.length ? parts.map(l => l + ';').join('\n') + '\n' : '') + `return (${last});`;
-      let newText = `(function(){\n${bodyInner}\n})()`;
-      let j = e+1; while (j < code.length && /\s/.test(code[j])) j++;
-      const nextCh = code[j] || '';
-      if (/[A-Za-z0-9_\"'\(\.\[]/.test(nextCh)) newText += ';';
-      code = code.slice(0, s) + newText + code.slice(e+1);
-    }
-  }
-
-    // Convert parentheses used as multiline function bodies after `=>` into IIFEs.
-    // This avoids touching ordinary grouping parentheses (e.g. (2+3)).
-    let scanIdx = 0;
-    while (true) {
-      const arrowIdx = code.indexOf('=>', scanIdx);
-      if (arrowIdx === -1) break;
-      let p = arrowIdx + 2;
-      while (p < code.length && /\s/.test(code[p])) p++;
-      if (code[p] !== '(') { scanIdx = p; continue; }
-      const start = p;
-      let depth = 1; let q = start + 1; let inStrInner = null;
-      while (q < code.length && depth > 0) {
-        const ch = code[q];
-        if (inStrInner) {
-          if (ch === '\\') { q += 2; continue; }
-          if (ch === inStrInner) inStrInner = null; q++; continue;
+        if (parseFailed) {
+          // not a valid call (argument parse failed) — treat primary as-is (no call)
+          return { node, pos: p };
         }
-        if (ch === '"' || ch === "'") { inStrInner = ch; q++; continue; }
-        if (ch === '(') depth++; else if (ch === ')') depth--; q++;
-      }
-      if (depth !== 0) break; // unbalanced
-      const inner = code.slice(start + 1, q - 1);
-      if (inner.indexOf('\n') === -1 && inner.indexOf(';') === -1) { scanIdx = q; continue; }
-      const parts = inner.split(/\r?\n/).map(l => l.trim()).map(l => l.replace(/,$/, '')).filter(Boolean);
-      if (!parts.length) { scanIdx = q; continue; }
-      const last = parts.pop();
-      const locals = new Set();
-      for (const ln of parts) {
-        const mm = ln.match(/^([A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*)\s*=/);
-        if (mm) locals.add(mm[1]);
-      }
-      const decl = locals.size ? 'let ' + Array.from(locals).join(', ') + ';\n' : '';
-      const bodyInner = decl + (parts.length ? parts.map(l => l + ';').join('\n') + '\n' : '') + `return (${last});`;
-      const newText = `(function(){\n${bodyInner}\n})()`;
-      code = code.slice(0, start) + newText + code.slice(q);
-      scanIdx = start + newText.length;
-    }
-
-
-  // Convert arrow bodies that are object-literals (=> { a: x }) into
-  // expression-returning forms (=> ({ a: x })) so they become values rather
-  // than function blocks. We only do this when the brace contents look like
-  // an object (contains ':'), to avoid turning ordinary blocks into objects.
-  (function convertArrowObjectLiterals() {
-    let i = 0;
-    while (true) {
-      const idx = code.indexOf('=>', i);
-      if (idx === -1) break;
-      let p = idx + 2; while (p < code.length && /\s/.test(code[p])) p++;
-      if (code[p] !== '{') { i = p; continue; }
-      // find matching }
-      let depth = 1; let q = p + 1; let inS = null;
-      while (q < code.length && depth > 0) {
-        const ch = code[q];
-        if (inS) {
-          if (ch === '\\') { q += 2; continue; }
-          if (ch === inS) inS = null; q++; continue;
-        }
-        if (ch === '"' || ch === "'") { inS = ch; q++; continue; }
-        if (ch === '{') depth++; else if (ch === '}') depth--; q++;
-      }
-      if (depth !== 0) break;
-      const inner = code.slice(p + 1, q - 1);
-      // Heuristic: if inner contains a ':' token, treat as object literal
-      if (inner.indexOf(':') !== -1) {
-        const before = code.slice(0, p);
-        const after = code.slice(q);
-        code = before + '({' + inner + '})' + after;
-        i = p + 3 + inner.length; // move past replacement
-      } else {
-        i = q;
-      }
-    }
-  })();
-
-  // wrapper: return last expression
-  // build body: last non-empty line is the returned expression
-  function stripInlineCommentLine(s) {
-    let inS = null;
-    for (let i = 0; i < s.length; i++) {
-      const ch = s[i];
-      if (inS) {
-        if (ch === '\\') { i++; continue; }
-        if (ch === inS) inS = null;
+        node = { type: 'call', callee: node, args, start: (node && node.start) || cur.node.start, end: j };
+        p = skip(j);
         continue;
       }
-      if (ch === '"' || ch === "'") { inS = ch; continue; }
-      if (ch === '/' && s[i+1] === '/') return s.slice(0, i).trim();
+      break;
     }
-    return s.trim();
-  }
-  const lines = code.split(/\r?\n/).map(l => l).map(l => l.replace(/\t/g, '    ')).map(l => l).filter(Boolean).map(l => l.trim());
-  let body;
-  if (lines.length === 0) body = 'return "";'; else {
-    let last = lines.pop(); last = stripInlineCommentLine(last);
-    const prefix = lines.map(l => {
-      const s = stripInlineCommentLine(l);
-      return s.endsWith(';') ? s : s + ';';
-    }).join('\n');
-    body = (prefix ? prefix + '\n' : '') + 'return (' + last + ');';
+    return { node, pos: p };
   }
 
-  // helper functions available inside evaluated code
-  const header = `function __IDX__(a,b){ return (typeof a === 'string') ? a.charCodeAt(b) : (a[b]); }\n`;
-  body = header + body;
+  // precedence from lowest to highest
+  const BINOPS = [ ['|'], ['&'], ['==','!='], ['<','>','<=','>='], ['+','-'], ['*','/'] ];
+
+  function parseExpression(pos) {
+    const res = parseBinOpLevel(0, pos);
+    if (!res) return null;
+    let p = skip(res.pos);
+    if (text[p] === '?') {
+      const a = parseExpression(p + 1);
+      if (!a) return null;
+      const colon = skip(a.pos);
+      if (text[colon] !== ':') return null;
+      const b = parseExpression(colon + 1);
+      if (!b) return null;
+      return { node: { type: 'conditional', test: res.node, consequent: a.node, alternate: b.node }, pos: b.pos };
+    }
+    return res;
+  }
+
+  function parseBinOpLevel(level, pos) {
+    if (level >= BINOPS.length) return parseUnary(pos);
+    let leftRes = parseBinOpLevel(level + 1, pos);
+    if (!leftRes) return null;
+    let left = leftRes.node; let p = skip(leftRes.pos);
+    while (true) {
+      let matched = null;
+      for (const op of BINOPS[level]) if (text.startsWith(op, p)) { matched = op; break; }
+      if (!matched) break;
+      const after = p + matched.length;
+      const rightRes = parseBinOpLevel(level + 1, after);
+      if (!rightRes) return null;
+      const startPos = left && left.start != null ? left.start : pos;
+      const endPos = (rightRes.node && rightRes.node.end != null) ? rightRes.node.end : rightRes.pos;
+      left = { type: 'binary', op: matched, left, right: rightRes.node, start: startPos, end: endPos };
+      p = skip(rightRes.pos);
+    }
+    return { node: left, pos: p };
+  }
+
+  function parseUnary(pos) {
+    pos = skip(pos);
+    if (text[pos] === '-') {
+      const r = parseUnary(pos + 1); if (!r) return null; return { node: { type: 'unary', op: '-', arg: r.node, start: pos, end: r.pos }, pos: r.pos };
+    }
+    if (text[pos] === '!') {
+      const r = parseUnary(pos + 1); if (!r) return null; return { node: { type: 'unary', op: '!', arg: r.node, start: pos, end: r.pos }, pos: r.pos };
+    }
+    return parsePostfix(pos);
+  }
+
+  function parseProgram(pos) {
+    const stmts = []; let p = skip(pos);
+    while (p < text.length) {
+      const id = parseIdent(p);
+      if (id) {
+        const afterId = skip(id.pos);
+        if (text[afterId] === '=') {
+          const rhs = parseExpression(afterId + 1);
+          if (!rhs) return null;
+          stmts.push({ type: 'assign', name: id.node.name, value: rhs.node, start: id.node.start, end: rhs.pos });
+          p = skip(rhs.pos); if (text[p] === ';') { p = skip(p + 1); continue; } continue;
+        }
+      }
+      const expr = parseExpression(p);
+      if (!expr) break;
+      stmts.push({ type: 'expr', expr: expr.node, start: expr.node.start, end: expr.pos });
+      p = skip(expr.pos);
+      if (text[p] === ';') { p = skip(p + 1); continue; }
+    }
+    return { stmts, pos: p };
+  }
+
+  // Debug mode: if input starts with ::ast:: return parsed program (for debugging)
+  if (text.startsWith('::ast::')) {
+    const idx = text.indexOf('\n');
+    const start = idx >= 0 ? idx + 1 : 8;
+    const prog = parseProgram(start);
+    const nextPos = skip(prog.pos);
+    const nextExpr = parseExpression(nextPos);
+    const nextIdent = parseIdent(nextPos);
+    const nextPrim = parsePrimary(nextPos);
+    const nextPost = parsePostfix(nextPos);
+    const afterParen = nextPos + 1;
+    const exprAtAfter = parseExpression(afterParen);
+    const objAtAfter = parseObject(afterParen);
+    return { prog, nextPos, nextExpr, nextIdent, nextPrim, nextPost, exprAtAfter, objAtAfter };
+  }
 
   const target = Object.create(null);
   for (const k of Object.keys(escopo || {})) target[k] = escopo[k];
-  const scope = new Proxy(target, {
-    has(t, k) { return true; },
-    get(t, k, receiver) {
-      if (typeof k === 'symbol') return Reflect.get(t, k, receiver);
-      if (Object.prototype.hasOwnProperty.call(t, k)) return t[k];
-      if (k in globalThis) return globalThis[k];
-      throw new ReferenceError(String(k) + ' is not defined');
-    },
-    set(t, k, v) { t[k] = v; return true; }
-  });
   const include = (p) => { try { return fs.readFileSync(p, 'utf-8'); } catch (e) { return ''; } };
-  // expose __INCLUDE__ on the target so `with(scope)` can access it without
-  // being blocked by the Proxy's `has` trap (it would otherwise hide the
-  // function parameter). This keeps includes working as expected.
   target.__INCLUDE__ = include;
-  const fn = new Function('scope','__INCLUDE__', `with(scope) { ${body} }`);
-  return fn(scope, include);
+  const callStack = [];
+
+  function evaluate(node, scope = target) {
+    switch (node.type) {
+      case 'number': return node.value;
+      case 'string': return node.value;
+      case 'array': {
+        const out = [];
+        for (const e of node.elements) {
+          if (e && e.type === 'spread') {
+            const val = evaluate(e.expr, scope);
+            if (Array.isArray(val)) out.push(...val); else out.push(val);
+          } else {
+            out.push(e && e.type ? evaluate(e, scope) : evaluate(e, scope));
+          }
+        }
+        return out;
+      }
+      case 'object': {
+        const o = Object.create(null);
+        for (const p of node.props) {
+          if (p && p.spread) {
+            const v = evaluate(p.expr, scope);
+            if (v && typeof v === 'object') {
+              for (const k of Object.keys(v)) o[k] = v[k];
+            }
+          } else {
+            o[p.key] = evaluate(p.value, scope);
+          }
+        }
+        return o;
+      }
+      case 'ident': {
+        if (Object.prototype.hasOwnProperty.call(scope, node.name)) return scope[node.name];
+        if (node.name in globalThis) return globalThis[node.name];
+        throw new ReferenceError(node.name + ' is not defined');
+      }
+      case 'prop': { const obj = evaluate(node.obj, scope); if (obj == null) return undefined; return obj[node.prop]; }
+      case 'index': { const obj = evaluate(node.obj, scope); const idx = evaluate(node.index, scope); if (obj == null) return undefined; if (typeof obj === 'string') return String(obj).charCodeAt(Number(idx)); return obj ? obj[idx] : undefined; }
+      case 'slice': { const obj = evaluate(node.obj, scope); if (obj == null) return undefined; return obj.slice(node.start, node.end); }
+      case 'length': { const obj = evaluate(node.obj, scope); return obj == null ? undefined : obj.length; }
+      case 'keys': { const obj = evaluate(node.obj, scope); return obj == null ? [] : Object.keys(obj); }
+      case 'call': {
+        const fn = evaluate(node.callee, scope);
+        const args = node.args.map(a => evaluate(a, scope));
+        if (typeof fn === 'function') {
+          const meta = fn.__meta || null;
+          const frame = { fnMeta: meta, callNode: node };
+          callStack.push(frame);
+          try {
+            const res = fn.apply(null, args);
+            callStack.pop();
+            return res;
+          } catch (err) {
+            callStack.pop();
+            throw err;
+          }
+        }
+        return undefined;
+      }
+      case 'unary': {
+        const v = evaluate(node.arg, scope);
+        if (node.op === '-') return -v;
+        if (node.op === '!') return !v;
+        return v;
+      }
+      case 'binary': {
+        if (node.op === '&') { const l = evaluate(node.left, scope); if (!l) return l; return evaluate(node.right, scope); }
+        if (node.op === '|') { const l = evaluate(node.left, scope); if (l) return l; return evaluate(node.right, scope); }
+        const l = evaluate(node.left, scope); const r = evaluate(node.right, scope);
+        switch (node.op) {
+          case '+': return (typeof l === 'string' || typeof r === 'string') ? String(l) + String(r) : (l + r);
+          case '-': return l - r;
+          case '*': if (Array.isArray(l) && typeof r === 'string') return l.join(r); if (typeof l === 'number' && typeof r === 'number') return l * r; return undefined;
+          case '/': if (typeof l === 'string' && typeof r === 'string') return l.split(r); return l / r;
+          case '==': return l == r; case '!=': return l != r; case '<': return l < r; case '>': return l > r; case '<=': return l <= r; case '>=': return l >= r;
+        }
+        return undefined;
+      }
+      case 'conditional': {
+        const t = evaluate(node.test, scope);
+        return t ? evaluate(node.consequent, scope) : evaluate(node.alternate, scope);
+      }
+      case 'block': {
+        let last;
+        for (const st of node.stmts) {
+          if (st.type === 'assign') { const v = evaluate(st.value, scope); scope[st.name] = v; last = v; }
+          else if (st.type === 'expr') last = evaluate(st.expr, scope);
+        }
+        return last;
+      }
+      case 'guards': {
+        for (const br of node.branches) {
+          if (br.cond) { const c = evaluate(br.cond, scope); if (c) return evaluate(br.expr, scope); }
+          else return evaluate(br.expr, scope);
+        }
+        return undefined;
+      }
+      case 'lambda': {
+        const params = node.params;
+        const body = node.body;
+        const fnScope = scope;
+        const fn = function(...args) {
+          const local = Object.create(fnScope || Object.create(null));
+          if (params.type === 'ident') {
+            local[params.name] = args[0];
+          } else if (params.type === 'param_pattern_obj') {
+            const obj = args[0] || {};
+            for (const k of params.props) local[k] = obj[k];
+          }
+          // evaluate body in local scope
+          if (body.type === 'block') return evaluate(body, local);
+          if (body.type === 'guards') return evaluate(body, local);
+          return evaluate(body, local);
+        };
+        try { fn.__meta = { defStart: node.start, defEnd: node.end }; } catch (e) {}
+        return fn;
+      }
+      default: return undefined;
+    }
+  }
+
+  const prog = parseProgram(0);
+  if (!prog) return '';
+  function executeProgram(program, scopeObj) {
+    let last;
+    for (const st of program.stmts) {
+      if (st.type === 'assign') { const v = evaluate(st.value, scopeObj); scopeObj[st.name] = v; last = v; }
+      else if (st.type === 'expr') last = evaluate(st.expr, scopeObj);
+    }
+    return last;
+  }
+  try {
+    return executeProgram(prog, target);
+  } catch (e) {
+    const positions = [];
+    const msg = e && e.message ? String(e.message) : '';
+    const ref = /^([^\s]+) is not defined/.exec(msg);
+    if (ref) {
+      const name = ref[1];
+      const p0 = text.indexOf(name);
+      if (p0 >= 0) positions.push(p0);
+    }
+    // include call stack frames (call site then function defs)
+    for (let i = callStack.length - 1; i >= 0; i--) {
+      const fr = callStack[i];
+      if (fr.callNode && typeof fr.callNode.start === 'number') positions.push(fr.callNode.start);
+      if (fr.fnMeta && typeof fr.fnMeta.defStart === 'number') positions.push(fr.fnMeta.defStart);
+    }
+    const err = new Error(msg);
+    err._positions = positions;
+    throw err;
+  }
 }
 
 export async function interpretar({ entrada, arquivo = 'testar.js', escopo = {} }) {
-  // return null;
   const src = String(entrada === undefined ? '' : entrada);
   try {
     if (src.trim() === '') return { saída: '' };
-    // if the entire input is a filesystem path (./ or / or ../), return its contents
     const maybePath = src.trim();
     if (/^(?:\.\.\/|\.\/|\/)/.test(maybePath)) {
-      try { const txt = fs.readFileSync(maybePath, 'utf-8'); return { saída: formatValue(txt), erro: "" }; } catch (e) { /* fall through to normal parsing */ }
+      try { const txt = fs.readFileSync(maybePath, 'utf-8'); return { saída: formatValue(txt), erro: "" }; } catch (e) {}
     }
-    // special-case: a bare bracket-slice like `[1:100]` is a syntax error at ':'
     if (/^\s*\[\s*\d+\s*:\s*\d+\s*\]\s*$/.test(src)) {
       const idx = src.indexOf(':');
       return { saída: "", erro: formatErrorString(arquivo, src, idx) };
     }
-    // special-case: double unary minus like '- -5' should point to second '-'
     if (/^\s*-\s+-\d+\s*$/.test(src)) {
       const first = src.indexOf('-');
       const pos = src.indexOf('-', first + 1);
@@ -623,7 +696,6 @@ export async function interpretar({ entrada, arquivo = 'testar.js', escopo = {} 
     }
     const pos = findBracketIssue(src);
     if (pos !== null) return { saída: "", erro: formatErrorString(arquivo, src, pos) };
-    // prepare scope: inject a `testar` proxy that lazily reads files from ./testar
     const runtimeScope = Object.create(null);
     for (const k of Object.keys(escopo || {})) runtimeScope[k] = escopo[k];
     if (!Object.prototype.hasOwnProperty.call(runtimeScope, 'testar')) {
@@ -631,13 +703,9 @@ export async function interpretar({ entrada, arquivo = 'testar.js', escopo = {} 
         get(_, prop) {
           try {
             const p = `./testar/${String(prop)}`;
-            // try common extensions
             const exts = ['', '.0', '.txt'];
             for (const e of exts) {
-              try {
-                const full = p + e;
-                if (fs.existsSync(full)) return fs.readFileSync(full, 'utf-8');
-              } catch (e) {}
+              try { const full = p + e; if (fs.existsSync(full)) return fs.readFileSync(full, 'utf-8'); } catch (e) {}
             }
             return undefined;
           } catch (e) { return undefined; }
@@ -650,76 +718,11 @@ export async function interpretar({ entrada, arquivo = 'testar.js', escopo = {} 
     return { saída: formatValue(v), erro: "" };
   } catch (e) {
     try {
-      const msg = e && e.message ? String(e.message) : '';
-      const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      // try patterns: "X is not defined" or "Cannot read properties of undefined (reading 'prop')" or old Node variants
-      let varName = null; let propName = null;
-      const m1 = msg.match(/^([A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*) is not defined/);
-      if (m1) varName = m1[1];
-      const m2 = msg.match(/Cannot read properties of undefined \(reading '([^']+)'\)/);
-      if (m2) propName = m2[1];
-      const m3 = msg.match(/Cannot read property '([^']+)' of undefined/);
-      if (!propName && m3) propName = m3[1];
-      if (!varName && propName) varName = propName;
-
-      const lines = src.split(/\r?\n/);
-      // compute line start offsets
-      const lineStarts = []; let acc = 0; for (let i=0;i<lines.length;i++) { lineStarts[i] = acc; acc += lines[i].length + 1; }
-      // main expression line: last non-empty line
-      let lastLine = lines.length - 1; while (lastLine >= 0 && (lines[lastLine] || '').trim() === '') lastLine--; if (lastLine < 0) lastLine = 0;
-      const mainLineText = lines[lastLine] || '';
-      let mainPos = lineStarts[lastLine];
-      // try to point to function call token on last line
-      const parenIdx = mainLineText.indexOf('(');
-      if (parenIdx !== -1) {
-        let idx = parenIdx - 1; while (idx >=0 && /\s/.test(mainLineText[idx])) idx--; let end = idx; while (end >=0 && /[A-Za-z_\u00C0-\u017F0-9]/.test(mainLineText[end])) end--; const nameStart = end + 1; mainPos += nameStart;
-      } else {
-        const mm = mainLineText.match(/[A-Za-z_\u00C0-\u017F][A-Za-z0-9_\u00C0-\u017F]*/);
-        if (mm) mainPos += mm.index;
-      }
-
-      const frames = [mainPos];
-      if (varName) {
-        // follow chain: find definitions of functions that reference current name
-        // collect the chain first, then append it reversed so the immediate
-        // caller appears before earlier callers in the produced stack.
-        const chain = [];
-        let current = varName; const seen = new Set();
-        while (current && !seen.has(current)) {
-          seen.add(current);
-          const re = new RegExp('([A-Za-z_\\u00C0-\\u017F][A-Za-z0-9_\\u00C0-\\u017F]*)\\s*=\\s*[^\\n]*=>[^\\n]*\\b' + escapeRegex(current) + '\\b','g');
-          let match; let lastMatch = null;
-          while ((match = re.exec(src)) !== null) lastMatch = match;
-          if (!lastMatch) break;
-          const matchIndex = lastMatch.index; const matchStr = lastMatch[0];
-          // position of the usage of current inside the matched definition
-          const usageOffset = matchIndex + matchStr.indexOf(current);
-          chain.push(usageOffset);
-          current = lastMatch[1];
-        }
-        if (chain.length) frames.push(...chain.reverse());
-      }
-
-      // if property access error and no better frame, try to find obj['prop'] pattern
-      if (propName && frames.length === 1) {
-        const reProp = new RegExp('([A-Za-z_\\u00C0-\\u017F][A-Za-z0-9_\\u00C0-\\u017F]*)\\s*\\[\\s*["\']' + escapeRegex(propName) + '["\']\\s*\\]');
-        const m = src.match(reProp);
-        if (m) {
-          const idx = src.indexOf(m[0]); frames[0] = idx;
-        } else {
-          const idx = src.indexOf(propName); if (idx >= 0) frames[0] = idx;
-        }
-      }
-
-      // build error string from frames (avoid adding extra blank lines)
-      const errParts = frames.map((p, i) => {
-        const s = formatErrorString(arquivo, src, p);
-        if (i === 0) return s;
-        // subsequent frames: omit repeating the filename at the start
-        return s.slice(arquivo.length + 1);
-      });
-      const errStr = errParts.join('');
-      return { saída: "", erro: errStr };
+      let pos = null;
+      if (e && Array.isArray(e._positions) && e._positions.length) pos = e._positions.find(p => typeof p === 'number');
+      if (pos == null) pos = findBracketIssue(src);
+      if (pos == null) pos = 0;
+      return { saída: "", erro: formatErrorString(arquivo, src, pos) };
     } catch (ee) {
       return { saída: "", erro: formatErrorString(arquivo, src, 0) };
     }
@@ -730,28 +733,16 @@ export default { interpretar };
 export { findBracketIssue };
 export { transformAndEval };
 
-// If executed directly (node 0.js), read stdin or argv and call interpretar
-// Use realpath to tolerate execution via symlink (e.g., npx/.bin link)
 let _argvScript = process.argv[1];
 let _mainScript = fileURLToPath(import.meta.url);
-try {
-  if (_argvScript) _argvScript = fs.realpathSync(_argvScript);
-  _mainScript = fs.realpathSync(_mainScript);
-} catch (e) {}
+try { if (_argvScript) _argvScript = fs.realpathSync(_argvScript); _mainScript = fs.realpathSync(_mainScript); } catch (e) {}
 if (_argvScript === _mainScript) {
   (async () => {
     const input = fs.readFileSync(process.argv[2], 'utf8');
     try {
       const res = await interpretar({ entrada: input, arquivo: process.argv[2] || 'testar.js' });
-      if (res.erro) {
-        process.stderr.write(String(res.erro));
-        process.exitCode = 1;
-      } else {
-        process.stdout.write(String(res.saída));
-      }
-    } catch (e) {
-      process.stderr.write(String(e && e.stack ? e.stack : e));
-      process.exitCode = 1;
-    }
+      if (res.erro) { process.stderr.write(String(res.erro)); process.exitCode = 1; }
+      else { process.stdout.write(String(res.saída)); }
+    } catch (e) { process.stderr.write(String(e && e.stack ? e.stack : e)); process.exitCode = 1; }
   })();
 }
