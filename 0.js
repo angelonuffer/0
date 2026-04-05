@@ -132,4 +132,11 @@ const comparacao = operação(
   },
 )
 
-const expressão = comparacao
+const e = operação(
+  comparacao,
+  {
+    "&": (a, b) => a && b,
+  },
+)
+
+const expressão = e
