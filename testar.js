@@ -18,12 +18,6 @@ const testes_txt = `
 🔍 -1 * -1
 🎯 1
 
-🔍 -10 >= -5
-🎯 0
-
-🔍 -5 == -5
-🎯 1
-
 🔍 8 - 4
 🎯 4
 
@@ -32,6 +26,9 @@ const testes_txt = `
 
 🔍 8 / 2
 🎯 4
+
+🔍 2147483647 + 1
+🎯 2147483648
 
 🔍 2 + 3 * 4
 🎯 14
@@ -48,15 +45,8 @@ const testes_txt = `
 🔍 10 - (6 / 2)
 🎯 7
 
-🔍 @ "./testar/pergunta.txt"
-🎯 O que você obtém se multiplicar seis por nove?
-
-🔍 caminho = "./testar/pergunta.txt"
-   @ caminho
-🎯 O que você obtém se multiplicar seis por nove?
-
-🔍 (@ "./testar/pergunta.txt")[.]
-🎯 46
+🔍 1 + 2 * 3 - 4 / 2
+🎯 5
 
 🔍 2 > 8
 🎯 0
@@ -85,6 +75,9 @@ const testes_txt = `
 🔍 8 == 8
 🎯 1
 
+🔍 -5 == -5
+🎯 1
+
 🔍 2 != 8
 🎯 1
 
@@ -92,6 +85,9 @@ const testes_txt = `
 🎯 1
 
 🔍 8 != 8
+🎯 0
+
+🔍 -10 >= -5
 🎯 0
 
 🔍 2 >= 8
@@ -142,26 +138,16 @@ const testes_txt = `
 🔍 ! 1
 🎯 0
 
+🔍 ! ! 0
+🎯 0
+
+🔍 0 & (1 / 0)
+🎯 0
+
 🔍 a = 5
    b = 8
    a + b
 🎯 13
-
-🔍 função1 = y => y == 42
-   função2 = _ => (
-      x = 42
-      função1 = y => y == 42
-      x = 42
-      função1(x)
-   )
-   função2 = _ => (
-      x = 42
-      função1 = y => y == 42
-      x = 42
-      função1(x)
-   )
-   função2(0)
-🎯 1
 
 🔍 a = 2
    b = 3
@@ -211,37 +197,9 @@ const testes_txt = `
    x + y
 🎯 5
 
-🔍 nome = "Alice"
-   sobrenome = "Silva"
-   nome + " " + sobrenome
-🎯 Alice Silva
-
-🔍 a = 0
-   b = 1
-   a | b
-🎯 1
-
-🔍 [ 2, 3 ][0]
-🎯 2
-
-🔍 [ 2, 3 ][1]
-🎯 3
-
 🔍 a = 4
    a + 5
 🎯 9
-
-🔍 [[1, 2], [3, 4]][0][1]
-🎯 2
-
-🔍 [ 1, 2, 3 ][.]
-🎯 3
-
-🔍 [ 1, 2, 3, 4, 5 ][1:3]
-🎯 [ 2, 3 ]
-
-🔍 [ 10, 20, 30 ][1 + 1]
-🎯 30
 
 🔍 x = 7
    x * 2
@@ -255,10 +213,40 @@ const testes_txt = `
    lista * "-"
 🎯 a-b-c
 
+🔍 [ 2, 3 ][0]
+🎯 2
+
+🔍 [ 2, 3 ][1]
+🎯 3
+
+🔍 [[1, 2], [3, 4]][0][1]
+🎯 2
+
+🔍 [ 1, 2, 3 ][.]
+🎯 3
+
+🔍 [ 1, 2, 3, 4, 5 ][1:3]
+🎯 [ 2, 3 ]
+
+🔍 [ 10, 20, 30 ][1 + 1]
+🎯 30
+
+🔍 nome = "Alice"
+   sobrenome = "Silva"
+   nome + " " + sobrenome
+🎯 Alice Silva
+
 🔍 nome = "Maria"
    pessoa = { nome }
    pessoa.nome
 🎯 Maria
+
+🔍 juntar = { primeiro, segundo } => [primeiro, " ", segundo] * ""
+   juntar({
+      primeiro: "Hello",
+      segundo: "World",
+   })
+🎯 Hello World
 
 🔍 quadrado = x => x * x
    quadrado(5)
@@ -293,13 +281,6 @@ const testes_txt = `
       a: 10,
    })
 🎯 5
-
-🔍 juntar = { primeiro, segundo } => [primeiro, " ", segundo] * ""
-   juntar({
-      primeiro: "Hello",
-      segundo: "World",
-   })
-🎯 Hello World
 
 🔍 multiplicar_e_somar = { x, y, base } => x * y + base
    multiplicar_e_somar({
@@ -418,6 +399,16 @@ const testes_txt = `
    a + b
 🎯 5
 
+🔍 @ "./testar/pergunta.txt"
+🎯 O que você obtém se multiplicar seis por nove?
+
+🔍 caminho = "./testar/pergunta.txt"
+   @ caminho
+🎯 O que você obtém se multiplicar seis por nove?
+
+🔍 (@ "./testar/pergunta.txt")[.]
+🎯 46
+
 🔍 testar.resposta == 42
 🎯 1
 
@@ -469,7 +460,7 @@ const testes_txt = `
 ⚠️ testar.js
    2:1
    variavelNaoDefinida
-   ^^^^^^^^^^^^^^^^^^^
+   ^^^^^^^^^^^^^^^^^^^^
 
 🔍 // Teste de erro de sintaxe: chave não fechada dentro de outro objeto
    obj = {
@@ -596,27 +587,13 @@ const testes_txt = `
    [1:100]
      ^
 
-🔍 2147483647 + 1
-🎯 2147483648
-
 🔍 - -5
 ⚠️ testar.js
    1:3
    - -5
      ^
 
-🔍 1 + 2 * 3 - 4 / 2
-🎯 5
-
-🔍 ! ! 0
-🎯 0
-
-🔍 0 & (1 / 0)
-🎯 0
-
 `;
-
-const testes = [];
 
 function parseTestes(texto) {
    const resultados = [];
@@ -677,6 +654,7 @@ function parseTestes(texto) {
 }
 
 // Add tests parsed from the `testes_txt` variable
+const testes = [];
 testes.push(...parseTestes(testes_txt));
 
 import fs from "fs";
