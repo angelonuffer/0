@@ -3,13 +3,14 @@
 export const interpretar = ({ entrada, arquivo }) => {
   const { valor, resto } = expressão(entrada)
   return {
-    saída: String(valor),
+    saída: valor instanceof Error ? "" : String(valor),
     erro: resto !== "" ? (() => {
       const linhas = entrada.split("\n")
       const número_linha = linhas.length - resto.split("\n").length + 1
       const linha = linhas[número_linha - 1]
       const número_coluna = linha.length - resto.split("\n")[0].length + 1
       return [
+        `⛔ ${valor instanceof Error ? valor.message : ""}`,
         `📄 ${arquivo}`,
         `👉 ${número_linha}: ${linha}`,
         `     ${" ".repeat(número_coluna - 1 + String(número_linha).length)}^ ${número_coluna}`,
@@ -58,7 +59,7 @@ const casar = regex => {
       }
     }
     return {
-      valor: new Error(),
+      valor: new Error(regex),
       resto: entrada,
     }
   }
@@ -66,7 +67,7 @@ const casar = regex => {
 
 const número = transformação(
   casar(/-?\d+/),
-  Number
+  Number,
 )
 
 const espaço = casar(/\s*/)
