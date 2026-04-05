@@ -521,7 +521,7 @@ const testes_txt = `
 
 🔍 = 5
 
-💥 testar.js
+⚠️ testar.js
    1:1
    = 5
    ^
@@ -529,7 +529,7 @@ const testes_txt = `
 🔍 // Teste de erro de referência: função não definida
    funcaoNaoDefinida(42)
 
-💥 testar.js
+⚠️ testar.js
    2:1
    funcaoNaoDefinida(42)
    ^^^^^^^^^^^^^^^^^
@@ -539,7 +539,7 @@ const testes_txt = `
    d = e => a(e)
    d(2)
 
-💥 testar.js
+⚠️ testar.js
    4:1
    d(2)
    ^
@@ -553,7 +553,7 @@ const testes_txt = `
 🔍 // Teste de erro de referência: acesso a campo em objeto não definido
    objetoNaoDefinido["campo"]
 
-💥 testar.js
+⚠️ testar.js
    2:1
    objetoNaoDefinido["campo"]
    ^^^^^^^^^^^^^^^^^
@@ -562,7 +562,7 @@ const testes_txt = `
    // Na expressão principal (última linha), a variável não está definida
    x + 10
 
-💥 testar.js
+⚠️ testar.js
    3:1
    x + 10
    ^
@@ -570,7 +570,7 @@ const testes_txt = `
 🔍 // Teste de erro de referência: variável não definida
    variavelNaoDefinida
 
-💥 testar.js
+⚠️ testar.js
    2:1
    variavelNaoDefinida
    ^^^^^^^^^^^^^^^^^^^
@@ -584,7 +584,7 @@ const testes_txt = `
       c: 3,
    }
 
-💥 testar.js
+⚠️ testar.js
    8:2
    }
     ^
@@ -597,7 +597,7 @@ const testes_txt = `
          2,
    }
 
-💥 testar.js
+⚠️ testar.js
    7:1
    }
    ^
@@ -605,7 +605,7 @@ const testes_txt = `
 🔍 // Teste de erro de sintaxe: chave não fechada
    obj = { a: 1 b: 2
 
-💥 testar.js
+⚠️ testar.js
    2:18
    obj = { a: 1 b: 2
                     ^
@@ -617,7 +617,7 @@ const testes_txt = `
       $
    }
 
-💥 testar.js
+⚠️ testar.js
    5:4
       $
       ^
@@ -628,7 +628,7 @@ const testes_txt = `
       : 2
    }
 
-💥 testar.js
+⚠️ testar.js
    4:4
       : 2
       ^
@@ -638,7 +638,7 @@ const testes_txt = `
       a: 1,
       b: 2,
 
-💥 testar.js
+⚠️ testar.js
    4:9
       b: 2,
            ^
@@ -646,7 +646,7 @@ const testes_txt = `
 🔍 // Teste de erro de sintaxe: colchete não fechado
    x = [1, 2, 3
 
-💥 testar.js
+⚠️ testar.js
    2:15
    x = [1, 2, 3
                ^
@@ -654,7 +654,7 @@ const testes_txt = `
 🔍 // Teste de erro de sintaxe: colchete de fechamento sem abertura
    x = ]
 
-💥 testar.js
+⚠️ testar.js
    2:5
    x = ]
        ^
@@ -665,7 +665,7 @@ const testes_txt = `
       2,
       3
 
-💥 testar.js
+⚠️ testar.js
    5:5
       3
        ^
@@ -673,7 +673,7 @@ const testes_txt = `
 🔍 // Teste de erro de sintaxe: parêntese não fechado
    f = x => (x + 1
 
-💥 testar.js
+⚠️ testar.js
    2:16
    f = x => (x + 1
                   ^
@@ -684,7 +684,7 @@ const testes_txt = `
       2
    )
 
-💥 testar.js
+⚠️ testar.js
    5:1
    )
    ^
@@ -694,7 +694,7 @@ const testes_txt = `
       1 + 2 +
       3 + 4
 
-💥 testar.js
+⚠️ testar.js
    4:9
       3 + 4
            ^
@@ -702,14 +702,14 @@ const testes_txt = `
 🔍 // Teste de erro de sintaxe: string não fechada
    texto = "Olá mundo
 
-💥 testar.js
+⚠️ testar.js
    2:19
    texto = "Olá mundo
                      ^
 
 🔍 [1:100]
 
-💥 testar.js
+⚠️ testar.js
    1:3
    [1:100]
      ^
@@ -720,7 +720,7 @@ const testes_txt = `
 
 🔍 - -5
 
-💥 testar.js
+⚠️ testar.js
    1:3
    - -5
      ^
@@ -771,7 +771,7 @@ function parseTestes(texto) {
          tipo = "saída";
          bloco_saida = lines[i].slice(3);
       }
-      if (lines[i].startsWith("💥 ")) {
+      if (lines[i].startsWith("⚠️ ")) {
          tipo = "erro";
          bloco_erro = lines[i].slice(3);
       }
@@ -825,46 +825,39 @@ for (const teste of testes) {
       entrada: teste.entrada,
       arquivo: teste.arquivo || "testar.js",
    });
-  if (teste.erro !== undefined) {
-    if (erro.trim() === teste.erro.trim()) {
+
+   const saída_inesperada =
+      teste.saída !== undefined &&
+      (saída === undefined || saída.trim() !== teste.saída.trim());
+   const erro_inesperado =
+      teste.erro !== undefined &&
+      (erro === undefined || erro.trim() !== teste.erro.trim());
+
+   if (saída_inesperada || erro_inesperado) {
+      const shouldPrint = exiba_todos || !primeira_falha_exibida;
+      if (shouldPrint) {
+         let output = `🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}\n\n`;
+         if (teste.saída !== undefined) {
+            output += `🎯 ${teste.saída.trim().replaceAll('\n', '\n   ')}\n\n`;
+         }
+         if (teste.erro !== undefined) {
+            output += `⚠️ ${teste.erro.trim().replaceAll('\n', '\n   ')}\n\n`;
+         }
+         if (saída !== "") {
+            output += `🚨 ${saída.trim().replaceAll('\n', '\n   ')}\n\n`;
+         }
+         if (erro !== "") {
+            output += `💥 ${erro.trim().replaceAll('\n', '\n   ')}\n\n`;
+         }
+         process.stderr.write(output);
+         primeira_falha_exibida = true;
+      }
+      if (!exiba_todos) {
+         if (!verifique_restantes) break;
+      }
+   } else {
       passaram++;
-    } else {
-        const shouldPrint = exiba_todos || !primeira_falha_exibida;
-        if (shouldPrint) {
-          process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
-
-💥 ${teste.erro.trim().replaceAll('\n', '\n   ')}
-
-🚨 ${erro.trim().replaceAll('\n', '\n   ')}
-
-`);
-          primeira_falha_exibida = true;
-        }
-        if (!exiba_todos) {
-          if (!verifique_restantes) break;
-        }
-    }
-  } else {
-    if (saída.trim() === teste.saída.trim()) {
-      passaram++;
-    } else {
-        const shouldPrint = exiba_todos || !primeira_falha_exibida;
-        if (shouldPrint) {
-          process.stderr.write(`🔍 ${teste.entrada.trim().replaceAll('\n', '\n   ')}
-
-🎯 ${teste.saída.trim().replaceAll('\n', '\n   ')}
-
-🚨 ${saída.trim().replaceAll('\n', '\n   ')}
-
-
-`);
-          primeira_falha_exibida = true;
-        }
-        if (!exiba_todos) {
-          if (!verifique_restantes) break;
-        }
-    }
-  }
+   }
 }
 
 process.stdout.write(`✅ ${passaram}/${total}\n`);
