@@ -88,8 +88,24 @@ const operação = (operando, operadores) => entrada => {
   }
 }
 
+const parêntese = entrada => {
+  if (entrada[0] === "(") {
+    const resto_1 = entrada.slice(1)
+    const resto_2 = passe(espaço)(resto_1)
+    const { valor, resto } = expressão(resto_2)
+    if (valor instanceof Error) return { valor, resto }
+    const resto_3 = passe(espaço)(resto)
+    if (!resto_3.startsWith(")")) return { valor: new Error(")"), resto: resto_3 }
+    return {
+      valor,
+      resto: resto_3.slice(1),
+    }
+  }
+  return número(entrada)
+}
+
 const produto = operação(
-  número,
+  parêntese,
   {
     "*": (a, b) => a * b,
     "/": (a, b) => a / b,
