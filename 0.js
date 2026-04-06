@@ -19,24 +19,6 @@ export const interpretar = ({ entrada, arquivo }) => {
   }
 }
 
-const sequência = (...analisadores) => entrada => {
-  if (analisadores.length === 1) return analisadores[0](entrada)
-  const {
-    valor,
-    resto,
-  } = analisadores[0](entrada)
-  if (valor instanceof Error) return { valor: [valor], resto }
-  const {
-    valor: valor_2,
-    resto: resto_2,
-  } = sequência(...analisadores.slice(1))(resto)
-  if (valor_2 instanceof Error) return { valor: [valor_2], resto: resto_2 }
-  return {
-    valor: [valor, ...valor_2],
-    resto: resto_2,
-  }
-}
-
 const transformação = (analisador, transformador) => entrada => {
   const { valor, resto } = analisador(entrada)
   if (valor instanceof Error) return { valor, resto }
