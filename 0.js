@@ -99,8 +99,42 @@ const operação = (operando, operadores) => entrada => {
   }
 }
 
+const itens_lista = entrada => {
+  const resto_1 = passe(espaço)(entrada)
+  if (resto_1.startsWith("]")) return { valor: () => [], resto: resto_1 }
+  const { valor: valor_1, resto: resto_2 } = expressão(resto_1)
+  if (valor_1 instanceof Error) return { valor: valor_1, resto: resto_2 }
+  const resto_3 = passe(espaço)(resto_2)
+  if (resto_3.startsWith("]")) return {
+    valor: escopo => [valor_1(escopo)],
+    resto: resto_3.slice(1),
+  }
+  if (resto_3.startsWith(",")) {
+    const resto_4 = passe(espaço)(resto_3.slice(1))
+    const { valor: valor_2, resto: resto_5 } = itens_lista(resto_4)
+    if (valor_2 instanceof Error) return { valor: valor_2, resto: resto_5 }
+    return {
+      valor: escopo => [valor_1(escopo), ...valor_2(escopo)],
+      resto: resto_5,
+    }
+  }
+  return { valor: new Error(/,|\]/), resto: resto_3 }
+}
+
+const literal = entrada => {
+  if (entrada.startsWith('"') || entrada.startsWith("'")) {
+    const { valor, resto } = transformação(casar(/"[^"\\]*"|'[^'\\]*'/), s => s.slice(1, -1))(entrada)
+    return { valor, resto }
+  }
+  if (entrada.startsWith("[")) {
+    const resto_1 = entrada.slice(1)
+    return itens_lista(resto_1)
+  }
+  return número(entrada)
+}
+
 const parênteses = entrada => {
-  if (entrada[0] === "(") {
+  if (entrada.startsWith("(")) {
     const resto_1 = entrada.slice(1)
     const resto_2 = passe(espaço)(resto_1)
     const { valor, resto } = expressão(resto_2)
@@ -113,12 +147,12 @@ const parênteses = entrada => {
     return { valor: new Error(/\)/), resto: resto_3 }
   }
   const { valor, resto } = variável(entrada)
-  if (valor instanceof Error) return número(entrada)
+  if (valor instanceof Error) return literal(entrada)
   return { valor, resto }
 }
 
 const unário = entrada => {
-  if (entrada[0] === "!") {
+  if (entrada.startsWith("!")) {
     const resto_1 = passe(espaço)(entrada.slice(1))
     const { valor, resto } = unário(resto_1)
     if (valor instanceof Error) return { valor, resto }
@@ -133,7 +167,10 @@ const unário = entrada => {
 const produto = operação(
   unário,
   {
-    "*": (a, b) => a * b,
+    "*": (a, b) => {
+      if (Array.isArray(a) && typeof b === "string") return a.join(b)
+      return a * b
+    },
     "/": (a, b) => a / b,
   },
 )
