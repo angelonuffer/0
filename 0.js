@@ -116,20 +116,23 @@ const aplicações = (valor_1, resto_1) => {
   }, resto_3)
 }
 
-const literal = entrada => {
-  if (entrada.startsWith('"') || entrada.startsWith("'")) {
-    const { valor, resto } = transformação(casar(/"[^"\\]*"|'[^'\\]*'/), s => s.slice(1, -1))(entrada)
-    return { valor, resto }
+const unário = entrada => {
+  if (entrada.startsWith("!")) {
+    const resto_1 = passe(espaço)(entrada.slice(1))
+    const { valor, resto: resto_2 } = comparação_lógica(resto_1)
+    return aplicações(escopo => valor(escopo) === 0 ? 1 : 0, resto_2)
   }
-  if (entrada.startsWith("[")) {
-    const resto_1 = entrada.slice(1)
-    const { valor: valor_1, resto: resto_2 } = itens_lista(resto_1)
-    return aplicações(valor_1, resto_2)
+  if (entrada.startsWith("|")) {
+    const resto_1 = passe(espaço)(entrada.slice(1))
+    const { valor, resto } = comparação(resto_1)
+    if (valor instanceof Error) return { valor, resto }
+    const resto_2 = passe(espaço)(resto)
+    if (resto_2.startsWith("|")) return {
+      valor: escopo => valor(escopo).length,
+      resto: resto_2.slice(1),
+    }
+    return { valor: new Error(/\|/), resto: resto_2 }
   }
-  return número(entrada)
-}
-
-const parênteses = entrada => {
   if (entrada.startsWith("(")) {
     const resto_1 = entrada.slice(1)
     const resto_2 = passe(espaço)(resto_1)
@@ -142,18 +145,18 @@ const parênteses = entrada => {
     }
     return { valor: new Error(/\)/), resto: resto_3 }
   }
-  const { valor, resto } = variável(entrada)
-  if (valor instanceof Error) return literal(entrada)
-  return { valor, resto }
-}
-
-const unário = entrada => {
-  if (entrada.startsWith("!")) {
-    const resto_1 = passe(espaço)(entrada.slice(1))
-    const { valor, resto: resto_2 } = comparação_lógica(resto_1)
-    return aplicações(escopo => valor(escopo) === 0 ? 1 : 0, resto_2)
+  if (entrada.startsWith('"') || entrada.startsWith("'")) {
+    const { valor, resto } = transformação(casar(/"[^"\\]*"|'[^'\\]*'/), s => s.slice(1, -1))(entrada)
+    return { valor, resto }
   }
-  return parênteses(entrada)
+  if (entrada.startsWith("[")) {
+    const resto_1 = entrada.slice(1)
+    const { valor: valor_1, resto: resto_2 } = itens_lista(resto_1)
+    return aplicações(valor_1, resto_2)
+  }
+  const { valor, resto } = variável(entrada)
+  if (valor instanceof Error) return número(entrada)
+  return { valor, resto }
 }
 
 const produto = operação(
