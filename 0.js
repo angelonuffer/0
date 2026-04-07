@@ -105,6 +105,13 @@ const itens_lista = entrada => {
   return { valor: new Error(/,|\]/), resto: resto_3 }
 }
 
+const aplicações = (valor_1, resto_1) => {
+  const resto_2 = passe(espaço_na_linha)(resto_1)
+  const { valor: valor_2, resto: resto_3 } = expressão(resto_2)
+  if (valor_2 instanceof Error) return { valor: valor_1, resto: resto_2 }
+  return aplicações(escopo => valor_1(escopo)[valor_2(escopo)], resto_3)
+}
+
 const literal = entrada => {
   if (entrada.startsWith('"') || entrada.startsWith("'")) {
     const { valor, resto } = transformação(casar(/"[^"\\]*"|'[^'\\]*'/), s => s.slice(1, -1))(entrada)
@@ -113,13 +120,7 @@ const literal = entrada => {
   if (entrada.startsWith("[")) {
     const resto_1 = entrada.slice(1)
     const { valor: valor_1, resto: resto_2 } = itens_lista(resto_1)
-    const resto_3 = passe(espaço_na_linha)(resto_2)
-    const { valor: valor_2, resto: resto_4 } = expressão(resto_3)
-    if (valor_2 instanceof Error) return { valor: valor_1, resto: resto_3 }
-    return {
-      valor: escopo => valor_1(escopo)[valor_2(escopo)],
-      resto: resto_4,
-    }
+    return aplicações(valor_1, resto_2)
   }
   return número(entrada)
 }
