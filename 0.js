@@ -193,8 +193,8 @@ const comparação = operação(
 const comparação_lógica = operação(
   comparação,
   {
-    "&": (a, b) => a && b,
-    "|": (a, b) => a || b,
+    "&&": (a, b) => a && b,
+    "||": (a, b) => a || b,
   },
 )
 
