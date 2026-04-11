@@ -681,16 +681,6 @@ function parseTestes(texto) {
 const testes = [];
 testes.push(...parseTestes(testes_txt));
 
-import fs from "fs";
-
-const exemplos = fs.readFileSync("LEIAME.md", "utf-8");
-const regex = /```0([\s\S]*?)```/g;
-let match;
-while ((match = regex.exec(exemplos)) !== null) {
-   const código = match[1].trim();
-   testes.push(...parseTestes(código));
-}
-
 import { interpretar } from "./0.js";
 
 let passaram = 0;
