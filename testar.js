@@ -240,6 +240,26 @@ const testes_txt = `
    nome + " " + sobrenome
 🎯 Alice Silva
 
+🔍 obj = { a: 1 }
+   obj.a
+🎯 1
+
+🔍 obj = { a: 1, b: 2 }
+   obj.a + obj.b
+🎯 3
+
+🔍 obj = { nested: { x: 10 } }
+   obj.nested.x
+🎯 10
+
+🔍 obj = { "chave-com-hifen": 5 }
+   obj "chave-com-hifen"
+🎯 5
+
+🔍 pessoa = { nome: "João", sobrenome: "Pereira" }
+   pessoa.nome + " " + pessoa.sobrenome
+🎯 João Pereira
+
 🔍 nome = "Maria"
    pessoa = { nome }
    pessoa.nome
