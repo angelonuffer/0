@@ -1,229 +1,240 @@
 #! /usr/bin/env node
 
+const símbolo = texto => ({ entrada, posição }) => {
+  const { valor_1, posição_1 } = texto[0] === entrada[posição] ? {
+    valor_1: () => texto[0],
+    posição_1: posição + 1,
+  } : {
+    valor_1: new Error(`"${texto[0]}"`),
+    posição_1: posição,
+  }
+  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
+  if (texto.length === 1) return { valor: () => texto, posição: posição_1 }
+  const { valor: valor_2, posição: posição_2 } = símbolo(texto.slice(1))({ entrada, posição: posição_1 })
+  if (valor_2 instanceof Error) return { valor: valor_2, posição }
+  return {
+    valor: escopo => texto[0] + valor_2(escopo),
+    posição: posição_2,
+  }
+}
+
+const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
+  valor: () => entrada[posição],
+  posição: posição + 1,
+} : { valor: new Error(`/[${de}-${até}]/`), posição }
+
+const alternativa = (...analisadores) => ({ entrada, posição }) => {
+  const { valor: valor_1, posição: posição_1 } = analisadores[0]({ entrada, posição })
+  if (posição_1 > posição) return { valor: valor_1, posição: posição_1 }
+  if (analisadores.length === 1) return { valor: valor_1, posição: posição_1 }
+  const { valor: valor_2, posição: posição_2 } = alternativa(...analisadores.slice(1))({ entrada, posição })
+  if (posição_2 > posição) return { valor: valor_2, posição: posição_2 }
+  return { valor: new Error(`${valor_1.message} | ${valor_2.message}`), posição }
+}
+
+const sequência = (...analisadores) => ({ entrada, posição }) => {
+  const { valor: valor_1, posição: posição_1 } = analisadores[0]({ entrada, posição })
+  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
+  if (analisadores.length === 1) return {
+    valor: escopo => [valor_1(escopo)],
+    posição: posição_1,
+  }
+  const { valor: valor_2, posição: posição_2 } = sequência(...analisadores.slice(1))({entrada, posição: posição_1})
+  if (valor_2 instanceof Error) return { valor: valor_2, posição: posição_2 }
+  return {
+    valor: escopo => [valor_1(escopo), ...valor_2(escopo)],
+    posição: posição_2,
+  }
+}
+
+const sequência_literal = (...analisadores) => ({ entrada, posição }) => {
+  const { valor: valor_1, posição: posição_1 } = analisadores[0]({entrada, posição})
+  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
+  if (analisadores.length === 1) return { valor: valor_1, posição: posição_1 }
+  const { valor: valor_2, posição: posição_2 } = sequência_literal(...analisadores.slice(1))({ entrada, posição: posição_1 })
+  if (valor_2 instanceof Error) return { valor: valor_2, posição: posição_2 }
+  return {
+    valor: escopo => valor_1(escopo) + valor_2(escopo),
+    posição: posição_2,
+  }
+}
+
+const opcional = analisador => ({ entrada, posição }) => {
+  const resultado = analisador({ entrada, posição })
+  if (resultado.valor instanceof Error) return { valor: () => "", posição }
+  return resultado
+}
+
+const inverso = analisador => ({ entrada, posição }) => {
+  if (posição >= entrada.length) return { valor: new Error(`/./`), posição }
+  const resultado = analisador({ entrada, posição })
+  if (resultado.valor instanceof Error) {
+    return {
+      valor: () => entrada[posição],
+      posição: posição + 1,
+    }
+  }
+  return { valor: new Error(`! "${entrada[posição]}"`), posição }
+}
+
+const ignorado = analisador => ({ entrada, posição }) => {
+  const resultado = analisador({ entrada, posição })
+  if (resultado.valor instanceof Error) return { valor: () => "", posição }
+  return { valor: () => "", posição: resultado.posição }
+}
+
+const transformação = (analisador, transformador) => ({ entrada, posição }) => {
+  const { valor, posição: novaPos } = analisador({ entrada, posição })
+  if (valor instanceof Error) return { valor, posição: novaPos }
+  return {
+    valor: escopo => transformador(valor(escopo), escopo),
+    posição: novaPos,
+  }
+}
+
+const conteúdo_comentário = sequência_literal(
+  inverso(
+    símbolo("\n"),
+  ),
+  opcional(
+    resultado => conteúdo_comentário(resultado)
+  ),
+)
+
+const espaço = ignorado(
+  opcional(
+    sequência_literal(
+      alternativa(
+        símbolo(" "),
+        sequência_literal(
+          símbolo("//"),
+          conteúdo_comentário,
+          opcional(
+            símbolo("\n"),
+          ),
+        ),
+      ),
+      opcional(
+        resultado => espaço(resultado),
+      ),
+    )
+  )
+)
+
+const número_natural_literal = sequência_literal(
+  faixa("0", "9"),
+  opcional(
+    resultado => número_natural_literal(resultado),
+  ),
+)
+
+const número = transformação(
+  sequência(
+    opcional(
+      símbolo("-"),
+    ),
+    número_natural_literal,
+  ),
+  ([sinal, corpo]) => {
+    const número = Number(corpo)
+    return sinal === "-" ? -número : número
+  }
+)
+
+const negação = transformação(
+  sequência(
+    símbolo("!"),
+    espaço,
+    resultado => átomo(resultado),
+  ),
+  ([, , valor]) => valor === 0 ? 1 : 0
+)
+
+const parênteses = transformação(
+  sequência(
+    símbolo("("),
+    resultado => expressão(resultado),
+    símbolo(")")
+  ),
+  ([, valor]) => valor,
+)
+
+const átomo = alternativa(
+  número,
+  negação,
+  parênteses,
+)
+
+const operação = (operando, operadores) => transformação(
+  sequência(
+    espaço,
+    operando,
+    opcional(
+      sequência(
+        espaço,
+        alternativa(
+          ...Object.keys(operadores).map(símbolo),
+        ),
+        espaço,
+        resultado => operação(operando, operadores)(resultado),
+      ),
+    ),
+  ),
+  ([, a, [, operador, , b]]) => {
+    if (operador === undefined) return a
+    return operadores[operador](a, b)
+  }
+)
+
+const produto = operação(átomo, {
+  "*": (a, b) => a * b,
+  "/": (a, b) => a / b,
+})
+
+const soma = operação(produto, {
+  "+": (a, b) => a + b,
+  "-": (a, b) => a - b,
+})
+
+const comparação = operação(soma, {
+  ">=": (a, b) => a >= b ? 1 : 0,
+  "<=": (a, b) => a <= b ? 1 : 0,
+  "==": (a, b) => a == b ? 1 : 0,
+  "!=": (a, b) => a != b ? 1 : 0,
+  ">": (a, b) => a > b ? 1 : 0,
+  "<": (a, b) => a < b ? 1 : 0,
+})
+
+const comparação_lógica = operação(comparação, {
+  "&&": (a, b) => a && b,
+  "||": (a, b) => a || b,
+})
+
+const expressão = transformação(
+  sequência(
+    comparação_lógica,
+    espaço,
+  ),
+  ([valor]) => valor
+)
+
 export const interpretar = ({ entrada, arquivo }) => {
-  const { valor, resto } = expressão(entrada)
+  const resultado = expressão({ entrada, posição: 0 })
+  const { valor, posição } = resultado
   return {
     saída: valor instanceof Error ? "" : String(valor({})),
-    erro: resto !== "" ? (() => {
+    erro: (posição !== entrada.length || valor instanceof Error) ? (() => {
+      const resto = entrada.slice(posição)
       const linhas = entrada.split("\n")
       const número_linha = linhas.length - resto.split("\n").length + 1
       const linha = linhas[número_linha - 1]
       const número_coluna = linha.length - resto.split("\n")[0].length + 1
       return [
-        `⛔ ${valor instanceof Error ? valor.message : ""}`,
+        `⛔ ${valor instanceof Error ? valor.message : "! /./"}`,
         `📄 ${arquivo}`,
         `👉 ${número_linha}: ${linha}`,
         `     ${" ".repeat(número_coluna - 1 + String(número_linha).length)}^ ${número_coluna}`,
       ].join("\n")
     })() : "",
-  }
-}
-
-const transformação = (analisador, transformador) => entrada => {
-  const { valor, resto } = analisador(entrada)
-  if (valor instanceof Error) return { valor, resto }
-  return {
-    valor: escopo => transformador(valor, escopo),
-    resto,
-  }
-}
-
-const passe = analisador => entrada => analisador(entrada).resto
-
-const casar = regex => {
-  const ancorado = new RegExp("^" + regex.source, regex.flags)
-  return entrada => {
-    const resultado = ancorado.exec(entrada)
-    if (resultado) {
-      return {
-        valor: resultado[0],
-        resto: entrada.slice(resultado[0].length),
-      }
-    }
-    return {
-      valor: new Error(regex),
-      resto: entrada,
-    }
-  }
-}
-
-const número = transformação(
-  casar(/-?\d+/),
-  Number,
-)
-
-const identificador = casar(/[_\p{L}][_\p{L}\p{N}]*/u)
- 
-const variável = transformação(
-  identificador,
-  (nome, escopo) => {
-    const valor = escopo[nome]
-    if (valor === undefined) return new Error(new RegExp(nome))
-    return valor(escopo)
-  },
-)
-
-const espaço = casar(/\s*/)
-
-const espaço_na_linha = casar(/[ \t]*/)
-
-const operação = (operando, operadores) => entrada => {
-  const { valor: a, resto } = operando(entrada)
-  if (a instanceof Error) return { valor: a, resto }
-  const resto_2 = passe(espaço)(resto)
-  const símbolo_operador = Object.keys(operadores).find(símbolo_operador => resto_2.startsWith(símbolo_operador))
-  if (símbolo_operador === undefined) return { valor: a, resto: resto_2 }
-  const resto_3 = resto_2.slice(símbolo_operador.length)
-  const resto_4 = passe(espaço)(resto_3)
-  const { valor: b, resto: resto_5 } = operação(operando, operadores)(resto_4)
-  if (b instanceof Error) return { valor: b, resto: resto_5 }
-  return {
-    valor: escopo => operadores[símbolo_operador](a(escopo), b(escopo)),
-    resto: resto_5,
-  }
-}
-
-const itens_lista = entrada => {
-  const resto_1 = passe(espaço)(entrada)
-  if (resto_1.startsWith("]")) return { valor: () => [], resto: resto_1 }
-  const { valor: valor_1, resto: resto_2 } = expressão(resto_1)
-  if (valor_1 instanceof Error) return { valor: valor_1, resto: resto_2 }
-  const resto_3 = passe(espaço)(resto_2)
-  if (resto_3.startsWith("]")) return {
-    valor: escopo => [valor_1(escopo)],
-    resto: resto_3.slice(1),
-  }
-  if (resto_3.startsWith(",")) {
-    const resto_4 = passe(espaço)(resto_3.slice(1))
-    const { valor: valor_2, resto: resto_5 } = itens_lista(resto_4)
-    if (valor_2 instanceof Error) return { valor: valor_2, resto: resto_5 }
-    return {
-      valor: escopo => [valor_1(escopo), ...valor_2(escopo)],
-      resto: resto_5,
-    }
-  }
-  return { valor: new Error(/,|\]/), resto: resto_3 }
-}
-
-const aplicações = (valor_1, resto_1) => {
-  const resto_2 = passe(espaço_na_linha)(resto_1)
-  const { valor: valor_2, resto: resto_3 } = expressão(resto_2)
-  if (valor_2 instanceof Error) return { valor: valor_1, resto: resto_2 }
-  return aplicações(escopo => {
-    const função = valor_1(escopo)
-    if (Array.isArray(função)) return função[valor_2(escopo)]
-    return função(valor_2(escopo))
-  }, resto_3)
-}
-
-const unário = entrada => {
-  if (entrada.startsWith("!")) {
-    const resto_1 = passe(espaço)(entrada.slice(1))
-    const { valor, resto: resto_2 } = comparação_lógica(resto_1)
-    return aplicações(escopo => valor(escopo) === 0 ? 1 : 0, resto_2)
-  }
-  if (entrada.startsWith("|")) {
-    const resto_1 = passe(espaço)(entrada.slice(1))
-    const { valor, resto } = comparação(resto_1)
-    if (valor instanceof Error) return { valor, resto }
-    const resto_2 = passe(espaço)(resto)
-    if (resto_2.startsWith("|")) return {
-      valor: escopo => valor(escopo).length,
-      resto: resto_2.slice(1),
-    }
-    return { valor: new Error(/\|/), resto: resto_2 }
-  }
-  if (entrada.startsWith("(")) {
-    const resto_1 = entrada.slice(1)
-    const resto_2 = passe(espaço)(resto_1)
-    const { valor, resto } = expressão(resto_2)
-    if (valor instanceof Error) return { valor, resto }
-    const resto_3 = passe(espaço)(resto)
-    if (resto_3.startsWith(")")) return {
-      valor,
-      resto: resto_3.slice(1),
-    }
-    return { valor: new Error(/\)/), resto: resto_3 }
-  }
-  if (entrada.startsWith('"') || entrada.startsWith("'")) {
-    const { valor, resto } = transformação(casar(/"[^"\\]*"|'[^'\\]*'/), s => s.slice(1, -1))(entrada)
-    return { valor, resto }
-  }
-  if (entrada.startsWith("[")) {
-    const resto_1 = entrada.slice(1)
-    const { valor: valor_1, resto: resto_2 } = itens_lista(resto_1)
-    return aplicações(valor_1, resto_2)
-  }
-  const { valor, resto } = variável(entrada)
-  if (valor instanceof Error) return número(entrada)
-  return { valor, resto }
-}
-
-const produto = operação(
-  unário,
-  {
-    "*": (a, b) => {
-      if (Array.isArray(a) && typeof b === "string") return a.join(b)
-      return a * b
-    },
-    "/": (a, b) => a / b,
-  },
-)
-
-const soma = operação(
-  produto,
-  {
-    "+": (a, b) => a + b,
-    "-": (a, b) => a - b,
-  },
-)
-
-const comparação = operação(
-  soma,
-  {
-    ">=": (a, b) => a >= b ? 1 : 0,
-    "<=": (a, b) => a <= b ? 1 : 0,
-    "==": (a, b) => a == b ? 1 : 0,
-    "!=": (a, b) => a != b ? 1 : 0,
-    ">": (a, b) => a > b ? 1 : 0,
-    "<": (a, b) => a < b ? 1 : 0,
-  },
-)
-
-const comparação_lógica = operação(
-  comparação,
-  {
-    "&&": (a, b) => a && b,
-    "||": (a, b) => a || b,
-  },
-)
-
-const declarações = entrada => {
-  const { valor: nome, resto } = identificador(entrada)
-  if (nome instanceof Error) return { valor: {}, resto: entrada }
-  const resto_2 = passe(espaço)(resto)
-  if (!resto_2.startsWith("=")) return { valor: {}, resto: entrada }
-  const resto_3 = resto_2.slice(1)
-  const resto_4 = passe(espaço)(resto_3)
-  const { valor: valor, resto: resto_5 } = expressão(resto_4)
-  if (valor instanceof Error) return { valor: new Error(), resto: resto_5 }
-  const { valor: outras_declaracoes, resto: resto_6 } = declarações(resto_5)
-  if (outras_declaracoes instanceof Error) return { valor: outras_declaracoes, resto: resto_6 }
-  return {
-    valor: { [nome]: valor, ...outras_declaracoes },
-    resto: resto_6,
-  }
-}
-
-const expressão = entrada => {
-  const {
-    valor: escopo_declarado,
-    resto,
-  } = declarações(entrada)
-  const { valor, resto: resto_2 } = comparação_lógica(resto)
-  if (valor instanceof Error) return { valor, resto: resto_2 }
-  return {
-    valor: escopo => valor({ ...escopo_declarado, ...escopo }),
-    resto: resto_2,
   }
 }

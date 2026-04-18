@@ -1,6 +1,29 @@
 const testes_txt = `
 
 entrada:
+  1
+saída esperada:
+  1
+
+entrada:
+   1
+saída esperada:
+  1
+
+entrada:
+  1 // comentário
+saída esperada:
+  1
+
+entrada:
+  +
+erro esperado:
+  ⛔ /[0-9]/ | "!" | "("
+  📄 testar.js
+  👉 1: +
+        ^ 1
+
+entrada:
   42 + 5
 saída esperada:
   47
@@ -236,7 +259,7 @@ saída esperada:
   0
 
 entrada:
-  0 & (1 / 0)
+  0 && (1 / 0)
 saída esperada:
   0
 
@@ -882,16 +905,16 @@ function parseTestes(texto) {
    let bloco_saida = "";
    let bloco_erro = "";
    while (i < lines.length) {
-      if (lines[i].trim() === "") {
+      if (lines[i] === "") {
          i++;
          continue;
       }
       if (lines[i] === "entrada:") {
-         if (bloco_entrada.trim() || bloco_saida.trim() || bloco_erro.trim()) {
+         if (bloco_entrada || bloco_saida || bloco_erro) {
             resultados.push({
-               entrada: bloco_entrada.trim(),
-               saída: bloco_saida.trim() || undefined,
-               erro: bloco_erro.trim() || undefined,
+               entrada: bloco_entrada,
+               saída: bloco_saida,
+               erro: bloco_erro,
             });
          }
          tipo = "entrada";
@@ -909,23 +932,26 @@ function parseTestes(texto) {
       }
       if (lines[i].startsWith("  ")) {
          if (tipo === "entrada") {
-            bloco_entrada += "\n" + lines[i].slice(2);
+            if (bloco_entrada) bloco_entrada += "\n";
+            bloco_entrada += lines[i].slice(2);
          }
          if (tipo === "saída") {
-            bloco_saida += "\n" + lines[i].slice(2);
+            if (bloco_saida) bloco_saida += "\n";
+            bloco_saida += lines[i].slice(2);
          }
          if (tipo === "erro") {
-            bloco_erro += "\n" + lines[i].slice(2);
+            if (bloco_erro) bloco_erro += "\n";
+            bloco_erro += lines[i].slice(2);
          }
       }
       i++;
    }
    // push last block if present
-   if (bloco_entrada.trim() || bloco_saida.trim() || bloco_erro.trim()) {
+   if (bloco_entrada || bloco_saida || bloco_erro) {
       resultados.push({
-         entrada: bloco_entrada.trim(),
-         saída: bloco_saida.trim() || undefined,
-         erro: bloco_erro.trim() || undefined,
+         entrada: bloco_entrada,
+         saída: bloco_saida || undefined,
+         erro: bloco_erro || undefined,
       });
    }
    return resultados;
@@ -949,28 +975,24 @@ for (const teste of testes) {
       arquivo: teste.arquivo || "testar.js",
    });
 
-   const saída_inesperada =
-      teste.saída !== undefined &&
-      (saída === undefined || saída.trim() !== teste.saída.trim());
-   const erro_inesperado =
-      teste.erro !== undefined &&
-      (erro === undefined || erro.trim() !== teste.erro.trim());
+   const saída_inesperada = saída !== teste.saída;
+   const erro_inesperado = erro !== teste.erro;
 
    if (saída_inesperada || erro_inesperado) {
       const shouldPrint = exiba_todos || !primeira_falha_exibida;
       if (shouldPrint) {
-         let output = `entrada:\n  ${teste.entrada.trim().replaceAll('\n', '\n  ')}\n`;
-         if (teste.saída !== undefined) {
-            output += `saída esperada:\n  ${teste.saída.trim().replaceAll('\n', '\n  ')}\n`;
+         let output = `entrada:\n  ${teste.entrada.replaceAll('\n', '\n  ')}\n`;
+         if (teste.saída !== "") {
+            output += `saída esperada:\n  ${teste.saída.replaceAll('\n', '\n  ')}\n`;
          }
-         if (teste.erro !== undefined) {
-            output += `erro esperado:\n  ${teste.erro.trim().replaceAll('\n', '\n  ')}\n`;
+         if (teste.erro !== "") {
+            output += `erro esperado:\n  ${teste.erro.replaceAll('\n', '\n  ')}\n`;
          }
          if (saída !== "") {
-            output += `saída:\n  ${saída.trim().replaceAll('\n', '\n  ')}\n`;
+            output += `saída:\n  ${saída.replaceAll('\n', '\n  ')}\n`;
          }
          if (erro !== "") {
-            output += `erro:\n  ${erro.trim().replaceAll('\n', '\n  ')}\n`;
+            output += `erro:\n  ${erro.replaceAll('\n', '\n  ')}\n`;
          }
          process.stderr.write(output + "\n");
          primeira_falha_exibida = true;
