@@ -1,19 +1,12 @@
 #! /usr/bin/env node
 
 const símbolo = texto => ({ entrada, posição }) => {
-  const { valor_1, posição_1 } = texto[0] === entrada[posição] ? {
-    valor_1: () => texto[0],
-    posição_1: posição + 1,
-  } : {
-    valor_1: new Error(`"${texto[0]}"`),
-    posição_1: posição,
-  }
-  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
-  if (texto.length === 1) return { valor: () => texto, posição: posição_1 }
-  const { valor: valor_2, posição: posição_2 } = símbolo(texto.slice(1))({ entrada, posição: posição_1 })
-  if (valor_2 instanceof Error) return { valor: valor_2, posição }
+  if (texto[0] !== entrada[posição]) return { valor: new Error(`"${texto[0]}"`), posição }
+  if (texto.length === 1) return { valor: () => texto, posição: posição + 1 }
+  const { valor, posição: posição_2 } = símbolo(texto.slice(1))({ entrada, posição: posição + 1 })
+  if (valor instanceof Error) return { valor, posição }
   return {
-    valor: escopo => texto[0] + valor_2(escopo),
+    valor: escopo => texto[0] + valor(escopo),
     posição: posição_2,
   }
 }
@@ -60,35 +53,32 @@ const sequência_literal = (...analisadores) => ({ entrada, posição }) => {
 }
 
 const opcional = analisador => ({ entrada, posição }) => {
-  const resultado = analisador({ entrada, posição })
-  if (resultado.valor instanceof Error) return { valor: () => "", posição }
-  return resultado
+  const { valor, posição: posição_2 } = analisador({ entrada, posição })
+  if (valor instanceof Error) return { valor: () => "", posição: posição_2 }
+  return { valor, posição: posição_2 }
 }
 
 const inverso = analisador => ({ entrada, posição }) => {
-  if (posição >= entrada.length) return { valor: new Error(`/./`), posição }
-  const resultado = analisador({ entrada, posição })
-  if (resultado.valor instanceof Error) {
-    return {
-      valor: () => entrada[posição],
-      posição: posição + 1,
-    }
+  if (posição >= entrada.length) return { valor: new Error("/./"), posição }
+  const { valor, } = analisador({ entrada, posição })
+  if (valor instanceof Error) return {
+    valor: () => entrada[posição],
+    posição: posição + 1,
   }
   return { valor: new Error(`! "${entrada[posição]}"`), posição }
 }
 
 const ignorado = analisador => ({ entrada, posição }) => {
-  const resultado = analisador({ entrada, posição })
-  if (resultado.valor instanceof Error) return { valor: () => "", posição }
-  return { valor: () => "", posição: resultado.posição }
+  const { valor, posição: posição_2 } = analisador({ entrada, posição })
+  return { valor: () => "", posição: posição_2 }
 }
 
 const transformação = (analisador, transformador) => ({ entrada, posição }) => {
-  const { valor, posição: novaPos } = analisador({ entrada, posição })
-  if (valor instanceof Error) return { valor, posição: novaPos }
+  const { valor, posição: posição_2 } = analisador({ entrada, posição })
+  if (valor instanceof Error) return { valor, posição: posição_2 }
   return {
     valor: escopo => transformador(valor(escopo), escopo),
-    posição: novaPos,
+    posição: posição_2,
   }
 }
 
