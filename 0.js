@@ -22,7 +22,8 @@ const alternativa = (...analisadores) => ({ entrada, posição }) => {
   if (analisadores.length === 1) return { valor: valor_1, posição: posição_1 }
   const { valor: valor_2, posição: posição_2 } = alternativa(...analisadores.slice(1))({ entrada, posição })
   if (posição_2 > posição) return { valor: valor_2, posição: posição_2 }
-  return { valor: new Error(`${valor_1.message} | ${valor_2.message}`), posição }
+  const mensagens = [...new Set(`${valor_1.message} | ${valor_2.message}`.split(" | "))].sort((a, b) => a.localeCompare(b)).join(" | ")
+  return { valor: new Error(mensagens), posição }
 }
 
 const sequência = (...analisadores) => ({ entrada, posição }) => {
@@ -96,6 +97,7 @@ const espaço = ignorado(
     sequência_literal(
       alternativa(
         símbolo(" "),
+        símbolo("\n"),
         sequência_literal(
           símbolo("//"),
           conteúdo_comentário,
@@ -149,10 +151,27 @@ const parênteses = transformação(
   ([, valor]) => valor,
 )
 
+const identificador_literal = sequência_literal(
+  alternativa(
+    faixa("a", "z"),
+    faixa("A", "Z"),
+    símbolo("_"),
+  ),
+  opcional(
+    resultado => identificador_literal(resultado),
+  ),
+)
+
+const constante = transformação(
+  identificador_literal,
+  (valor, escopo) => escopo[valor],
+)
+
 const átomo = alternativa(
   número,
   negação,
   parênteses,
+  constante,
 )
 
 const operação = (operando, operadores) => transformação(
@@ -220,7 +239,7 @@ export const interpretar = ({ entrada, arquivo }) => {
       const linha = linhas[número_linha - 1]
       const número_coluna = linha.length - resto.split("\n")[0].length + 1
       return [
-        `⛔ ${valor instanceof Error ? valor.message : "! /./"}`,
+        `⛔ ${valor instanceof Error ? valor.message : "/$/"}`,
         `📄 ${arquivo}`,
         `👉 ${número_linha}: ${linha}`,
         `     ${" ".repeat(número_coluna - 1 + String(número_linha).length)}^ ${número_coluna}`,

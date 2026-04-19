@@ -18,7 +18,7 @@ saída esperada:
 entrada:
   +
 erro esperado:
-  ⛔ /[0-9]/ | "!" | "("
+  ⛔ "_" | "!" | "(" | /[0-9]/ | /[a-z]/ | /[A-Z]/
   📄 testar.js
   👉 1: +
         ^ 1
@@ -262,6 +262,13 @@ entrada:
   0 && (1 / 0)
 saída esperada:
   0
+
+entrada:
+  a = 5
+  b = 8
+  2 + a + b
+saída esperada:
+  15
 
 entrada:
   a = 5
