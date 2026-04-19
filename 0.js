@@ -55,7 +55,7 @@ const sequência_literal = (...analisadores) => ({ entrada, posição }) => {
 
 const opcional = analisador => ({ entrada, posição }) => {
   const { valor, posição: posição_2 } = analisador({ entrada, posição })
-  if (valor instanceof Error) return { valor: "", posição: posição_2 }
+  if (valor instanceof Error) return { valor: "", posição: posição }
   return { valor, posição: posição_2 }
 }
 
