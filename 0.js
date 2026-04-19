@@ -145,10 +145,12 @@ const negação = transformação(
 const parênteses = transformação(
   sequência(
     símbolo("("),
+    espaço,
     resultado => expressão(resultado),
+    espaço,
     símbolo(")")
   ),
-  ([, valor]) => valor,
+  ([, , valor, , ]) => valor,
 )
 
 const identificador_literal = sequência_literal(
