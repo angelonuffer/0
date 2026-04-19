@@ -176,20 +176,20 @@ const átomo = alternativa(
 
 const operação = (operando, operadores) => transformação(
   sequência(
-    espaço,
     operando,
+    espaço,
     opcional(
       sequência(
-        espaço,
         alternativa(
           ...Object.keys(operadores).map(símbolo),
         ),
         espaço,
         resultado => operação(operando, operadores)(resultado),
+        espaço,
       ),
     ),
   ),
-  ([, a, [, operador, , b]]) => {
+  ([a, , [operador, , b]]) => {
     if (operador === undefined) return a
     return escopo => operadores[operador](a(escopo), b(escopo))
   }
@@ -228,18 +228,18 @@ const expressão = transformação(
 )
 
 export const interpretar = ({ entrada, arquivo }) => {
-  const resultado = expressão({ entrada, posição: 0 })
-  const { valor, posição } = resultado
+  const { posição: posição_1 } = espaço({ entrada, posição: 0 })
+  const { valor: valor_2, posição: posição_2 } = expressão({ entrada, posição: posição_1 })
   return {
-    saída: valor instanceof Error ? "" : String(valor({})),
-    erro: (posição !== entrada.length || valor instanceof Error) ? (() => {
-      const resto = entrada.slice(posição)
+    saída: valor_2 instanceof Error ? "" : String(valor_2({})),
+    erro: (posição_2 !== entrada.length || valor_2 instanceof Error) ? (() => {
+      const resto = entrada.slice(posição_2)
       const linhas = entrada.split("\n")
       const número_linha = linhas.length - resto.split("\n").length + 1
       const linha = linhas[número_linha - 1]
       const número_coluna = linha.length - resto.split("\n")[0].length + 1
       return [
-        `⛔ ${valor instanceof Error ? valor.message : "/$/"}`,
+        `⛔ ${valor_2 instanceof Error ? valor_2.message : "/$/"}`,
         `📄 ${arquivo}`,
         `👉 ${número_linha}: ${linha}`,
         `     ${" ".repeat(número_coluna - 1 + String(número_linha).length)}^ ${número_coluna}`,
