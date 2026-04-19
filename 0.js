@@ -164,7 +164,10 @@ const identificador_literal = sequência_literal(
 
 const constante = transformação(
   identificador_literal,
-  valor => escopo => escopo[valor],
+  valor => escopo => {
+    if (! (valor in escopo)) return new Error(Object.keys(escopo).join(" | "))
+    return escopo[valor](escopo)
+  }
 )
 
 const átomo = alternativa(
@@ -219,12 +222,40 @@ const comparação_lógica = operação(comparação, {
   "||": (a, b) => a || b,
 })
 
+const declarações = transformação(
+  sequência(
+    identificador_literal,
+    espaço,
+    símbolo("="),
+    espaço,
+    resultado => comparação_lógica(resultado),
+    espaço,
+    opcional(
+      resultado => declarações(resultado),
+    ),
+    espaço,
+  ),
+  ([identificador, , , , valor, , declarações]) => escopo => {
+    if (declarações === "") return { [identificador]: valor }
+    return {
+      ...declarações(escopo),
+      [identificador]: valor,
+    }
+  }
+)
+
 const expressão = transformação(
   sequência(
+    opcional(
+      declarações,
+    ),
     comparação_lógica,
     espaço,
   ),
-  ([valor]) => valor
+  ([declarações, valor]) => {
+    if (declarações === "") return valor
+    return escopo => valor(declarações(escopo))
+  }
 )
 
 export const interpretar = ({ entrada, arquivo }) => {
