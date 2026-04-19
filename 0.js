@@ -2,17 +2,17 @@
 
 const símbolo = texto => ({ entrada, posição }) => {
   if (texto[0] !== entrada[posição]) return { valor: new Error(`"${texto[0]}"`), posição }
-  if (texto.length === 1) return { valor: () => texto, posição: posição + 1 }
+  if (texto.length === 1) return { valor: texto, posição: posição + 1 }
   const { valor, posição: posição_2 } = símbolo(texto.slice(1))({ entrada, posição: posição + 1 })
   if (valor instanceof Error) return { valor, posição }
   return {
-    valor: escopo => texto[0] + valor(escopo),
+    valor: texto[0] + valor,
     posição: posição_2,
   }
 }
 
 const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
-  valor: () => entrada[posição],
+  valor: entrada[posição],
   posição: posição + 1,
 } : { valor: new Error(`/[${de}-${até}]/`), posição }
 
@@ -30,13 +30,13 @@ const sequência = (...analisadores) => ({ entrada, posição }) => {
   const { valor: valor_1, posição: posição_1 } = analisadores[0]({ entrada, posição })
   if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
   if (analisadores.length === 1) return {
-    valor: escopo => [valor_1(escopo)],
+    valor: [valor_1],
     posição: posição_1,
   }
   const { valor: valor_2, posição: posição_2 } = sequência(...analisadores.slice(1))({entrada, posição: posição_1})
   if (valor_2 instanceof Error) return { valor: valor_2, posição: posição_2 }
   return {
-    valor: escopo => [valor_1(escopo), ...valor_2(escopo)],
+    valor: [valor_1, ...valor_2],
     posição: posição_2,
   }
 }
@@ -48,14 +48,14 @@ const sequência_literal = (...analisadores) => ({ entrada, posição }) => {
   const { valor: valor_2, posição: posição_2 } = sequência_literal(...analisadores.slice(1))({ entrada, posição: posição_1 })
   if (valor_2 instanceof Error) return { valor: valor_2, posição: posição_2 }
   return {
-    valor: escopo => valor_1(escopo) + valor_2(escopo),
+    valor: valor_1 + valor_2,
     posição: posição_2,
   }
 }
 
 const opcional = analisador => ({ entrada, posição }) => {
   const { valor, posição: posição_2 } = analisador({ entrada, posição })
-  if (valor instanceof Error) return { valor: () => "", posição: posição_2 }
+  if (valor instanceof Error) return { valor: "", posição: posição_2 }
   return { valor, posição: posição_2 }
 }
 
@@ -63,7 +63,7 @@ const inverso = analisador => ({ entrada, posição }) => {
   if (posição >= entrada.length) return { valor: new Error("/./"), posição }
   const { valor, } = analisador({ entrada, posição })
   if (valor instanceof Error) return {
-    valor: () => entrada[posição],
+    valor: entrada[posição],
     posição: posição + 1,
   }
   return { valor: new Error(`! "${entrada[posição]}"`), posição }
@@ -71,14 +71,14 @@ const inverso = analisador => ({ entrada, posição }) => {
 
 const ignorado = analisador => ({ entrada, posição }) => {
   const { valor, posição: posição_2 } = analisador({ entrada, posição })
-  return { valor: () => "", posição: posição_2 }
+  return { valor: "", posição: posição_2 }
 }
 
 const transformação = (analisador, transformador) => ({ entrada, posição }) => {
   const { valor, posição: posição_2 } = analisador({ entrada, posição })
   if (valor instanceof Error) return { valor, posição: posição_2 }
   return {
-    valor: escopo => transformador(valor(escopo), escopo),
+    valor: transformador(valor),
     posição: posição_2,
   }
 }
@@ -129,7 +129,7 @@ const número = transformação(
   ),
   ([sinal, corpo]) => {
     const número = Number(corpo)
-    return sinal === "-" ? -número : número
+    return () => sinal === "-" ? -número : número
   }
 )
 
@@ -139,7 +139,7 @@ const negação = transformação(
     espaço,
     resultado => átomo(resultado),
   ),
-  ([, , valor]) => valor === 0 ? 1 : 0
+  ([, , valor]) => escopo => valor(escopo) === 0 ? 1 : 0
 )
 
 const parênteses = transformação(
@@ -164,7 +164,7 @@ const identificador_literal = sequência_literal(
 
 const constante = transformação(
   identificador_literal,
-  (valor, escopo) => escopo[valor],
+  valor => escopo => escopo[valor],
 )
 
 const átomo = alternativa(
@@ -191,7 +191,7 @@ const operação = (operando, operadores) => transformação(
   ),
   ([, a, [, operador, , b]]) => {
     if (operador === undefined) return a
-    return operadores[operador](a, b)
+    return escopo => operadores[operador](a(escopo), b(escopo))
   }
 )
 
