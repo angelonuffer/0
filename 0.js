@@ -53,10 +53,13 @@ const sequência_literal = (...analisadores) => ({ entrada, posição }) => {
   }
 }
 
-const opcional = analisador => ({ entrada, posição }) => {
+const opcional = (analisador, valor_padrão = "") => ({ entrada, posição }) => {
   const { valor, posição: posição_2 } = analisador({ entrada, posição })
-  if (valor instanceof Error) return { valor: "", posição: posição }
-  return { valor, posição: posição_2 }
+  if (posição_2 > posição) return { valor, posição: posição_2 }
+  return {
+    valor: valor instanceof Error ? valor_padrão : valor,
+    posição,
+  }
 }
 
 const inverso = analisador => ({ entrada, posição }) => {
