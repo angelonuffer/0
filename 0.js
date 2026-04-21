@@ -72,11 +72,6 @@ const inverso = analisador => ({ entrada, posição }) => {
   return { valor: new Error(`! "${entrada[posição]}"`), posição }
 }
 
-const ignorado = analisador => ({ entrada, posição }) => {
-  const { valor, posição: posição_2 } = analisador({ entrada, posição })
-  return { valor: "", posição: posição_2 }
-}
-
 const transformação = (analisador, transformador) => ({ entrada, posição }) => {
   const { valor, posição: posição_2 } = analisador({ entrada, posição })
   if (valor instanceof Error) return { valor, posição: posição_2 }
@@ -95,24 +90,22 @@ const conteúdo_comentário = sequência_literal(
   ),
 )
 
-const espaço = ignorado(
-  opcional(
-    sequência_literal(
-      alternativa(
-        símbolo(" "),
-        símbolo("\n"),
-        sequência_literal(
-          símbolo("//"),
-          conteúdo_comentário,
-          opcional(
-            símbolo("\n"),
-          ),
+const espaço = opcional(
+  sequência_literal(
+    alternativa(
+      símbolo(" "),
+      símbolo("\n"),
+      sequência_literal(
+        símbolo("//"),
+        conteúdo_comentário,
+        opcional(
+          símbolo("\n"),
         ),
       ),
-      opcional(
-        resultado => espaço(resultado),
-      ),
-    )
+    ),
+    opcional(
+      resultado => espaço(resultado),
+    ),
   )
 )
 
