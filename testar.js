@@ -273,6 +273,16 @@ saída esperada:
 entrada:
   a = 5
   b = 8
+  3 + c
+erro esperado:
+  ⛔ a | b
+  📄 testar.js
+  👉 3: 3 + c
+            ^ 5
+
+entrada:
+  a = 5
+  b = 8
   a + b
 saída esperada:
   13

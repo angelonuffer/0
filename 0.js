@@ -1,5 +1,7 @@
 #! /usr/bin/env node
 
+const ordenar = lista => lista.sort((a, b) => a.localeCompare(b))
+
 const símbolo = texto => ({ entrada, posição }) => {
   if (texto[0] !== entrada[posição]) return { valor: new Error(`"${texto[0]}"`), posição }
   if (texto.length === 1) return { valor: texto, posição: posição + 1 }
@@ -22,7 +24,7 @@ const alternativa = (...analisadores) => ({ entrada, posição }) => {
   if (analisadores.length === 1) return { valor: valor_1, posição: posição_1 }
   const { valor: valor_2, posição: posição_2 } = alternativa(...analisadores.slice(1))({ entrada, posição })
   if (posição_2 > posição) return { valor: valor_2, posição: posição_2 }
-  const mensagens = [...new Set(`${valor_1.message} | ${valor_2.message}`.split(" | "))].sort((a, b) => a.localeCompare(b)).join(" | ")
+  const mensagens = ordenar([...new Set(`${valor_1.message} | ${valor_2.message}`.split(" | "))]).join(" | ")
   return { valor: new Error(mensagens), posição }
 }
 
@@ -73,10 +75,22 @@ const inverso = analisador => ({ entrada, posição }) => {
 }
 
 const transformação = (analisador, transformador) => ({ entrada, posição }) => {
-  const { valor, posição: posição_2 } = analisador({ entrada, posição })
-  if (valor instanceof Error) return { valor, posição: posição_2 }
+  const { valor: valor_1, posição: posição_2 } = analisador({ entrada, posição })
+  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_2 }
   return {
-    valor: transformador(valor),
+    valor: escopo => {
+      const valor_2 = transformador(valor_1)(escopo)
+      if (valor_2 instanceof Error) {
+        if (valor_2.cause !== undefined) return valor_2
+        return new Error(valor_2.message, {
+          cause: {
+            início: posição,
+            fim: posição_2,
+          },
+        })
+      }
+      return valor_2
+    },
     posição: posição_2,
   }
 }
@@ -163,7 +177,7 @@ const identificador_literal = sequência_literal(
 const constante = transformação(
   identificador_literal,
   valor => escopo => {
-    if (! (valor in escopo)) return new Error(Object.keys(escopo).join(" | "))
+    if (! (valor in escopo)) return new Error(ordenar(Object.keys(escopo)).join(" | "))
     return escopo[valor](escopo)
   }
 )
@@ -192,7 +206,13 @@ const operação = (operando, operadores) => transformação(
   ),
   ([a, , [operador, , b]]) => {
     if (operador === undefined) return a
-    return escopo => operadores[operador](a(escopo), b(escopo))
+    return escopo => {
+      const valor_a = a(escopo)
+      if (valor_a instanceof Error) return valor_a
+      const valor_b = b(escopo)
+      if (valor_b instanceof Error) return valor_b
+      return operadores[operador](valor_a, valor_b)
+    }
   }
 )
 
@@ -256,23 +276,33 @@ const expressão = transformação(
   }
 )
 
+const formatar_erro = (entrada, posição, mensagem, arquivo) => {
+  const linhas = entrada.split("\n")
+  const número_linha = linhas.length - entrada.slice(posição).split("\n").length + 1
+  const linha = linhas[número_linha - 1]
+  const número_coluna = linha.length - entrada.slice(posição).split("\n")[0].length + 1
+  return [
+    `⛔ ${mensagem}`,
+    `📄 ${arquivo}`,
+    `👉 ${número_linha}: ${linha}`,
+    `     ${" ".repeat(número_coluna - 1 + String(número_linha).length)}^ ${número_coluna}`,
+  ].join("\n")
+}
+
 export const interpretar = ({ entrada, arquivo }) => {
   const { posição: posição_1 } = espaço({ entrada, posição: 0 })
   const { valor: valor_2, posição: posição_2 } = expressão({ entrada, posição: posição_1 })
+  if (posição_2 !== entrada.length || valor_2 instanceof Error) return {
+    saída: "",
+    erro: formatar_erro(entrada, posição_2, valor_2.message, arquivo),
+  }
+  const valor_3 = valor_2({})
+  if (valor_3 instanceof Error) return {
+    saída: "",
+    erro: formatar_erro(entrada, valor_3.cause.início, valor_3.message, arquivo),
+  }
   return {
-    saída: valor_2 instanceof Error ? "" : String(valor_2({})),
-    erro: (posição_2 !== entrada.length || valor_2 instanceof Error) ? (() => {
-      const resto = entrada.slice(posição_2)
-      const linhas = entrada.split("\n")
-      const número_linha = linhas.length - resto.split("\n").length + 1
-      const linha = linhas[número_linha - 1]
-      const número_coluna = linha.length - resto.split("\n")[0].length + 1
-      return [
-        `⛔ ${valor_2 instanceof Error ? valor_2.message : "/$/"}`,
-        `📄 ${arquivo}`,
-        `👉 ${número_linha}: ${linha}`,
-        `     ${" ".repeat(número_coluna - 1 + String(número_linha).length)}^ ${número_coluna}`,
-      ].join("\n")
-    })() : "",
+    saída: String(valor_3),
+    erro: "",
   }
 }
