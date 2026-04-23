@@ -3,106 +3,99 @@
 const ordenar = lista => lista.sort((a, b) => a.localeCompare(b))
 
 const símbolo = texto => ({ entrada, posição }) => {
-  if (texto[0] !== entrada[posição]) return { valor: new Error(`"${texto[0]}"`), posição }
+  if (texto[0] !== entrada[posição]) return { erro: `"${texto[0]}"`, posição }
   if (texto.length === 1) return { valor: texto, posição: posição + 1 }
-  const { valor, posição: posição_2 } = símbolo(texto.slice(1))({ entrada, posição: posição + 1 })
-  if (valor instanceof Error) return { valor, posição }
+  const resultado = símbolo(texto.slice(1))({ entrada, posição: posição + 1 })
+  if (resultado.erro) return { erro: resultado.erro, posição }
   return {
-    valor: texto[0] + valor,
-    posição: posição_2,
+    valor: texto[0] + resultado.valor,
+    posição: resultado.posição,
   }
 }
 
 const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
   valor: entrada[posição],
   posição: posição + 1,
-} : { valor: new Error(`/[${de}-${até}]/`), posição }
+} : { erro: `/[${de}-${até}]/`, posição }
 
 const alternativa = (...analisadores) => ({ entrada, posição }) => {
-  const { valor: valor_1, posição: posição_1 } = analisadores[0]({ entrada, posição })
-  if (posição_1 > posição) return { valor: valor_1, posição: posição_1 }
-  if (analisadores.length === 1) return { valor: valor_1, posição: posição_1 }
-  const { valor: valor_2, posição: posição_2 } = alternativa(...analisadores.slice(1))({ entrada, posição })
-  if (posição_2 > posição) return { valor: valor_2, posição: posição_2 }
-  const mensagens = ordenar([...new Set(`${valor_1.message} | ${valor_2.message}`.split(" | "))]).join(" | ")
-  return { valor: new Error(mensagens), posição }
+  const resultado_1 = analisadores[0]({ entrada, posição })
+  if (resultado_1.posição > posição || analisadores.length === 1) return resultado_1
+  const resultado_2 = alternativa(...analisadores.slice(1))({ entrada, posição })
+  if (resultado_2.posição > posição) return resultado_2
+  const mensagens = ordenar([...new Set(`${resultado_1.erro} | ${resultado_2.erro}`.split(" | "))]).join(" | ")
+  return { erro: mensagens, posição }
 }
 
 const sequência = (...analisadores) => ({ entrada, posição }) => {
-  const { valor: valor_1, posição: posição_1 } = analisadores[0]({ entrada, posição })
-  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
+  const resultado_1 = analisadores[0]({ entrada, posição })
+  if (resultado_1.erro) return resultado_1
   if (analisadores.length === 1) return {
-    valor: [valor_1],
-    posição: posição_1,
+    valor: [resultado_1.valor],
+    posição: resultado_1.posição,
   }
-  const { valor: valor_2, posição: posição_2 } = sequência(...analisadores.slice(1))({entrada, posição: posição_1})
-  if (valor_2 instanceof Error) return { valor: valor_2, posição: posição_2 }
+  const resultado_2 = sequência(...analisadores.slice(1))({entrada, posição: resultado_1.posição})
+  if (resultado_2.erro) return resultado_2
   return {
-    valor: [valor_1, ...valor_2],
-    posição: posição_2,
+    valor: [resultado_1.valor, ...resultado_2.valor],
+    posição: resultado_2.posição,
   }
 }
 
 const sequência_literal = (...analisadores) => ({ entrada, posição }) => {
-  const { valor: valor_1, posição: posição_1 } = analisadores[0]({entrada, posição})
-  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
-  if (analisadores.length === 1) return { valor: valor_1, posição: posição_1 }
-  const { valor: valor_2, posição: posição_2 } = sequência_literal(...analisadores.slice(1))({ entrada, posição: posição_1 })
-  if (valor_2 instanceof Error) return { valor: valor_2, posição: posição_2 }
+  const resultado_1 = analisadores[0]({entrada, posição})
+  if (resultado_1.erro || analisadores.length === 1) return resultado_1
+  const resultado_2 = sequência_literal(...analisadores.slice(1))({ entrada, posição: resultado_1.posição })
+  if (resultado_2.erro) return resultado_2
   return {
-    valor: valor_1 + valor_2,
-    posição: posição_2,
+    valor: resultado_1.valor + resultado_2.valor,
+    posição: resultado_2.posição,
   }
 }
 
 const opcional = (analisador, valor_padrão = "") => ({ entrada, posição }) => {
-  const { valor, posição: posição_2 } = analisador({ entrada, posição })
-  if (posição_2 > posição) return { valor, posição: posição_2 }
+  const resultado = analisador({ entrada, posição })
+  if (resultado.posição > posição) return resultado
   return {
-    valor: valor instanceof Error ? valor_padrão : valor,
+    valor: valor_padrão,
     posição,
   }
 }
 
 const inverso = analisador => ({ entrada, posição }) => {
-  if (posição >= entrada.length) return { valor: new Error("/./"), posição }
-  const { valor, } = analisador({ entrada, posição })
-  if (valor instanceof Error) return {
+  if (posição >= entrada.length) return { erro: "/./", posição }
+  const resultado = analisador({ entrada, posição })
+  if (resultado.erro) return {
     valor: entrada[posição],
     posição: posição + 1,
   }
-  return { valor: new Error(`! "${entrada[posição]}"`), posição }
+  return { erro: `! "${entrada[posição]}"`, posição }
 }
 
 const encadeamento = (analisador, continuação) => ({ entrada, posição }) => {
-  const { valor: valor_1, posição: posição_1 } = analisador({ entrada, posição })
-  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
-  const { valor: valor_2, posição: posição_2 } = continuação(valor_1)({ entrada, posição: posição_1 })
-  if (valor_2 instanceof Error) return { valor: valor_2, posição: posição_2 }
-  return {
-    valor: valor_2,
-    posição: posição_2,
-  }
+  const resultado_1 = analisador({ entrada, posição })
+  if (resultado_1.erro) return resultado_1
+  return continuação(resultado_1.valor)({ entrada, posição: resultado_1.posição })
 }
 
 const transformação = (analisador, transformador) => ({ entrada, posição }) => {
-  const { valor: valor_1, posição: posição_2 } = analisador({ entrada, posição })
-  if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_2 }
+  const resultado = analisador({ entrada, posição })
+  if (resultado.erro) return resultado
   return {
     valor: escopo => {
-      const valor_2 = transformador(valor_1)(escopo)
-      if (valor_2 instanceof Error) {
-        if (valor_2.cause !== undefined) return valor_2
-        return new Error(valor_2.message, {
+      const valor = transformador(resultado.valor)(escopo)
+      if (valor instanceof Error) {
+        if (valor.cause !== undefined) return valor
+        return new Error(valor.message, {
           cause: {
             início: posição,
-            fim: posição_2,
+            fim: resultado.posição,
           },
         })
       }
-      return valor_2
+      return valor
     },
-    posição: posição_2,
+    posição: resultado.posição,
   }
 }
 
@@ -292,23 +285,23 @@ const formatar_erro = (entrada, posição, mensagem, arquivo) => {
 }
 
 export const interpretar = ({ entrada, arquivo }) => {
-  const { posição: posição_1 } = espaço({ entrada, posição: 0 })
-  const { valor: valor_2, posição: posição_2 } = expressão({ entrada, posição: posição_1 })
-  if (valor_2 instanceof Error) return {
+  const resultado_1 = espaço({ entrada, posição: 0 })
+  const resultado_2 = expressão({ entrada, posição: resultado_1.posição })
+  if (resultado_2.erro) return {
     saída: "",
-    erro: formatar_erro(entrada, posição_2, valor_2.message, arquivo),
+    erro: formatar_erro(entrada, resultado_2.posição, resultado_2.erro, arquivo),
   }
-  if (posição_2 !== entrada.length) return {
+  if (resultado_2.posição !== entrada.length) return {
     saída: "",
-    erro: formatar_erro(entrada, posição_2, "/$/", arquivo),
+    erro: formatar_erro(entrada, resultado_2.posição, "/$/", arquivo),
   }
-  const valor_3 = valor_2({})
-  if (valor_3 instanceof Error) return {
+  const valor = resultado_2.valor({})
+  if (valor instanceof Error) return {
     saída: "",
-    erro: formatar_erro(entrada, valor_3.cause.início, valor_3.message, arquivo),
+    erro: formatar_erro(entrada, valor.cause.início, valor.message, arquivo),
   }
   return {
-    saída: String(valor_3),
+    saída: typeof valor === "number" ? String(valor) : valor,
     erro: "",
   }
 }
