@@ -77,7 +77,7 @@ const inverso = analisador => ({ entrada, posição }) => {
 const encadeamento = (analisador, continuação) => ({ entrada, posição }) => {
   const { valor: valor_1, posição: posição_1 } = analisador({ entrada, posição })
   if (valor_1 instanceof Error) return { valor: valor_1, posição: posição_1 }
-  const { valor: valor_2, posição: posição_2 } = continuação(valor_1)({ entrada, posição: posição_1, início: posição })
+  const { valor: valor_2, posição: posição_2 } = continuação(valor_1)({ entrada, posição: posição_1 })
   if (valor_2 instanceof Error) return { valor: valor_2, posição: posição_2 }
   return {
     valor: valor_2,
@@ -251,42 +251,32 @@ const comparação_lógica = operação(comparação, {
   "||": (a, b) => a || b,
 })
 
-const expressão =
-  alternativa(
-    encadeamento(
-      identificador_literal,
-      nome => {
-        return ({ entrada, posição: posição_1, início }) => {
-          const { valor: valor_2, posição: posição_2 } = sequência(
-            espaço,
-            símbolo("="),
-            espaço,
-            comparação_lógica,
-          )({ entrada, posição: posição_1 })
-          if (valor_2 instanceof Error) return {
-            valor: escopo => {
-              if (! (nome in escopo)) return new Error(ordenar(Object.keys(escopo)).join(" | "))
-              return escopo[nome](escopo)
-            },
-            posição: início,
-          }
-          const { valor: valor_3, posição: posição_3 } = expressão({ entrada, posição: posição_2 })
-          if (valor_3 instanceof Function) return {
-            valor: escopo => valor_3({
-              ...escopo,
-              [nome]: valor_2[3],
-            }),
-            posição: posição_3,
-          }
-          return {
-            valor: escopo => valor_2[3]({ ...escopo, [nome]: valor_2[3] }),
-            posição: posição_2,
-          }
-        }
-      },
-    ),
+const expressão_com_declarações = nome => transformação(
+  sequência(
+    símbolo("="),
+    espaço,
     comparação_lógica,
-  )
+    espaço,
+    opcional(
+      expressão,
+    ),
+  ),
+  ([, , valor, , próximo]) => escopo => próximo({
+    ...escopo,
+    [nome]: () => valor(escopo),
+  }),
+)
+
+const expressão = alternativa(
+  encadeamento(
+    sequência(
+      identificador_literal,
+      espaço,
+    ),
+    ([nome]) => expressão_com_declarações(nome),
+  ),
+  comparação_lógica,
+)
 
 const formatar_erro = (entrada, posição, mensagem, arquivo) => {
   const linhas = entrada.split("\n")
