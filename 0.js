@@ -2,16 +2,10 @@
 
 const ordenar = lista => lista.sort((a, b) => a.localeCompare(b))
 
-const símbolo = texto => ({ entrada, posição }) => {
-  if (texto[0] !== entrada[posição]) return { erro: `"${texto[0]}"`, posição }
-  if (texto.length === 1) return { valor: texto, posição: posição + 1 }
-  const resultado = símbolo(texto.slice(1))({ entrada, posição: posição + 1 })
-  if (resultado.erro) return { erro: resultado.erro, posição }
-  return {
-    valor: texto[0] + resultado.valor,
-    posição: resultado.posição,
-  }
-}
+const símbolo = texto => ({ entrada, posição }) => entrada.startsWith(texto, posição) ? {
+    valor: texto,
+    posição: posição + texto.length,
+  } : { erro: `"${texto}"`, posição }
 
 const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
   valor: entrada[posição],
