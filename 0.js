@@ -38,6 +38,7 @@ const espaço = opcional(
     ),
     opcional(
       resultado => espaço(resultado),
+      "",
     ),
   )
 )
@@ -179,41 +180,33 @@ const expressão_lógica = transformação(
   ([valor, , próximo]) => próximo(valor)
 )
 
-const declaração = transformação(
+const expressão_iniciada_por_identificador = transformação(
   sequência(
     identificador_literal,
     espaço,
-    símbolo("="),
-    espaço,
-    expressão_lógica,
-    espaço,
-  ),
-  ([identificador, , , , valor]) => ({ [identificador]: valor })
-)
-
-const declarações = transformação(
-  sequência(
-    declaração,
-    espaço,
-    opcional(
-      resultado => declarações(resultado),
+    alternativa(
+      sequência(
+        símbolo("="),
+        espaço,
+        expressão_lógica,
+        espaço,
+        alternativa(
+          resultado => expressão_iniciada_por_identificador(resultado),
+          expressão_lógica,
+        ),
+        espaço,
+      ),
+      comparação_lógica,
     ),
-    espaço,
   ),
-  ([escopo_1, , escopo_2]) => ({ ...escopo_1, ...escopo_2 })
-)
-
-const expressão_iniciada_por_identificador = transformação(
-  sequência(
-    declarações,
-    espaço,
-    expressão_lógica,
-    espaço,
-  ),
-  ([escopo_1, , expressão_final]) => escopo_2 => expressão_final({
-    ...escopo_1,
-    ...escopo_2,
-  })
+  ([identificador_1, , próximo_1]) => escopo => {
+    if (próximo_1 instanceof Function) return próximo_1(() => escopo[identificador_1](escopo))(escopo)
+    const [, , valor_1, , próximo_2] = próximo_1
+    return próximo_2({
+      ...escopo,
+      [identificador_1]: valor_1,
+    })
+  }
 )
 
 const expressão = alternativa(
