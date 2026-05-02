@@ -1,5 +1,7 @@
 import { ordenar } from "./lista.js"
 
+export const vazio = ({ posição }) => ({ posição })
+
 export const símbolo = texto => ({ entrada, posição }) => entrada.startsWith(texto, posição) ? {
     valor: texto,
     posição: posição + texto.length,
@@ -45,7 +47,7 @@ export const sequência_literal = (...analisadores) => ({ entrada, posição }) 
   }
 }
 
-export const opcional = (analisador, valor_padrão = "") => ({ entrada, posição }) => {
+export const opcional = (analisador, valor_padrão) => ({ entrada, posição }) => {
   const resultado = analisador({ entrada, posição })
   if (resultado.posição > posição) return resultado
   return {

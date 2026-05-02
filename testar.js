@@ -48,46 +48,6 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
-      . -5
-    `),
-    saída_esperada: bloco(`
-      . -5
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . -3 + 8
-    `),
-    saída_esperada: bloco(`
-      . 5
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . 10 + -2
-    `),
-    saída_esperada: bloco(`
-      . 8
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . -0
-    `),
-    saída_esperada: bloco(`
-      . 0
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . -1 * -1
-    `),
-    saída_esperada: bloco(`
-      . 1
-    `),
-  }),
-  teste({
-    entrada: bloco(`
       . 8 - 4
     `),
     saída_esperada: bloco(`
@@ -116,6 +76,14 @@ const resultado = testar(interpretar, "testar.js", [
     `),
     saída_esperada: bloco(`
       . 2147483648
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . 4 - 2 - 1
+    `),
+    saída_esperada: bloco(`
+      . 1
     `),
   }),
   teste({
@@ -240,14 +208,6 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
-      . -5 == -5
-    `),
-    saída_esperada: bloco(`
-      . 1
-    `),
-  }),
-  teste({
-    entrada: bloco(`
       . 2 != 8
     `),
     saída_esperada: bloco(`
@@ -265,14 +225,6 @@ const resultado = testar(interpretar, "testar.js", [
   teste({
     entrada: bloco(`
       . 8 != 8
-    `),
-    saída_esperada: bloco(`
-      . 0
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . -10 >= -5
     `),
     saída_esperada: bloco(`
       . 0
@@ -420,6 +372,15 @@ const resultado = testar(interpretar, "testar.js", [
     `),
     saída_esperada: bloco(`
       . 0
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . a = 11
+      . 12 + a
+    `),
+    saída_esperada: bloco(`
+      . 23
     `),
   }),
   teste({

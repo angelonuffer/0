@@ -10,6 +10,7 @@ import {
   transformação,
   encadeamento,
   sequência,
+  vazio,
 } from "./dialeto.js"
 import { ordenar } from "./lista.js"
 
@@ -45,20 +46,13 @@ const número_natural_literal = sequência_literal(
   faixa("0", "9"),
   opcional(
     resultado => número_natural_literal(resultado),
+    "",
   ),
 )
 
 const número = transformação(
-  sequência(
-    opcional(
-      símbolo("-"),
-    ),
-    número_natural_literal,
-  ),
-  ([sinal, corpo]) => {
-    const número = Number(corpo)
-    return () => sinal === "-" ? -número : número
-  }
+  número_natural_literal,
+  (corpo) => () =>  Number(corpo),
 )
 
 const negação = transformação(
@@ -89,6 +83,7 @@ const identificador_literal = sequência_literal(
   ),
   opcional(
     resultado => identificador_literal(resultado),
+    "",
   ),
 )
 
@@ -109,9 +104,12 @@ const átomo = alternativa(
   constante,
 )
 
-const operação = (operando, operadores) => transformação(
+const operação = (operação_precedente, operadores) => transformação(
   sequência(
-    operando,
+    opcional(
+      operação_precedente,
+      a => a,
+    ),
     espaço,
     opcional(
       sequência(
@@ -119,24 +117,36 @@ const operação = (operando, operadores) => transformação(
           ...Object.keys(operadores).map(símbolo),
         ),
         espaço,
-        resultado => operação(operando, operadores)(resultado),
+        átomo,
+        espaço,
+        opcional(
+          operação_precedente,
+          b => b,
+        ),
+        espaço,
+        opcional(
+          resultado => operação(operação_precedente, operadores)(resultado),
+        ),
         espaço,
       ),
+      [],
     ),
   ),
-  ([a, , [operador, , b]]) => {
-    if (operador === undefined) return a
+  ([operação_precedente_a, , [operador, , b, , operação_precedente_b, , próximo]]) => a => {
+    if (operador === undefined) return operação_precedente_a(a)
     return escopo => {
-      const valor_a = a(escopo)
+      const valor_a = operação_precedente_a(a)(escopo)
       if (valor_a instanceof Error) return valor_a
-      const valor_b = b(escopo)
+      const valor_b = operação_precedente_b(b)(escopo)
       if (valor_b instanceof Error) return valor_b
-      return operadores[operador](valor_a, valor_b)
+      const resultado = operadores[operador](valor_a, valor_b)
+      if (! próximo) return resultado
+      return próximo(() => resultado)(escopo)
     }
   }
 )
 
-const produto = operação(átomo, {
+const produto = operação(vazio, {
   "*": (a, b) => a * b,
   "/": (a, b) => a / b,
 })
@@ -160,31 +170,55 @@ const comparação_lógica = operação(comparação, {
   "||": (a, b) => a || b,
 })
 
-const expressão_com_declarações = nome => transformação(
+const expressão_lógica = transformação(
   sequência(
-    símbolo("="),
+    átomo,
     espaço,
     comparação_lógica,
+  ),
+  ([valor, , próximo]) => próximo(valor)
+)
+
+const declaração = transformação(
+  sequência(
+    identificador_literal,
+    espaço,
+    símbolo("="),
+    espaço,
+    expressão_lógica,
+    espaço,
+  ),
+  ([identificador, , , , valor]) => ({ [identificador]: valor })
+)
+
+const declarações = transformação(
+  sequência(
+    declaração,
     espaço,
     opcional(
-      expressão,
+      resultado => declarações(resultado),
     ),
+    espaço,
   ),
-  ([, , valor, , próximo]) => escopo => próximo({
-    ...escopo,
-    [nome]: () => valor(escopo),
-  }),
+  ([escopo_1, , escopo_2]) => ({ ...escopo_1, ...escopo_2 })
+)
+
+const expressão_iniciada_por_identificador = transformação(
+  sequência(
+    declarações,
+    espaço,
+    expressão_lógica,
+    espaço,
+  ),
+  ([escopo_1, , expressão_final]) => escopo_2 => expressão_final({
+    ...escopo_1,
+    ...escopo_2,
+  })
 )
 
 const expressão = alternativa(
-  encadeamento(
-    sequência(
-      identificador_literal,
-      espaço,
-    ),
-    ([nome]) => expressão_com_declarações(nome),
-  ),
-  comparação_lógica,
+  expressão_iniciada_por_identificador,
+  expressão_lógica,
 )
 
 const formatar_erro = (entrada, posição, mensagem, arquivo) => {
