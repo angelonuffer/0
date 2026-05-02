@@ -14,28 +14,10 @@ npx angelonuffer/0 <módulo.0>
 
 Avalia a expressão final do módulo e imprime o resultado.
 
-## Executar os testes do núcleo
+## Executar os testes
 
 ```bash
 node testar.js
-```
-
-Opções úteis para execução dos testes:
-
-- `--exiba-todos`: exibe todas as falhas (modo não fail‑fast).
-- `--verifique-restantes`: após exibir a primeira falha, continua executando os testes restantes silenciosamente apenas para ajustar a contagem final de testes aprovados.
-
-Exemplos:
-
-```bash
-# modo padrão: para na primeira falha
-node testar.js
-
-# ver todas as falhas
-node testar.js --exiba-todos
-
-# exibe só a primeira falha, mas verifica silenciosamente o restante para contagem precisa
-node testar.js --verifique-restantes
 ```
 
 ## Teste de integração com outro repositório
