@@ -94,8 +94,10 @@ const identificador_literal = sequência_literal(
 
 const constante = transformação(
   identificador_literal,
-  valor => escopo => {
-    if (! (valor in escopo)) return new Error(ordenar(Object.keys(escopo)).join(" | "))
+  (valor, início, fim) => escopo => {
+    if (! (valor in escopo)) return new Error(ordenar(Object.keys(escopo)).join(" | "), {
+      cause: { início, fim },
+    })
     return escopo[valor](escopo)
   }
 )

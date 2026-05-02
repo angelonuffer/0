@@ -74,19 +74,7 @@ export const transformação = (analisador, transformador) => ({ entrada, posiç
   const resultado = analisador({ entrada, posição })
   if (resultado.erro) return resultado
   return {
-    valor: escopo => {
-      const valor = transformador(resultado.valor)(escopo)
-      if (valor instanceof Error) {
-        if (valor.cause !== undefined) return valor
-        return new Error(valor.message, {
-          cause: {
-            início: posição,
-            fim: resultado.posição,
-          },
-        })
-      }
-      return valor
-    },
+    valor: transformador(resultado.valor, posição, resultado.posição),
     posição: resultado.posição,
   }
 }
