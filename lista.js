@@ -1,0 +1,1 @@
+export const ordenar = lista => lista.sort((a, b) => a.localeCompare(b))
