@@ -163,6 +163,39 @@ const tamanho = transformação(
   }
 )
 
+const elementos_lista = transformação(
+  sequência(
+    resultado => expressão_lógica(resultado),
+    espaço,
+    opcional(
+      sequência(
+        símbolo(";"),
+        espaço,
+        resultado => elementos_lista(resultado),
+      ),
+    ),
+  ),
+  ([primeiro, , resto]) => {
+    if (!resto) return [primeiro]
+    const [, , restante] = resto
+    return [primeiro, ...restante]
+  }
+)
+
+const lista_literal = transformação(
+  sequência(
+    símbolo("["),
+    espaço,
+    opcional(
+      resultado => elementos_lista(resultado),
+      [],
+    ),
+    espaço,
+    símbolo("]"),
+  ),
+  ([, , elementos]) => escopo => elementos.map(e => e(escopo))
+)
+
 const átomo = alternativa(
   número,
   negação,
@@ -171,6 +204,7 @@ const átomo = alternativa(
   texto_literal,
   modelo_texto,
   tamanho,
+  lista_literal,
 )
 
 const operação = (operação_precedente, operadores) => transformação(

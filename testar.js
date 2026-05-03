@@ -32,7 +32,7 @@ const resultado = testar(interpretar, "testar.js", [
       . +
     `),
     erro_esperado: bloco(`
-      . ⛔ "_" | "!" | "(" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
+      . ⛔ "_" | "!" | "(" | "[" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
       . 📄 testar.js
       . 👉 1: +
       .       ^ 1
@@ -561,24 +561,6 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
-      . lista = [ 1 ; 2 ; 3 ]
-      . lista * ","
-    `),
-    saída_esperada: bloco(`
-      . 1,2,3
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . lista = [ "a" ; "b" ; "c" ]
-      . lista * "-"
-    `),
-    saída_esperada: bloco(`
-      . a-b-c
-    `),
-  }),
-  teste({
-    entrada: bloco(`
       . lista = [ 2 ; 3 ]
       . lista 0
     `),
@@ -620,6 +602,24 @@ const resultado = testar(interpretar, "testar.js", [
     `),
     saída_esperada: bloco(`
       . 30
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista = [ 1 ; 2 ; 3 ]
+      . lista * ","
+    `),
+    saída_esperada: bloco(`
+      . 1,2,3
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista = [ "a" ; "b" ; "c" ]
+      . lista * "-"
+    `),
+    saída_esperada: bloco(`
+      . a-b-c
     `),
   }),
   teste({
