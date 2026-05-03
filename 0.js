@@ -112,6 +112,43 @@ const texto_literal = transformação(
   ([, caracteres, ]) => () => caracteres.join(""),
 )
 
+const interpolação = transformação(
+  sequência(
+    símbolo("${"),
+    resultado => expressão(resultado),
+    símbolo("}"),
+  ),
+  ([, expr, ]) => escopo => {
+    const val = expr(escopo)
+    if (val instanceof Error) return val
+    return String(val)
+  },
+)
+
+const modelo_texto = transformação(
+  sequência(
+    símbolo("`"),
+    zero_ou_mais(
+      alternativa(
+        interpolação,
+        inverso(símbolo("`")),
+      ),
+    ),
+    símbolo("`"),
+  ),
+  ([, segmentos, ]) => escopo => {
+    const partes = segmentos.reduce((acc, seg) => {
+      if (acc instanceof Error) return acc
+      if (typeof seg === "string") return [...acc, seg]
+      const val = seg(escopo)
+      if (val instanceof Error) return val
+      return [...acc, val]
+    }, [])
+    if (partes instanceof Error) return partes
+    return partes.join("")
+  },
+)
+
 const tamanho = transformação(
   sequência(
     símbolo("#"),
@@ -132,6 +169,7 @@ const átomo = alternativa(
   parênteses,
   constante,
   texto_literal,
+  modelo_texto,
   tamanho,
 )
 

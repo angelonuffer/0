@@ -32,7 +32,7 @@ const resultado = testar(interpretar, "testar.js", [
       . +
     `),
     erro_esperado: bloco(`
-      . ⛔ "_" | "!" | "(" | "\\"" | "#" | /[0-9]/ | /[a-z]/ | /[A-Z]/
+      . ⛔ "_" | "!" | "(" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
       . 📄 testar.js
       . 👉 1: +
       .       ^ 1
