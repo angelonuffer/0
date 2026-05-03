@@ -248,6 +248,16 @@ const expressão_lógica = transformação(
   ([valor, , próximo]) => próximo(valor)
 )
 
+const aplicação = transformação(
+  átomo,
+  (argumento, início, fim) => função => escopo => {
+    console.log(função(escopo))
+    const valor_função = função(escopo)
+    if (valor_função instanceof Error) return valor_função
+    return valor_função[argumento(escopo)]
+  },
+)
+
 const expressão_iniciada_por_identificador = transformação(
   sequência(
     identificador_literal,
@@ -264,27 +274,17 @@ const expressão_iniciada_por_identificador = transformação(
         ),
         espaço,
       ),
-      sequência(
-        átomo,
-      ),
+      aplicação,
       comparação_lógica,
     ),
   ),
   ([identificador_1, , próximo_1]) => escopo => {
     if (próximo_1 instanceof Function) return próximo_1(() => escopo[identificador_1](escopo))(escopo)
-    if (próximo_1[0] === "=") {
-      const [, , valor_1, , próximo_2] = próximo_1
-      return próximo_2({
-        ...escopo,
-        [identificador_1]: valor_1,
-      })
-    }
-    const base = escopo[identificador_1](escopo)
-    if (base instanceof Error) return base
-    const [idx_fn] = próximo_1
-    const idx = idx_fn(escopo)
-    if (idx instanceof Error) return idx
-    return base[idx]
+    const [, , valor_1, , próximo_2] = próximo_1
+    return próximo_2({
+      ...escopo,
+      [identificador_1]: valor_1,
+    })
   }
 )
 
