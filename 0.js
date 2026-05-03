@@ -285,7 +285,6 @@ const expressão_lógica = transformação(
 const aplicação = transformação(
   átomo,
   (argumento, início, fim) => função => escopo => {
-    console.log(função(escopo))
     const valor_função = função(escopo)
     if (valor_função instanceof Error) return valor_função
     return valor_função[argumento(escopo)]
