@@ -83,9 +83,13 @@ const identificador_literal = sequência_literal(
     faixa("A", "Z"),
     símbolo("_"),
   ),
-  opcional(
-    resultado => identificador_literal(resultado),
-    "",
+  zero_ou_mais(
+    alternativa(
+      faixa("a", "z"),
+      faixa("A", "Z"),
+      símbolo("_"),
+      faixa("0", "9"),
+    ),
   ),
 )
 
@@ -166,7 +170,7 @@ const tamanho = transformação(
 
 const elementos_lista = transformação(
   sequência(
-    resultado => expressão_lógica(resultado),
+    resultado => expressão(resultado),
     espaço,
     opcional(
       sequência(

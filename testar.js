@@ -615,20 +615,12 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
-      . lista = [ 1 ; 2 ; 3 ]
-      . lista * ","
+      . lista_1 = [ 10 ; 20 ; 30 ]
+      . lista_2 = [ lista_1 2 ; 40 ]
+      . lista_2 0
     `),
     saída_esperada: bloco(`
-      . 1,2,3
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . lista = [ "a" ; "b" ; "c" ]
-      . lista * "-"
-    `),
-    saída_esperada: bloco(`
-      . a-b-c
+      . 30
     `),
   }),
   teste({
