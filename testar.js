@@ -579,6 +579,15 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
+      . lista = [ 2 ; 3 ]
+      . #lista
+    `),
+    saída_esperada: bloco(`
+      . 2
+    `),
+  }),
+  teste({
+    entrada: bloco(`
       . lista = [[ 1 ; 2 ] ; [ 3 ; 4 ]]
       . lista 0 1
     `),

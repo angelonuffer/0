@@ -157,6 +157,7 @@ const tamanho = transformação(
   ([, valor], início, fim) => escopo => {
     const valor_escopo = valor(escopo)
     if (typeof valor_escopo === "string" || Array.isArray(valor_escopo)) return valor_escopo.length
+    if (typeof valor_escopo === "function") return valor_escopo("#")
     return new Error("#[] | #\"\"", {
       cause: { início, fim },
     })
@@ -193,7 +194,16 @@ const lista_literal = transformação(
     espaço,
     símbolo("]"),
   ),
-  ([, , elementos]) => escopo => elementos.map(e => e(escopo))
+  ([, , elementos], início, fim) => escopo => i => {
+    if (i === "#") return elementos.length
+    if (typeof i !== "number") return new Error("[0-9]+", {
+      cause: { início, fim },
+    })
+    if (i < 0 || i >= elementos.length) return new Error("0-" + (elementos.length - 1), {
+      cause: { início, fim },
+    })
+    return elementos[i](escopo)
+  }
 )
 
 const átomo = alternativa(
@@ -287,7 +297,9 @@ const aplicação = transformação(
   (argumento, início, fim) => função => escopo => {
     const valor_função = função(escopo)
     if (valor_função instanceof Error) return valor_função
-    return valor_função[argumento(escopo)]
+    const idx = argumento(escopo)
+    if (typeof valor_função === "function") return valor_função(idx)
+    return valor_função[idx]
   },
 )
 
