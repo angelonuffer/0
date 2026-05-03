@@ -293,13 +293,20 @@ const expressão_lógica = transformação(
 )
 
 const aplicação = transformação(
-  átomo,
-  (argumento, início, fim) => função => escopo => {
+  sequência(
+    expressão_lógica,
+    espaço,
+    opcional(
+      resultado => aplicação(resultado),
+    ),
+  ),
+  ([argumento, , próxima], início, fim) => função => escopo => {
     const valor_função = função(escopo)
     if (valor_função instanceof Error) return valor_função
     const idx = argumento(escopo)
-    if (typeof valor_função === "function") return valor_função(idx)
-    return valor_função[idx]
+    const resultado = typeof valor_função === "function" ? valor_função(idx) : valor_função[idx]
+    if (! próxima) return resultado
+    return próxima(() => resultado)(escopo)
   },
 )
 
