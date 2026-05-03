@@ -32,7 +32,7 @@ const resultado = testar(interpretar, "testar.js", [
       . +
     `),
     erro_esperado: bloco(`
-      . ⛔ "_" | "!" | "(" | /[0-9]/ | /[a-z]/ | /[A-Z]/
+      . ⛔ "_" | "!" | "(" | "\\"" | /[0-9]/ | /[a-z]/ | /[A-Z]/
       . 📄 testar.js
       . 👉 1: +
       .       ^ 1
@@ -524,56 +524,11 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
-      . lista = [1, 2, 3]
-      . lista * ","
+      . str = "abcdef"
+      . str
     `),
     saída_esperada: bloco(`
-      . 1,2,3
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . lista = ["a", "b", "c"]
-      . lista * "-"
-    `),
-    saída_esperada: bloco(`
-      . a-b-c
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . lista = [2, 3]
-      . lista 0
-    `),
-    saída_esperada: bloco(`
-      . 2
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . lista = [2, 3]
-      . lista 1
-    `),
-    saída_esperada: bloco(`
-      . 3
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . lista = [[1, 2], [3, 4]]
-      . lista 0 1
-    `),
-    saída_esperada: bloco(`
-      . 2
-    `),
-  }),
-  teste({
-    entrada: bloco(`
-      . lista = [1, 2, 3]
-      . lista 2
-    `),
-    saída_esperada: bloco(`
-      . 3
+      . abcdef
     `),
   }),
   teste({
@@ -582,13 +537,13 @@ const resultado = testar(interpretar, "testar.js", [
       . str 5
     `),
     saída_esperada: bloco(`
-      . 6
+      . f
     `),
   }),
   teste({
     entrada: bloco(`
       . a = "abcd"
-      . a
+      . #a
     `),
     saída_esperada: bloco(`
       . 4
@@ -596,21 +551,75 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
-      . lista = [10, 20, 30]
-      . lista 1 + 1
+      . nome = "Alice"
+      . sobrenome = "Silva"
+      . \`\${nome} \${sobrenome}\`
     `),
     saída_esperada: bloco(`
-      . 30
+      . Alice Silva
     `),
   }),
   teste({
     entrada: bloco(`
-      . nome = "Alice"
-      . sobrenome = "Silva"
-      . nome + " " + sobrenome
+      . lista = [ 1 ; 2 ; 3 ]
+      . lista * ","
     `),
     saída_esperada: bloco(`
-      . Alice Silva
+      . 1,2,3
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista = [ "a" ; "b" ; "c" ]
+      . lista * "-"
+    `),
+    saída_esperada: bloco(`
+      . a-b-c
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista = [ 2 ; 3 ]
+      . lista 0
+    `),
+    saída_esperada: bloco(`
+      . 2
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista = [ 2 ; 3 ]
+      . lista 1
+    `),
+    saída_esperada: bloco(`
+      . 3
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista = [[ 1 ; 2 ] ; [ 3 ; 4 ]]
+      . lista 0 1
+    `),
+    saída_esperada: bloco(`
+      . 2
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista = [ 1 ; 2 ; 3 ]
+      . lista 2
+    `),
+    saída_esperada: bloco(`
+      . 3
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista = [ 10 ; 20 ; 30 ]
+      . lista 1 + 1
+    `),
+    saída_esperada: bloco(`
+      . 30
     `),
   }),
   teste({

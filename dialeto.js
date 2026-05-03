@@ -3,9 +3,9 @@ import { ordenar } from "./lista.js"
 export const vazio = ({ posição }) => ({ posição })
 
 export const símbolo = texto => ({ entrada, posição }) => entrada.startsWith(texto, posição) ? {
-    valor: texto,
-    posição: posição + texto.length,
-  } : { erro: `"${texto}"`, posição }
+  valor: texto,
+  posição: posição + texto.length,
+} : { erro: `"${texto.replace(/"/g, '\\"')}"`, posição }
 
 export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
   valor: entrada[posição],
@@ -43,6 +43,20 @@ export const sequência_literal = (...analisadores) => ({ entrada, posição }) 
   if (resultado_2.erro) return resultado_2
   return {
     valor: resultado_1.valor + resultado_2.valor,
+    posição: resultado_2.posição,
+  }
+}
+
+export const zero_ou_mais = analisador => ({ entrada, posição }) => {
+  const resultado = analisador({ entrada, posição })
+  if (resultado.erro) return {
+    valor: [],
+    posição,
+  }
+  const resultado_2 = zero_ou_mais(analisador)({ entrada, posição: resultado.posição })
+  if (resultado_2.erro) return resultado
+  return {
+    valor: [resultado.valor, ...resultado_2.valor],
     posição: resultado_2.posição,
   }
 }

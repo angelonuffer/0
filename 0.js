@@ -11,6 +11,7 @@ import {
   encadeamento,
   sequência,
   vazio,
+  zero_ou_mais,
 } from "./dialeto.js"
 import { ordenar } from "./lista.js"
 
@@ -98,11 +99,25 @@ const constante = transformação(
   }
 )
 
+const texto_literal = transformação(
+  sequência(
+    símbolo('"'),
+    zero_ou_mais(
+      inverso(
+        símbolo('"'),
+      ),
+    ),
+    símbolo('"'),
+  ),
+  ([, caracteres, ]) => () => caracteres.join(""),
+)
+
 const átomo = alternativa(
   número,
   negação,
   parênteses,
   constante,
+  texto_literal,
 )
 
 const operação = (operação_precedente, operadores) => transformação(
