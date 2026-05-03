@@ -264,16 +264,27 @@ const expressão_iniciada_por_identificador = transformação(
         ),
         espaço,
       ),
+      sequência(
+        átomo,
+      ),
       comparação_lógica,
     ),
   ),
   ([identificador_1, , próximo_1]) => escopo => {
     if (próximo_1 instanceof Function) return próximo_1(() => escopo[identificador_1](escopo))(escopo)
-    const [, , valor_1, , próximo_2] = próximo_1
-    return próximo_2({
-      ...escopo,
-      [identificador_1]: valor_1,
-    })
+    if (próximo_1[0] === "=") {
+      const [, , valor_1, , próximo_2] = próximo_1
+      return próximo_2({
+        ...escopo,
+        [identificador_1]: valor_1,
+      })
+    }
+    const base = escopo[identificador_1](escopo)
+    if (base instanceof Error) return base
+    const [idx_fn] = próximo_1
+    const idx = idx_fn(escopo)
+    if (idx instanceof Error) return idx
+    return base[idx]
   }
 )
 
