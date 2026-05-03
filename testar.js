@@ -32,7 +32,7 @@ const resultado = testar(interpretar, "testar.js", [
       . +
     `),
     erro_esperado: bloco(`
-      . ⛔ "_" | "!" | "(" | "\\"" | /[0-9]/ | /[a-z]/ | /[A-Z]/
+      . ⛔ "_" | "!" | "(" | "\\"" | "#" | /[0-9]/ | /[a-z]/ | /[A-Z]/
       . 📄 testar.js
       . 👉 1: +
       .       ^ 1
@@ -533,15 +533,6 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
-      . str = "abcdef"
-      . str 5
-    `),
-    saída_esperada: bloco(`
-      . f
-    `),
-  }),
-  teste({
-    entrada: bloco(`
       . a = "abcd"
       . #a
     `),
@@ -557,6 +548,15 @@ const resultado = testar(interpretar, "testar.js", [
     `),
     saída_esperada: bloco(`
       . Alice Silva
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . str = "abcdef"
+      . str 5
+    `),
+    saída_esperada: bloco(`
+      . f
     `),
   }),
   teste({

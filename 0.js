@@ -112,12 +112,27 @@ const texto_literal = transformação(
   ([, caracteres, ]) => () => caracteres.join(""),
 )
 
+const tamanho = transformação(
+  sequência(
+    símbolo("#"),
+    resultado => átomo(resultado),
+  ),
+  ([, valor], início, fim) => escopo => {
+    const valor_escopo = valor(escopo)
+    if (typeof valor_escopo === "string" || Array.isArray(valor_escopo)) return valor_escopo.length
+    return new Error("#[] | #\"\"", {
+      cause: { início, fim },
+    })
+  }
+)
+
 const átomo = alternativa(
   número,
   negação,
   parênteses,
   constante,
   texto_literal,
+  tamanho,
 )
 
 const operação = (operação_precedente, operadores) => transformação(
