@@ -77,20 +77,23 @@ const parênteses = transformação(
   ([, , valor, , ]) => valor,
 )
 
-const identificador_literal = sequência_literal(
-  alternativa(
-    faixa("a", "z"),
-    faixa("A", "Z"),
-    símbolo("_"),
-  ),
-  zero_ou_mais(
+const identificador_literal = transformação(
+  sequência(
     alternativa(
       faixa("a", "z"),
       faixa("A", "Z"),
       símbolo("_"),
-      faixa("0", "9"),
+    ),
+    zero_ou_mais(
+      alternativa(
+        faixa("a", "z"),
+        faixa("A", "Z"),
+        símbolo("_"),
+        faixa("0", "9"),
+      ),
     ),
   ),
+  ([primeira_letra, resto]) => primeira_letra + resto.join(""),
 )
 
 const constante = transformação(
@@ -170,7 +173,12 @@ const tamanho = transformação(
 
 const elementos_lista = transformação(
   sequência(
-    resultado => expressão(resultado),
+    sequência(
+      opcional(
+        símbolo("..."),
+      ),
+      resultado => expressão(resultado),
+    ),
     espaço,
     opcional(
       sequência(
@@ -198,15 +206,34 @@ const lista_literal = transformação(
     espaço,
     símbolo("]"),
   ),
-  ([, , elementos], início, fim) => escopo => i => {
-    if (i === "#") return elementos.length
-    if (typeof i !== "number") return new Error("[0-9]+", {
-      cause: { início, fim },
-    })
-    if (i < 0 || i >= elementos.length) return new Error("0-" + (elementos.length - 1), {
-      cause: { início, fim },
-    })
-    return elementos[i](escopo)
+  ([, , elementos], início, fim) => escopo => {
+    const tamanho = (i = 0) => {
+      if (i === elementos.length) return 0
+      if (elementos[i][0] === "...") return elementos[i][1](escopo)("#") + tamanho(i + 1)
+      return 1 + tamanho(i + 1)
+    }
+    const obter = (i_resultado, i_elementos = 0, i_atual = 0) => {
+      if (i_resultado < 0 || i_elementos === elementos.length) return new Error("0-" + (tamanho() - 1), {
+        cause: { início, fim },
+      })
+      if (elementos[i_elementos][0] === "...") {
+        if (i_resultado < i_atual + elementos[i_elementos][1](escopo)("#")) {
+          return elementos[i_elementos][1](escopo)(i_resultado - i_atual)
+        }
+        return obter(i_resultado, i_elementos + 1, i_atual + elementos[i_elementos][1](escopo)("#"))
+      }
+      if (i_resultado === i_atual) {
+        return elementos[i_elementos][1](escopo)
+      }
+      return obter(i_resultado, i_elementos + 1, i_atual + 1)
+    }
+    return i => {
+      if (i === "#") return tamanho()
+      if (typeof i !== "number") return new Error("[0-9]+", {
+        cause: { início, fim },
+      })
+      return obter(i)
+    }
   }
 )
 

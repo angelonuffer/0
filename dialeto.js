@@ -54,7 +54,7 @@ export const zero_ou_mais = analisador => ({ entrada, posição }) => {
     posição,
   }
   const resultado_2 = zero_ou_mais(analisador)({ entrada, posição: resultado.posição })
-  if (resultado_2.erro) return resultado
+  if (resultado_2.erro) return { valor: [resultado.valor], posição: resultado.posição }
   return {
     valor: [resultado.valor, ...resultado_2.valor],
     posição: resultado_2.posição,
