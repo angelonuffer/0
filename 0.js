@@ -12,36 +12,29 @@ import {
   sequência,
   vazio,
   zero_ou_mais,
+  um_ou_mais,
 } from "./dialeto.js"
 import { ordenar } from "./lista.js"
 
-const conteúdo_comentário = sequência_literal(
-  inverso(
-    símbolo("\n"),
-  ),
-  opcional(
-    resultado => conteúdo_comentário(resultado)
-  ),
-)
-
-const espaço = opcional(
-  sequência_literal(
-    alternativa(
-      símbolo(" "),
-      símbolo("\n"),
-      sequência_literal(
-        símbolo("//"),
-        conteúdo_comentário,
-        opcional(
+const espaço_na_linha = um_ou_mais(
+  alternativa(
+    símbolo(" "),
+    sequência_literal(
+      símbolo("//"),
+      zero_ou_mais(
+        inverso(
           símbolo("\n"),
         ),
       ),
     ),
-    opcional(
-      resultado => espaço(resultado),
-      "",
-    ),
-  )
+  ),
+)
+
+const espaço = zero_ou_mais(
+  alternativa(
+    símbolo("\n"),
+    espaço_na_linha,
+  ),
 )
 
 const número_natural_literal = sequência_literal(

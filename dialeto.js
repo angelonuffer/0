@@ -61,6 +61,18 @@ export const zero_ou_mais = analisador => ({ entrada, posição }) => {
   }
 }
 
+export const um_ou_mais = analisador => ({ entrada, posição }) => {
+  const resultado = analisador({ entrada, posição })
+  if (resultado.erro) return resultado
+  const resultado_2 = zero_ou_mais(analisador)({ entrada, posição: resultado.posição })
+  if (resultado_2.erro) return { valor: [resultado.valor], posição: resultado.posição }
+  return {
+    valor: [resultado.valor, ...resultado_2.valor],
+    posição: resultado_2.posição,
+  }
+}
+
+
 export const opcional = (analisador, valor_padrão) => ({ entrada, posição }) => {
   const resultado = analisador({ entrada, posição })
   if (resultado.posição > posição) return resultado
