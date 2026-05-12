@@ -645,6 +645,39 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
+      . lista_1 = [ 10 ; 20 ]
+      . lista_2 = [ 30 ; 40 ]
+      . lista_3 = [ ...lista_1 ; ...lista_2 ]
+      . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
+    `),
+    saída_esperada: bloco(`
+      . 10 20 30 40
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista_1 = [ 10 ; 20 ]
+      . lista_2 = [ ...lista_1 ; 30 ]
+      . lista_3 = [ ...lista_2 ; 40 ]
+      . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
+    `),
+    saída_esperada: bloco(`
+      . 10 20 30 40
+    `),
+  }),
+  teste({
+    entrada: bloco(`
+      . lista_1 = [ 20 ; 30 ]
+      . lista_2 = [ 50 ; 60 ]
+      . lista_3 = [ 10 ; ...lista_1 ; 40 ; ...lista_2 ; 70 ]
+      . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3} \${lista_3 4} \${lista_3 5} \${lista_3 6}\`
+    `),
+    saída_esperada: bloco(`
+      . 10 20 30 40 50 60 70
+    `),
+  }),
+  teste({
+    entrada: bloco(`
       . obj = { a: 1 }
       . obj.a
     `),
