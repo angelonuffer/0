@@ -610,7 +610,7 @@ const resultado = testar(interpretar, "testar.js", [
       . lista 1 + 1
     `),
     saída_esperada: bloco(`
-      . 30
+      . 21
     `),
   }),
   teste({
