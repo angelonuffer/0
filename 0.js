@@ -227,7 +227,7 @@ const operação = (operação_precedente, operadores) => transformação(
       a => a,
     ),
     espaço,
-    opcional(
+    zero_ou_mais(
       sequência(
         alternativa(
           ...Object.keys(operadores).map(símbolo),
@@ -240,25 +240,20 @@ const operação = (operação_precedente, operadores) => transformação(
           b => b,
         ),
         espaço,
-        opcional(
-          resultado => operação(operação_precedente, operadores)(resultado),
-        ),
-        espaço,
       ),
-      [],
     ),
   ),
-  ([operação_precedente_a, , [operador, , b, , operação_precedente_b, , próximo]]) => a => {
-    if (operador === undefined) return operação_precedente_a(a)
-    return escopo => {
-      const valor_a = operação_precedente_a(a)(escopo)
-      if (valor_a instanceof Error) return valor_a
+  ([operação_precedente_a, , operações]) => a => {
+    const aplicar = (valor_a, i = 0) => escopo => {
+      if (i === operações.length) return valor_a(escopo)
+      const [operador, , b, , operação_precedente_b] = operações[i]
+      const atual = valor_a(escopo)
+      if (atual instanceof Error) return atual
       const valor_b = operação_precedente_b(b)(escopo)
       if (valor_b instanceof Error) return valor_b
-      const resultado = operadores[operador](valor_a, valor_b)
-      if (! próximo) return resultado
-      return próximo(() => resultado)(escopo)
+      return aplicar(() => operadores[operador](atual, valor_b), i + 1)(escopo)
     }
+    return aplicar(operação_precedente_a(a))
   }
 )
 
