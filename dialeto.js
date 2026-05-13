@@ -48,26 +48,26 @@ export const sequência_literal = (...analisadores) => ({ entrada, posição }) 
 }
 
 export const zero_ou_mais = analisador => ({ entrada, posição }) => {
-  const resultado = analisador({ entrada, posição })
-  if (resultado.erro) return {
+  const resultado_1 = analisador({ entrada, posição })
+  if (resultado_1.posição <= posição) return {
     valor: [],
     posição,
   }
-  const resultado_2 = zero_ou_mais(analisador)({ entrada, posição: resultado.posição })
-  if (resultado_2.erro) return { valor: [resultado.valor], posição: resultado.posição }
+  const resultado_2 = zero_ou_mais(analisador)({ entrada, posição: resultado_1.posição })
+  if (resultado_2.posição <= resultado_1.posição) return { valor: [resultado_1.valor], posição: resultado_1.posição }
   return {
-    valor: [resultado.valor, ...resultado_2.valor],
+    valor: [resultado_1.valor, ...resultado_2.valor],
     posição: resultado_2.posição,
   }
 }
 
 export const um_ou_mais = analisador => ({ entrada, posição }) => {
-  const resultado = analisador({ entrada, posição })
-  if (resultado.erro) return resultado
-  const resultado_2 = zero_ou_mais(analisador)({ entrada, posição: resultado.posição })
-  if (resultado_2.erro) return { valor: [resultado.valor], posição: resultado.posição }
+  const resultado_1 = analisador({ entrada, posição })
+  if (resultado_1.posição <= posição) return resultado_1
+  const resultado_2 = zero_ou_mais(analisador)({ entrada, posição: resultado_1.posição })
+  if (resultado_2.posição <= resultado_1.posição) return { valor: [resultado_1.valor], posição: resultado_1.posição }
   return {
-    valor: [resultado.valor, ...resultado_2.valor],
+    valor: [resultado_1.valor, ...resultado_2.valor],
     posição: resultado_2.posição,
   }
 }

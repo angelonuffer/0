@@ -16,7 +16,7 @@ import {
 } from "./dialeto.js"
 import { ordenar } from "./lista.js"
 
-const espaço_na_linha = um_ou_mais(
+const espaço_na_linha = zero_ou_mais(
   alternativa(
     símbolo(" "),
     sequência_literal(
@@ -37,17 +37,11 @@ const espaço = zero_ou_mais(
   ),
 )
 
-const número_natural_literal = sequência_literal(
-  faixa("0", "9"),
-  opcional(
-    resultado => número_natural_literal(resultado),
-    "",
-  ),
-)
-
 const número = transformação(
-  número_natural_literal,
-  (corpo) => () =>  Number(corpo),
+  um_ou_mais(
+    faixa("0", "9"),
+  ),
+  (corpo) => () =>  Number(corpo.join("")),
 )
 
 const negação = transformação(
