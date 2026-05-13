@@ -164,19 +164,15 @@ const lista_literal = transformação(
     espaço,
     zero_ou_mais(
       sequência(
-        sequência(
-          opcional(
-            símbolo("..."),
-          ),
-          resultado => expressão(resultado),
+        opcional(
+          símbolo("..."),
         ),
+        resultado => expressão(resultado),
         espaço,
         opcional(
-          sequência(
-            símbolo(";"),
-            espaço,
-          ),
+          símbolo(";"),
         ),
+        espaço,
       ),
     ),
     espaço,
@@ -185,21 +181,21 @@ const lista_literal = transformação(
   ([, , elementos], início, fim) => escopo => {
     const tamanho = (i = 0) => {
       if (i === elementos.length) return 0
-      if (elementos[i][0][0] === "...") return elementos[i][0][1](escopo)("#") + tamanho(i + 1)
+      if (elementos[i][0] === "...") return elementos[i][1](escopo)("#") + tamanho(i + 1)
       return 1 + tamanho(i + 1)
     }
     const obter = (i_resultado, i_elementos = 0, i_atual = 0) => {
       if (i_resultado < 0 || i_elementos === elementos.length) return new Error("0-" + (tamanho() - 1), {
         cause: { início, fim },
       })
-      if (elementos[i_elementos][0][0] === "...") {
-        if (i_resultado < i_atual + elementos[i_elementos][0][1](escopo)("#")) {
-          return elementos[i_elementos][0][1](escopo)(i_resultado - i_atual)
+      if (elementos[i_elementos][0] === "...") {
+        if (i_resultado < i_atual + elementos[i_elementos][1](escopo)("#")) {
+          return elementos[i_elementos][1](escopo)(i_resultado - i_atual)
         }
-        return obter(i_resultado, i_elementos + 1, i_atual + elementos[i_elementos][0][1](escopo)("#"))
+        return obter(i_resultado, i_elementos + 1, i_atual + elementos[i_elementos][1](escopo)("#"))
       }
       if (i_resultado === i_atual) {
-        return elementos[i_elementos][0][1](escopo)
+        return elementos[i_elementos][1](escopo)
       }
       return obter(i_resultado, i_elementos + 1, i_atual + 1)
     }
