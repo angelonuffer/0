@@ -570,6 +570,20 @@ const resultado = testar(interpretar, "testar.js", [
   }),
   teste({
     entrada: bloco(`
+      . lista = [
+      .   4 ;
+      .   5 ;
+      .   6 ;
+      .   7 ;
+      . ]
+      . \`\${lista 0} \${lista 1} \${lista 2} \${lista 3}\`
+    `),
+    saída_esperada: bloco(`
+      . 4 5 6 7
+    `),
+  }),
+  teste({
+    entrada: bloco(`
       . lista = [ 2 ; 3 ]
       . lista 1
     `),

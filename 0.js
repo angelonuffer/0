@@ -158,24 +158,28 @@ const tamanho = transformação(
   }
 )
 
-const lista_literal = transformação(
+const lista = transformação(
   sequência(
     símbolo("["),
-    espaço_na_linha,
+    espaço,
     zero_ou_mais(
       sequência(
         opcional(
           símbolo("..."),
         ),
         resultado => expressão(resultado),
-        espaço_na_linha,
+        espaço,
       ),
       sequência(
         símbolo(";"),
-        espaço_na_linha,
+        espaço,
       ),
     ),
-    espaço_na_linha,
+    espaço,
+    opcional(
+      símbolo(";"),
+    ),
+    espaço,
     símbolo("]"),
   ),
   ([, , elementos], início, fim) => escopo => {
@@ -217,7 +221,7 @@ const átomo = alternativa(
   texto_literal,
   modelo_texto,
   tamanho,
-  lista_literal,
+  lista,
 )
 
 const operação = (operação_precedente, operadores) => transformação(
@@ -309,37 +313,37 @@ const aplicações = transformação(
 )
 
 const expressão_iniciada_por_identificador = transformação(
- sequência(
-   identificador_literal,
-   espaço,
-   opcional(
-     aplicações,
-   ),
-   espaço,
-   alternativa(
-     sequência(
-       símbolo("="),
-       espaço,
-       expressão_lógica,
-       espaço,
-       alternativa(
-         resultado => expressão_iniciada_por_identificador(resultado),
-         expressão_lógica,
-       ),
-       espaço,
-     ),
-     comparação_lógica,
-   ),
- ),
- ([identificador_1, , função_aplicação, , próximo_1]) => escopo => {
-   const valor_1 = (função_aplicação instanceof Function) ? função_aplicação(() => escopo[identificador_1](escopo)) : () => escopo[identificador_1](escopo)
-   if (próximo_1 instanceof Function) return próximo_1(valor_1)(escopo)
-   const [, , valor_2, , próximo_2] = próximo_1
-   return próximo_2({
-     ...escopo,
-     [identificador_1]: valor_2,
-   })
- }
+  sequência(
+    identificador_literal,
+    espaço,
+    opcional(
+      aplicações,
+    ),
+    espaço,
+    alternativa(
+      sequência(
+        símbolo("="),
+        espaço,
+        expressão_lógica,
+        espaço,
+        alternativa(
+          resultado => expressão_iniciada_por_identificador(resultado),
+          expressão_lógica,
+        ),
+        espaço,
+      ),
+      comparação_lógica,
+    ),
+  ),
+  ([identificador_1, , função_aplicação, , próximo_1]) => escopo => {
+    const valor_1 = (função_aplicação instanceof Function) ? função_aplicação(() => escopo[identificador_1](escopo)) : () => escopo[identificador_1](escopo)
+    if (próximo_1 instanceof Function) return próximo_1(valor_1)(escopo)
+    const [, , valor_2, , próximo_2] = próximo_1
+    return próximo_2({
+      ...escopo,
+      [identificador_1]: valor_2,
+    })
+  }
 )
 
 const expressão = alternativa(
