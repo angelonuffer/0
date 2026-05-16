@@ -161,21 +161,21 @@ const tamanho = transformação(
 const lista_literal = transformação(
   sequência(
     símbolo("["),
-    espaço,
+    espaço_na_linha,
     zero_ou_mais(
       sequência(
         opcional(
           símbolo("..."),
         ),
         resultado => expressão(resultado),
-        espaço,
-        opcional(
-          símbolo(";"),
-        ),
-        espaço,
+        espaço_na_linha,
+      ),
+      sequência(
+        símbolo(";"),
+        espaço_na_linha,
       ),
     ),
-    espaço,
+    espaço_na_linha,
     símbolo("]"),
   ),
   ([, , elementos], início, fim) => escopo => {
