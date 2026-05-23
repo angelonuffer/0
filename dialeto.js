@@ -2,13 +2,18 @@ import { ordenar } from "./lista.js"
 
 export const vazio = ({ posição }) => ({ posição })
 
-export const símbolo = texto => ({ entrada, posição }) => entrada.startsWith(texto, posição) ? {
-  valor: texto,
-  posição: posição + texto.length,
-} : { erro: `"${texto.replace(/"/g, '\\"')}"`, posição }
+const caracteres = símbolos => símbolos.map(({ símbolo }) => símbolo).join("")
 
-export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
-  valor: entrada[posição],
+export const símbolo = texto => ({ entrada, posição }) => {
+  const comprimento = [...texto].length
+  return caracteres(entrada.slice(posição, posição + comprimento)) === texto ? {
+    valor: texto,
+    posição: posição + comprimento,
+  } : { erro: `"${texto.replace(/"/g, '\\"')}"`, posição }
+}
+
+export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição]?.símbolo >= de && entrada[posição]?.símbolo <= até ? {
+  valor: entrada[posição].símbolo,
   posição: posição + 1,
 } : { erro: `/[${de}-${até}]/`, posição }
 
@@ -97,10 +102,10 @@ export const inverso = analisador => ({ entrada, posição }) => {
   if (posição >= entrada.length) return { erro: "/./", posição }
   const resultado = analisador({ entrada, posição })
   if (resultado.erro) return {
-    valor: entrada[posição],
+    valor: entrada[posição].símbolo,
     posição: posição + 1,
   }
-  return { erro: `! "${entrada[posição]}"`, posição }
+  return { erro: `! "${entrada[posição].símbolo}"`, posição }
 }
 
 export const encadeamento = (analisador, continuação) => ({ entrada, posição }) => {

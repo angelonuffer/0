@@ -1,6 +1,21 @@
 import { teste, testar } from "./uniteste.js"
-import { interpretar } from "./0.js";
+import { interpretar, analisador_léxico } from "./0.js"
 import { bloco } from "./texto.js"
+
+const símbolos = analisador_léxico(bloco(`
+  . a + 2
+`))
+
+if (JSON.stringify(símbolos) !== JSON.stringify([
+  { símbolo: "a", início: 0, fim: 1 },
+  { símbolo: " ", início: 1, fim: 2 },
+  { símbolo: "+", início: 2, fim: 3 },
+  { símbolo: " ", início: 3, fim: 4 },
+  { símbolo: "2", início: 4, fim: 5 },
+])) {
+  process.stdout.write("🚨 Teste do analisador léxico falhou!\n")
+  process.exit(1)
+}
 
 const resultado = testar(interpretar, "testar.js", [
   teste({

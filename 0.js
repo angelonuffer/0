@@ -16,6 +16,20 @@ import {
 } from "./dialeto.js"
 import { ordenar } from "./lista.js"
 
+export const analisador_léxico = entrada => {
+  const símbolos = []
+  let posição = 0
+  for (const símbolo of entrada) {
+    símbolos.push({
+      símbolo,
+      início: posição,
+      fim: posição + símbolo.length,
+    })
+    posição += símbolo.length
+  }
+  return símbolos
+}
+
 const espaço_na_linha = zero_ou_mais(
   alternativa(
     símbolo(" "),
@@ -351,11 +365,14 @@ const expressão = alternativa(
   expressão_lógica,
 )
 
-const formatar_erro = (entrada, posição, mensagem, arquivo) => {
+const posição_textual = (símbolos, posição, fim_da_entrada) => posição < símbolos.length ? símbolos[posição].início : fim_da_entrada
+
+const formatar_erro = (entrada, símbolos, posição, mensagem, arquivo) => {
+  const posição_na_entrada = posição_textual(símbolos, posição, entrada.length)
   const linhas = entrada.split("\n")
-  const número_linha = linhas.length - entrada.slice(posição).split("\n").length + 1
+  const número_linha = linhas.length - entrada.slice(posição_na_entrada).split("\n").length + 1
   const linha = linhas[número_linha - 1]
-  const número_coluna = linha.length - entrada.slice(posição).split("\n")[0].length + 1
+  const número_coluna = linha.length - entrada.slice(posição_na_entrada).split("\n")[0].length + 1
   return [
     `⛔ ${mensagem}`,
     `📄 ${arquivo}`,
@@ -365,20 +382,21 @@ const formatar_erro = (entrada, posição, mensagem, arquivo) => {
 }
 
 export const interpretar = ({ entrada, arquivo }) => {
-  const resultado_1 = espaço({ entrada, posição: 0 })
-  const resultado_2 = expressão({ entrada, posição: resultado_1.posição })
+  const símbolos = analisador_léxico(entrada)
+  const resultado_1 = espaço({ entrada: símbolos, posição: 0 })
+  const resultado_2 = expressão({ entrada: símbolos, posição: resultado_1.posição })
   if (resultado_2.erro) return {
     saída: "",
-    erro: formatar_erro(entrada, resultado_2.posição, resultado_2.erro, arquivo),
+    erro: formatar_erro(entrada, símbolos, resultado_2.posição, resultado_2.erro, arquivo),
   }
-  if (resultado_2.posição !== entrada.length) return {
+  if (resultado_2.posição !== símbolos.length) return {
     saída: "",
-    erro: formatar_erro(entrada, resultado_2.posição, "/$/", arquivo),
+    erro: formatar_erro(entrada, símbolos, resultado_2.posição, "/$/", arquivo),
   }
   const valor = resultado_2.valor({})
   if (valor instanceof Error) return {
     saída: "",
-    erro: formatar_erro(entrada, valor.cause.início, valor.message, arquivo),
+    erro: formatar_erro(entrada, símbolos, valor.cause.início, valor.message, arquivo),
   }
   return {
     saída: typeof valor === "number" ? String(valor) : valor,
