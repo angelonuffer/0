@@ -3,13 +3,14 @@ import { ordenar } from "./lista.js"
 export const vazio = ({ posição }) => ({ posição })
 
 const caracteres = símbolos => símbolos.map(({ símbolo }) => símbolo).join("")
+const escapar = texto => texto.replace(/\\/g, "\\\\").replace(/"/g, '\\"')
 
 export const símbolo = texto => ({ entrada, posição }) => {
-  const comprimento = [...texto].length
+  const comprimento = Array.from(texto).length
   return caracteres(entrada.slice(posição, posição + comprimento)) === texto ? {
     valor: texto,
     posição: posição + comprimento,
-  } : { erro: `"${texto.replace(/"/g, '\\"')}"`, posição }
+  } : { erro: `"${escapar(texto)}"`, posição }
 }
 
 export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição]?.símbolo >= de && entrada[posição]?.símbolo <= até ? {

@@ -2,9 +2,7 @@ import { teste, testar } from "./uniteste.js"
 import { interpretar, analisador_léxico } from "./0.js"
 import { bloco } from "./texto.js"
 
-const símbolos = analisador_léxico(bloco(`
-  . a + 2
-`))
+const símbolos = analisador_léxico("a + 2")
 
 if (JSON.stringify(símbolos) !== JSON.stringify([
   { símbolo: "a", início: 0, fim: 1 },
