@@ -2,7 +2,12 @@ import { teste, testar } from "./uniteste.js"
 import { interpretar } from "./0.js";
 import { bloco } from "./texto.js"
 
-const resultado = testar(interpretar, "testar.js", [
+const resultado = testar({
+  nome_arquivo: "testar.js",
+  testes: [
+    {
+      função: interpretar,
+      testes: [
   teste({
     entrada: bloco(`
       . 1
@@ -690,7 +695,10 @@ const resultado = testar(interpretar, "testar.js", [
       . 10 20 30 40 50 60 70
     `),
   }),
-])
+      ]
+    }
+  ]
+})
 
 process.stdout.write(resultado.saída + "\n")
 process.exit(resultado.código)

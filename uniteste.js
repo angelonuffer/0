@@ -1,66 +1,107 @@
 import { bloco } from "./texto.js"
+import iguais from "./testar/iguais.js"
 
 export const teste = ({
   entrada,
   saída_esperada = "",
   erro_esperado = "",
-}) => (interpretar, arquivo) => {
-  try {
-    const resultado = interpretar({ entrada, arquivo })
-    return{
-      entrada,
-      saída_esperada,
-      saída: "",
-      erro_esperado,
-      erro: "",
-      ...resultado,
-    }
-  } catch (erro) {
-    return {
-      entrada,
-      saída_esperada,
-      saída: "",
-      erro_esperado,
-      erro: "",
-      erro_interno: erro,
-    }
+}) => ({
+  argumento: { entrada },
+  retorno_esperado: {
+    saída: saída_esperada,
+    erro: erro_esperado,
   }
-}
+})
 
-export const testar = (interpretar, arquivo = "uniteste.js", testes, i = 0) => {
-  const resultado = testes[i](interpretar, arquivo)
-  if (resultado.saída !== resultado.saída_esperada || resultado.erro !== resultado.erro_esperado) {
-    return {
-      código: 1,
-      saída: bloco(`
-        . entrada:
-        .   ${resultado.entrada.replace(/\n/g, "\n  ")}
-      `) + (resultado.saída_esperada !== "" ? bloco(`
-        . 
-        . saída esperada:
-        .   ${resultado.saída_esperada.replace(/\n/g, "\n  ")}
-      `) : "") + (resultado.saída !== "" ? bloco(`
-        . 
-        . saída:
-        .   ${resultado.saída.replace(/\n/g, "\n  ")}
-      `) : "") + (resultado.erro_esperado !== "" ? bloco(`
-        . 
-        . erro esperado:
-        .   ${resultado.erro_esperado.replace(/\n/g, "\n  ")}
-      `) : "") + (resultado.erro !== "" ? bloco(`
-        . 
-        . erro:
-        .   ${resultado.erro.replace(/\n/g, "\n  ")}
-      `) : "") + (resultado.erro_interno ? bloco(`
-        . 
-        . erro interno:
-        .   ${resultado.erro_interno.stack}
-      `) : "") + `\n\n🚨 Teste ${i + 1}/${testes.length} falhou!`,
+export const testar = ({ nome_arquivo, testes: grupos_testes }) => {
+  const total = grupos_testes.reduce((acc, { testes }) => acc + testes.length, 0)
+  let atual = 0
+
+  for (const { função, testes } of grupos_testes) {
+    for (const { argumento, retorno_esperado } of testes) {
+      atual++
+      let resultado
+      let erro_interno
+      try {
+        const arg = (typeof argumento === "object" && argumento !== null)
+          ? { ...argumento, arquivo: nome_arquivo }
+          : argumento
+        resultado = função(arg)
+      } catch (erro) {
+        erro_interno = erro
+      }
+
+      if (erro_interno || !iguais(resultado, retorno_esperado)) {
+        let mensagem = ""
+        if (argumento && argumento.entrada) {
+          mensagem += bloco(`
+            . entrada:
+            .   ${argumento.entrada.replace(/\n/g, "\n  ")}
+          `)
+        }
+
+        const esperado_saída = retorno_esperado?.saída
+        const atual_saída = resultado?.saída
+        const esperado_erro = retorno_esperado?.erro
+        const atual_erro = resultado?.erro
+
+        let mostrado_saída = false
+        if (esperado_saída !== undefined || atual_saída !== undefined) {
+          if (esperado_saída !== "") {
+            mensagem += (mensagem === "" ? "" : "\n") + bloco(`
+              . saída esperada:
+              .   ${String(esperado_saída).replace(/\n/g, "\n  ")}
+            `)
+          }
+          if (atual_saída !== "" && atual_saída !== undefined) {
+            mensagem += (mensagem === "" ? "" : "\n") + bloco(`
+              . saída:
+              .   ${String(atual_saída).replace(/\n/g, "\n  ")}
+            `)
+          }
+          mostrado_saída = true
+        }
+
+        let mostrado_erro = false
+        if (esperado_erro !== undefined || atual_erro !== undefined) {
+          if (esperado_erro !== "") {
+            mensagem += (mensagem === "" ? "" : "\n") + bloco(`
+              . erro esperado:
+              .   ${String(esperado_erro).replace(/\n/g, "\n  ")}
+            `)
+          }
+          if (atual_erro !== "" && atual_erro !== undefined) {
+            mensagem += (mensagem === "" ? "" : "\n") + bloco(`
+              . erro:
+              .   ${String(atual_erro).replace(/\n/g, "\n  ")}
+            `)
+          }
+          mostrado_erro = true
+        }
+
+        if (erro_interno) {
+          mensagem += (mensagem === "" ? "" : "\n") + bloco(`
+            . erro interno:
+            .   ${erro_interno.stack}
+          `)
+        }
+
+        if (!mostrado_saída && !mostrado_erro) {
+          mensagem += (mensagem === "" ? "" : "\n") + `argumento: ${JSON.stringify(argumento, null, 2)}\n`
+          mensagem += `retorno esperado: ${JSON.stringify(retorno_esperado, null, 2)}\n`
+          mensagem += `retorno: ${JSON.stringify(resultado, null, 2)}\n`
+        }
+
+        return {
+          código: 1,
+          saída: mensagem.trimEnd() + `\n\n🚨 Teste ${atual}/${total} falhou!`,
+        }
+      }
     }
   }
-  if (i < testes.length - 1) return testar(interpretar, arquivo, testes, i + 1)
+
   return {
     código: 0,
-    saída: `✅ Todos os ${testes.length} testes passaram!`
+    saída: `✅ Todos os ${total} testes passaram!`,
   }
 }
