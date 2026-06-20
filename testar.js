@@ -4,14 +4,14 @@ import { bloco } from "./texto.js"
 
 const teste = ({
   entrada,
-  saída_esperada = "",
-  erro_esperado = "",
+  saída = "",
+  erro = "",
 }) => ({
   função: interpretar,
   argumento: { entrada, arquivo: "testar.js" },
   retorno_esperado: {
-    saída: saída_esperada,
-    erro: erro_esperado,
+    saída,
+    erro,
   }
 })
 
@@ -20,7 +20,7 @@ const resultado = testar([
     entrada: bloco(`
       . 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -28,7 +28,7 @@ const resultado = testar([
     entrada: bloco(`
       .  1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -36,7 +36,7 @@ const resultado = testar([
     entrada: bloco(`
       . 1 // comentário
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -44,7 +44,7 @@ const resultado = testar([
     entrada: bloco(`
       . +
     `),
-    erro_esperado: bloco(`
+    erro: bloco(`
       . ⛔ "_" | "!" | "(" | "[" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
       . 📄 testar.js
       . 👉 1: +
@@ -55,7 +55,7 @@ const resultado = testar([
     entrada: bloco(`
       . 42 + 5
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 47
     `),
   }),
@@ -63,7 +63,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 - 4
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 4
     `),
   }),
@@ -71,7 +71,7 @@ const resultado = testar([
     entrada: bloco(`
       . 3 * 4
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 12
     `),
   }),
@@ -79,7 +79,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 / 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 4
     `),
   }),
@@ -87,7 +87,7 @@ const resultado = testar([
     entrada: bloco(`
       . 2147483647 + 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 2147483648
     `),
   }),
@@ -95,7 +95,7 @@ const resultado = testar([
     entrada: bloco(`
       . 4 - 2 - 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -103,7 +103,7 @@ const resultado = testar([
     entrada: bloco(`
       . 2 + 3 * 4
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 14
     `),
   }),
@@ -111,7 +111,7 @@ const resultado = testar([
     entrada: bloco(`
       . 10 - 6 / 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 7
     `),
   }),
@@ -119,7 +119,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 / 2 + 3 * 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 10
     `),
   }),
@@ -127,7 +127,7 @@ const resultado = testar([
     entrada: bloco(`
       . (2 + 3) * 4
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 20
     `),
   }),
@@ -135,7 +135,7 @@ const resultado = testar([
     entrada: bloco(`
       . 10 - (6 / 2)
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 7
     `),
   }),
@@ -143,7 +143,7 @@ const resultado = testar([
     entrada: bloco(`
       . 1 + 2 * 3 - 4 / 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 5
     `),
   }),
@@ -151,7 +151,7 @@ const resultado = testar([
     entrada: bloco(`
       . 2 > 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -159,7 +159,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 > 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -167,7 +167,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 > 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -175,7 +175,7 @@ const resultado = testar([
     entrada: bloco(`
       . 2 < 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -183,7 +183,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 < 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -191,7 +191,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 < 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -199,7 +199,7 @@ const resultado = testar([
     entrada: bloco(`
       . 2 == 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -207,7 +207,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 == 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -215,7 +215,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 == 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -223,7 +223,7 @@ const resultado = testar([
     entrada: bloco(`
       . 2 != 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -231,7 +231,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 != 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -239,7 +239,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 != 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -247,7 +247,7 @@ const resultado = testar([
     entrada: bloco(`
       . 2 >= 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -255,7 +255,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 >= 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -263,7 +263,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 >= 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -271,7 +271,7 @@ const resultado = testar([
     entrada: bloco(`
       . 2 <= 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -279,7 +279,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 <= 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -287,7 +287,7 @@ const resultado = testar([
     entrada: bloco(`
       . 8 <= 8
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -295,7 +295,7 @@ const resultado = testar([
     entrada: bloco(`
       . 0 && 0
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -303,7 +303,7 @@ const resultado = testar([
     entrada: bloco(`
       . 0 && 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -311,7 +311,7 @@ const resultado = testar([
     entrada: bloco(`
       . 1 && 0
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -319,7 +319,7 @@ const resultado = testar([
     entrada: bloco(`
       . 1 && 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 2
     `),
   }),
@@ -327,7 +327,7 @@ const resultado = testar([
     entrada: bloco(`
       . 0 || 0
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -335,7 +335,7 @@ const resultado = testar([
     entrada: bloco(`
       . 0 || 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -343,7 +343,7 @@ const resultado = testar([
     entrada: bloco(`
       . 1 || 0
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -351,7 +351,7 @@ const resultado = testar([
     entrada: bloco(`
       . 1 || 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -359,7 +359,7 @@ const resultado = testar([
     entrada: bloco(`
       . ! 0
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 1
     `),
   }),
@@ -367,7 +367,7 @@ const resultado = testar([
     entrada: bloco(`
       . ! 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -375,7 +375,7 @@ const resultado = testar([
     entrada: bloco(`
       . ! ! 0
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -383,7 +383,7 @@ const resultado = testar([
     entrada: bloco(`
       . 0 && (1 / 0)
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 0
     `),
   }),
@@ -392,7 +392,7 @@ const resultado = testar([
       . a = 11
       . 12 + a
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 23
     `),
   }),
@@ -402,7 +402,7 @@ const resultado = testar([
       . b = 8
       . 2 + a + b
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 15
     `),
   }),
@@ -412,7 +412,7 @@ const resultado = testar([
       . b = 8
       . 3 + c
     `),
-    erro_esperado: bloco(`
+    erro: bloco(`
       . ⛔ a | b
       . 📄 testar.js
       . 👉 3: 3 + c
@@ -425,7 +425,7 @@ const resultado = testar([
       . b = 8
       . a + b
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 13
     `),
   }),
@@ -435,7 +435,7 @@ const resultado = testar([
       . b = 3
       . a + b
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 5
     `),
   }),
@@ -445,7 +445,7 @@ const resultado = testar([
       . y = 5
       . x * y
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 20
     `),
   }),
@@ -454,7 +454,7 @@ const resultado = testar([
       . valor = 10
       . valor + 5
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 15
     `),
   }),
@@ -465,7 +465,7 @@ const resultado = testar([
       . c = 4
       . a + b * c
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 14
     `),
   }),
@@ -475,7 +475,7 @@ const resultado = testar([
       . b = a * 2
       . b + 3
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 13
     `),
   }),
@@ -489,7 +489,7 @@ const resultado = testar([
       . )
       . a * b
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 14
     `),
   }),
@@ -503,7 +503,7 @@ const resultado = testar([
       . )
       . x + y
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 10
     `),
   }),
@@ -513,7 +513,7 @@ const resultado = testar([
       . y = 3
       . x + y
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 5
     `),
   }),
@@ -522,7 +522,7 @@ const resultado = testar([
       . a = 4
       . a + 5
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 9
     `),
   }),
@@ -531,7 +531,7 @@ const resultado = testar([
       . x = 7
       . x * 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 14
     `),
   }),
@@ -540,7 +540,7 @@ const resultado = testar([
       . str = "abcdef"
       . str
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . abcdef
     `),
   }),
@@ -549,7 +549,7 @@ const resultado = testar([
       . a = "abcd"
       . #a
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 4
     `),
   }),
@@ -559,7 +559,7 @@ const resultado = testar([
       . sobrenome = "Silva"
       . \`\${nome} \${sobrenome}\`
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . Alice Silva
     `),
   }),
@@ -568,7 +568,7 @@ const resultado = testar([
       . str = "abcdef"
       . str 5
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . f
     `),
   }),
@@ -577,7 +577,7 @@ const resultado = testar([
       . lista = [ 2 ; 3 ]
       . lista 0
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 2
     `),
   }),
@@ -591,7 +591,7 @@ const resultado = testar([
       . ]
       . \`\${lista 0} \${lista 1} \${lista 2} \${lista 3}\`
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 4 5 6 7
     `),
   }),
@@ -600,7 +600,7 @@ const resultado = testar([
       . lista = [ 2 ; 3 ]
       . lista 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 3
     `),
   }),
@@ -609,7 +609,7 @@ const resultado = testar([
       . lista = [ 2 ; 3 ]
       . #lista
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 2
     `),
   }),
@@ -618,7 +618,7 @@ const resultado = testar([
       . lista = [[ 1 ; 2 ] ; [ 3 ; 4 ]]
       . lista 0 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 2
     `),
   }),
@@ -627,7 +627,7 @@ const resultado = testar([
       . lista = [ 1 ; 2 ; 3 ]
       . lista 2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 3
     `),
   }),
@@ -636,7 +636,7 @@ const resultado = testar([
       . lista = [ 10 ; 20 ; 30 ]
       . lista 1 + 1
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 21
     `),
   }),
@@ -646,7 +646,7 @@ const resultado = testar([
       . lista_2 = [ lista_1 2 ; 40 ]
       . lista_2 0
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 30
     `),
   }),
@@ -656,7 +656,7 @@ const resultado = testar([
       . lista_2 = [ ...lista_1 ; 40 ]
       . #lista_2
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 4
     `),
   }),
@@ -666,7 +666,7 @@ const resultado = testar([
       . lista_2 = [ ...lista_1 ; 40 ]
       . \`\${lista_2 0} \${lista_2 1} \${lista_2 2} \${lista_2 3}\`
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 10 20 30 40
     `),
   }),
@@ -677,7 +677,7 @@ const resultado = testar([
       . lista_3 = [ ...lista_1 ; ...lista_2 ]
       . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 10 20 30 40
     `),
   }),
@@ -688,7 +688,7 @@ const resultado = testar([
       . lista_3 = [ ...lista_2 ; 40 ]
       . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 10 20 30 40
     `),
   }),
@@ -699,7 +699,7 @@ const resultado = testar([
       . lista_3 = [ 10 ; ...lista_1 ; 40 ; ...lista_2 ; 70 ]
       . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3} \${lista_3 4} \${lista_3 5} \${lista_3 6}\`
     `),
-    saída_esperada: bloco(`
+    saída: bloco(`
       . 10 20 30 40 50 60 70
     `),
   }),
