@@ -90,18 +90,32 @@ export const analisador_léxico = entrada => direita(
         sequência_literal(
           símbolo("`"),
           repetição(
-            alternativa(
-              sequência_literal(
+            inverso(
+              alternativa(
                 símbolo("${"),
-                repetição(
-                  inverso(símbolo("}")),
-                ),
-                símbolo("}"),
+                símbolo("`"),
               ),
-              inverso(símbolo("`")),
             ),
           ),
-          símbolo("`"),
+          alternativa(
+            símbolo("${"),
+            símbolo("`"),
+          ),
+        ),
+        sequência_literal(
+          símbolo("}"),
+          repetição(
+            inverso(
+              alternativa(
+                símbolo("${"),
+                símbolo("`"),
+              ),
+            ),
+          ),
+          alternativa(
+            símbolo("${"),
+            símbolo("`"),
+          ),
         ),
         símbolo("#"),
       ),
