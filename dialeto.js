@@ -7,6 +7,15 @@ export const símbolo = texto => ({ entrada, posição }) => entrada.startsWith(
   posição: posição + texto.length,
 } : { erro: `"${texto.replace(/"/g, '\\"')}"`, posição }
 
+export const padrão_lista = (padrão, nome = padrão.toString()) => ({ entrada, posição }) => {
+  const atual = entrada[posição]
+  if (typeof atual === "string" && padrão.test(atual)) return {
+    valor: atual,
+    posição: posição + 1,
+  }
+  return { erro: nome, posição }
+}
+
 export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
   valor: entrada[posição],
   posição: posição + 1,

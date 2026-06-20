@@ -4,6 +4,7 @@ import {
   sequência_literal,
   inverso,
   símbolo,
+  padrão_lista,
   alternativa,
   faixa,
   opcional,
@@ -41,11 +42,12 @@ const espaço = zero_ou_mais(
   ),
 )
 
-export const analisador_léxico = entrada => direita(
-  espaço,
-  lista(
-    esquerda(
-      alternativa(
+export const analisador_léxico = entrada => {
+  const símbolos = direita(
+    espaço,
+    lista(
+      esquerda(
+        alternativa(
         repetição(
           faixa("0", "9"),
         ),
@@ -119,10 +121,13 @@ export const analisador_léxico = entrada => direita(
         ),
         símbolo("#"),
       ),
-      espaço,
+        espaço,
+      ),
     ),
-  ),
-)({entrada, posição: 0}).valor
+  )({entrada, posição: 0}).valor
+  símbolos.origem = entrada
+  return símbolos
+}
 
 const número = transformação(
   um_ou_mais(
@@ -449,6 +454,21 @@ const formatar_erro = (entrada, posição, mensagem, arquivo) => {
     `👉 ${número_linha}: ${linha}`,
     `     ${" ".repeat(número_coluna - 1 + String(número_linha).length)}^ ${número_coluna}`,
   ].join("\n")
+}
+
+const número_sintático = transformação(
+  padrão_lista(/^[0-9]+$/, "/[0-9]+/"),
+  valor => ({
+    "Número": Number(valor),
+  }),
+)
+
+export const analisador_sintático = entrada => {
+  const resultado = número_sintático({ entrada, posição: 0 })
+  if (! resultado.erro && resultado.posição === entrada.length && entrada.origem === entrada[0]) {
+    return resultado.valor
+  }
+  return {}
 }
 
 export const interpretar = ({ entrada, arquivo }) => {

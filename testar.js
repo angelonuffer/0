@@ -1,16 +1,23 @@
 import { testar } from "./uniteste.js"
-import { analisador_léxico, interpretar } from "./0.js";
+import { analisador_léxico, analisador_sintático, interpretar } from "./0.js";
 import { bloco } from "./texto.js"
 
 const teste = ({
   entrada,
   símbolos = [],
+  árvore = {},
   saída = "",
   erro = "",
 }) => [{
   função: analisador_léxico,
   argumento: entrada,
   retorno_esperado: símbolos,
+}, {
+  função: entrada => analisador_sintático(
+    analisador_léxico(entrada)
+  ),
+  argumento: entrada,
+  retorno_esperado: árvore,
 }, {
   função: interpretar,
   argumento: { entrada, arquivo: "testar.js" },
@@ -26,6 +33,9 @@ const resultado = testar([
       . 1
     `),
     símbolos: [ "1" ],
+    árvore: {
+      "Número": 1,
+    },
     saída: bloco(`
       . 1
     `),
