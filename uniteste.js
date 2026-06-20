@@ -1,66 +1,44 @@
 import { bloco } from "./texto.js"
+import iguais from "./testar/iguais.js"
 
-export const teste = ({
-  entrada,
-  saída_esperada = "",
-  erro_esperado = "",
-}) => (interpretar, arquivo) => {
-  try {
-    const resultado = interpretar({ entrada, arquivo })
-    return{
-      entrada,
-      saída_esperada,
-      saída: "",
-      erro_esperado,
-      erro: "",
-      ...resultado,
-    }
-  } catch (erro) {
-    return {
-      entrada,
-      saída_esperada,
-      saída: "",
-      erro_esperado,
-      erro: "",
-      erro_interno: erro,
+export const testar = testes => {
+  const total = testes.length
+  let atual = 0
+  for (const { função, argumento, retorno_esperado } of testes) {
+    atual++
+    try {
+      const resultado = função(argumento)
+      if (! iguais(resultado, retorno_esperado)) {
+        return {
+          código: 1,
+          saída: bloco(`
+          . função:
+          .   ${função.name || "anônima"}
+          . argumento:
+          .   ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
+          . retorno esperado:
+          .   ${JSON.stringify(retorno_esperado, null, 2).replace(/\n/g, "\n  ")}
+          . retorno:
+          .   ${JSON.stringify(resultado, null, 2).replace(/\n/g, "\n  ")}
+        `) + `\n\n🚨 Teste ${atual}/${total} falhou!`,
+        }
+      }
+    } catch (erro) {
+      return {
+        código: 1,
+        saída: bloco(`
+          . função:
+          .   ${função.name || "anônima"}
+          . argumento:
+          .   ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
+          . erro interno:
+          .   ${erro.stack}
+        `) + `\n\n🚨 Teste ${atual}/${total} falhou!`,
+      }
     }
   }
-}
-
-export const testar = (interpretar, arquivo = "uniteste.js", testes, i = 0) => {
-  const resultado = testes[i](interpretar, arquivo)
-  if (resultado.saída !== resultado.saída_esperada || resultado.erro !== resultado.erro_esperado) {
-    return {
-      código: 1,
-      saída: bloco(`
-        . entrada:
-        .   ${resultado.entrada.replace(/\n/g, "\n  ")}
-      `) + (resultado.saída_esperada !== "" ? bloco(`
-        . 
-        . saída esperada:
-        .   ${resultado.saída_esperada.replace(/\n/g, "\n  ")}
-      `) : "") + (resultado.saída !== "" ? bloco(`
-        . 
-        . saída:
-        .   ${resultado.saída.replace(/\n/g, "\n  ")}
-      `) : "") + (resultado.erro_esperado !== "" ? bloco(`
-        . 
-        . erro esperado:
-        .   ${resultado.erro_esperado.replace(/\n/g, "\n  ")}
-      `) : "") + (resultado.erro !== "" ? bloco(`
-        . 
-        . erro:
-        .   ${resultado.erro.replace(/\n/g, "\n  ")}
-      `) : "") + (resultado.erro_interno ? bloco(`
-        . 
-        . erro interno:
-        .   ${resultado.erro_interno.stack}
-      `) : "") + `\n\n🚨 Teste ${i + 1}/${testes.length} falhou!`,
-    }
-  }
-  if (i < testes.length - 1) return testar(interpretar, arquivo, testes, i + 1)
   return {
     código: 0,
-    saída: `✅ Todos os ${testes.length} testes passaram!`
+    saída: `✅ Todos os ${total} testes passaram!`,
   }
 }
