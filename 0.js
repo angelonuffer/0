@@ -13,6 +13,10 @@ import {
   vazio,
   zero_ou_mais,
   um_ou_mais,
+  repetição,
+  lista,
+  direita,
+  esquerda,
 } from "./dialeto.js"
 import { ordenar } from "./lista.js"
 
@@ -36,6 +40,74 @@ const espaço = zero_ou_mais(
     espaço_na_linha,
   ),
 )
+
+export const analisador_léxico = entrada => direita(
+  espaço,
+  lista(
+    esquerda(
+      alternativa(
+        repetição(
+          faixa("0", "9"),
+        ),
+        repetição(
+          alternativa(
+            faixa("a", "z"),
+            faixa("A", "Z"),
+            símbolo("_"),
+            faixa("0", "9"),
+          ),
+        ),
+        símbolo("+"),
+        símbolo("-"),
+        símbolo("*"),
+        símbolo("/"),
+        símbolo(">="),
+        símbolo("<="),
+        símbolo("=="),
+        símbolo("!="),
+        símbolo(">"),
+        símbolo("<"),
+        símbolo("&&"),
+        símbolo("||"),
+        símbolo("!="),
+        símbolo("!"),
+        símbolo("="),
+        símbolo("["),
+        símbolo("]"),
+        símbolo("("),
+        símbolo(")"),
+        símbolo(";"),
+        símbolo("..."),
+        sequência_literal(
+          símbolo('"'),
+          repetição(
+            inverso(
+              símbolo('"'),
+            ),
+          ),
+          símbolo('"'),
+        ),
+        sequência_literal(
+          símbolo("`"),
+          repetição(
+            alternativa(
+              inverso(símbolo("`")),
+              sequência_literal(
+                símbolo("${"),
+                repetição(
+                  inverso(símbolo("}")),
+                ),
+                símbolo("}"),
+              ),
+            ),
+          ),
+        ),
+        símbolo("#"),
+      ),
+      espaço,
+    ),
+  ),
+)({entrada, posição: 0}).valor
 
 const número = transformação(
   um_ou_mais(
@@ -158,7 +230,7 @@ const tamanho = transformação(
   }
 )
 
-const lista = transformação(
+const lista_literal = transformação(
   sequência(
     símbolo("["),
     espaço,
@@ -221,7 +293,7 @@ const átomo = alternativa(
   texto_literal,
   modelo_texto,
   tamanho,
-  lista,
+  lista_literal,
 )
 
 const operação = (operação_precedente, operadores) => transformação(

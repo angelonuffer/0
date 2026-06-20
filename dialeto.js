@@ -14,7 +14,7 @@ export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição
 
 export const alternativa = (...analisadores) => ({ entrada, posição }) => {
   const resultado_1 = analisadores[0]({ entrada, posição })
-  if (! resultado_1.erro || resultado_1.posição > posição || analisadores.length === 1) return resultado_1
+  if (resultado_1.posição > posição || analisadores.length === 1) return resultado_1
   const resultado_2 = alternativa(...analisadores.slice(1))({ entrada, posição })
   if (! resultado_2.erro || resultado_2.posição > posição) return resultado_2
   const mensagens = ordenar([...new Set(`${resultado_1.erro} | ${resultado_2.erro}`.split(" | "))]).join(" | ")
@@ -72,6 +72,8 @@ export const zero_ou_mais = (analisador, separador) => ({ entrada, posição }) 
   return prosseguir(resultado_1.posição)
 }
 
+export const lista = zero_ou_mais
+
 export const um_ou_mais = analisador => ({ entrada, posição }) => {
   const resultado_1 = analisador({ entrada, posição })
   if (resultado_1.posição <= posição) return resultado_1
@@ -115,5 +117,36 @@ export const transformação = (analisador, transformador) => ({ entrada, posiç
   return {
     valor: transformador(resultado.valor, posição, resultado.posição),
     posição: resultado.posição,
+  }
+}
+
+export const repetição = analisador => ({ entrada, posição }) => {
+  const resultado_1 = analisador({ entrada, posição })
+  if (resultado_1.erro) return {
+    valor: "",
+    posição,
+  }
+  const resultado_2 = repetição(analisador)({ entrada, posição: resultado_1.posição })
+  return {
+    valor: resultado_1.valor + resultado_2.valor,
+    posição: resultado_2.posição,
+  }
+}
+
+export const direita = (esquerda, direita) => ({ entrada, posição }) => {
+  const resultado_1 = esquerda({ entrada, posição })
+  if (resultado_1.erro) return resultado_1
+  const resultado_2 = direita({ entrada, posição: resultado_1.posição })
+  return resultado_2
+}
+
+export const esquerda = (esquerda, direita) => ({ entrada, posição }) => {
+  const resultado_1 = esquerda({ entrada, posição })
+  if (resultado_1.erro) return resultado_1
+  const resultado_2 = direita({ entrada, posição: resultado_1.posição })
+  if (resultado_2.erro) return resultado_2
+  return {
+    valor: resultado_1.valor,
+    posição: resultado_2.posição,
   }
 }
