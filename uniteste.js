@@ -11,10 +11,7 @@ export const testar = ({ nome_arquivo, testes: grupos_testes }) => {
       let resultado
       let erro_interno
       try {
-        const arg = (typeof argumento === "object" && argumento !== null)
-          ? { ...argumento, arquivo: nome_arquivo }
-          : argumento
-        resultado = função(arg)
+        resultado = função(argumento)
       } catch (erro) {
         erro_interno = erro
       }

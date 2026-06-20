@@ -7,7 +7,7 @@ const teste = ({
   saída_esperada = "",
   erro_esperado = "",
 }) => ({
-  argumento: { entrada },
+  argumento: { entrada, arquivo: "testar.js" },
   retorno_esperado: {
     saída: saída_esperada,
     erro: erro_esperado,
