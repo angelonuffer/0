@@ -1,6 +1,18 @@
-import { teste, testar } from "./uniteste.js"
+import { testar } from "./uniteste.js"
 import { interpretar } from "./0.js";
 import { bloco } from "./texto.js"
+
+const teste = ({
+  entrada,
+  saída_esperada = "",
+  erro_esperado = "",
+}) => ({
+  argumento: { entrada },
+  retorno_esperado: {
+    saída: saída_esperada,
+    erro: erro_esperado,
+  }
+})
 
 const resultado = testar({
   nome_arquivo: "testar.js",

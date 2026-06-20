@@ -1,18 +1,6 @@
 import { bloco } from "./texto.js"
 import iguais from "./testar/iguais.js"
 
-export const teste = ({
-  entrada,
-  saída_esperada = "",
-  erro_esperado = "",
-}) => ({
-  argumento: { entrada },
-  retorno_esperado: {
-    saída: saída_esperada,
-    erro: erro_esperado,
-  }
-})
-
 export const testar = ({ nome_arquivo, testes: grupos_testes }) => {
   const total = grupos_testes.reduce((acc, { testes }) => acc + testes.length, 0)
   let atual = 0
