@@ -8,42 +8,38 @@ export const testar = grupos_testes => {
   for (const { função, testes } of grupos_testes) {
     for (const { argumento, retorno_esperado } of testes) {
       atual++
-      let resultado
-      let erro_interno
       try {
-        resultado = função(argumento)
-      } catch (erro) {
-        erro_interno = erro
-      }
-
-      if (erro_interno || !iguais(resultado, retorno_esperado)) {
-        let mensagem = ""
-        mensagem += bloco(`
-          . função:
-          .   ${função.name || "anônima"}
-          . argumento:
-          .   ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
-          . retorno esperado:
-          .   ${JSON.stringify(retorno_esperado, null, 2).replace(/\n/g, "\n  ")}
-          . retorno:
-          .   ${JSON.stringify(resultado, null, 2).replace(/\n/g, "\n  ")}
-        `)
-
-        if (erro_interno) {
-          mensagem += (mensagem === "" ? "" : "\n") + bloco(`
-            . erro interno:
-            .   ${erro_interno.stack}
-          `)
+        const resultado = função(argumento)
+        if (! iguais(resultado, retorno_esperado)) {
+          return {
+            código: 1,
+            saída: bloco(`
+            . função:
+            .   ${função.name || "anônima"}
+            . argumento:
+            .   ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
+            . retorno esperado:
+            .   ${JSON.stringify(retorno_esperado, null, 2).replace(/\n/g, "\n  ")}
+            . retorno:
+            .   ${JSON.stringify(resultado, null, 2).replace(/\n/g, "\n  ")}
+          `) + `\n\n🚨 Teste ${atual}/${total} falhou!`,
+          }
         }
-
+      } catch (erro) {
         return {
           código: 1,
-          saída: mensagem.trimEnd() + `\n\n🚨 Teste ${atual}/${total} falhou!`,
+          saída: bloco(`
+            . função:
+            .   ${função.name || "anônima"}
+            . argumento:
+            .   ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
+            . erro interno:
+            .   ${erro.stack}
+          `) + `\n\n🚨 Teste ${atual}/${total} falhou!`,
         }
       }
     }
   }
-
   return {
     código: 0,
     saída: `✅ Todos os ${total} testes passaram!`,
