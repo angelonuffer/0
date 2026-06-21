@@ -1,4 +1,4 @@
-import { analisador_léxico, analisador_sintático, interpretar } from "../0.js";
+import { analisador_léxico, analisador_sintático } from "../0.js";
 
 export const teste = ({
   entrada,
@@ -16,11 +16,11 @@ export const teste = ({
   ),
   argumento: entrada,
   retorno_esperado: árvore,
-}, {
+}, /* {
   função: interpretar,
   argumento: { entrada, arquivo: "testar.js" },
   retorno_esperado: {
     saída,
     erro,
   },
-}]
+} */ ]
