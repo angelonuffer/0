@@ -20,24 +20,9 @@ export const alternativa = (...analisadores) => ({ entrada, posição }) => {
 }
 
 export const sequência = (...analisadores) => ({ entrada, posição }) => {
-  const resultado_1 = analisadores[0]({ entrada, posição })
-  if (resultado_1.erro) return resultado_1
-  if (analisadores.length === 1) return {
-    valor: [resultado_1.valor],
-    posição: resultado_1.posição,
-  }
-  const resultado_2 = sequência(...analisadores.slice(1))({entrada, posição: resultado_1.posição})
-  if (resultado_2.erro) return resultado_2
-  return {
-    valor: [resultado_1.valor, ...resultado_2.valor],
-    posição: resultado_2.posição,
-  }
-}
-
-export const sequência_literal = (...analisadores) => ({ entrada, posição }) => {
   const resultado_1 = analisadores[0]({entrada, posição})
   if (resultado_1.erro || analisadores.length === 1) return resultado_1
-  const resultado_2 = sequência_literal(...analisadores.slice(1))({ entrada, posição: resultado_1.posição })
+  const resultado_2 = sequência(...analisadores.slice(1))({ entrada, posição: resultado_1.posição })
   if (resultado_2.erro) return resultado_2
   return {
     valor: resultado_1.valor + resultado_2.valor,

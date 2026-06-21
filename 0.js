@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import {
-  sequência_literal,
+  sequência,
   inverso,
   símbolo,
   alternativa,
@@ -19,7 +19,7 @@ const espaço = repetição(
   alternativa(
     símbolo("\n"),
     símbolo(" "),
-    sequência_literal(
+    sequência(
       símbolo("//"),
       repetição(
         inverso(
@@ -78,7 +78,7 @@ export const analisador_léxico = entrada => {
           localizar_pontuação(";"),
           localizar_pontuação("..."),
           localizar(
-            sequência_literal(
+            sequência(
               símbolo('"'),
               repetição(
                 inverso(
@@ -90,7 +90,7 @@ export const analisador_léxico = entrada => {
             "texto",
           ),
           localizar(
-            sequência_literal(
+            sequência(
               símbolo("`"),
               repetição(
                 inverso(
@@ -108,7 +108,7 @@ export const analisador_léxico = entrada => {
             "modelo_texto",
           ),
           localizar(
-            sequência_literal(
+            sequência(
               símbolo("}"),
               repetição(
                 inverso(
