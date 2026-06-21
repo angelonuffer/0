@@ -1,20 +1,9 @@
 import { ordenar } from "./lista.js"
 
-export const vazio = ({ posição }) => ({ posição })
-
 export const símbolo = texto => ({ entrada, posição }) => entrada.startsWith(texto, posição) ? {
   valor: texto,
   posição: posição + texto.length,
 } : { erro: `"${texto.replace(/"/g, '\\"')}"`, posição }
-
-export const padrão_lista = (padrão, nome = padrão.toString()) => ({ entrada, posição }) => {
-  const atual = entrada[posição]
-  if (typeof atual === "string" && padrão.test(atual)) return {
-    valor: atual,
-    posição: posição + 1,
-  }
-  return { erro: nome, posição }
-}
 
 export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
   valor: entrada[posição],
@@ -56,44 +45,22 @@ export const sequência_literal = (...analisadores) => ({ entrada, posição }) 
   }
 }
 
-export const zero_ou_mais = (analisador, separador) => ({ entrada, posição }) => {
+export const lista = (analisador) => ({ entrada, posição }) => {
   const resultado_1 = analisador({ entrada, posição })
   if (resultado_1.posição <= posição) return {
     valor: [],
     posição,
   }
   const prosseguir = posição => {
-    const resultado_3 = zero_ou_mais(analisador, separador)({ entrada, posição })
-    if (resultado_3.posição <= posição) return { valor: [resultado_1.valor], posição: resultado_1.posição }
+    const resultado_2 = lista(analisador)({ entrada, posição })
+    if (resultado_2.posição <= posição) return { valor: [resultado_1.valor], posição: resultado_1.posição }
     return {
-      valor: [resultado_1.valor, ...resultado_3.valor],
-      posição: resultado_3.posição,
+      valor: [resultado_1.valor, ...resultado_2.valor],
+      posição: resultado_2.posição,
     }
-  }
-  if (separador !== undefined) {
-    const resultado_2 = separador({ entrada, posição: resultado_1.posição })
-    if (resultado_2.posição <= resultado_1.posição) return {
-      valor: [resultado_1.valor],
-      posição: resultado_1.posição,
-    }
-    return prosseguir(resultado_2.posição)
   }
   return prosseguir(resultado_1.posição)
 }
-
-export const lista = zero_ou_mais
-
-export const um_ou_mais = analisador => ({ entrada, posição }) => {
-  const resultado_1 = analisador({ entrada, posição })
-  if (resultado_1.posição <= posição) return resultado_1
-  const resultado_2 = zero_ou_mais(analisador)({ entrada, posição: resultado_1.posição })
-  if (resultado_2.posição <= resultado_1.posição) return { valor: [resultado_1.valor], posição: resultado_1.posição }
-  return {
-    valor: [resultado_1.valor, ...resultado_2.valor],
-    posição: resultado_2.posição,
-  }
-}
-
 
 export const opcional = (analisador, valor_padrão) => ({ entrada, posição }) => {
   const resultado = analisador({ entrada, posição })
