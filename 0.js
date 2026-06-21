@@ -4,11 +4,11 @@ import {
   sequência_literal,
   inverso,
   símbolo,
-  padrão_lista,
   alternativa,
   faixa,
   opcional,
   transformação,
+  localizar,
   encadeamento,
   sequência,
   vazio,
@@ -42,84 +42,102 @@ const espaço = zero_ou_mais(
   ),
 )
 
+const localizar_operador = símbolo_token => localizar(símbolo(símbolo_token), "operador")
+const localizar_pontuação = símbolo_token => localizar(símbolo(símbolo_token), "pontuação")
+
 export const analisador_léxico = entrada => {
   const símbolos = direita(
     espaço,
     lista(
       esquerda(
         alternativa(
-        repetição(
-          faixa("0", "9"),
-        ),
-        repetição(
-          alternativa(
-            faixa("a", "z"),
-            faixa("A", "Z"),
-            símbolo("_"),
-            faixa("0", "9"),
+          localizar(
+            repetição(
+              faixa("0", "9"),
+            ),
+            "número",
           ),
-        ),
-        símbolo("+"),
-        símbolo("-"),
-        símbolo("*"),
-        símbolo("/"),
-        símbolo(">="),
-        símbolo("<="),
-        símbolo("=="),
-        símbolo("!="),
-        símbolo(">"),
-        símbolo("<"),
-        símbolo("&&"),
-        símbolo("||"),
-        símbolo("!="),
-        símbolo("!"),
-        símbolo("="),
-        símbolo("["),
-        símbolo("]"),
-        símbolo("("),
-        símbolo(")"),
-        símbolo(";"),
-        símbolo("..."),
-        sequência_literal(
-          símbolo('"'),
-          repetição(
-            inverso(
+          localizar(
+            repetição(
+              alternativa(
+                faixa("a", "z"),
+                faixa("A", "Z"),
+                símbolo("_"),
+                faixa("0", "9"),
+              ),
+            ),
+            "identificador",
+          ),
+          localizar_operador("+"),
+          localizar_operador("-"),
+          localizar_operador("*"),
+          localizar_operador("/"),
+          localizar_operador(">="),
+          localizar_operador("<="),
+          localizar_operador("=="),
+          localizar_operador("!="),
+          localizar_operador(">"),
+          localizar_operador("<"),
+          localizar_operador("&&"),
+          localizar_operador("||"),
+          localizar_operador("!="),
+          localizar_operador("!"),
+          localizar_operador("="),
+          localizar_pontuação("["),
+          localizar_pontuação("]"),
+          localizar_pontuação("("),
+          localizar_pontuação(")"),
+          localizar_pontuação(";"),
+          localizar_pontuação("..."),
+          localizar(
+            sequência_literal(
+              símbolo('"'),
+              repetição(
+                inverso(
+                  símbolo('"'),
+                ),
+              ),
               símbolo('"'),
             ),
+            "texto",
           ),
-          símbolo('"'),
-        ),
-        sequência_literal(
-          símbolo("`"),
-          repetição(
-            inverso(
+          localizar(
+            sequência_literal(
+              símbolo("`"),
+              repetição(
+                inverso(
+                  alternativa(
+                    símbolo("${"),
+                    símbolo("`"),
+                  ),
+                ),
+              ),
               alternativa(
                 símbolo("${"),
                 símbolo("`"),
               ),
             ),
+            "modelo_texto",
           ),
-          alternativa(
-            símbolo("${"),
-            símbolo("`"),
-          ),
-        ),
-        sequência_literal(
-          símbolo("}"),
-          repetição(
-            inverso(
+          localizar(
+            sequência_literal(
+              símbolo("}"),
+              repetição(
+                inverso(
+                  alternativa(
+                    símbolo("${"),
+                    símbolo("`"),
+                  ),
+                ),
+              ),
               alternativa(
                 símbolo("${"),
                 símbolo("`"),
               ),
             ),
+            "modelo_texto",
           ),
-          alternativa(
-            símbolo("${"),
-            símbolo("`"),
-          ),
-        ),
-        símbolo("#"),
+          localizar_pontuação("#"),
       ),
         espaço,
       ),
@@ -457,7 +475,15 @@ const formatar_erro = (entrada, posição, mensagem, arquivo) => {
 }
 
 const número_sintático = transformação(
-  padrão_lista(/^[0-9]+$/, "/[0-9]+/"),
+  ({ entrada, posição }) => {
+    const atual = entrada[posição]
+    const valor = typeof atual === "string" ? atual : atual?.valor
+    if (typeof valor === "string" && /^[0-9]+$/.test(valor)) return {
+      valor,
+      posição: posição + 1,
+    }
+    return { erro: "/[0-9]+/", posição }
+  },
   valor => ({
     "Número": Number(valor),
   }),
@@ -465,7 +491,8 @@ const número_sintático = transformação(
 
 export const analisador_sintático = entrada => {
   const resultado = número_sintático({ entrada, posição: 0 })
-  if (! resultado.erro && resultado.posição === entrada.length && entrada.origem === entrada[0]) {
+  const primeiro_valor = typeof entrada[0] === "string" ? entrada[0] : entrada[0]?.valor
+  if (! resultado.erro && resultado.posição === entrada.length && entrada.origem === primeiro_valor) {
     return resultado.valor
   }
   return {}

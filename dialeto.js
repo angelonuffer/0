@@ -129,6 +129,20 @@ export const transformação = (analisador, transformador) => ({ entrada, posiç
   }
 }
 
+export const localizar = (analisador, tipo) => ({ entrada, posição }) => {
+  const resultado = analisador({ entrada, posição })
+  if (resultado.erro) return resultado
+  return {
+    valor: {
+      valor: resultado.valor,
+      início: posição,
+      fim: resultado.posição,
+      tipo,
+    },
+    posição: resultado.posição,
+  }
+}
+
 export const repetição = analisador => ({ entrada, posição }) => {
   const resultado_1 = analisador({ entrada, posição })
   if (resultado_1.erro) return {
