@@ -15,7 +15,10 @@ export default [
       },
     ],
     árvore: {
-      "Número": 1,
+      valor: "1",
+      início: 0,
+      fim: 1,
+      tipo: "número",
     },
     saída: bloco(`
       . 1
@@ -33,6 +36,12 @@ export default [
         tipo: 'número',
       },
     ],
+    árvore: {
+      valor: "1",
+      início: 1,
+      fim: 2,
+      tipo: "número",
+    },
     saída: bloco(`
       . 1
     `),
@@ -49,6 +58,12 @@ export default [
         tipo: 'número',
       },
     ],
+    árvore: {
+      valor: "1",
+      início: 0,
+      fim: 1,
+      tipo: "número",
+    },
     saída: bloco(`
       . 1
     `),

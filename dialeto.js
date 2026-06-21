@@ -125,3 +125,11 @@ export const esquerda = (esquerda, direita) => ({ entrada, posição }) => {
     posição: resultado_2.posição,
   }
 }
+
+export const tipo = tipo => ({ entrada, posição }) => {
+  if (entrada[posição]?.tipo === tipo) return {
+    valor: entrada[posição],
+    posição: posição + 1,
+  }
+  return { erro: tipo, posição }
+}

@@ -12,6 +12,7 @@ import {
   lista,
   direita,
   esquerda,
+  tipo,
 } from "./dialeto.js"
 import { ordenar } from "./lista.js"
 
@@ -151,10 +152,7 @@ const número_sintático = transformação(
 )
 
 export const analisador_sintático = entrada => {
-  const resultado = número_sintático({ entrada, posição: 0 })
-  const primeiro_valor = typeof entrada[0] === "string" ? entrada[0] : entrada[0]?.valor
-  if (! resultado.erro && resultado.posição === entrada.length && entrada.origem === primeiro_valor) {
-    return resultado.valor
-  }
-  return {}
+  const resultado = tipo("número")({ entrada, posição: 0 })
+  if (resultado.erro || resultado.posição !== entrada.length) return {}
+  return resultado.valor
 }
