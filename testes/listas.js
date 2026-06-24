@@ -4,21 +4,21 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      . lista = [ 2 ; 3 ]
+      . = lista [ 2 ; 3 ]
       . lista 0
     `),
     símbolos: [
       {
-        valor: 'lista',
+        valor: '=',
         início: 0,
-        fim: 5,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 6,
+        valor: 'lista',
+        início: 2,
         fim: 7,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -69,7 +69,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [
+      . = lista [
       .   4 ;
       .   5 ;
       .   6 ;
@@ -79,16 +79,16 @@ export default [
     `),
     símbolos: [
       {
-        valor: 'lista',
+        valor: '=',
         início: 0,
-        fim: 5,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 6,
+        valor: 'lista',
+        início: 2,
         fim: 7,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -235,21 +235,21 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [ 2 ; 3 ]
+      . = lista [ 2 ; 3 ]
       . lista 1
     `),
     símbolos: [
       {
-        valor: 'lista',
+        valor: '=',
         início: 0,
-        fim: 5,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 6,
+        valor: 'lista',
+        início: 2,
         fim: 7,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -300,21 +300,21 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [ 2 ; 3 ]
-      . #lista
+      . = lista [ 2 ; 3 ]
+      . # lista
     `),
     símbolos: [
       {
-        valor: 'lista',
+        valor: '=',
         início: 0,
-        fim: 5,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 6,
+        valor: 'lista',
+        início: 2,
         fim: 7,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -354,8 +354,8 @@ export default [
       },
       {
         valor: 'lista',
-        início: 19,
-        fim: 24,
+        início: 20,
+        fim: 25,
         tipo: 'identificador',
       },
     ],
@@ -365,21 +365,21 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [[ 1 ; 2 ] ; [ 3 ; 4 ]]
+      . = lista [[ 1 ; 2 ] ; [ 3 ; 4 ]]
       . lista 0 1
     `),
     símbolos: [
       {
-        valor: 'lista',
+        valor: '=',
         início: 0,
-        fim: 5,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 6,
+        valor: 'lista',
+        início: 2,
         fim: 7,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -484,21 +484,21 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [ 1 ; 2 ; 3 ]
+      . = lista [ 1 ; 2 ; 3 ]
       . lista 2
     `),
     símbolos: [
       {
-        valor: 'lista',
+        valor: '=',
         início: 0,
-        fim: 5,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 6,
+        valor: 'lista',
+        início: 2,
         fim: 7,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -561,21 +561,21 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [ 10 ; 20 ; 30 ]
-      . lista 1 + 1
+      . = lista [ 10 ; 20 ; 30 ]
+      . + lista 1 1
     `),
     símbolos: [
       {
-        valor: 'lista',
+        valor: '=',
         início: 0,
-        fim: 5,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 6,
+        valor: 'lista',
+        início: 2,
         fim: 7,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -620,22 +620,22 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista',
+        valor: '+',
         início: 25,
-        fim: 30,
+        fim: 26,
+        tipo: 'operador',
+      },
+      {
+        valor: 'lista',
+        início: 27,
+        fim: 32,
         tipo: 'identificador',
       },
       {
         valor: '1',
-        início: 31,
-        fim: 32,
-        tipo: 'número',
-      },
-      {
-        valor: '+',
         início: 33,
         fim: 34,
-        tipo: 'operador',
+        tipo: 'número',
       },
       {
         valor: '1',
@@ -650,22 +650,22 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ; 30 ]
-      . lista_2 = [ lista_1 2 ; 40 ]
+      . = lista_1 [ 10 ; 20 ; 30 ]
+      . = lista_2 [ lista_1 2 ; 40 ]
       . lista_2 0
     `),
     símbolos: [
       {
-        valor: 'lista_1',
+        valor: '=',
         início: 0,
-        fim: 7,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 8,
+        valor: 'lista_1',
+        início: 2,
         fim: 9,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -710,16 +710,16 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_2',
+        valor: '=',
         início: 27,
-        fim: 34,
-        tipo: 'identificador',
+        fim: 28,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 35,
+        valor: 'lista_2',
+        início: 29,
         fim: 36,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -776,22 +776,22 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ; 30 ]
-      . lista_2 = [ ...lista_1 ; 40 ]
-      . #lista_2
+      . = lista_1 [ 10 ; 20 ; 30 ]
+      . = lista_2 [ ... lista_1 ; 40 ]
+      . # lista_2
     `),
     símbolos: [
       {
-        valor: 'lista_1',
+        valor: '=',
         início: 0,
-        fim: 7,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 8,
+        valor: 'lista_1',
+        início: 2,
         fim: 9,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -836,16 +836,16 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_2',
+        valor: '=',
         início: 27,
-        fim: 34,
-        tipo: 'identificador',
+        fim: 28,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 35,
+        valor: 'lista_2',
+        início: 29,
         fim: 36,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -861,38 +861,38 @@ export default [
       },
       {
         valor: 'lista_1',
-        início: 42,
-        fim: 49,
+        início: 43,
+        fim: 50,
         tipo: 'identificador',
       },
       {
         valor: ';',
-        início: 50,
-        fim: 51,
+        início: 51,
+        fim: 52,
         tipo: 'pontuação',
       },
       {
         valor: '40',
-        início: 52,
-        fim: 54,
+        início: 53,
+        fim: 55,
         tipo: 'número',
       },
       {
         valor: ']',
-        início: 55,
-        fim: 56,
+        início: 56,
+        fim: 57,
         tipo: 'pontuação',
       },
       {
         valor: '#',
-        início: 57,
-        fim: 58,
+        início: 58,
+        fim: 59,
         tipo: 'pontuação',
       },
       {
         valor: 'lista_2',
-        início: 58,
-        fim: 65,
+        início: 60,
+        fim: 67,
         tipo: 'identificador',
       },
     ],
@@ -902,22 +902,22 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ; 30 ]
-      . lista_2 = [ ...lista_1 ; 40 ]
+      . = lista_1 [ 10 ; 20 ; 30 ]
+      . = lista_2 [ ... lista_1 ; 40 ]
       . \`\${lista_2 0} \${lista_2 1} \${lista_2 2} \${lista_2 3}\`
     `),
     símbolos: [
       {
-        valor: 'lista_1',
+        valor: '=',
         início: 0,
-        fim: 7,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 8,
+        valor: 'lista_1',
+        início: 2,
         fim: 9,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -962,16 +962,16 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_2',
+        valor: '=',
         início: 27,
-        fim: 34,
-        tipo: 'identificador',
+        fim: 28,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 35,
+        valor: 'lista_2',
+        início: 29,
         fim: 36,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -987,104 +987,104 @@ export default [
       },
       {
         valor: 'lista_1',
-        início: 42,
-        fim: 49,
+        início: 43,
+        fim: 50,
         tipo: 'identificador',
       },
       {
         valor: ';',
-        início: 50,
-        fim: 51,
+        início: 51,
+        fim: 52,
         tipo: 'pontuação',
       },
       {
         valor: '40',
-        início: 52,
-        fim: 54,
+        início: 53,
+        fim: 55,
         tipo: 'número',
       },
       {
         valor: ']',
-        início: 55,
-        fim: 56,
+        início: 56,
+        fim: 57,
         tipo: 'pontuação',
       },
       {
         valor: '`${',
-        início: 57,
-        fim: 60,
+        início: 58,
+        fim: 61,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_2',
-        início: 60,
-        fim: 67,
+        início: 61,
+        fim: 68,
         tipo: 'identificador',
       },
       {
         valor: '0',
-        início: 68,
-        fim: 69,
+        início: 69,
+        fim: 70,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 69,
-        fim: 73,
+        início: 70,
+        fim: 74,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_2',
-        início: 73,
-        fim: 80,
+        início: 74,
+        fim: 81,
         tipo: 'identificador',
       },
       {
         valor: '1',
-        início: 81,
-        fim: 82,
+        início: 82,
+        fim: 83,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 82,
-        fim: 86,
+        início: 83,
+        fim: 87,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_2',
-        início: 86,
-        fim: 93,
+        início: 87,
+        fim: 94,
         tipo: 'identificador',
       },
       {
         valor: '2',
-        início: 94,
-        fim: 95,
+        início: 95,
+        fim: 96,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 95,
-        fim: 99,
+        início: 96,
+        fim: 100,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_2',
-        início: 99,
-        fim: 106,
+        início: 100,
+        fim: 107,
         tipo: 'identificador',
       },
       {
         valor: '3',
-        início: 107,
-        fim: 108,
+        início: 108,
+        fim: 109,
         tipo: 'número',
       },
       {
         valor: '}`',
-        início: 108,
-        fim: 110,
+        início: 109,
+        fim: 111,
         tipo: 'modelo_texto',
       },
     ],
@@ -1094,23 +1094,23 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ]
-      . lista_2 = [ 30 ; 40 ]
-      . lista_3 = [ ...lista_1 ; ...lista_2 ]
+      . = lista_1 [ 10 ; 20 ]
+      . = lista_2 [ 30 ; 40 ]
+      . = lista_3 [ ... lista_1 ; ... lista_2 ]
       . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
     `),
     símbolos: [
       {
-        valor: 'lista_1',
+        valor: '=',
         início: 0,
-        fim: 7,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 8,
+        valor: 'lista_1',
+        início: 2,
         fim: 9,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -1143,16 +1143,16 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_2',
+        valor: '=',
         início: 22,
-        fim: 29,
-        tipo: 'identificador',
+        fim: 23,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 30,
+        valor: 'lista_2',
+        início: 24,
         fim: 31,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -1185,16 +1185,16 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_3',
+        valor: '=',
         início: 44,
-        fim: 51,
-        tipo: 'identificador',
+        fim: 45,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 52,
+        valor: 'lista_3',
+        início: 46,
         fim: 53,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -1210,110 +1210,110 @@ export default [
       },
       {
         valor: 'lista_1',
-        início: 59,
-        fim: 66,
+        início: 60,
+        fim: 67,
         tipo: 'identificador',
       },
       {
         valor: ';',
-        início: 67,
-        fim: 68,
+        início: 68,
+        fim: 69,
         tipo: 'pontuação',
       },
       {
         valor: '...',
-        início: 69,
-        fim: 72,
+        início: 70,
+        fim: 73,
         tipo: 'pontuação',
       },
       {
         valor: 'lista_2',
-        início: 72,
-        fim: 79,
+        início: 74,
+        fim: 81,
         tipo: 'identificador',
       },
       {
         valor: ']',
-        início: 80,
-        fim: 81,
+        início: 82,
+        fim: 83,
         tipo: 'pontuação',
       },
       {
         valor: '`${',
-        início: 82,
-        fim: 85,
+        início: 84,
+        fim: 87,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 85,
-        fim: 92,
+        início: 87,
+        fim: 94,
         tipo: 'identificador',
       },
       {
         valor: '0',
-        início: 93,
-        fim: 94,
+        início: 95,
+        fim: 96,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 94,
-        fim: 98,
+        início: 96,
+        fim: 100,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 98,
-        fim: 105,
+        início: 100,
+        fim: 107,
         tipo: 'identificador',
       },
       {
         valor: '1',
-        início: 106,
-        fim: 107,
+        início: 108,
+        fim: 109,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 107,
-        fim: 111,
+        início: 109,
+        fim: 113,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 111,
-        fim: 118,
+        início: 113,
+        fim: 120,
         tipo: 'identificador',
       },
       {
         valor: '2',
-        início: 119,
-        fim: 120,
+        início: 121,
+        fim: 122,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 120,
-        fim: 124,
+        início: 122,
+        fim: 126,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 124,
-        fim: 131,
+        início: 126,
+        fim: 133,
         tipo: 'identificador',
       },
       {
         valor: '3',
-        início: 132,
-        fim: 133,
+        início: 134,
+        fim: 135,
         tipo: 'número',
       },
       {
         valor: '}`',
-        início: 133,
-        fim: 135,
+        início: 135,
+        fim: 137,
         tipo: 'modelo_texto',
       },
     ],
@@ -1323,23 +1323,23 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ]
-      . lista_2 = [ ...lista_1 ; 30 ]
-      . lista_3 = [ ...lista_2 ; 40 ]
+      . = lista_1 [ 10 ; 20 ]
+      . = lista_2 [ ... lista_1 ; 30 ]
+      . = lista_3 [ ... lista_2 ; 40 ]
       . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
     `),
     símbolos: [
       {
-        valor: 'lista_1',
+        valor: '=',
         início: 0,
-        fim: 7,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 8,
+        valor: 'lista_1',
+        início: 2,
         fim: 9,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -1372,16 +1372,16 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_2',
+        valor: '=',
         início: 22,
-        fim: 29,
-        tipo: 'identificador',
+        fim: 23,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 30,
+        valor: 'lista_2',
+        início: 24,
         fim: 31,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -1397,152 +1397,152 @@ export default [
       },
       {
         valor: 'lista_1',
-        início: 37,
-        fim: 44,
+        início: 38,
+        fim: 45,
         tipo: 'identificador',
       },
       {
         valor: ';',
-        início: 45,
-        fim: 46,
+        início: 46,
+        fim: 47,
         tipo: 'pontuação',
       },
       {
         valor: '30',
-        início: 47,
-        fim: 49,
+        início: 48,
+        fim: 50,
         tipo: 'número',
       },
       {
         valor: ']',
-        início: 50,
-        fim: 51,
+        início: 51,
+        fim: 52,
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_3',
-        início: 52,
-        fim: 59,
-        tipo: 'identificador',
-      },
-      {
         valor: '=',
-        início: 60,
-        fim: 61,
+        início: 53,
+        fim: 54,
         tipo: 'operador',
       },
       {
+        valor: 'lista_3',
+        início: 55,
+        fim: 62,
+        tipo: 'identificador',
+      },
+      {
         valor: '[',
-        início: 62,
-        fim: 63,
+        início: 63,
+        fim: 64,
         tipo: 'pontuação',
       },
       {
         valor: '...',
-        início: 64,
-        fim: 67,
+        início: 65,
+        fim: 68,
         tipo: 'pontuação',
       },
       {
         valor: 'lista_2',
-        início: 67,
-        fim: 74,
+        início: 69,
+        fim: 76,
         tipo: 'identificador',
       },
       {
         valor: ';',
-        início: 75,
-        fim: 76,
+        início: 77,
+        fim: 78,
         tipo: 'pontuação',
       },
       {
         valor: '40',
-        início: 77,
-        fim: 79,
+        início: 79,
+        fim: 81,
         tipo: 'número',
       },
       {
         valor: ']',
-        início: 80,
-        fim: 81,
+        início: 82,
+        fim: 83,
         tipo: 'pontuação',
       },
       {
         valor: '`${',
-        início: 82,
-        fim: 85,
+        início: 84,
+        fim: 87,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 85,
-        fim: 92,
+        início: 87,
+        fim: 94,
         tipo: 'identificador',
       },
       {
         valor: '0',
-        início: 93,
-        fim: 94,
+        início: 95,
+        fim: 96,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 94,
-        fim: 98,
+        início: 96,
+        fim: 100,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 98,
-        fim: 105,
+        início: 100,
+        fim: 107,
         tipo: 'identificador',
       },
       {
         valor: '1',
-        início: 106,
-        fim: 107,
+        início: 108,
+        fim: 109,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 107,
-        fim: 111,
+        início: 109,
+        fim: 113,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 111,
-        fim: 118,
+        início: 113,
+        fim: 120,
         tipo: 'identificador',
       },
       {
         valor: '2',
-        início: 119,
-        fim: 120,
+        início: 121,
+        fim: 122,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 120,
-        fim: 124,
+        início: 122,
+        fim: 126,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 124,
-        fim: 131,
+        início: 126,
+        fim: 133,
         tipo: 'identificador',
       },
       {
         valor: '3',
-        início: 132,
-        fim: 133,
+        início: 134,
+        fim: 135,
         tipo: 'número',
       },
       {
         valor: '}`',
-        início: 133,
-        fim: 135,
+        início: 135,
+        fim: 137,
         tipo: 'modelo_texto',
       },
     ],
@@ -1552,23 +1552,23 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 20 ; 30 ]
-      . lista_2 = [ 50 ; 60 ]
-      . lista_3 = [ 10 ; ...lista_1 ; 40 ; ...lista_2 ; 70 ]
+      . = lista_1 [ 20 ; 30 ]
+      . = lista_2 [ 50 ; 60 ]
+      . = lista_3 [ 10 ; ... lista_1 ; 40 ; ... lista_2 ; 70 ]
       . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3} \${lista_3 4} \${lista_3 5} \${lista_3 6}\`
     `),
     símbolos: [
       {
-        valor: 'lista_1',
+        valor: '=',
         início: 0,
-        fim: 7,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 8,
+        valor: 'lista_1',
+        início: 2,
         fim: 9,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -1601,16 +1601,16 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_2',
+        valor: '=',
         início: 22,
-        fim: 29,
-        tipo: 'identificador',
+        fim: 23,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 30,
+        valor: 'lista_2',
+        início: 24,
         fim: 31,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -1643,16 +1643,16 @@ export default [
         tipo: 'pontuação',
       },
       {
-        valor: 'lista_3',
+        valor: '=',
         início: 44,
-        fim: 51,
-        tipo: 'identificador',
+        fim: 45,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 52,
+        valor: 'lista_3',
+        início: 46,
         fim: 53,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '[',
@@ -1680,188 +1680,188 @@ export default [
       },
       {
         valor: 'lista_1',
-        início: 64,
-        fim: 71,
+        início: 65,
+        fim: 72,
         tipo: 'identificador',
       },
       {
         valor: ';',
-        início: 72,
-        fim: 73,
+        início: 73,
+        fim: 74,
         tipo: 'pontuação',
       },
       {
         valor: '40',
-        início: 74,
-        fim: 76,
+        início: 75,
+        fim: 77,
         tipo: 'número',
       },
       {
         valor: ';',
-        início: 77,
-        fim: 78,
+        início: 78,
+        fim: 79,
         tipo: 'pontuação',
       },
       {
         valor: '...',
-        início: 79,
-        fim: 82,
+        início: 80,
+        fim: 83,
         tipo: 'pontuação',
       },
       {
         valor: 'lista_2',
-        início: 82,
-        fim: 89,
+        início: 84,
+        fim: 91,
         tipo: 'identificador',
       },
       {
         valor: ';',
-        início: 90,
-        fim: 91,
+        início: 92,
+        fim: 93,
         tipo: 'pontuação',
       },
       {
         valor: '70',
-        início: 92,
-        fim: 94,
+        início: 94,
+        fim: 96,
         tipo: 'número',
       },
       {
         valor: ']',
-        início: 95,
-        fim: 96,
+        início: 97,
+        fim: 98,
         tipo: 'pontuação',
       },
       {
         valor: '`${',
-        início: 97,
-        fim: 100,
+        início: 99,
+        fim: 102,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 100,
-        fim: 107,
+        início: 102,
+        fim: 109,
         tipo: 'identificador',
       },
       {
         valor: '0',
-        início: 108,
-        fim: 109,
+        início: 110,
+        fim: 111,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 109,
-        fim: 113,
+        início: 111,
+        fim: 115,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 113,
-        fim: 120,
+        início: 115,
+        fim: 122,
         tipo: 'identificador',
       },
       {
         valor: '1',
-        início: 121,
-        fim: 122,
+        início: 123,
+        fim: 124,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 122,
-        fim: 126,
+        início: 124,
+        fim: 128,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 126,
-        fim: 133,
+        início: 128,
+        fim: 135,
         tipo: 'identificador',
       },
       {
         valor: '2',
-        início: 134,
-        fim: 135,
+        início: 136,
+        fim: 137,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 135,
-        fim: 139,
+        início: 137,
+        fim: 141,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 139,
-        fim: 146,
+        início: 141,
+        fim: 148,
         tipo: 'identificador',
       },
       {
         valor: '3',
-        início: 147,
-        fim: 148,
+        início: 149,
+        fim: 150,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 148,
-        fim: 152,
+        início: 150,
+        fim: 154,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 152,
-        fim: 159,
+        início: 154,
+        fim: 161,
         tipo: 'identificador',
       },
       {
         valor: '4',
-        início: 160,
-        fim: 161,
+        início: 162,
+        fim: 163,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 161,
-        fim: 165,
+        início: 163,
+        fim: 167,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 165,
-        fim: 172,
+        início: 167,
+        fim: 174,
         tipo: 'identificador',
       },
       {
         valor: '5',
-        início: 173,
-        fim: 174,
+        início: 175,
+        fim: 176,
         tipo: 'número',
       },
       {
         valor: '} ${',
-        início: 174,
-        fim: 178,
+        início: 176,
+        fim: 180,
         tipo: 'modelo_texto',
       },
       {
         valor: 'lista_3',
-        início: 178,
-        fim: 185,
+        início: 180,
+        fim: 187,
         tipo: 'identificador',
       },
       {
         valor: '6',
-        início: 186,
-        fim: 187,
+        início: 188,
+        fim: 189,
         tipo: 'número',
       },
       {
         valor: '}`',
-        início: 187,
-        fim: 189,
+        início: 189,
+        fim: 191,
         tipo: 'modelo_texto',
       },
     ],
