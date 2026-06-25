@@ -65,7 +65,7 @@ export default [
         valor: '#',
         início: 11,
         fim: 12,
-        tipo: 'pontuação',
+        tipo: 'operador',
       },
       {
         valor: 'a',
