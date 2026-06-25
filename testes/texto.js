@@ -4,21 +4,21 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      . str = "abcdef"
+      . = str "abcdef"
       . str
     `),
     símbolos: [
       {
-        valor: 'str',
+        valor: '=',
         início: 0,
-        fim: 3,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 4,
+        valor: 'str',
+        início: 2,
         fim: 5,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '"abcdef"',
@@ -39,21 +39,21 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . a = "abcd"
-      . #a
+      . = a "abcd"
+      . # a
     `),
     símbolos: [
       {
-        valor: 'a',
+        valor: '=',
         início: 0,
         fim: 1,
-        tipo: 'identificador',
+        tipo: 'operador',
       },
       {
-        valor: '=',
+        valor: 'a',
         início: 2,
         fim: 3,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '"abcd"',
@@ -69,8 +69,8 @@ export default [
       },
       {
         valor: 'a',
-        início: 12,
-        fim: 13,
+        início: 13,
+        fim: 14,
         tipo: 'identificador',
       },
     ],
@@ -80,22 +80,22 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . nome = "Alice"
-      . sobrenome = "Silva"
-      . \`\${nome} \${sobrenome}\`
+      . = nome "Alice"
+      . = sobrenome "Silva"
+      . \`\${ nome } \${ sobrenome }\`
     `),
     símbolos: [
       {
-        valor: 'nome',
+        valor: '=',
         início: 0,
-        fim: 4,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 5,
+        valor: 'nome',
+        início: 2,
         fim: 6,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '"Alice"',
@@ -104,16 +104,16 @@ export default [
         tipo: 'texto',
       },
       {
-        valor: 'sobrenome',
+        valor: '=',
         início: 15,
-        fim: 24,
-        tipo: 'identificador',
+        fim: 16,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 25,
+        valor: 'sobrenome',
+        início: 17,
         fim: 26,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '"Silva"',
@@ -129,26 +129,26 @@ export default [
       },
       {
         valor: 'nome',
-        início: 38,
-        fim: 42,
+        início: 39,
+        fim: 43,
         tipo: 'identificador',
       },
       {
         valor: '} ${',
-        início: 42,
-        fim: 46,
+        início: 44,
+        fim: 48,
         tipo: 'modelo_texto',
       },
       {
         valor: 'sobrenome',
-        início: 46,
-        fim: 55,
+        início: 49,
+        fim: 58,
         tipo: 'identificador',
       },
       {
         valor: '}`',
-        início: 55,
-        fim: 57,
+        início: 59,
+        fim: 61,
         tipo: 'modelo_texto',
       },
     ],
@@ -158,21 +158,21 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . str = "abcdef"
-      . str 5
+      . = str "abcdef"
+      . $ str 5
     `),
     símbolos: [
       {
-        valor: 'str',
+        valor: '=',
         início: 0,
-        fim: 3,
-        tipo: 'identificador',
+        fim: 1,
+        tipo: 'operador',
       },
       {
-        valor: '=',
-        início: 4,
+        valor: 'str',
+        início: 2,
         fim: 5,
-        tipo: 'operador',
+        tipo: 'identificador',
       },
       {
         valor: '"abcdef"',
@@ -181,15 +181,21 @@ export default [
         tipo: 'texto',
       },
       {
-        valor: 'str',
+        valor: '$',
         início: 15,
-        fim: 18,
+        fim: 16,
+        tipo: 'operador',
+      },
+      {
+        valor: 'str',
+        início: 17,
+        fim: 20,
         tipo: 'identificador',
       },
       {
         valor: '5',
-        início: 19,
-        fim: 20,
+        início: 21,
+        fim: 22,
         tipo: 'número',
       },
     ],
