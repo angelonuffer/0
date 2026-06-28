@@ -12,13 +12,9 @@ const iguais = (a, b) => {
     return true;
   }
   if (typeof a === 'object' && typeof b === 'object') {
-    const ka = Object.keys(a);
     const kb = Object.keys(b);
-    if (ka.length !== kb.length) return false;
-    ka.sort();
     kb.sort();
-    for (let i = 0; i < ka.length; i++) if (ka[i] !== kb[i]) return false;
-    for (const k of ka) if (!iguais(a[k], b[k])) return false;
+    for (const k of kb) if (!iguais(a[k], b[k])) return false;
     return true;
   }
   return false;
