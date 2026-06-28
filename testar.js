@@ -5,6 +5,7 @@ import lógica from "./testes/lógica.js"
 import variáveis from "./testes/variáveis.js"
 import texto from "./testes/texto.js"
 import listas from "./testes/listas.js"
+import região from "./testes/região.js"
 
 const resultado = testar([
   ...aritmética,
@@ -13,6 +14,7 @@ const resultado = testar([
   ...variáveis,
   ...texto,
   ...listas,
+  ...região,
 ])
 
 process.stdout.write(resultado.saída + "\n")
