@@ -39,18 +39,28 @@ export const analisador_léxico = entrada => direita(
     esquerda(
       alternativa(
         localizar(
-          repetição(
+          sequência(
             faixa("0", "9"),
+            repetição(
+              faixa("0", "9"),
+            ),
           ),
           "número",
         ),
         localizar(
-          repetição(
+          sequência(
             alternativa(
               faixa("a", "z"),
               faixa("A", "Z"),
               símbolo("_"),
-              faixa("0", "9"),
+            ),
+            repetição(
+              alternativa(
+                faixa("a", "z"),
+                faixa("A", "Z"),
+                símbolo("_"),
+                faixa("0", "9"),
+              ),
             ),
           ),
           "identificador",

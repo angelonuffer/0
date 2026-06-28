@@ -1,5 +1,73 @@
 import { ordenar } from "./lista.js"
 
+const item = ({ entrada, posição }) => ({
+  valor: entrada[posição],
+  posição: posição + 1,
+})
+
+const posição = ({ posição }) => ({
+  valor: posição,
+  posição,
+})
+
+const sucesso = valor => ({ posição }) => ({
+  valor,
+  posição,
+})
+
+const falha = erro => ({ posição }) => ({
+  erro,
+  posição,
+})
+
+const então = (analisador, continuação) => ({ entrada, posição }) => {
+  const resultado_1 = analisador({ entrada, posição })
+  if (resultado_1.erro) return resultado_1
+  return continuação(resultado_1.valor)({ entrada, posição: resultado_1.posição })
+}
+
+const senão = (analisador, continuação) => ({ entrada, posição }) => {
+  const resultado_1 = analisador({ entrada, posição })
+  if (! resultado_1.erro) return resultado_1
+  return continuação(resultado_1.erro)({ entrada, posição })
+}
+
+export const alternativa = (...analisadores) => então(
+  posição,
+  início => senão(
+    analisadores[0],
+    erro_1 => então(
+      posição,
+      fim => {
+        if (analisadores.length === 1 || fim > início) return falha(erro_1)
+        return senão(
+          alternativa(
+            ...analisadores.slice(1)
+          ),
+          erro_2 => falha(
+            ordenar([...new Set(`${erro_1} | ${erro_2}`.split(" | "))]).join(" | ")
+          )
+        )
+      }
+    )
+  )
+)
+
+export const sequência = (...analisadores) => então(
+  analisadores[0],
+  valor_1 => {
+    if (analisadores.length === 1) return sucesso(valor_1)
+    return então(
+      sequência(
+        ...analisadores.slice(1)
+      ),
+      valor_2 => sucesso(
+        valor_1 + valor_2
+      )
+    )
+  }
+)
+
 export const símbolo = texto => ({ entrada, posição }) => entrada.startsWith(texto, posição) ? {
   valor: texto,
   posição: posição + texto.length,
@@ -9,26 +77,6 @@ export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição
   valor: entrada[posição],
   posição: posição + 1,
 } : { erro: `/[${de}-${até}]/`, posição }
-
-export const alternativa = (...analisadores) => ({ entrada, posição }) => {
-  const resultado_1 = analisadores[0]({ entrada, posição })
-  if (resultado_1.posição > posição || analisadores.length === 1) return resultado_1
-  const resultado_2 = alternativa(...analisadores.slice(1))({ entrada, posição })
-  if (! resultado_2.erro || resultado_2.posição > posição) return resultado_2
-  const mensagens = ordenar([...new Set(`${resultado_1.erro} | ${resultado_2.erro}`.split(" | "))]).join(" | ")
-  return { erro: mensagens, posição }
-}
-
-export const sequência = (...analisadores) => ({ entrada, posição }) => {
-  const resultado_1 = analisadores[0]({entrada, posição})
-  if (resultado_1.erro || analisadores.length === 1) return resultado_1
-  const resultado_2 = sequência(...analisadores.slice(1))({ entrada, posição: resultado_1.posição })
-  if (resultado_2.erro) return resultado_2
-  return {
-    valor: resultado_1.valor + resultado_2.valor,
-    posição: resultado_2.posição,
-  }
-}
 
 export const lista = (analisador) => ({ entrada, posição }) => {
   const resultado_1 = analisador({ entrada, posição })
