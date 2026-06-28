@@ -29,7 +29,7 @@ const então = (analisador, continuação) => ({ entrada, posição }) => {
 const senão = (analisador, continuação) => ({ entrada, posição }) => {
   const resultado_1 = analisador({ entrada, posição })
   if (! resultado_1.erro) return resultado_1
-  return continuação(resultado_1.erro)({ entrada, posição })
+  return continuação(resultado_1.erro)({ entrada, posição: resultado_1.posição })
 }
 
 export const alternativa = (...analisadores) => então(
