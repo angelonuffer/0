@@ -1,4 +1,4 @@
-name: IC
+name: Testar
 on:
   workflow_dispatch:
   push:
@@ -16,3 +16,6 @@ jobs:
       with:
         node-version: 22
     - run: node testar.js
+    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: DeterminateSystems/magic-nix-cache-action@main
+    - run: nix run github:angelonuffer/testes-caixa-preta/f32611c3acb19c4cf9bf144d5d0268842c84e568

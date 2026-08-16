@@ -1,0 +1,25 @@
+- comando: node fonte/analisador-léxico.js
+  entrada: |
+    "Olá, mundo!"
+  saída_esperada: |
+    [
+      {
+        "texto": "Olá, mundo!"
+      },
+      {
+        "fim": true
+      }
+    ]
+
+- comando: node fonte/analisador-léxico.js
+  entrada: |
+    "Outro texto"
+  saída_esperada: |
+    [
+      {
+        "texto": "Outro texto"
+      },
+      {
+        "fim": true
+      }
+    ]
