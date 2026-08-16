@@ -1,25 +1,37 @@
-- comando: node fonte/analisador-léxico.js
-  entrada: |
-    "Olá, mundo!"
-  saída_esperada: |
-    [
+- tubo:
+  - entrada: |
+      "Olá, mundo!"
+  - comando: node fonte/analisador-léxico.js
+    saída_esperada: |
+      [
+        {
+          "texto": "Olá, mundo!"
+        },
+        {
+          "fim": true
+        }
+      ]
+  - comando: node fonte/analisador-sintático.js
+    saída_esperada: |
       {
         "texto": "Olá, mundo!"
-      },
-      {
-        "fim": true
       }
-    ]
 
-- comando: node fonte/analisador-léxico.js
-  entrada: |
-    "Outro texto"
-  saída_esperada: |
-    [
+- tubo:
+  - entrada: |
+      "Outro texto"
+  - comando: node fonte/analisador-léxico.js
+    saída_esperada: |
+      [
+        {
+          "texto": "Outro texto"
+        },
+        {
+          "fim": true
+        }
+      ]
+  - comando: node fonte/analisador-sintático.js
+    saída_esperada: |
       {
         "texto": "Outro texto"
-      },
-      {
-        "fim": true
       }
-    ]
