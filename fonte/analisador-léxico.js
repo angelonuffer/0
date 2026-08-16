@@ -2,53 +2,17 @@ import * as fs from 'fs';
 
 const entrada = fs.readFileSync(0, 'utf-8').trim();
 
-let estado = 'INICIAL';
-let lexema = '';
 const tokens = [];
+const regex = /"([^"]*)"|([&#=])|([a-zA-Z]+)|\s+/g;
 
-for (let i = 0; i < entrada.length; i++) {
-  const char = entrada[i];
-
-  switch (estado) {
-    case 'INICIAL':
-      if (char === '"') {
-        estado = 'STRING';
-      } else if (char === '&') {
-        tokens.push({ símbolo: '&' });
-      } else if (char === '#') {
-        tokens.push({ símbolo: '#' });
-      } else if (char === '=') {
-        tokens.push({ símbolo: '=' });
-      } else if (/[a-zA-Z]/.test(char)) {
-        lexema += char;
-        estado = 'IDENTIFICADOR';
-      } else if (char.trim() === '') {
-      }
-      break;
-    case 'STRING':
-      if (char === '"') {
-        tokens.push({ texto: lexema });
-        lexema = '';
-        estado = 'INICIAL';
-      } else {
-        lexema += char;
-      }
-      break;
-    case 'IDENTIFICADOR':
-      if (/[a-zA-Z]/.test(char)) {
-        lexema += char;
-      } else {
-        tokens.push({ identificador: lexema });
-        lexema = '';
-        estado = 'INICIAL';
-        i--;
-      }
-      break;
+for (const match of entrada.matchAll(regex)) {
+  if (match[1] !== undefined) {
+    tokens.push({ texto: match[1] });
+  } else if (match[2] !== undefined) {
+    tokens.push({ símbolo: match[2] });
+  } else if (match[3] !== undefined) {
+    tokens.push({ identificador: match[3] });
   }
-}
-
-if (estado === 'IDENTIFICADOR') {
-  tokens.push({ identificador: lexema });
 }
 
 tokens.push({ fim: true });
