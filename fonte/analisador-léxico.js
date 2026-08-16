@@ -13,6 +13,15 @@ for (let i = 0; i < entrada.length; i++) {
     case 'INICIAL':
       if (char === '"') {
         estado = 'STRING';
+      } else if (char === '&') {
+        tokens.push({ símbolo: '&' });
+      } else if (char === '#') {
+        tokens.push({ símbolo: '#' });
+      } else if (char === '=') {
+        tokens.push({ símbolo: '=' });
+      } else if (/[a-zA-Z]/.test(char)) {
+        lexema += char;
+        estado = 'IDENTIFICADOR';
       } else if (char.trim() === '') {
       }
       break;
@@ -25,9 +34,24 @@ for (let i = 0; i < entrada.length; i++) {
         lexema += char;
       }
       break;
+    case 'IDENTIFICADOR':
+      if (/[a-zA-Z]/.test(char)) {
+        lexema += char;
+      } else {
+        tokens.push({ identificador: lexema });
+        lexema = '';
+        estado = 'INICIAL';
+        i--;
+      }
+      break;
   }
+}
+
+if (estado === 'IDENTIFICADOR') {
+  tokens.push({ identificador: lexema });
 }
 
 tokens.push({ fim: true });
 
 console.log(JSON.stringify(tokens, null, 2))
+

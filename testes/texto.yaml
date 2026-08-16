@@ -41,3 +41,51 @@
   - comando: node fonte/analisador-semântico.js
     saída_esperada: |
       Outro texto
+
+- tubo:
+  - entrada: |
+      &texto = "abcd"
+      #texto
+  - comando: node fonte/analisador-léxico.js
+    saída_esperada: |
+      [
+        {
+          "símbolo": "&"
+        },
+        {
+          "identificador": "texto"
+        },
+        {
+          "símbolo": "="
+        },
+        {
+          "texto": "abcd"
+        },
+        {
+          "símbolo": "#"
+        },
+        {
+          "identificador": "texto"
+        },
+        {
+          "fim": true
+        }
+      ]
+  - comando: node fonte/analisador-sintático.js
+    saída_esperada: |
+      {
+        "declaracoes": [
+          {
+            "identificador": "texto",
+            "valor": {
+              "texto": "abcd"
+            }
+          }
+        ],
+        "retorno": {
+          "tamanho": "texto"
+        }
+      }
+  - comando: node fonte/analisador-semântico.js
+    saída_esperada: |
+      4
