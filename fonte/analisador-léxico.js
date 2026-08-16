@@ -2,17 +2,32 @@ import * as fs from 'fs';
 
 const entrada = fs.readFileSync(0, 'utf-8').trim();
 
-const tokens = [];
-const regex = /"([^"]*)"|([&#=])|([a-zA-Z]+)|\s+/g;
+const regras = [
+  { regex: /"([^"]*)"/g, token: 'texto' },
+  { regex: /([&#=])/g, token: 'símbolo' },
+  { regex: /([a-zA-Z]+)/g, token: 'identificador' },
+  { regex: /\s+/g, token: 'espaço', ignore: true },
+]
 
-for (const match of entrada.matchAll(regex)) {
-  if (match[1] !== undefined) {
-    tokens.push({ texto: match[1] });
-  } else if (match[2] !== undefined) {
-    tokens.push({ símbolo: match[2] });
-  } else if (match[3] !== undefined) {
-    tokens.push({ identificador: match[3] });
+const tokens = [];
+
+let posicao = 0;
+while (posicao < entrada.length) {
+  let matchLength = 0;
+  for (const regra of regras) {
+    const match = entrada.slice(posicao).match(new RegExp('^' + regra.regex.source));
+    if (match) {
+      if (!regra.ignore) {
+        tokens.push({ [regra.token]: match[1] });
+      }
+      matchLength = match[0].length;
+      break;
+    }
   }
+  if (matchLength === 0) {
+    throw new Error(`Erro léxico na posição ${posicao}`);
+  }
+  posicao += matchLength;
 }
 
 tokens.push({ fim: true });
