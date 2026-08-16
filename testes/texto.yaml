@@ -16,6 +16,9 @@
       {
         "texto": "Olá, mundo!"
       }
+  - comando: node fonte/analisador-semântico.js
+    saída_esperada: |
+      Olá, mundo!
 
 - tubo:
   - entrada: |
@@ -35,3 +38,6 @@
       {
         "texto": "Outro texto"
       }
+  - comando: node fonte/analisador-semântico.js
+    saída_esperada: |
+      Outro texto
