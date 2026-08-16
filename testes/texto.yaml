@@ -14,7 +14,10 @@
   - comando: node fonte/analisador-sintático.js
     saída_esperada: |
       {
-        "texto": "Olá, mundo!"
+        "declaracoes": [],
+        "retorno": {
+          "texto": "Olá, mundo!"
+        }
       }
   - comando: node fonte/analisador-semântico.js
     saída_esperada: |
@@ -36,7 +39,10 @@
   - comando: node fonte/analisador-sintático.js
     saída_esperada: |
       {
-        "texto": "Outro texto"
+        "declaracoes": [],
+        "retorno": {
+          "texto": "Outro texto"
+        }
       }
   - comando: node fonte/analisador-semântico.js
     saída_esperada: |

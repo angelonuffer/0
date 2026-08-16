@@ -10,11 +10,6 @@ if (entrada) {
     retorno: null
   };
 
-  if (tokens.length > 0 && tokens[0].texto !== undefined && tokens[1]?.fim) {
-    console.log(JSON.stringify({ texto: tokens[0].texto }, null, 2));
-    process.exit(0);
-  }
-
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
     if (token.símbolo === '&') {
@@ -32,6 +27,8 @@ if (entrada) {
         ast.retorno = { tamanho: tokens[i+1].identificador };
         i += 1;
       }
+    } else if (token.texto !== undefined) {
+      ast.retorno = { texto: token.texto };
     }
   }
 
