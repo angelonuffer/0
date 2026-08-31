@@ -4,76 +4,20 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      . 0 && 0
+      . && 0 0
     `),
     símbolos: [
       {
-        valor: '0',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
         valor: '&&',
-        início: 2,
-        fim: 4,
+        início: 0,
+        fim: 2,
         tipo: 'operador',
       },
       {
         valor: '0',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
-    ],
-    saída: bloco(`
-      . 0
-    `),
-  }),
-  ...teste({
-    entrada: bloco(`
-      . 0 && 1
-    `),
-    símbolos: [
-      {
-        valor: '0',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '&&',
-        início: 2,
+        início: 3,
         fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '1',
-        início: 5,
-        fim: 6,
         tipo: 'número',
-      },
-    ],
-    saída: bloco(`
-      . 0
-    `),
-  }),
-  ...teste({
-    entrada: bloco(`
-      . 1 && 0
-    `),
-    símbolos: [
-      {
-        valor: '1',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '&&',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
       },
       {
         valor: '0',
@@ -88,20 +32,76 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 1 && 2
+      . && 0 1
     `),
     símbolos: [
       {
-        valor: '1',
+        valor: '&&',
         início: 0,
-        fim: 1,
+        fim: 2,
+        tipo: 'operador',
+      },
+      {
+        valor: '0',
+        início: 3,
+        fim: 4,
         tipo: 'número',
       },
       {
+        valor: '1',
+        início: 5,
+        fim: 6,
+        tipo: 'número',
+      },
+    ],
+    saída: bloco(`
+      . 0
+    `),
+  }),
+  ...teste({
+    entrada: bloco(`
+      . && 1 0
+    `),
+    símbolos: [
+      {
         valor: '&&',
-        início: 2,
-        fim: 4,
+        início: 0,
+        fim: 2,
         tipo: 'operador',
+      },
+      {
+        valor: '1',
+        início: 3,
+        fim: 4,
+        tipo: 'número',
+      },
+      {
+        valor: '0',
+        início: 5,
+        fim: 6,
+        tipo: 'número',
+      },
+    ],
+    saída: bloco(`
+      . 0
+    `),
+  }),
+  ...teste({
+    entrada: bloco(`
+      . && 1 2
+    `),
+    símbolos: [
+      {
+        valor: '&&',
+        início: 0,
+        fim: 2,
+        tipo: 'operador',
+      },
+      {
+        valor: '1',
+        início: 3,
+        fim: 4,
+        tipo: 'número',
       },
       {
         valor: '2',
@@ -116,20 +116,20 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 0 || 0
+      . || 0 0
     `),
     símbolos: [
       {
-        valor: '0',
+        valor: '||',
         início: 0,
-        fim: 1,
-        tipo: 'número',
+        fim: 2,
+        tipo: 'operador',
       },
       {
-        valor: '||',
-        início: 2,
+        valor: '0',
+        início: 3,
         fim: 4,
-        tipo: 'operador',
+        tipo: 'número',
       },
       {
         valor: '0',
@@ -144,20 +144,20 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 0 || 1
+      . || 0 1
     `),
     símbolos: [
       {
-        valor: '0',
+        valor: '||',
         início: 0,
-        fim: 1,
-        tipo: 'número',
+        fim: 2,
+        tipo: 'operador',
       },
       {
-        valor: '||',
-        início: 2,
+        valor: '0',
+        início: 3,
         fim: 4,
-        tipo: 'operador',
+        tipo: 'número',
       },
       {
         valor: '1',
@@ -172,20 +172,20 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 1 || 0
+      . || 1 0
     `),
     símbolos: [
       {
-        valor: '1',
+        valor: '||',
         início: 0,
-        fim: 1,
-        tipo: 'número',
+        fim: 2,
+        tipo: 'operador',
       },
       {
-        valor: '||',
-        início: 2,
+        valor: '1',
+        início: 3,
         fim: 4,
-        tipo: 'operador',
+        tipo: 'número',
       },
       {
         valor: '0',
@@ -200,20 +200,20 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 1 || 2
+      . || 1 2
     `),
     símbolos: [
       {
-        valor: '1',
+        valor: '||',
         início: 0,
-        fim: 1,
-        tipo: 'número',
+        fim: 2,
+        tipo: 'operador',
       },
       {
-        valor: '||',
-        início: 2,
+        valor: '1',
+        início: 3,
         fim: 4,
-        tipo: 'operador',
+        tipo: 'número',
       },
       {
         valor: '2',
@@ -300,50 +300,38 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 0 && (1 / 0)
+      . && 0 / 1 0
     `),
     símbolos: [
       {
-        valor: '0',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
         valor: '&&',
-        início: 2,
-        fim: 4,
+        início: 0,
+        fim: 2,
         tipo: 'operador',
       },
       {
-        valor: '(',
-        início: 5,
-        fim: 6,
-        tipo: 'pontuação',
-      },
-      {
-        valor: '1',
-        início: 6,
-        fim: 7,
+        valor: '0',
+        início: 3,
+        fim: 4,
         tipo: 'número',
       },
       {
         valor: '/',
-        início: 8,
-        fim: 9,
+        início: 5,
+        fim: 6,
         tipo: 'operador',
       },
       {
-        valor: '0',
-        início: 10,
-        fim: 11,
+        valor: '1',
+        início: 7,
+        fim: 8,
         tipo: 'número',
       },
       {
-        valor: ')',
-        início: 11,
-        fim: 12,
-        tipo: 'pontuação',
+        valor: '0',
+        início: 9,
+        fim: 10,
+        tipo: 'número',
       },
     ],
     saída: bloco(`
