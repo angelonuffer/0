@@ -1,7 +1,3 @@
-import * as fs from "node:fs";
-import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-
 const regras = {
   ignore: /(?:\/\/[^\r\n]*|\s+)/g,
   texto: /"([^\"]*)"/g,
