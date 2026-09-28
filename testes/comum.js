@@ -12,9 +12,7 @@ export const teste = ({
     retorno_esperado: símbolos,
   },
   ...("árvore" in opções ? [{
-    função: entrada => analisador_sintático(
-      analisador_léxico(entrada)
-    ),
+    função: analisador_sintático,
     argumento: entrada,
     retorno_esperado: opções.árvore,
   }] : []),
