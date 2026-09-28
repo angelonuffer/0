@@ -1,4 +1,5 @@
-import { analisador_léxico, analisador_sintático } from "../fonte/0.js";
+import { analisador_sintático } from "../fonte/0.js";
+import { analisador_léxico } from "../fonte/analisador-léxico.js";
 
 export const teste = ({
   entrada,

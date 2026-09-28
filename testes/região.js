@@ -15,6 +15,13 @@ export default [
     ]
   }),
   ...teste({
+    entrada: "\t123\r\nabc",
+    símbolos: [
+      { valor: "123", início: 1, fim: 4, tipo: "número" },
+      { valor: "abc", início: 6, fim: 9, tipo: "identificador" }
+    ]
+  }),
+  ...teste({
     entrada: "a + b",
     símbolos: [
       { valor: "a", início: 0, fim: 1, tipo: "identificador" },
