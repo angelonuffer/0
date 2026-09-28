@@ -5,8 +5,7 @@ import { pathToFileURL } from "node:url";
 const regras = [
   { regex: /(?:\/\/[^\r\n]*|\s+)/g, ignore: true },
   { token: "texto", regex: /"([^\"]*)"/g },
-  { token: "modelo_texto", regex: /`[^`]*?(?:\$\{|`)/g },
-  { token: "modelo_texto", regex: /}[^`]*?(?:\$\{|`)/g },
+  { token: "modelo_texto", regex: /(?:`|})[^`]*?(?:\$\{|`)/g },
   { token: "número", regex: /[0-9]+/g },
   { token: "identificador", regex: /[a-zA-Z_][a-zA-Z_0-9]*/g },
   { token: "operador", regex: />=|<=|==|!=|&&|\|\||[+*/><!\-=]/g },
