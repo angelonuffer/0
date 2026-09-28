@@ -5,6 +5,13 @@ const item = ({ entrada, posição }) => ({
   posição: posição + 1,
 })
 
+const entrada_tokenizada = entrada => Array.isArray(entrada)
+  && (entrada.length === 0 || typeof entrada[0] === "object")
+
+const valor_do_item = (entrada, posição) => entrada_tokenizada(entrada)
+  ? entrada[posição]?.valor
+  : entrada[posição]
+
 const posição = ({ posição }) => ({
   valor: posição,
   posição,
@@ -53,30 +60,41 @@ export const alternativa = (...analisadores) => então(
   )
 )
 
-export const sequência = (...analisadores) => então(
-  analisadores[0],
-  valor_1 => {
-    if (analisadores.length === 1) return sucesso(valor_1)
-    return então(
-      sequência(
-        ...analisadores.slice(1)
-      ),
-      valor_2 => sucesso(
-        valor_1 + valor_2
-      )
-    )
+export const sequência = (...analisadores) => ({ entrada, posição }) => {
+  const tokenizada = entrada_tokenizada(entrada)
+  let valor = tokenizada ? [] : ""
+  let posição_atual = posição
+
+  for (const analisador of analisadores) {
+    const resultado = analisador({ entrada, posição: posição_atual })
+    if (resultado.erro) return resultado
+    valor = tokenizada ? [...valor, resultado.valor] : valor + resultado.valor
+    posição_atual = resultado.posição
   }
-)
 
-export const símbolo = texto => ({ entrada, posição }) => entrada.startsWith(texto, posição) ? {
-  valor: texto,
-  posição: posição + texto.length,
-} : { erro: `"${texto.replace(/"/g, '\\"')}"`, posição }
+  return { valor, posição: posição_atual }
+}
 
-export const faixa = (de, até) => ({ entrada, posição }) => entrada[posição] >= de && entrada[posição] <= até ? {
-  valor: entrada[posição],
-  posição: posição + 1,
-} : { erro: `/[${de}-${até}]/`, posição }
+export const símbolo = texto => ({ entrada, posição }) => {
+  const tokenizada = entrada_tokenizada(entrada)
+  const encontrado = tokenizada
+    ? valor_do_item(entrada, posição)
+    : entrada.slice(posição, posição + texto.length)
+  if (encontrado === texto) return {
+    valor: tokenizada ? entrada[posição] : texto,
+    posição: posição + (tokenizada ? 1 : texto.length),
+  }
+  return { erro: `"${texto.replace(/"/g, '\\"')}"`, posição }
+}
+
+export const faixa = (de, até) => ({ entrada, posição }) => {
+  const valor = valor_do_item(entrada, posição)
+  if (typeof valor === "string" && valor.length === 1 && valor >= de && valor <= até) return {
+    valor: entrada_tokenizada(entrada) ? entrada[posição] : valor,
+    posição: posição + 1,
+  }
+  return { erro: `/[${de}-${até}]/`, posição }
+}
 
 export const lista = (analisador) => ({ entrada, posição }) => {
   const resultado_1 = analisador({ entrada, posição })
@@ -111,7 +129,7 @@ export const inverso = analisador => ({ entrada, posição }) => {
     valor: entrada[posição],
     posição: posição + 1,
   }
-  return { erro: `! "${entrada[posição]}"`, posição }
+  return { erro: `! "${valor_do_item(entrada, posição)}"`, posição }
 }
 
 export const encadeamento = (analisador, continuação) => ({ entrada, posição }) => {
@@ -123,11 +141,16 @@ export const encadeamento = (analisador, continuação) => ({ entrada, posição
 export const localizar = (analisador, tipo) => ({ entrada, posição }) => {
   const resultado = analisador({ entrada, posição })
   if (resultado.erro) return resultado
+  const tokenizada = entrada_tokenizada(entrada)
+  const primeiro = tokenizada ? entrada[posição] : undefined
+  const último = tokenizada ? entrada[resultado.posição - 1] : undefined
   return {
     valor: {
-      valor: resultado.valor,
-      início: posição,
-      fim: resultado.posição,
+      valor: tokenizada && resultado.valor?.valor !== undefined
+        ? resultado.valor.valor
+        : resultado.valor,
+      início: primeiro?.início ?? posição,
+      fim: último?.fim ?? resultado.posição,
       tipo,
     },
     posição: resultado.posição,
@@ -137,12 +160,14 @@ export const localizar = (analisador, tipo) => ({ entrada, posição }) => {
 export const repetição = analisador => ({ entrada, posição }) => {
   const resultado_1 = analisador({ entrada, posição })
   if (resultado_1.erro) return {
-    valor: "",
+    valor: entrada_tokenizada(entrada) ? [] : "",
     posição,
   }
   const resultado_2 = repetição(analisador)({ entrada, posição: resultado_1.posição })
   return {
-    valor: resultado_1.valor + resultado_2.valor,
+    valor: entrada_tokenizada(entrada)
+      ? [resultado_1.valor, ...(Array.isArray(resultado_2.valor) ? resultado_2.valor : [resultado_2.valor])]
+      : resultado_1.valor + resultado_2.valor,
     posição: resultado_2.posição,
   }
 }
@@ -171,4 +196,12 @@ export const tipo = tipo => ({ entrada, posição }) => {
     posição: posição + 1,
   }
   return { erro: tipo, posição }
+}
+
+export const fim = ({ entrada, posição }) => {
+  if (posição !== entrada.length) return { erro: "fim da entrada", posição }
+  return {
+    valor: undefined,
+    posição: entrada[posição - 1]?.fim ?? posição,
+  }
 }

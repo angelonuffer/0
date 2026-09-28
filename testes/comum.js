@@ -1,4 +1,4 @@
-import { analisador_sintático } from "../fonte/0.js";
+import { analisador_sintático } from "../fonte/analisador-sintático.js";
 import { analisador_léxico } from "../fonte/analisador-léxico.js";
 
 export const teste = ({
@@ -12,7 +12,10 @@ export const teste = ({
     retorno_esperado: símbolos,
   },
   ...("árvore" in opções ? [{
-    função: analisador_sintático,
+    função: entrada => analisador_sintático({
+      entrada: analisador_léxico(entrada),
+      posição: 0,
+    }),
     argumento: entrada,
     retorno_esperado: opções.árvore,
   }] : []),
