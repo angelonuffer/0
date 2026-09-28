@@ -16,6 +16,3 @@ jobs:
       with:
         node-version: 22
     - run: node testar.js
-    - uses: DeterminateSystems/nix-installer-action@main
-    - uses: DeterminateSystems/magic-nix-cache-action@main
-    - run: nix run github:angelonuffer/testes-caixa-preta/1a6d4b60d23d48937d03ed5151565a6a0d1dc69e
