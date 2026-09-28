@@ -18,9 +18,9 @@ export default [
       },
       posição: 1,
     },
-    /* saída: bloco(`
+    saída: bloco(`
       . 1
-    `), */
+    `),
   }),
   ...teste({
     entrada: bloco(`
