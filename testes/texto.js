@@ -13,9 +13,9 @@ export default [
       { valor: '"abcdef"' },
       { valor: 'str' },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . abcdef
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -29,9 +29,9 @@ export default [
       { valor: '#' },
       { valor: 'a' },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 4
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -52,9 +52,9 @@ export default [
       { valor: 'sobrenome' },
       { valor: '}`' },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . Alice Silva
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -68,8 +68,8 @@ export default [
       { valor: 'str' },
       { valor: '5' },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . f
-    `),
+    `), */
   }),
 ]

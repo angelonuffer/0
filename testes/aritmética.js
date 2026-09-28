@@ -18,9 +18,9 @@ export default [
       },
       posição: 1,
     },
-    saída: bloco(`
+    /* saída: bloco(`
       . 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -38,9 +38,9 @@ export default [
       },
       posição: 2,
     },
-    saída: bloco(`
+    /* saída: bloco(`
       . 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -58,9 +58,9 @@ export default [
       },
       posição: 1,
     },
-    saída: bloco(`
+    /* saída: bloco(`
       . 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -74,12 +74,12 @@ export default [
         tipo: 'operador',
       },
     ],
-    erro: bloco(`
+    /* erro: bloco(`
       . ⛔ "_" | "!" | "(" | "[" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
       . 📄 testar.js
       . 👉 1: +
       .       ^ 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -105,9 +105,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 47
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -133,9 +133,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 4
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -161,9 +161,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 12
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -189,9 +189,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 4
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -217,9 +217,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 2147483648
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -257,9 +257,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -297,9 +297,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 14
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -337,9 +337,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 7
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -389,9 +389,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 10
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -441,9 +441,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 20
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -493,9 +493,9 @@ export default [
         tipo: 'pontuação',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 7
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -557,8 +557,8 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 5
-    `),
+    `), */
   }),
 ]

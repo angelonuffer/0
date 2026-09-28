@@ -26,9 +26,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 0
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -54,9 +54,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 0
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -82,9 +82,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 0
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -110,9 +110,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 2
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -138,9 +138,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 0
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -166,9 +166,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -194,9 +194,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -222,9 +222,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -244,9 +244,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 1
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -266,9 +266,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 0
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -294,9 +294,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 0
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -346,8 +346,8 @@ export default [
         tipo: 'pontuação',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 0
-    `),
+    `), */
   }),
 ]

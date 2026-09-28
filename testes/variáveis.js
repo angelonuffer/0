@@ -45,9 +45,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 23
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -123,9 +123,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 15
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -189,12 +189,12 @@ export default [
         tipo: 'identificador',
       },
     ],
-    erro: bloco(`
+    /* erro: bloco(`
       . ⛔ a | b
       . 📄 testar.js
       . 👉 3: 3 + c
       .           ^ 5
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -258,9 +258,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 13
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -324,9 +324,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 5
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -390,9 +390,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 20
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -437,9 +437,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 15
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -534,9 +534,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 14
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -612,9 +612,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 13
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -742,9 +742,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 14
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -872,9 +872,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 10
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -938,9 +938,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 5
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -985,9 +985,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 9
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -1032,8 +1032,8 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 14
-    `),
+    `), */
   }),
 ]

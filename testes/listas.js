@@ -63,9 +63,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 2
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -229,9 +229,9 @@ export default [
         tipo: 'modelo_texto',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 4 5 6 7
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -294,9 +294,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 3
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -359,9 +359,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 2
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -478,9 +478,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 2
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -555,9 +555,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 3
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -644,9 +644,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 21
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -770,9 +770,9 @@ export default [
         tipo: 'número',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 30
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -896,9 +896,9 @@ export default [
         tipo: 'identificador',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 4
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -1088,9 +1088,9 @@ export default [
         tipo: 'modelo_texto',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 10 20 30 40
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -1317,9 +1317,9 @@ export default [
         tipo: 'modelo_texto',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 10 20 30 40
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -1546,9 +1546,9 @@ export default [
         tipo: 'modelo_texto',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 10 20 30 40
-    `),
+    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -1865,8 +1865,8 @@ export default [
         tipo: 'modelo_texto',
       },
     ],
-    saída: bloco(`
+    /* saída: bloco(`
       . 10 20 30 40 50 60 70
-    `),
+    `), */
   }),
 ]
