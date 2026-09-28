@@ -13,7 +13,6 @@ import {
   esquerda,
   tipo,
 } from "./dialeto.js"
-import { ordenar } from "./lista.js"
 
 const espaço = repetição(
   alternativa(

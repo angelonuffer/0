@@ -1,4 +1,4 @@
-import { testar } from "./uniteste.js"
+import { testar } from "./testes/uniteste.js"
 import aritmética from "./testes/aritmética.js"
 import comparação from "./testes/comparação.js"
 import lógica from "./testes/lógica.js"

@@ -1,7 +1,7 @@
 {
   "name": "0",
   "bin": {
-    "0": "0.js"
+    "0": "fonte/0.js"
   },
   "type": "module"
 }

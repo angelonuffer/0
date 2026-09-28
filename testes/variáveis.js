@@ -1,4 +1,4 @@
-import { bloco } from "../texto.js"
+import { bloco } from "./texto-comum.js"
 import { teste } from "./comum.js"
 
 export default [
