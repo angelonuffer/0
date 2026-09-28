@@ -7,12 +7,7 @@ export default [
       . 1
     `),
     símbolos: [
-      {
-        valor: '1',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
+      { valor: '1' },
     ],
     árvore: {
       valor: "1",
@@ -29,12 +24,7 @@ export default [
       .  1
     `),
     símbolos: [
-      {
-        valor: '1',
-        início: 1,
-        fim: 2,
-        tipo: 'número',
-      },
+      { valor: '1' },
     ],
     árvore: {
       valor: "1",
@@ -51,12 +41,7 @@ export default [
       . 1 // comentário
     `),
     símbolos: [
-      {
-        valor: '1',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
+      { valor: '1' },
     ],
     árvore: {
       valor: "1",
