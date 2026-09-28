@@ -38,9 +38,9 @@ export default [
       },
       posição: 2,
     },
-    /* saída: bloco(`
+    saída: bloco(`
       . 1
-    `), */
+    `),
   }),
   ...teste({
     entrada: bloco(`
@@ -58,9 +58,9 @@ export default [
       },
       posição: 1,
     },
-    /* saída: bloco(`
+    saída: bloco(`
       . 1
-    `), */
+    `),
   }),
   ...teste({
     entrada: bloco(`
