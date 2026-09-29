@@ -73,9 +73,7 @@ export default [
       { operador: '-' },
       { número: '4' },
     ],
-    /* saída: bloco(`
-      . 4
-    `), */
+    saída: 4,
   }),
   ...teste({
     entrada: bloco(`
@@ -86,9 +84,7 @@ export default [
       { operador: '*' },
       { número: '4' },
     ],
-    /* saída: bloco(`
-      . 12
-    `), */
+    saída: 12,
   }),
   ...teste({
     entrada: bloco(`
@@ -99,9 +95,7 @@ export default [
       { operador: '/' },
       { número: '2' },
     ],
-    /* saída: bloco(`
-      . 4
-    `), */
+    saída: 4,
   }),
   ...teste({
     entrada: bloco(`
@@ -112,9 +106,7 @@ export default [
       { operador: '+' },
       { número: '1' },
     ],
-    /* saída: bloco(`
-      . 2147483648
-    `), */
+    saída: 2147483648,
   }),
   ...teste({
     entrada: bloco(`
