@@ -8,8 +8,11 @@ const item = ({ entrada, posição }) => ({
 const entrada_tokenizada = entrada => Array.isArray(entrada)
   && (entrada.length === 0 || typeof entrada[0] === "object")
 
+const tipo_do_item = item => item?.tipo
+  ?? Object.keys(item ?? {}).find(chave => chave !== "início" && chave !== "fim")
+
 const valor_do_item = (entrada, posição) => entrada_tokenizada(entrada)
-  ? entrada[posição]?.valor
+  ? entrada[posição]?.valor ?? entrada[posição]?.[tipo_do_item(entrada[posição])]
   : entrada[posição]
 
 const posição = ({ posição }) => ({
@@ -200,8 +203,10 @@ export const esquerda = (esquerda, direita) => ({ entrada, posição }) => {
 }
 
 export const tipo = tipo => ({ entrada, posição }) => {
-  if (entrada[posição]?.tipo === tipo) return {
-    valor: entrada[posição],
+  const item = entrada[posição]
+  const valor = item?.[tipo] ?? item?.valor
+  if (tipo_do_item(item) === tipo) return {
+    valor: { [tipo]: valor },
     posição: posição + 1,
   }
   return { erro: tipo, posição }
