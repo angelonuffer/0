@@ -10,12 +10,7 @@ export default [
       { valor: '1' },
     ],
     árvore: {
-      valor: {
-        valor: "1",
-        início: 0,
-        fim: 1,
-        tipo: "número",
-      },
+      valor: { valor: "1" },
       posição: 1,
     },
     saída: bloco(`
@@ -30,12 +25,7 @@ export default [
       { valor: '1' },
     ],
     árvore: {
-      valor: {
-        valor: "1",
-        início: 1,
-        fim: 2,
-        tipo: "número",
-      },
+      valor: { valor: "1" },
       posição: 2,
     },
     saída: bloco(`
@@ -50,12 +40,7 @@ export default [
       { valor: '1' },
     ],
     árvore: {
-      valor: {
-        valor: "1",
-        início: 0,
-        fim: 1,
-        tipo: "número",
-      },
+      valor: { valor: "1" },
       posição: 1,
     },
     saída: bloco(`
@@ -67,12 +52,7 @@ export default [
       . +
     `),
     símbolos: [
-      {
-        valor: '+',
-        início: 0,
-        fim: 1,
-        tipo: 'operador',
-      },
+      { valor: '+' },
     ],
     /* erro: bloco(`
       . ⛔ "_" | "!" | "(" | "[" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
@@ -93,24 +73,9 @@ export default [
     árvore: {
       valor: {
         tipo: "operação",
-        operador: {
-          valor: "+",
-          início: 3,
-          fim: 4,
-          tipo: "operador",
-        },
-        esquerda: {
-          valor: "42",
-          início: 0,
-          fim: 2,
-          tipo: "número",
-        },
-        direita: {
-          valor: "5",
-          início: 5,
-          fim: 6,
-          tipo: "número",
-        },
+        operador: { valor: "+" },
+        esquerda: { valor: "42" },
+        direita: { valor: "5" },
       },
       posição: 6,
     },
