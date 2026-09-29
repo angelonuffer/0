@@ -68,9 +68,9 @@ export default [
         direita: { número: "5" },
       },
     },
-    /* saída: bloco(`
+    saída: bloco(`
       . 47
-    `), */
+    `),
   }),
   ...teste({
     entrada: bloco(`
