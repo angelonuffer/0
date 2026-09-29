@@ -86,25 +86,34 @@ export default [
       . 42 + 5
     `),
     símbolos: [
-      {
-        valor: '42',
-        início: 0,
-        fim: 2,
-        tipo: 'número',
-      },
-      {
-        valor: '+',
-        início: 3,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '5',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { valor: '42' },
+      { valor: '+' },
+      { valor: '5' },
     ],
+    árvore: {
+      valor: {
+        tipo: "operação",
+        operador: {
+          valor: "+",
+          início: 3,
+          fim: 4,
+          tipo: "operador",
+        },
+        esquerda: {
+          valor: "42",
+          início: 0,
+          fim: 2,
+          tipo: "número",
+        },
+        direita: {
+          valor: "5",
+          início: 5,
+          fim: 6,
+          tipo: "número",
+        },
+      },
+      posição: 6,
+    },
     /* saída: bloco(`
       . 47
     `), */

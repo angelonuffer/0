@@ -138,6 +138,15 @@ export const encadeamento = (analisador, continuação) => ({ entrada, posição
   return continuação(resultado_1.valor)({ entrada, posição: resultado_1.posição })
 }
 
+export const mapear = (analisador, transformação) => ({ entrada, posição }) => {
+  const resultado = analisador({ entrada, posição })
+  if (resultado.erro) return resultado
+  return {
+    ...resultado,
+    valor: transformação(resultado.valor),
+  }
+}
+
 export const localizar = (analisador, tipo) => ({ entrada, posição }) => {
   const resultado = analisador({ entrada, posição })
   if (resultado.erro) return resultado
