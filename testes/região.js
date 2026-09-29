@@ -68,8 +68,8 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . a
-      . b
+      a
+      b
     `),
     símbolos: [
       { identificador: "a", início: 0, fim: 1 },
@@ -101,9 +101,9 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . \`multilinha
-      .   \${ 1 }
-      . \`
+      \`multilinha
+        \${ 1 }
+      \`
     `),
     símbolos: [
       { modelo_texto: "`multilinha\n  ${", início: 0, fim: 16 },

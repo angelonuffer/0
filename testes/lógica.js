@@ -4,7 +4,7 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      . 0 && 0
+      0 && 0
     `),
     símbolos: [
       { número: '0' },
@@ -12,12 +12,12 @@ export default [
       { número: '0' },
     ],
     /* saída: bloco(`
-      . 0
+      0
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 0 && 1
+      0 && 1
     `),
     símbolos: [
       { número: '0' },
@@ -25,12 +25,12 @@ export default [
       { número: '1' },
     ],
     /* saída: bloco(`
-      . 0
+      0
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 1 && 0
+      1 && 0
     `),
     símbolos: [
       { número: '1' },
@@ -38,12 +38,12 @@ export default [
       { número: '0' },
     ],
     /* saída: bloco(`
-      . 0
+      0
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 1 && 2
+      1 && 2
     `),
     símbolos: [
       { número: '1' },
@@ -51,12 +51,12 @@ export default [
       { número: '2' },
     ],
     /* saída: bloco(`
-      . 2
+      2
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 0 || 0
+      0 || 0
     `),
     símbolos: [
       { número: '0' },
@@ -64,12 +64,12 @@ export default [
       { número: '0' },
     ],
     /* saída: bloco(`
-      . 0
+      0
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 0 || 1
+      0 || 1
     `),
     símbolos: [
       { número: '0' },
@@ -77,12 +77,12 @@ export default [
       { número: '1' },
     ],
     /* saída: bloco(`
-      . 1
+      1
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 1 || 0
+      1 || 0
     `),
     símbolos: [
       { número: '1' },
@@ -90,12 +90,12 @@ export default [
       { número: '0' },
     ],
     /* saída: bloco(`
-      . 1
+      1
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 1 || 2
+      1 || 2
     `),
     símbolos: [
       { número: '1' },
@@ -103,36 +103,36 @@ export default [
       { número: '2' },
     ],
     /* saída: bloco(`
-      . 1
+      1
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . ! 0
+      ! 0
     `),
     símbolos: [
       { operador: '!' },
       { número: '0' },
     ],
     /* saída: bloco(`
-      . 1
+      1
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . ! 1
+      ! 1
     `),
     símbolos: [
       { operador: '!' },
       { número: '1' },
     ],
     /* saída: bloco(`
-      . 0
+      0
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . ! ! 0
+      ! ! 0
     `),
     símbolos: [
       { operador: '!' },
@@ -140,12 +140,12 @@ export default [
       { número: '0' },
     ],
     /* saída: bloco(`
-      . 0
+      0
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 0 && (1 / 0)
+      0 && (1 / 0)
     `),
     símbolos: [
       { número: '0' },
@@ -157,7 +157,7 @@ export default [
       { pontuação: ')' },
     ],
     /* saída: bloco(`
-      . 0
+      0
     `), */
   }),
 ]

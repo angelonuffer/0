@@ -4,8 +4,8 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      . str = "abcdef"
-      . str
+      str = "abcdef"
+      str
     `),
     símbolos: [
       { identificador: 'str' },
@@ -14,13 +14,13 @@ export default [
       { identificador: 'str' },
     ],
     /* saída: bloco(`
-      . abcdef
+      abcdef
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . a = "abcd"
-      . #a
+      a = "abcd"
+      #a
     `),
     símbolos: [
       { identificador: 'a' },
@@ -30,14 +30,14 @@ export default [
       { identificador: 'a' },
     ],
     /* saída: bloco(`
-      . 4
+      4
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . nome = "Alice"
-      . sobrenome = "Silva"
-      . \`\${nome} \${sobrenome}\`
+      nome = "Alice"
+      sobrenome = "Silva"
+      \`\${nome} \${sobrenome}\`
     `),
     símbolos: [
       { identificador: 'nome' },
@@ -53,13 +53,13 @@ export default [
       { modelo_texto: '}`' },
     ],
     /* saída: bloco(`
-      . Alice Silva
+      Alice Silva
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . str = "abcdef"
-      . str 5
+      str = "abcdef"
+      str 5
     `),
     símbolos: [
       { identificador: 'str' },
@@ -69,7 +69,7 @@ export default [
       { número: '5' },
     ],
     /* saída: bloco(`
-      . f
+      f
     `), */
   }),
 ]

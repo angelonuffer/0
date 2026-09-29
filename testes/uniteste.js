@@ -26,24 +26,24 @@ export const testar = testes => {
       const retorno = função(argumento)
       if (! iguais(retorno, retorno_esperado)) {
         return bloco(`
-          . função:
-          .   ${função.name || "anônima"}
-          . argumento:
-          .   ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
-          . retorno esperado:
-          .   ${JSON.stringify(retorno_esperado, null, 2).replace(/\n/g, "\n  ")}
-          . retorno:
-          .   ${JSON.stringify(retorno, null, 2).replace(/\n/g, "\n  ")}
+          função:
+            ${função.name || "anônima"}
+          argumento:
+            ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
+          retorno esperado:
+            ${JSON.stringify(retorno_esperado, null, 2).replace(/\n/g, "\n  ")}
+          retorno:
+            ${JSON.stringify(retorno, null, 2).replace(/\n/g, "\n  ")}
         `)
       }
     } catch (erro) {
       return bloco(`
-        . função:
-        .   ${função.name || "anônima"}
-        . argumento:
-        .   ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
-        . erro interno:
-        .   ${erro.stack}
+        função:
+          ${função.name || "anônima"}
+        argumento:
+          ${JSON.stringify(argumento, null, 2).replace(/\n/g, "\n  ")}
+        erro interno:
+          ${erro.stack}
       `)
     }
     return null

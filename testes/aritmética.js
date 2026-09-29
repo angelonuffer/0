@@ -4,7 +4,8 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      . 1
+      1
+      // comentário
     `),
     símbolos: [
       { número: '1' },
@@ -14,7 +15,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      .  1
+       1
     `),
     símbolos: [
       { número: '1' },
@@ -24,7 +25,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 1 // comentário
+      1 // comentário
     `),
     símbolos: [
       { número: '1' },
@@ -34,21 +35,21 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . +
+      +
     `),
     símbolos: [
       { operador: '+' },
     ],
     /* erro: bloco(`
-      . ⛔ "_" | "!" | "(" | "[" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
-      . 📄 testar.js
-      . 👉 1: +
-      .       ^ 1
+      ⛔ "_" | "!" | "(" | "[" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
+      📄 testar.js
+      👉 1: +
+            ^ 1
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 42 + 5
+      42 + 5
     `),
     símbolos: [
       { número: '42' },
@@ -66,7 +67,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 8 - 4
+      8 - 4
     `),
     símbolos: [
       { número: '8' },
@@ -77,7 +78,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 3 * 4
+      3 * 4
     `),
     símbolos: [
       { número: '3' },
@@ -88,7 +89,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 8 / 2
+      8 / 2
     `),
     símbolos: [
       { número: '8' },
@@ -99,7 +100,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 2147483647 + 1
+      2147483647 + 1
     `),
     símbolos: [
       { número: '2147483647' },
@@ -110,7 +111,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      . 4 - 2 - 1
+      4 - 2 - 1
     `),
     símbolos: [
       { número: '4' },
@@ -120,12 +121,12 @@ export default [
       { número: '1' },
     ],
     /* saída: bloco(`
-      . 1
+      1
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 2 + 3 * 4
+      2 + 3 * 4
     `),
     símbolos: [
       { número: '2' },
@@ -135,12 +136,12 @@ export default [
       { número: '4' },
     ],
     /* saída: bloco(`
-      . 14
+      14
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 10 - 6 / 2
+      10 - 6 / 2
     `),
     símbolos: [
       { número: '10' },
@@ -150,12 +151,12 @@ export default [
       { número: '2' },
     ],
     /* saída: bloco(`
-      . 7
+      7
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 8 / 2 + 3 * 2
+      8 / 2 + 3 * 2
     `),
     símbolos: [
       { número: '8' },
@@ -167,12 +168,12 @@ export default [
       { número: '2' },
     ],
     /* saída: bloco(`
-      . 10
+      10
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . (2 + 3) * 4
+      (2 + 3) * 4
     `),
     símbolos: [
       { pontuação: '(' },
@@ -184,12 +185,12 @@ export default [
       { número: '4' },
     ],
     /* saída: bloco(`
-      . 20
+      20
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 10 - (6 / 2)
+      10 - (6 / 2)
     `),
     símbolos: [
       { número: '10' },
@@ -201,12 +202,12 @@ export default [
       { pontuação: ')' },
     ],
     /* saída: bloco(`
-      . 7
+      7
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . 1 + 2 * 3 - 4 / 2
+      1 + 2 * 3 - 4 / 2
     `),
     símbolos: [
       { número: '1' },
@@ -220,7 +221,7 @@ export default [
       { número: '2' },
     ],
     /* saída: bloco(`
-      . 5
+      5
     `), */
   }),
 ]

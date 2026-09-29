@@ -4,8 +4,8 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      . lista = [ 2 ; 3 ]
-      . lista 0
+      lista = [ 2 ; 3 ]
+      lista 0
     `),
     símbolos: [
       { identificador: 'lista' },
@@ -19,18 +19,18 @@ export default [
       { número: '0' },
     ],
     /* saída: bloco(`
-      . 2
+      2
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [
-      .   4 ;
-      .   5 ;
-      .   6 ;
-      .   7 ;
-      . ]
-      . \`\${lista 0} \${lista 1} \${lista 2} \${lista 3}\`
+      lista = [
+        4 ;
+        5 ;
+        6 ;
+        7 ;
+      ]
+      \`\${lista 0} \${lista 1} \${lista 2} \${lista 3}\`
     `),
     símbolos: [
       { identificador: 'lista' },
@@ -60,13 +60,13 @@ export default [
       { modelo_texto: '}`' },
     ],
     /* saída: bloco(`
-      . 4 5 6 7
+      4 5 6 7
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [ 2 ; 3 ]
-      . lista 1
+      lista = [ 2 ; 3 ]
+      lista 1
     `),
     símbolos: [
       { identificador: 'lista' },
@@ -80,13 +80,13 @@ export default [
       { número: '1' },
     ],
     /* saída: bloco(`
-      . 3
+      3
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [ 2 ; 3 ]
-      . #lista
+      lista = [ 2 ; 3 ]
+      #lista
     `),
     símbolos: [
       { identificador: 'lista' },
@@ -100,13 +100,13 @@ export default [
       { identificador: 'lista' },
     ],
     /* saída: bloco(`
-      . 2
+      2
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [[ 1 ; 2 ] ; [ 3 ; 4 ]]
-      . lista 0 1
+      lista = [[ 1 ; 2 ] ; [ 3 ; 4 ]]
+      lista 0 1
     `),
     símbolos: [
       { identificador: 'lista' },
@@ -129,13 +129,13 @@ export default [
       { número: '1' },
     ],
     /* saída: bloco(`
-      . 2
+      2
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [ 1 ; 2 ; 3 ]
-      . lista 2
+      lista = [ 1 ; 2 ; 3 ]
+      lista 2
     `),
     símbolos: [
       { identificador: 'lista' },
@@ -151,13 +151,13 @@ export default [
       { número: '2' },
     ],
     /* saída: bloco(`
-      . 3
+      3
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista = [ 10 ; 20 ; 30 ]
-      . lista 1 + 1
+      lista = [ 10 ; 20 ; 30 ]
+      lista 1 + 1
     `),
     símbolos: [
       { identificador: 'lista' },
@@ -175,14 +175,14 @@ export default [
       { número: '1' },
     ],
     /* saída: bloco(`
-      . 21
+      21
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ; 30 ]
-      . lista_2 = [ lista_1 2 ; 40 ]
-      . lista_2 0
+      lista_1 = [ 10 ; 20 ; 30 ]
+      lista_2 = [ lista_1 2 ; 40 ]
+      lista_2 0
     `),
     símbolos: [
       { identificador: 'lista_1' },
@@ -206,14 +206,14 @@ export default [
       { número: '0' },
     ],
     /* saída: bloco(`
-      . 30
+      30
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ; 30 ]
-      . lista_2 = [ ...lista_1 ; 40 ]
-      . #lista_2
+      lista_1 = [ 10 ; 20 ; 30 ]
+      lista_2 = [ ...lista_1 ; 40 ]
+      #lista_2
     `),
     símbolos: [
       { identificador: 'lista_1' },
@@ -237,14 +237,14 @@ export default [
       { identificador: 'lista_2' },
     ],
     /* saída: bloco(`
-      . 4
+      4
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ; 30 ]
-      . lista_2 = [ ...lista_1 ; 40 ]
-      . \`\${lista_2 0} \${lista_2 1} \${lista_2 2} \${lista_2 3}\`
+      lista_1 = [ 10 ; 20 ; 30 ]
+      lista_2 = [ ...lista_1 ; 40 ]
+      \`\${lista_2 0} \${lista_2 1} \${lista_2 2} \${lista_2 3}\`
     `),
     símbolos: [
       { identificador: 'lista_1' },
@@ -279,15 +279,15 @@ export default [
       { modelo_texto: '}`' },
     ],
     /* saída: bloco(`
-      . 10 20 30 40
+      10 20 30 40
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ]
-      . lista_2 = [ 30 ; 40 ]
-      . lista_3 = [ ...lista_1 ; ...lista_2 ]
-      . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
+      lista_1 = [ 10 ; 20 ]
+      lista_2 = [ 30 ; 40 ]
+      lista_3 = [ ...lista_1 ; ...lista_2 ]
+      \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
     `),
     símbolos: [
       { identificador: 'lista_1' },
@@ -328,15 +328,15 @@ export default [
       { modelo_texto: '}`' },
     ],
     /* saída: bloco(`
-      . 10 20 30 40
+      10 20 30 40
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 10 ; 20 ]
-      . lista_2 = [ ...lista_1 ; 30 ]
-      . lista_3 = [ ...lista_2 ; 40 ]
-      . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
+      lista_1 = [ 10 ; 20 ]
+      lista_2 = [ ...lista_1 ; 30 ]
+      lista_3 = [ ...lista_2 ; 40 ]
+      \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
     `),
     símbolos: [
       { identificador: 'lista_1' },
@@ -377,15 +377,15 @@ export default [
       { modelo_texto: '}`' },
     ],
     /* saída: bloco(`
-      . 10 20 30 40
+      10 20 30 40
     `), */
   }),
   ...teste({
     entrada: bloco(`
-      . lista_1 = [ 20 ; 30 ]
-      . lista_2 = [ 50 ; 60 ]
-      . lista_3 = [ 10 ; ...lista_1 ; 40 ; ...lista_2 ; 70 ]
-      . \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3} \${lista_3 4} \${lista_3 5} \${lista_3 6}\`
+      lista_1 = [ 20 ; 30 ]
+      lista_2 = [ 50 ; 60 ]
+      lista_3 = [ 10 ; ...lista_1 ; 40 ; ...lista_2 ; 70 ]
+      \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3} \${lista_3 4} \${lista_3 5} \${lista_3 6}\`
     `),
     símbolos: [
       { identificador: 'lista_1' },
@@ -441,7 +441,7 @@ export default [
       { modelo_texto: '}`' },
     ],
     /* saída: bloco(`
-      . 10 20 30 40 50 60 70
+      10 20 30 40 50 60 70
     `), */
   }),
 ]
