@@ -10,9 +10,7 @@ export default [
       { número: '1' },
     ],
     árvore: { número: "1" },
-    saída: bloco(`
-      . 1
-    `),
+    saída: 1,
   }),
   ...teste({
     entrada: bloco(`
@@ -22,9 +20,7 @@ export default [
       { número: '1' },
     ],
     árvore: { número: "1" },
-    saída: bloco(`
-      . 1
-    `),
+    saída: 1,
   }),
   ...teste({
     entrada: bloco(`
@@ -34,9 +30,7 @@ export default [
       { número: '1' },
     ],
     árvore: { número: "1" },
-    saída: bloco(`
-      . 1
-    `),
+    saída: 1,
   }),
   ...teste({
     entrada: bloco(`
@@ -68,9 +62,7 @@ export default [
         direita: { número: "5" },
       },
     },
-    saída: bloco(`
-      . 47
-    `),
+    saída: 47,
   }),
   ...teste({
     entrada: bloco(`
