@@ -8,10 +8,10 @@ export default [
       . str
     `),
     símbolos: [
-      { valor: 'str' },
-      { valor: '=' },
-      { valor: '"abcdef"' },
-      { valor: 'str' },
+      { identificador: 'str' },
+      { operador: '=' },
+      { texto: '"abcdef"' },
+      { identificador: 'str' },
     ],
     /* saída: bloco(`
       . abcdef
@@ -23,11 +23,11 @@ export default [
       . #a
     `),
     símbolos: [
-      { valor: 'a' },
-      { valor: '=' },
-      { valor: '"abcd"' },
-      { valor: '#' },
-      { valor: 'a' },
+      { identificador: 'a' },
+      { operador: '=' },
+      { texto: '"abcd"' },
+      { pontuação: '#' },
+      { identificador: 'a' },
     ],
     /* saída: bloco(`
       . 4
@@ -40,17 +40,17 @@ export default [
       . \`\${nome} \${sobrenome}\`
     `),
     símbolos: [
-      { valor: 'nome' },
-      { valor: '=' },
-      { valor: '"Alice"' },
-      { valor: 'sobrenome' },
-      { valor: '=' },
-      { valor: '"Silva"' },
-      { valor: '`${' },
-      { valor: 'nome' },
-      { valor: '} ${' },
-      { valor: 'sobrenome' },
-      { valor: '}`' },
+      { identificador: 'nome' },
+      { operador: '=' },
+      { texto: '"Alice"' },
+      { identificador: 'sobrenome' },
+      { operador: '=' },
+      { texto: '"Silva"' },
+      { modelo_texto: '`${' },
+      { identificador: 'nome' },
+      { modelo_texto: '} ${' },
+      { identificador: 'sobrenome' },
+      { modelo_texto: '}`' },
     ],
     /* saída: bloco(`
       . Alice Silva
@@ -62,11 +62,11 @@ export default [
       . str 5
     `),
     símbolos: [
-      { valor: 'str' },
-      { valor: '=' },
-      { valor: '"abcdef"' },
-      { valor: 'str' },
-      { valor: '5' },
+      { identificador: 'str' },
+      { operador: '=' },
+      { texto: '"abcdef"' },
+      { identificador: 'str' },
+      { número: '5' },
     ],
     /* saída: bloco(`
       . f

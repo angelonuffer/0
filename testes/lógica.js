@@ -7,24 +7,9 @@ export default [
       . 0 && 0
     `),
     símbolos: [
-      {
-        valor: '0',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '&&',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '0',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '0' },
+      { operador: '&&' },
+      { número: '0' },
     ],
     /* saída: bloco(`
       . 0
@@ -35,24 +20,9 @@ export default [
       . 0 && 1
     `),
     símbolos: [
-      {
-        valor: '0',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '&&',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '1',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '0' },
+      { operador: '&&' },
+      { número: '1' },
     ],
     /* saída: bloco(`
       . 0
@@ -63,24 +33,9 @@ export default [
       . 1 && 0
     `),
     símbolos: [
-      {
-        valor: '1',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '&&',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '0',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '1' },
+      { operador: '&&' },
+      { número: '0' },
     ],
     /* saída: bloco(`
       . 0
@@ -91,24 +46,9 @@ export default [
       . 1 && 2
     `),
     símbolos: [
-      {
-        valor: '1',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '&&',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '1' },
+      { operador: '&&' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 2
@@ -119,24 +59,9 @@ export default [
       . 0 || 0
     `),
     símbolos: [
-      {
-        valor: '0',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '||',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '0',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '0' },
+      { operador: '||' },
+      { número: '0' },
     ],
     /* saída: bloco(`
       . 0
@@ -147,24 +72,9 @@ export default [
       . 0 || 1
     `),
     símbolos: [
-      {
-        valor: '0',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '||',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '1',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '0' },
+      { operador: '||' },
+      { número: '1' },
     ],
     /* saída: bloco(`
       . 1
@@ -175,24 +85,9 @@ export default [
       . 1 || 0
     `),
     símbolos: [
-      {
-        valor: '1',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '||',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '0',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '1' },
+      { operador: '||' },
+      { número: '0' },
     ],
     /* saída: bloco(`
       . 1
@@ -203,24 +98,9 @@ export default [
       . 1 || 2
     `),
     símbolos: [
-      {
-        valor: '1',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '||',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '1' },
+      { operador: '||' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 1
@@ -231,18 +111,8 @@ export default [
       . ! 0
     `),
     símbolos: [
-      {
-        valor: '!',
-        início: 0,
-        fim: 1,
-        tipo: 'operador',
-      },
-      {
-        valor: '0',
-        início: 2,
-        fim: 3,
-        tipo: 'número',
-      },
+      { operador: '!' },
+      { número: '0' },
     ],
     /* saída: bloco(`
       . 1
@@ -253,18 +123,8 @@ export default [
       . ! 1
     `),
     símbolos: [
-      {
-        valor: '!',
-        início: 0,
-        fim: 1,
-        tipo: 'operador',
-      },
-      {
-        valor: '1',
-        início: 2,
-        fim: 3,
-        tipo: 'número',
-      },
+      { operador: '!' },
+      { número: '1' },
     ],
     /* saída: bloco(`
       . 0
@@ -275,24 +135,9 @@ export default [
       . ! ! 0
     `),
     símbolos: [
-      {
-        valor: '!',
-        início: 0,
-        fim: 1,
-        tipo: 'operador',
-      },
-      {
-        valor: '!',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '0',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { operador: '!' },
+      { operador: '!' },
+      { número: '0' },
     ],
     /* saída: bloco(`
       . 0
@@ -303,48 +148,13 @@ export default [
       . 0 && (1 / 0)
     `),
     símbolos: [
-      {
-        valor: '0',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '&&',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '(',
-        início: 5,
-        fim: 6,
-        tipo: 'pontuação',
-      },
-      {
-        valor: '1',
-        início: 6,
-        fim: 7,
-        tipo: 'número',
-      },
-      {
-        valor: '/',
-        início: 8,
-        fim: 9,
-        tipo: 'operador',
-      },
-      {
-        valor: '0',
-        início: 10,
-        fim: 11,
-        tipo: 'número',
-      },
-      {
-        valor: ')',
-        início: 11,
-        fim: 12,
-        tipo: 'pontuação',
-      },
+      { número: '0' },
+      { operador: '&&' },
+      { pontuação: '(' },
+      { número: '1' },
+      { operador: '/' },
+      { número: '0' },
+      { pontuação: ')' },
     ],
     /* saída: bloco(`
       . 0

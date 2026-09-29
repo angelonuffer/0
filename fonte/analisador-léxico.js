@@ -30,10 +30,9 @@ export const analisador_léxico = entrada => {
     const fim = posição + correspondência[0].length;
     if (regra_encontrada !== "ignore") {
       tokens.push({
-        valor: correspondência[0],
+        [regra_encontrada]: correspondência[0],
         início: posição,
         fim,
-        tipo: regra_encontrada,
       });
     }
     posição = fim;

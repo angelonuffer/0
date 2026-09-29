@@ -5,65 +5,65 @@ export default [
   ...teste({
     entrada: "123",
     símbolos: [
-      { valor: "123", início: 0, fim: 3, tipo: "número" }
+      { número: "123", início: 0, fim: 3 }
     ]
   }),
   ...teste({
     entrada: "  abc",
     símbolos: [
-      { valor: "abc", início: 2, fim: 5, tipo: "identificador" }
+      { identificador: "abc", início: 2, fim: 5 }
     ]
   }),
   ...teste({
     entrada: "\t123\r\nabc",
     símbolos: [
-      { valor: "123", início: 1, fim: 4, tipo: "número" },
-      { valor: "abc", início: 6, fim: 9, tipo: "identificador" }
+      { número: "123", início: 1, fim: 4 },
+      { identificador: "abc", início: 6, fim: 9 }
     ]
   }),
   ...teste({
     entrada: "a + b",
     símbolos: [
-      { valor: "a", início: 0, fim: 1, tipo: "identificador" },
-      { valor: "+", início: 2, fim: 3, tipo: "operador" },
-      { valor: "b", início: 4, fim: 5, tipo: "identificador" }
+      { identificador: "a", início: 0, fim: 1 },
+      { operador: "+", início: 2, fim: 3 },
+      { identificador: "b", início: 4, fim: 5 }
     ]
   }),
   ...teste({
     entrada: "&& || ==",
     símbolos: [
-      { valor: "&&", início: 0, fim: 2, tipo: "operador" },
-      { valor: "||", início: 3, fim: 5, tipo: "operador" },
-      { valor: "==", início: 6, fim: 8, tipo: "operador" }
+      { operador: "&&", início: 0, fim: 2 },
+      { operador: "||", início: 3, fim: 5 },
+      { operador: "==", início: 6, fim: 8 }
     ]
   }),
   ...teste({
     entrada: "( [ ] )",
     símbolos: [
-      { valor: "(", início: 0, fim: 1, tipo: "pontuação" },
-      { valor: "[", início: 2, fim: 3, tipo: "pontuação" },
-      { valor: "]", início: 4, fim: 5, tipo: "pontuação" },
-      { valor: ")", início: 6, fim: 7, tipo: "pontuação" }
+      { pontuação: "(", início: 0, fim: 1 },
+      { pontuação: "[", início: 2, fim: 3 },
+      { pontuação: "]", início: 4, fim: 5 },
+      { pontuação: ")", início: 6, fim: 7 }
     ]
   }),
   ...teste({
     entrada: '"texto"',
     símbolos: [
-      { valor: '"texto"', início: 0, fim: 7, tipo: "texto" }
+      { texto: '"texto"', início: 0, fim: 7 }
     ]
   }),
   ...teste({
     entrada: '`modelo ${ expressao }`',
     símbolos: [
-      { valor: '`modelo ${', início: 0, fim: 10, tipo: "modelo_texto" },
-      { valor: "expressao", início: 11, fim: 20, tipo: "identificador" },
-      { valor: "}`", início: 21, fim: 23, tipo: "modelo_texto" }
+      { modelo_texto: '`modelo ${', início: 0, fim: 10 },
+      { identificador: "expressao", início: 11, fim: 20 },
+      { modelo_texto: "}`", início: 21, fim: 23 }
     ]
   }),
   ...teste({
     entrada: "// comentário\n42",
     símbolos: [
-      { valor: "42", início: 14, fim: 16, tipo: "número" }
+      { número: "42", início: 14, fim: 16 }
     ]
   }),
   ...teste({
@@ -72,31 +72,31 @@ export default [
       . b
     `),
     símbolos: [
-      { valor: "a", início: 0, fim: 1, tipo: "identificador" },
-      { valor: "b", início: 2, fim: 3, tipo: "identificador" }
+      { identificador: "a", início: 0, fim: 1 },
+      { identificador: "b", início: 2, fim: 3 }
     ]
   }),
   ...teste({
     entrada: "#lista",
     símbolos: [
-      { valor: "#", início: 0, fim: 1, tipo: "pontuação" },
-      { valor: "lista", início: 1, fim: 6, tipo: "identificador" }
+      { pontuação: "#", início: 0, fim: 1 },
+      { identificador: "lista", início: 1, fim: 6 }
     ]
   }),
   ...teste({
     entrada: "...spread",
     símbolos: [
-      { valor: "...", início: 0, fim: 3, tipo: "pontuação" },
-      { valor: "spread", início: 3, fim: 9, tipo: "identificador" }
+      { pontuação: "...", início: 0, fim: 3 },
+      { identificador: "spread", início: 3, fim: 9 }
     ]
   }),
   ...teste({
     entrada: ">= <= != !",
     símbolos: [
-      { valor: ">=", início: 0, fim: 2, tipo: "operador" },
-      { valor: "<=", início: 3, fim: 5, tipo: "operador" },
-      { valor: "!=", início: 6, fim: 8, tipo: "operador" },
-      { valor: "!", início: 9, fim: 10, tipo: "operador" }
+      { operador: ">=", início: 0, fim: 2 },
+      { operador: "<=", início: 3, fim: 5 },
+      { operador: "!=", início: 6, fim: 8 },
+      { operador: "!", início: 9, fim: 10 }
     ]
   }),
   ...teste({
@@ -106,9 +106,9 @@ export default [
       . \`
     `),
     símbolos: [
-      { valor: "`multilinha\n  ${", início: 0, fim: 16, tipo: "modelo_texto" },
-      { valor: "1", início: 17, fim: 18, tipo: "número" },
-      { valor: "}\n`", início: 19, fim: 22, tipo: "modelo_texto" }
+      { modelo_texto: "`multilinha\n  ${", início: 0, fim: 16 },
+      { número: "1", início: 17, fim: 18 },
+      { modelo_texto: "}\n`", início: 19, fim: 22 }
     ]
   })
 ]

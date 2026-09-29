@@ -7,24 +7,9 @@ export default [
       . 2 > 8
     `),
     símbolos: [
-      {
-        valor: '2',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '>',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '2' },
+      { operador: '>' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 0
@@ -35,24 +20,9 @@ export default [
       . 8 > 2
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '>',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '>' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 1
@@ -63,24 +33,9 @@ export default [
       . 8 > 8
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '>',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '>' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 0
@@ -91,24 +46,9 @@ export default [
       . 2 < 8
     `),
     símbolos: [
-      {
-        valor: '2',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '<',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '2' },
+      { operador: '<' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 1
@@ -119,24 +59,9 @@ export default [
       . 8 < 2
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '<',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '<' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 0
@@ -147,24 +72,9 @@ export default [
       . 8 < 8
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '<',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '<' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 0
@@ -175,24 +85,9 @@ export default [
       . 2 == 8
     `),
     símbolos: [
-      {
-        valor: '2',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '==',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '2' },
+      { operador: '==' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 0
@@ -203,24 +98,9 @@ export default [
       . 8 == 2
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '==',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '==' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 0
@@ -231,24 +111,9 @@ export default [
       . 8 == 8
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '==',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '==' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 1
@@ -259,24 +124,9 @@ export default [
       . 2 != 8
     `),
     símbolos: [
-      {
-        valor: '2',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '!=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '2' },
+      { operador: '!=' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 1
@@ -287,24 +137,9 @@ export default [
       . 8 != 2
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '!=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '!=' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 1
@@ -315,24 +150,9 @@ export default [
       . 8 != 8
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '!=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '!=' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 0
@@ -343,24 +163,9 @@ export default [
       . 2 >= 8
     `),
     símbolos: [
-      {
-        valor: '2',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '>=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '2' },
+      { operador: '>=' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 0
@@ -371,24 +176,9 @@ export default [
       . 8 >= 2
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '>=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '>=' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 1
@@ -399,24 +189,9 @@ export default [
       . 8 >= 8
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '>=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '>=' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 1
@@ -427,24 +202,9 @@ export default [
       . 2 <= 8
     `),
     símbolos: [
-      {
-        valor: '2',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '<=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '2' },
+      { operador: '<=' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 1
@@ -455,24 +215,9 @@ export default [
       . 8 <= 2
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '<=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '<=' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 0
@@ -483,24 +228,9 @@ export default [
       . 8 <= 8
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '<=',
-        início: 2,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '8',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '<=' },
+      { número: '8' },
     ],
     /* saída: bloco(`
       . 1

@@ -7,12 +7,9 @@ export default [
       . 1
     `),
     símbolos: [
-      { valor: '1' },
+      { número: '1' },
     ],
-    árvore: {
-      valor: { valor: "1" },
-      posição: 1,
-    },
+    árvore: { número: "1" },
     saída: bloco(`
       . 1
     `),
@@ -22,12 +19,9 @@ export default [
       .  1
     `),
     símbolos: [
-      { valor: '1' },
+      { número: '1' },
     ],
-    árvore: {
-      valor: { valor: "1" },
-      posição: 2,
-    },
+    árvore: { número: "1" },
     saída: bloco(`
       . 1
     `),
@@ -37,12 +31,9 @@ export default [
       . 1 // comentário
     `),
     símbolos: [
-      { valor: '1' },
+      { número: '1' },
     ],
-    árvore: {
-      valor: { valor: "1" },
-      posição: 1,
-    },
+    árvore: { número: "1" },
     saída: bloco(`
       . 1
     `),
@@ -52,7 +43,7 @@ export default [
       . +
     `),
     símbolos: [
-      { valor: '+' },
+      { operador: '+' },
     ],
     /* erro: bloco(`
       . ⛔ "_" | "!" | "(" | "[" | "\\"" | "#" | "\`" | /[0-9]/ | /[a-z]/ | /[A-Z]/
@@ -66,18 +57,16 @@ export default [
       . 42 + 5
     `),
     símbolos: [
-      { valor: '42' },
-      { valor: '+' },
-      { valor: '5' },
+      { número: '42' },
+      { operador: '+' },
+      { número: '5' },
     ],
     árvore: {
-      valor: {
-        tipo: "operação",
-        operador: { valor: "+" },
-        esquerda: { valor: "42" },
-        direita: { valor: "5" },
+      operação: {
+        operador: { operador: "+" },
+        esquerda: { número: "42" },
+        direita: { número: "5" },
       },
-      posição: 6,
     },
     /* saída: bloco(`
       . 47
@@ -88,24 +77,9 @@ export default [
       . 8 - 4
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '-',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '4',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '-' },
+      { número: '4' },
     ],
     /* saída: bloco(`
       . 4
@@ -116,24 +90,9 @@ export default [
       . 3 * 4
     `),
     símbolos: [
-      {
-        valor: '3',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '*',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '4',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '3' },
+      { operador: '*' },
+      { número: '4' },
     ],
     /* saída: bloco(`
       . 12
@@ -144,24 +103,9 @@ export default [
       . 8 / 2
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '/',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '/' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 4
@@ -172,24 +116,9 @@ export default [
       . 2147483647 + 1
     `),
     símbolos: [
-      {
-        valor: '2147483647',
-        início: 0,
-        fim: 10,
-        tipo: 'número',
-      },
-      {
-        valor: '+',
-        início: 11,
-        fim: 12,
-        tipo: 'operador',
-      },
-      {
-        valor: '1',
-        início: 13,
-        fim: 14,
-        tipo: 'número',
-      },
+      { número: '2147483647' },
+      { operador: '+' },
+      { número: '1' },
     ],
     /* saída: bloco(`
       . 2147483648
@@ -200,36 +129,11 @@ export default [
       . 4 - 2 - 1
     `),
     símbolos: [
-      {
-        valor: '4',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '-',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
-      {
-        valor: '-',
-        início: 6,
-        fim: 7,
-        tipo: 'operador',
-      },
-      {
-        valor: '1',
-        início: 8,
-        fim: 9,
-        tipo: 'número',
-      },
+      { número: '4' },
+      { operador: '-' },
+      { número: '2' },
+      { operador: '-' },
+      { número: '1' },
     ],
     /* saída: bloco(`
       . 1
@@ -240,36 +144,11 @@ export default [
       . 2 + 3 * 4
     `),
     símbolos: [
-      {
-        valor: '2',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '+',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '3',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
-      {
-        valor: '*',
-        início: 6,
-        fim: 7,
-        tipo: 'operador',
-      },
-      {
-        valor: '4',
-        início: 8,
-        fim: 9,
-        tipo: 'número',
-      },
+      { número: '2' },
+      { operador: '+' },
+      { número: '3' },
+      { operador: '*' },
+      { número: '4' },
     ],
     /* saída: bloco(`
       . 14
@@ -280,36 +159,11 @@ export default [
       . 10 - 6 / 2
     `),
     símbolos: [
-      {
-        valor: '10',
-        início: 0,
-        fim: 2,
-        tipo: 'número',
-      },
-      {
-        valor: '-',
-        início: 3,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '6',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
-      {
-        valor: '/',
-        início: 7,
-        fim: 8,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 9,
-        fim: 10,
-        tipo: 'número',
-      },
+      { número: '10' },
+      { operador: '-' },
+      { número: '6' },
+      { operador: '/' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 7
@@ -320,48 +174,13 @@ export default [
       . 8 / 2 + 3 * 2
     `),
     símbolos: [
-      {
-        valor: '8',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '/',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
-      {
-        valor: '+',
-        início: 6,
-        fim: 7,
-        tipo: 'operador',
-      },
-      {
-        valor: '3',
-        início: 8,
-        fim: 9,
-        tipo: 'número',
-      },
-      {
-        valor: '*',
-        início: 10,
-        fim: 11,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 12,
-        fim: 13,
-        tipo: 'número',
-      },
+      { número: '8' },
+      { operador: '/' },
+      { número: '2' },
+      { operador: '+' },
+      { número: '3' },
+      { operador: '*' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 10
@@ -372,48 +191,13 @@ export default [
       . (2 + 3) * 4
     `),
     símbolos: [
-      {
-        valor: '(',
-        início: 0,
-        fim: 1,
-        tipo: 'pontuação',
-      },
-      {
-        valor: '2',
-        início: 1,
-        fim: 2,
-        tipo: 'número',
-      },
-      {
-        valor: '+',
-        início: 3,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '3',
-        início: 5,
-        fim: 6,
-        tipo: 'número',
-      },
-      {
-        valor: ')',
-        início: 6,
-        fim: 7,
-        tipo: 'pontuação',
-      },
-      {
-        valor: '*',
-        início: 8,
-        fim: 9,
-        tipo: 'operador',
-      },
-      {
-        valor: '4',
-        início: 10,
-        fim: 11,
-        tipo: 'número',
-      },
+      { pontuação: '(' },
+      { número: '2' },
+      { operador: '+' },
+      { número: '3' },
+      { pontuação: ')' },
+      { operador: '*' },
+      { número: '4' },
     ],
     /* saída: bloco(`
       . 20
@@ -424,48 +208,13 @@ export default [
       . 10 - (6 / 2)
     `),
     símbolos: [
-      {
-        valor: '10',
-        início: 0,
-        fim: 2,
-        tipo: 'número',
-      },
-      {
-        valor: '-',
-        início: 3,
-        fim: 4,
-        tipo: 'operador',
-      },
-      {
-        valor: '(',
-        início: 5,
-        fim: 6,
-        tipo: 'pontuação',
-      },
-      {
-        valor: '6',
-        início: 6,
-        fim: 7,
-        tipo: 'número',
-      },
-      {
-        valor: '/',
-        início: 8,
-        fim: 9,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 10,
-        fim: 11,
-        tipo: 'número',
-      },
-      {
-        valor: ')',
-        início: 11,
-        fim: 12,
-        tipo: 'pontuação',
-      },
+      { número: '10' },
+      { operador: '-' },
+      { pontuação: '(' },
+      { número: '6' },
+      { operador: '/' },
+      { número: '2' },
+      { pontuação: ')' },
     ],
     /* saída: bloco(`
       . 7
@@ -476,60 +225,15 @@ export default [
       . 1 + 2 * 3 - 4 / 2
     `),
     símbolos: [
-      {
-        valor: '1',
-        início: 0,
-        fim: 1,
-        tipo: 'número',
-      },
-      {
-        valor: '+',
-        início: 2,
-        fim: 3,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 4,
-        fim: 5,
-        tipo: 'número',
-      },
-      {
-        valor: '*',
-        início: 6,
-        fim: 7,
-        tipo: 'operador',
-      },
-      {
-        valor: '3',
-        início: 8,
-        fim: 9,
-        tipo: 'número',
-      },
-      {
-        valor: '-',
-        início: 10,
-        fim: 11,
-        tipo: 'operador',
-      },
-      {
-        valor: '4',
-        início: 12,
-        fim: 13,
-        tipo: 'número',
-      },
-      {
-        valor: '/',
-        início: 14,
-        fim: 15,
-        tipo: 'operador',
-      },
-      {
-        valor: '2',
-        início: 16,
-        fim: 17,
-        tipo: 'número',
-      },
+      { número: '1' },
+      { operador: '+' },
+      { número: '2' },
+      { operador: '*' },
+      { número: '3' },
+      { operador: '-' },
+      { número: '4' },
+      { operador: '/' },
+      { número: '2' },
     ],
     /* saída: bloco(`
       . 5

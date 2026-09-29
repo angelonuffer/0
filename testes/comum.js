@@ -41,7 +41,7 @@ export const teste = opções => {
           entrada: analisador_léxico(entrada),
           posição: 0,
         })
-        return analisador_semântico(sintaxe.valor) ?? ""
+        return analisador_semântico(sintaxe) ?? ""
       },
       argumento: entrada,
       retorno_esperado: saída,

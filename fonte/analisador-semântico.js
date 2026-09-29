@@ -1,8 +1,5 @@
-import * as fs from 'fs';
-import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-
 export const analisador_semântico = ast => {
+  if (ast?.número !== undefined) return ast.número;
   if (ast?.tipo === 'número') return ast.valor;
 
   if (ast?.declaracoes) {
