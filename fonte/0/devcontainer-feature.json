@@ -1,0 +1,17 @@
+{
+  "id": "0",
+  "version": "0.0.0",
+  "name": "Interpretador 0",
+  "description": "Instala o interpretador da linguagem 0.",
+  "documentationURL": "https://github.com/angelonuffer/0",
+  "options": {
+    "ref": {
+      "type": "string",
+      "default": "main",
+      "description": "Branch, tag, SHA de commit ou semver:<intervalo> do repositório 0 a instalar."
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/node": {}
+  }
+}

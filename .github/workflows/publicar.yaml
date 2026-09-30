@@ -1,0 +1,25 @@
+name: Publicar feature
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "fonte/0/**"
+      - ".github/workflows/publicar.yaml"
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: devcontainers/action@v1
+        with:
+          publish-features: "true"
+          base-path-to-features: ./fonte
+          features-namespace: ghcr.io/${{ github.repository }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

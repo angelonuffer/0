@@ -17,3 +17,29 @@ Avalia a expressão final do módulo e imprime o resultado.
 ```bash
 node testar.js
 ```
+
+## Usar como Dev Container Feature
+
+Adicione a feature a `.devcontainer/devcontainer.json`:
+
+```json
+{
+	"features": {
+		"ghcr.io/angelonuffer/0/0:0.0.0": {}
+	}
+}
+```
+
+A opção `ref` aceita o nome de um branch, uma tag ou um SHA de commit. Também aceita `semver:<intervalo>`, como `semver:^0.2.0`, para selecionar uma tag compatível existente no repositório. Sem a opção, a feature instala o conteúdo atual da branch `main`. Por exemplo, para fixar uma referência:
+
+```json
+{
+	"features": {
+		"ghcr.io/angelonuffer/0/0:0.0.0": {
+			"ref": "<branch-tag-SHA-ou-semver>"
+		}
+	}
+}
+```
+
+Depois de alterar a configuração, reconstrua o Dev Container.
