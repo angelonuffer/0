@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "fonte/0/**"
+      - ".devcontainer/features/0/**"
       - ".github/workflows/publicar.yaml"
 jobs:
   publicar:
@@ -19,7 +19,7 @@ jobs:
       - uses: devcontainers/action@v1
         with:
           publish-features: "true"
-          base-path-to-features: ./fonte
+          base-path-to-features: ./.devcontainer/features
           features-namespace: ghcr.io/${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
