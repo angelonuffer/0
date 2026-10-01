@@ -9,14 +9,14 @@ on:
       - ".github/workflows/publicar.yaml"
 jobs:
   publicar:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
       packages: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: devcontainers/action@v1
+      - uses: actions/checkout@v7.0.1
+      - uses: devcontainers/action@v1.4.4
         with:
           publish-features: "true"
           base-path-to-features: ./.devcontainer/features
