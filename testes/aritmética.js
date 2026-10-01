@@ -12,6 +12,7 @@ export default [
     ],
     árvore: { número: "1" },
     saída: 1,
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
@@ -64,6 +65,7 @@ export default [
       },
     },
     saída: 47,
+    js: "42+5",
   }),
   ...teste({
     entrada: bloco(`

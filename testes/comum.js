@@ -1,9 +1,10 @@
 import { analisador_léxico } from "../fonte/analisador-léxico.js";
 import { analisador_sintático } from "../fonte/analisador-sintático.js";
 import { analisador_semântico } from "../fonte/analisador-semântico.js";
+import { árvore_para_js } from "../fonte/árvore_para_js.js";
 
 export const teste = opções => {
-  const chaves_permitidas = ["entrada", "símbolos", "árvore", "saída"]
+  const chaves_permitidas = ["entrada", "símbolos", "árvore", "saída", "js"]
   const chaves = opções && typeof opções === "object" ? Object.keys(opções) : []
   const ausentes = ["entrada", "símbolos"].filter(chave => !chaves.includes(chave))
   const extras = chaves.filter(chave => !chaves_permitidas.includes(chave))
@@ -20,7 +21,7 @@ export const teste = opções => {
     }]
   }
 
-  const { entrada, símbolos, árvore = undefined, saída = undefined } = opções
+  const { entrada, símbolos, árvore = undefined, saída = undefined, js = undefined } = opções
   return [
     {
       função: analisador_léxico,
@@ -46,5 +47,16 @@ export const teste = opções => {
       argumento: entrada,
       retorno_esperado: saída,
     }] : []),
+    ...(js !== undefined ? [{
+      função: entrada => {
+        const sintaxe = analisador_sintático({
+          entrada: analisador_léxico(entrada),
+          posição: 0,
+        })
+        return árvore_para_js(sintaxe) ?? ""
+      },
+      argumento: entrada,
+      retorno_esperado: js,
+    }] : [])
   ]
 }
