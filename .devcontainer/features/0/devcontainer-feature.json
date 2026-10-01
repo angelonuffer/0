@@ -12,6 +12,8 @@
     }
   },
   "dependsOn": {
-    "ghcr.io/devcontainers/features/node": {}
+		"ghcr.io/devcontainers/features/node:2.1.0": {
+      "version": "24.21.0"
+    }
   }
 }
