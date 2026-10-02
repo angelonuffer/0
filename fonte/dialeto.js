@@ -202,6 +202,9 @@ export const esquerda = (esquerda, direita) => ({ entrada, posição }) => {
   }
 }
 
+export const prever = (condição, analisador_se, analisador_senão) => ({ entrada, posição }) =>
+  (condição({ entrada, posição }) ? analisador_se : analisador_senão)({ entrada, posição })
+
 export const tipo = tipo => ({ entrada, posição }) => {
   const item = entrada[posição]
   const valor = item?.[tipo] ?? item?.valor
