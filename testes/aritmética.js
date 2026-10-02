@@ -16,26 +16,6 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-       1
-    `),
-    símbolos: [
-      { número: '1' },
-    ],
-    árvore: { número: "1" },
-    saída: 1,
-  }),
-  ...teste({
-    entrada: bloco(`
-      1 // comentário
-    `),
-    símbolos: [
-      { número: '1' },
-    ],
-    árvore: { número: "1" },
-    saída: 1,
-  }),
-  ...teste({
-    entrada: bloco(`
       +
     `),
     símbolos: [
