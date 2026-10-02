@@ -11,6 +11,14 @@ export default [
       { operador: '&&' },
       { número: '0' },
     ],
+    árvore: {
+      operação: {
+        operador: "&&",
+        esquerda: { número: "0" },
+        direita: { número: "0" },
+      },
+    },
+    js: `0&&0`,
     /* saída: bloco(`
       0
     `), */
@@ -19,11 +27,7 @@ export default [
     entrada: bloco(`
       0 && 1
     `),
-    símbolos: [
-      { número: '0' },
-      { operador: '&&' },
-      { número: '1' },
-    ],
+    js: `0&&1`,
     /* saída: bloco(`
       0
     `), */
@@ -32,11 +36,7 @@ export default [
     entrada: bloco(`
       1 && 0
     `),
-    símbolos: [
-      { número: '1' },
-      { operador: '&&' },
-      { número: '0' },
-    ],
+    js: `1&&0`,
     /* saída: bloco(`
       0
     `), */
@@ -45,11 +45,7 @@ export default [
     entrada: bloco(`
       1 && 2
     `),
-    símbolos: [
-      { número: '1' },
-      { operador: '&&' },
-      { número: '2' },
-    ],
+    js: `1&&2`,
     /* saída: bloco(`
       2
     `), */
@@ -58,11 +54,7 @@ export default [
     entrada: bloco(`
       0 || 0
     `),
-    símbolos: [
-      { número: '0' },
-      { operador: '||' },
-      { número: '0' },
-    ],
+    js: `0||0`,
     /* saída: bloco(`
       0
     `), */
@@ -71,11 +63,7 @@ export default [
     entrada: bloco(`
       0 || 1
     `),
-    símbolos: [
-      { número: '0' },
-      { operador: '||' },
-      { número: '1' },
-    ],
+    js: `0||1`,
     /* saída: bloco(`
       1
     `), */
@@ -84,11 +72,7 @@ export default [
     entrada: bloco(`
       1 || 0
     `),
-    símbolos: [
-      { número: '1' },
-      { operador: '||' },
-      { número: '0' },
-    ],
+    js: `1||0`,
     /* saída: bloco(`
       1
     `), */
@@ -97,11 +81,7 @@ export default [
     entrada: bloco(`
       1 || 2
     `),
-    símbolos: [
-      { número: '1' },
-      { operador: '||' },
-      { número: '2' },
-    ],
+    js: `1||2`,
     /* saída: bloco(`
       1
     `), */
@@ -110,10 +90,7 @@ export default [
     entrada: bloco(`
       ! 0
     `),
-    símbolos: [
-      { operador: '!' },
-      { número: '0' },
-    ],
+    js: `!0`,
     /* saída: bloco(`
       1
     `), */
@@ -122,10 +99,7 @@ export default [
     entrada: bloco(`
       ! 1
     `),
-    símbolos: [
-      { operador: '!' },
-      { número: '1' },
-    ],
+    js: `!1`,
     /* saída: bloco(`
       0
     `), */
@@ -134,11 +108,7 @@ export default [
     entrada: bloco(`
       ! ! 0
     `),
-    símbolos: [
-      { operador: '!' },
-      { operador: '!' },
-      { número: '0' },
-    ],
+    js: `!!0`,
     /* saída: bloco(`
       0
     `), */
@@ -147,15 +117,7 @@ export default [
     entrada: bloco(`
       0 && (1 / 0)
     `),
-    símbolos: [
-      { número: '0' },
-      { operador: '&&' },
-      { pontuação: '(' },
-      { número: '1' },
-      { operador: '/' },
-      { número: '0' },
-      { pontuação: ')' },
-    ],
+    js: `0&&(1/0)`,
     /* saída: bloco(`
       0
     `), */

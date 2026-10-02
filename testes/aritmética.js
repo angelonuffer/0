@@ -21,13 +21,13 @@ export default [
     símbolos: [
       { operador: '+' },
     ],
-    árvore: { erro: "\"(\" | número", posição: 0 },
+    árvore: { erro: "\"!\" | \"(\" | número", posição: 0 },
     erro: bloco(`
       testar.js
       1: +
          ^ 1
       Erro de sintaxe. Esperava:
-        "(" | número
+        "!" | "(" | número
     `)
   }),
   ...teste({

@@ -26,9 +26,23 @@ const agrupamento = encadeamento(
   ),
 )
 
+const prefixo = encadeamento(
+  símbolo("!"),
+  operador => mapear(
+    átomo,
+    direita => ({
+      operação: {
+        operador: operador.operador,
+        direita,
+      },
+    }),
+  ),
+)
+
 const átomo = alternativa(
   tipo("número"),
   agrupamento,
+  prefixo,
 )
 
 expressão = encadeamento(

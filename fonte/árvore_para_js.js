@@ -8,6 +8,7 @@ export const árvore_para_js = árvore => {
 
   if (árvore?.operação) {
     const { operador, esquerda, direita } = árvore.operação
+    if (esquerda === undefined) return `${operador}${árvore_para_js(direita)}`
     return `${árvore_para_js(esquerda)}${operador}${árvore_para_js(direita)}`
   }
 }
