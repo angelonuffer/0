@@ -19,6 +19,7 @@ export default [
       },
     },
     js: `0&&0`,
+    js_eval: 0,
     /* saída: bloco(`
       0
     `), */
@@ -28,6 +29,7 @@ export default [
       0 && 1
     `),
     js: `0&&1`,
+    js_eval: 0,
     /* saída: bloco(`
       0
     `), */
@@ -37,6 +39,7 @@ export default [
       1 && 0
     `),
     js: `1&&0`,
+    js_eval: 0,
     /* saída: bloco(`
       0
     `), */
@@ -46,6 +49,7 @@ export default [
       1 && 2
     `),
     js: `1&&2`,
+    js_eval: 2,
     /* saída: bloco(`
       2
     `), */
@@ -55,6 +59,7 @@ export default [
       0 || 0
     `),
     js: `0||0`,
+    js_eval: 0,
     /* saída: bloco(`
       0
     `), */
@@ -64,6 +69,7 @@ export default [
       0 || 1
     `),
     js: `0||1`,
+    js_eval: 1,
     /* saída: bloco(`
       1
     `), */
@@ -73,6 +79,7 @@ export default [
       1 || 0
     `),
     js: `1||0`,
+    js_eval: 1,
     /* saída: bloco(`
       1
     `), */
@@ -82,6 +89,7 @@ export default [
       1 || 2
     `),
     js: `1||2`,
+    js_eval: 1,
     /* saída: bloco(`
       1
     `), */
@@ -91,6 +99,7 @@ export default [
       ! 0
     `),
     js: `!0`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -100,6 +109,7 @@ export default [
       ! 1
     `),
     js: `!1`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -109,6 +119,7 @@ export default [
       ! ! 0
     `),
     js: `!!0`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -118,6 +129,7 @@ export default [
       0 && (1 / 0)
     `),
     js: `0&&(1/0)`,
+    js_eval: 0,
     /* saída: bloco(`
       0
     `), */

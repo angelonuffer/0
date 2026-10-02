@@ -5,7 +5,7 @@ import { árvore_para_js } from "../fonte/árvore_para_js.js";
 import { formatar_erro } from "../fonte/erro.js";
 
 export const teste = opções => {
-  const chaves_permitidas = ["entrada", "símbolos", "árvore", "saída", "js", "erro"]
+  const chaves_permitidas = ["entrada", "símbolos", "árvore", "saída", "js", "js_eval", "erro"]
   const chaves = opções && typeof opções === "object" ? Object.keys(opções) : []
   const ausentes = ["entrada"].filter(chave => !chaves.includes(chave))
   const extras = chaves.filter(chave => !chaves_permitidas.includes(chave))
@@ -22,7 +22,7 @@ export const teste = opções => {
     }]
   }
 
-  const { entrada, símbolos, árvore = undefined, saída = undefined, js = undefined, erro = undefined } = opções
+  const { entrada, símbolos, árvore = undefined, saída = undefined, js = undefined, js_eval = undefined, erro = undefined } = opções
   return [
     ...(símbolos !== undefined ? [{
       função: analisador_léxico,
@@ -68,6 +68,17 @@ export const teste = opções => {
       },
       argumento: entrada,
       retorno_esperado: js,
+    }] : []),
+    ...(js_eval !== undefined ? [{
+      função: entrada => {
+        const sintaxe = analisador_sintático({
+          entrada: analisador_léxico(entrada),
+          posição: 0,
+        })
+        return eval(árvore_para_js(sintaxe) ?? "")
+      },
+      argumento: entrada,
+      retorno_esperado: js_eval,
     }] : [])
   ]
 }

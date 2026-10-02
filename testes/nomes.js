@@ -28,6 +28,7 @@ export default [
       ],
     },
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>11);12+a()",
+    js_eval: 23,
     /* saída: bloco(`
       23
     `), */

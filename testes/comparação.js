@@ -19,6 +19,7 @@ export default [
       },
     },
     js: `2>8`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -28,6 +29,7 @@ export default [
       8 > 2
     `),
     js: `8>2`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -37,6 +39,7 @@ export default [
       8 > 8
     `),
     js: `8>8`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -46,6 +49,7 @@ export default [
       2 < 8
     `),
     js: `2<8`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -55,6 +59,7 @@ export default [
       8 < 2
     `),
     js: `8<2`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -64,6 +69,7 @@ export default [
       8 < 8
     `),
     js: `8<8`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -73,6 +79,7 @@ export default [
       2 == 8
     `),
     js: `2==8`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -82,6 +89,7 @@ export default [
       8 == 2
     `),
     js: `8==2`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -91,6 +99,7 @@ export default [
       8 == 8
     `),
     js: `8==8`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -100,6 +109,7 @@ export default [
       2 != 8
     `),
     js: `2!=8`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -109,6 +119,7 @@ export default [
       8 != 2
     `),
     js: `8!=2`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -118,6 +129,7 @@ export default [
       8 != 8
     `),
     js: `8!=8`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -127,6 +139,7 @@ export default [
       2 >= 8
     `),
     js: `2>=8`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -136,6 +149,7 @@ export default [
       8 >= 2
     `),
     js: `8>=2`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -145,6 +159,7 @@ export default [
       8 >= 8
     `),
     js: `8>=8`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -154,6 +169,7 @@ export default [
       2 <= 8
     `),
     js: `2<=8`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */
@@ -163,6 +179,7 @@ export default [
       8 <= 2
     `),
     js: `8<=2`,
+    js_eval: false,
     /* saída: bloco(`
       0
     `), */
@@ -172,6 +189,7 @@ export default [
       8 <= 8
     `),
     js: `8<=8`,
+    js_eval: true,
     /* saída: bloco(`
       1
     `), */

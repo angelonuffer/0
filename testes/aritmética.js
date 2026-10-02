@@ -13,6 +13,7 @@ export default [
     árvore: { número: "1" },
     saída: 1,
     js: "1",
+    js_eval: 1,
   }),
   ...teste({
     entrada: bloco(`
@@ -48,6 +49,7 @@ export default [
     },
     saída: 47,
     js: "42+5",
+    js_eval: 47,
   }),
   ...teste({
     entrada: bloco(`
@@ -55,6 +57,7 @@ export default [
     `),
     saída: 4,
     js: "8-4",
+    js_eval: 4,
   }),
   ...teste({
     entrada: bloco(`
@@ -62,6 +65,7 @@ export default [
     `),
     saída: 12,
     js: "3*4",
+    js_eval: 12,
   }),
   ...teste({
     entrada: bloco(`
@@ -69,6 +73,7 @@ export default [
     `),
     saída: 4,
     js: "8/2",
+    js_eval: 4,
   }),
   ...teste({
     entrada: bloco(`
@@ -76,6 +81,7 @@ export default [
     `),
     saída: 2147483648,
     js: "2147483647+1",
+    js_eval: 2147483648,
   }),
   ...teste({
     entrada: bloco(`
@@ -95,6 +101,7 @@ export default [
       },
     },
     js: "4-2-1",
+    js_eval: 1,
     /* saída: bloco(`
       1
     `), */
@@ -104,6 +111,7 @@ export default [
       2 + 3 * 4
     `),
     js: "2+3*4",
+    js_eval: 14,
     /* saída: bloco(`
       14
     `), */
@@ -113,6 +121,7 @@ export default [
       10 - 6 / 2
     `),
     js: "10-6/2",
+    js_eval: 7,
     /* saída: bloco(`
       7
     `), */
@@ -122,6 +131,7 @@ export default [
       8 / 2 + 3 * 2
     `),
     js: "8/2+3*2",
+    js_eval: 10,
     /* saída: bloco(`
       10
     `), */
@@ -153,6 +163,7 @@ export default [
       },
     },
     js: "(2+3)*4",
+    js_eval: 20,
     /* saída: bloco(`
       20
     `), */
@@ -162,6 +173,7 @@ export default [
       10 - (6 / 2)
     `),
     js: "10-(6/2)",
+    js_eval: 7,
     /* saída: bloco(`
       7
     `), */
@@ -171,6 +183,7 @@ export default [
       1 + 2 * 3 - 4 / 2
     `),
     js: "1+2*3-4/2",
+    js_eval: 5,
     /* saída: bloco(`
       5
     `), */
