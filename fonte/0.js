@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url"
 import { analisador_léxico } from "./analisador-léxico.js"
 import { analisador_sintático } from "./analisador-sintático.js"
 import { analisador_semântico } from "./analisador-semântico.js"
+import { formatar_erro } from "./erro.js"
 
 const executar = arquivo => {
 	const código = readFileSync(arquivo, "utf8")
@@ -12,7 +13,7 @@ const executar = arquivo => {
 	const sintaxe = analisador_sintático({ entrada: tokens, posição: 0 })
 
 	if (sintaxe.erro) {
-		throw new Error(`Erro sintático na posição ${sintaxe.posição}: esperado ${sintaxe.erro}`)
+		throw new Error(formatar_erro({ ...sintaxe, entrada: código, tokens, arquivo }))
 	}
 
 	return analisador_semântico(sintaxe)
