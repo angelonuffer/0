@@ -51,45 +51,29 @@ export default [
     entrada: bloco(`
       8 - 4
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '-' },
-      { número: '4' },
-    ],
     saída: 4,
+    js: "8-4",
   }),
   ...teste({
     entrada: bloco(`
       3 * 4
     `),
-    símbolos: [
-      { número: '3' },
-      { operador: '*' },
-      { número: '4' },
-    ],
     saída: 12,
+    js: "3*4",
   }),
   ...teste({
     entrada: bloco(`
       8 / 2
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '/' },
-      { número: '2' },
-    ],
     saída: 4,
+    js: "8/2",
   }),
   ...teste({
     entrada: bloco(`
       2147483647 + 1
     `),
-    símbolos: [
-      { número: '2147483647' },
-      { operador: '+' },
-      { número: '1' },
-    ],
     saída: 2147483648,
+    js: "2147483647+1",
   }),
   ...teste({
     entrada: bloco(`

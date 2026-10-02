@@ -6,7 +6,7 @@ import { árvore_para_js } from "../fonte/árvore_para_js.js";
 export const teste = opções => {
   const chaves_permitidas = ["entrada", "símbolos", "árvore", "saída", "js"]
   const chaves = opções && typeof opções === "object" ? Object.keys(opções) : []
-  const ausentes = ["entrada", "símbolos"].filter(chave => !chaves.includes(chave))
+  const ausentes = ["entrada"].filter(chave => !chaves.includes(chave))
   const extras = chaves.filter(chave => !chaves_permitidas.includes(chave))
 
   if (!opções || typeof opções !== "object" || ausentes.length > 0 || extras.length > 0) {
@@ -23,11 +23,11 @@ export const teste = opções => {
 
   const { entrada, símbolos, árvore = undefined, saída = undefined, js = undefined } = opções
   return [
-    {
+    ...(símbolos !== undefined ? [{
       função: analisador_léxico,
       argumento: entrada,
       retorno_esperado: símbolos,
-    },
+    }] : []),
     ...(árvore !== undefined ? [{
       função: entrada => analisador_sintático({
         entrada: analisador_léxico(entrada),
