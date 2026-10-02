@@ -39,19 +39,8 @@ export default [
       b = 8
       2 + a + b
     `),
-    símbolos: [
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '5' },
-      { identificador: 'b' },
-      { operador: '=' },
-      { número: '8' },
-      { número: '2' },
-      { operador: '+' },
-      { identificador: 'a' },
-      { operador: '+' },
-      { identificador: 'b' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>5);const b=_(()=>8);2+a()+b()",
+    js_eval: 15,
     /* saída: bloco(`
       15
     `), */
@@ -62,17 +51,6 @@ export default [
       b = 8
       3 + c
     `),
-    símbolos: [
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '5' },
-      { identificador: 'b' },
-      { operador: '=' },
-      { número: '8' },
-      { número: '3' },
-      { operador: '+' },
-      { identificador: 'c' },
-    ],
     /* erro: bloco(`
       ⛔ a | b
       📄 testar.js
@@ -86,17 +64,8 @@ export default [
       b = 8
       a + b
     `),
-    símbolos: [
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '5' },
-      { identificador: 'b' },
-      { operador: '=' },
-      { número: '8' },
-      { identificador: 'a' },
-      { operador: '+' },
-      { identificador: 'b' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>5);const b=_(()=>8);a()+b()",
+    js_eval: 13,
     /* saída: bloco(`
       13
     `), */
@@ -107,17 +76,8 @@ export default [
       b = 3
       a + b
     `),
-    símbolos: [
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '2' },
-      { identificador: 'b' },
-      { operador: '=' },
-      { número: '3' },
-      { identificador: 'a' },
-      { operador: '+' },
-      { identificador: 'b' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>2);const b=_(()=>3);a()+b()",
+    js_eval: 5,
     /* saída: bloco(`
       5
     `), */
@@ -128,17 +88,8 @@ export default [
       y = 5
       x * y
     `),
-    símbolos: [
-      { identificador: 'x' },
-      { operador: '=' },
-      { número: '4' },
-      { identificador: 'y' },
-      { operador: '=' },
-      { número: '5' },
-      { identificador: 'x' },
-      { operador: '*' },
-      { identificador: 'y' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const x=_(()=>4);const y=_(()=>5);x()*y()",
+    js_eval: 20,
     /* saída: bloco(`
       20
     `), */
@@ -148,14 +99,8 @@ export default [
       valor = 10
       valor + 5
     `),
-    símbolos: [
-      { identificador: 'valor' },
-      { operador: '=' },
-      { número: '10' },
-      { identificador: 'valor' },
-      { operador: '+' },
-      { número: '5' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const valor=_(()=>10);valor()+5",
+    js_eval: 15,
     /* saída: bloco(`
       15
     `), */
@@ -167,22 +112,8 @@ export default [
       c = 4
       a + b * c
     `),
-    símbolos: [
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '2' },
-      { identificador: 'b' },
-      { operador: '=' },
-      { número: '3' },
-      { identificador: 'c' },
-      { operador: '=' },
-      { número: '4' },
-      { identificador: 'a' },
-      { operador: '+' },
-      { identificador: 'b' },
-      { operador: '*' },
-      { identificador: 'c' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>2);const b=_(()=>3);const c=_(()=>4);a()+b()*c()",
+    js_eval: 14,
     /* saída: bloco(`
       14
     `), */
@@ -193,19 +124,8 @@ export default [
       b = a * 2
       b + 3
     `),
-    símbolos: [
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '5' },
-      { identificador: 'b' },
-      { operador: '=' },
-      { identificador: 'a' },
-      { operador: '*' },
-      { número: '2' },
-      { identificador: 'b' },
-      { operador: '+' },
-      { número: '3' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>5);const b=_(()=>a()*2);b()+3",
+    js_eval: 13,
     /* saída: bloco(`
       13
     `), */
@@ -220,27 +140,8 @@ export default [
       )
       a * b
     `),
-    símbolos: [
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '2' },
-      { identificador: 'b' },
-      { operador: '=' },
-      { pontuação: '(' },
-      { identificador: 'x' },
-      { operador: '=' },
-      { número: '3' },
-      { identificador: 'y' },
-      { operador: '=' },
-      { número: '4' },
-      { identificador: 'x' },
-      { operador: '+' },
-      { identificador: 'y' },
-      { pontuação: ')' },
-      { identificador: 'a' },
-      { operador: '*' },
-      { identificador: 'b' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>2);const b=_(()=>{const x=_(()=>3);const y=_(()=>4);return x()+y()});a()*b()",
+    js_eval: 14,
     /* saída: bloco(`
       14
     `), */
@@ -255,27 +156,8 @@ export default [
       )
       x + y
     `),
-    símbolos: [
-      { identificador: 'x' },
-      { operador: '=' },
-      { número: '5' },
-      { identificador: 'y' },
-      { operador: '=' },
-      { pontuação: '(' },
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '2' },
-      { identificador: 'b' },
-      { operador: '=' },
-      { número: '3' },
-      { identificador: 'a' },
-      { operador: '+' },
-      { identificador: 'b' },
-      { pontuação: ')' },
-      { identificador: 'x' },
-      { operador: '+' },
-      { identificador: 'y' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const x=_(()=>5);const y=_(()=>{const a=_(()=>2);const b=_(()=>3);return a()+b()});x()+y()",
+    js_eval: 10,
     /* saída: bloco(`
       10
     `), */
@@ -286,17 +168,8 @@ export default [
       y = 3
       x + y
     `),
-    símbolos: [
-      { identificador: 'x' },
-      { operador: '=' },
-      { número: '2' },
-      { identificador: 'y' },
-      { operador: '=' },
-      { número: '3' },
-      { identificador: 'x' },
-      { operador: '+' },
-      { identificador: 'y' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const x=_(()=>2);const y=_(()=>3);x()+y()",
+    js_eval: 5,
     /* saída: bloco(`
       5
     `), */
@@ -306,14 +179,8 @@ export default [
       a = 4
       a + 5
     `),
-    símbolos: [
-      { identificador: 'a' },
-      { operador: '=' },
-      { número: '4' },
-      { identificador: 'a' },
-      { operador: '+' },
-      { número: '5' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>4);a()+5",
+    js_eval: 9,
     /* saída: bloco(`
       9
     `), */
@@ -323,14 +190,8 @@ export default [
       x = 7
       x * 2
     `),
-    símbolos: [
-      { identificador: 'x' },
-      { operador: '=' },
-      { número: '7' },
-      { identificador: 'x' },
-      { operador: '*' },
-      { número: '2' },
-    ],
+    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const x=_(()=>7);x()*2",
+    js_eval: 14,
     /* saída: bloco(`
       14
     `), */

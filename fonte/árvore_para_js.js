@@ -1,8 +1,9 @@
 const declaração_preguiça = "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};"
 
-const converter = (árvore, topo) => {
+const converter = (árvore, topo, corpo_de_função = false) => {
   if (árvore?.agrupado) {
     const { agrupado, ...expressão } = árvore
+    if (corpo_de_função && expressão.bloco) return converter(expressão, false, true)
     return `(${converter(expressão, false)})`
   }
 
@@ -15,11 +16,12 @@ const converter = (árvore, topo) => {
     const instruções = árvore.bloco.map((instrução, i) => {
       if (instrução.associação) {
         const { identificador, valor } = instrução.associação
-        return `const ${identificador}=_(()=>${converter(valor, false)})`
+        return `const ${identificador}=_(()=>${converter(valor, false, true)})`
       }
       const código = converter(instrução, false)
       return !topo && i === último ? `return ${código}` : código
     }).join(";")
+    if (corpo_de_função) return `{${instruções}}`
     return topo
       ? `${declaração_preguiça}${instruções}`
       : `(()=>{${instruções}})()`
