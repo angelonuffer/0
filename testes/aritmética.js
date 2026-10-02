@@ -79,13 +79,20 @@ export default [
     entrada: bloco(`
       4 - 2 - 1
     `),
-    símbolos: [
-      { número: '4' },
-      { operador: '-' },
-      { número: '2' },
-      { operador: '-' },
-      { número: '1' },
-    ],
+    árvore: {
+      operação: {
+        operador: { operador: "-" },
+        esquerda: {
+          operação: {
+            operador: { operador: "-" },
+            esquerda: { número: "4" },
+            direita: { número: "2" },
+          },
+        },
+        direita: { número: "1" },
+      },
+    },
+    js: "4-2-1",
     /* saída: bloco(`
       1
     `), */
@@ -94,13 +101,7 @@ export default [
     entrada: bloco(`
       2 + 3 * 4
     `),
-    símbolos: [
-      { número: '2' },
-      { operador: '+' },
-      { número: '3' },
-      { operador: '*' },
-      { número: '4' },
-    ],
+    js: "2+3*4",
     /* saída: bloco(`
       14
     `), */
@@ -109,13 +110,7 @@ export default [
     entrada: bloco(`
       10 - 6 / 2
     `),
-    símbolos: [
-      { número: '10' },
-      { operador: '-' },
-      { número: '6' },
-      { operador: '/' },
-      { número: '2' },
-    ],
+    js: "10-6/2",
     /* saída: bloco(`
       7
     `), */
@@ -124,15 +119,7 @@ export default [
     entrada: bloco(`
       8 / 2 + 3 * 2
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '/' },
-      { número: '2' },
-      { operador: '+' },
-      { número: '3' },
-      { operador: '*' },
-      { número: '2' },
-    ],
+    js: "8/2+3*2",
     /* saída: bloco(`
       10
     `), */
