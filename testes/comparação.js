@@ -11,6 +11,14 @@ export default [
       { operador: '>' },
       { número: '8' },
     ],
+    árvore: {
+      operação: {
+        operador: ">",
+        esquerda: { número: "2" },
+        direita: { número: "8" },
+      },
+    },
+    js: `2>8`,
     /* saída: bloco(`
       0
     `), */
@@ -19,11 +27,7 @@ export default [
     entrada: bloco(`
       8 > 2
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '>' },
-      { número: '2' },
-    ],
+    js: `8>2`,
     /* saída: bloco(`
       1
     `), */
@@ -32,11 +36,7 @@ export default [
     entrada: bloco(`
       8 > 8
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '>' },
-      { número: '8' },
-    ],
+    js: `8>8`,
     /* saída: bloco(`
       0
     `), */
@@ -45,11 +45,7 @@ export default [
     entrada: bloco(`
       2 < 8
     `),
-    símbolos: [
-      { número: '2' },
-      { operador: '<' },
-      { número: '8' },
-    ],
+    js: `2<8`,
     /* saída: bloco(`
       1
     `), */
@@ -58,11 +54,7 @@ export default [
     entrada: bloco(`
       8 < 2
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '<' },
-      { número: '2' },
-    ],
+    js: `8<2`,
     /* saída: bloco(`
       0
     `), */
@@ -71,11 +63,7 @@ export default [
     entrada: bloco(`
       8 < 8
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '<' },
-      { número: '8' },
-    ],
+    js: `8<8`,
     /* saída: bloco(`
       0
     `), */
@@ -84,11 +72,7 @@ export default [
     entrada: bloco(`
       2 == 8
     `),
-    símbolos: [
-      { número: '2' },
-      { operador: '==' },
-      { número: '8' },
-    ],
+    js: `2==8`,
     /* saída: bloco(`
       0
     `), */
@@ -97,11 +81,7 @@ export default [
     entrada: bloco(`
       8 == 2
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '==' },
-      { número: '2' },
-    ],
+    js: `8==2`,
     /* saída: bloco(`
       0
     `), */
@@ -110,11 +90,7 @@ export default [
     entrada: bloco(`
       8 == 8
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '==' },
-      { número: '8' },
-    ],
+    js: `8==8`,
     /* saída: bloco(`
       1
     `), */
@@ -123,11 +99,7 @@ export default [
     entrada: bloco(`
       2 != 8
     `),
-    símbolos: [
-      { número: '2' },
-      { operador: '!=' },
-      { número: '8' },
-    ],
+    js: `2!=8`,
     /* saída: bloco(`
       1
     `), */
@@ -136,11 +108,7 @@ export default [
     entrada: bloco(`
       8 != 2
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '!=' },
-      { número: '2' },
-    ],
+    js: `8!=2`,
     /* saída: bloco(`
       1
     `), */
@@ -149,11 +117,7 @@ export default [
     entrada: bloco(`
       8 != 8
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '!=' },
-      { número: '8' },
-    ],
+    js: `8!=8`,
     /* saída: bloco(`
       0
     `), */
@@ -162,11 +126,7 @@ export default [
     entrada: bloco(`
       2 >= 8
     `),
-    símbolos: [
-      { número: '2' },
-      { operador: '>=' },
-      { número: '8' },
-    ],
+    js: `2>=8`,
     /* saída: bloco(`
       0
     `), */
@@ -175,11 +135,7 @@ export default [
     entrada: bloco(`
       8 >= 2
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '>=' },
-      { número: '2' },
-    ],
+    js: `8>=2`,
     /* saída: bloco(`
       1
     `), */
@@ -188,11 +144,7 @@ export default [
     entrada: bloco(`
       8 >= 8
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '>=' },
-      { número: '8' },
-    ],
+    js: `8>=8`,
     /* saída: bloco(`
       1
     `), */
@@ -201,11 +153,7 @@ export default [
     entrada: bloco(`
       2 <= 8
     `),
-    símbolos: [
-      { número: '2' },
-      { operador: '<=' },
-      { número: '8' },
-    ],
+    js: `2<=8`,
     /* saída: bloco(`
       1
     `), */
@@ -214,11 +162,7 @@ export default [
     entrada: bloco(`
       8 <= 2
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '<=' },
-      { número: '2' },
-    ],
+    js: `8<=2`,
     /* saída: bloco(`
       0
     `), */
@@ -227,11 +171,7 @@ export default [
     entrada: bloco(`
       8 <= 8
     `),
-    símbolos: [
-      { número: '8' },
-      { operador: '<=' },
-      { número: '8' },
-    ],
+    js: `8<=8`,
     /* saída: bloco(`
       1
     `), */
