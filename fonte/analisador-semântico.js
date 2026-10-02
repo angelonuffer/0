@@ -6,7 +6,7 @@ export const analisador_semântico = ast => {
     const valor_esquerdo = analisador_semântico(esquerda);
     const valor_direito = analisador_semântico(direita);
 
-    switch (operador?.operador) {
+    switch (operador) {
       case '+': return valor_esquerdo + valor_direito;
       case '-': return valor_esquerdo - valor_direito;
       case '*': return valor_esquerdo * valor_direito;

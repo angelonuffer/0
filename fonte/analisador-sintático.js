@@ -9,7 +9,7 @@ const operações = (árvore, analisador_átomo) => mapear(
   ),
   operações => operações.reduce((esquerda, [operador, direita]) => ({
     operação: {
-      operador,
+      operador: operador.operador,
       esquerda,
       direita,
     },

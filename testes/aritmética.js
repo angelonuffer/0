@@ -41,7 +41,7 @@ export default [
     ],
     árvore: {
       operação: {
-        operador: { operador: "+" },
+        operador: "+",
         esquerda: { número: "42" },
         direita: { número: "5" },
       },
@@ -83,10 +83,10 @@ export default [
     `),
     árvore: {
       operação: {
-        operador: { operador: "-" },
+        operador: "-",
         esquerda: {
           operação: {
-            operador: { operador: "-" },
+            operador: "-",
             esquerda: { número: "4" },
             direita: { número: "2" },
           },
@@ -141,10 +141,10 @@ export default [
     ],
     árvore: {
       operação: {
-        operador: { operador: "*" },
+        operador: "*",
         esquerda: {
           operação: {
-            operador: { operador: "+" },
+            operador: "+",
             esquerda: { número: "2" },
             direita: { número: "3" },
           },
