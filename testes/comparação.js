@@ -20,9 +20,6 @@ export default [
     },
     js: `2>8`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -30,9 +27,6 @@ export default [
     `),
     js: `8>2`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -40,9 +34,6 @@ export default [
     `),
     js: `8>8`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -50,9 +41,6 @@ export default [
     `),
     js: `2<8`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -60,9 +48,6 @@ export default [
     `),
     js: `8<2`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -70,9 +55,6 @@ export default [
     `),
     js: `8<8`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -80,9 +62,6 @@ export default [
     `),
     js: `2==8`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -90,9 +69,6 @@ export default [
     `),
     js: `8==2`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -100,9 +76,6 @@ export default [
     `),
     js: `8==8`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -110,9 +83,6 @@ export default [
     `),
     js: `2!=8`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -120,9 +90,6 @@ export default [
     `),
     js: `8!=2`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -130,9 +97,6 @@ export default [
     `),
     js: `8!=8`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -140,9 +104,6 @@ export default [
     `),
     js: `2>=8`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -150,9 +111,6 @@ export default [
     `),
     js: `8>=2`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -160,9 +118,6 @@ export default [
     `),
     js: `8>=8`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -170,9 +125,6 @@ export default [
     `),
     js: `2<=8`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -180,9 +132,6 @@ export default [
     `),
     js: `8<=2`,
     js_eval: false,
-    /* saída: bloco(`
-      0
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -190,8 +139,5 @@ export default [
     `),
     js: `8<=8`,
     js_eval: true,
-    /* saída: bloco(`
-      1
-    `), */
   }),
 ]

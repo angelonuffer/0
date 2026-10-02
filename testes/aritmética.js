@@ -102,9 +102,6 @@ export default [
     },
     js: "4-2-1",
     js_eval: 1,
-    /* saída: bloco(`
-      1
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -112,9 +109,6 @@ export default [
     `),
     js: "2+3*4",
     js_eval: 14,
-    /* saída: bloco(`
-      14
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -122,9 +116,6 @@ export default [
     `),
     js: "10-6/2",
     js_eval: 7,
-    /* saída: bloco(`
-      7
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -132,9 +123,6 @@ export default [
     `),
     js: "8/2+3*2",
     js_eval: 10,
-    /* saída: bloco(`
-      10
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -164,9 +152,6 @@ export default [
     },
     js: "(2+3)*4",
     js_eval: 20,
-    /* saída: bloco(`
-      20
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -174,9 +159,6 @@ export default [
     `),
     js: "10-(6/2)",
     js_eval: 7,
-    /* saída: bloco(`
-      7
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -184,8 +166,5 @@ export default [
     `),
     js: "1+2*3-4/2",
     js_eval: 5,
-    /* saída: bloco(`
-      5
-    `), */
   }),
 ]

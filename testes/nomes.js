@@ -29,9 +29,6 @@ export default [
     },
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>11);12+a()",
     js_eval: 23,
-    /* saída: bloco(`
-      23
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -41,9 +38,6 @@ export default [
     `),
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>5);const b=_(()=>8);2+a()+b()",
     js_eval: 15,
-    /* saída: bloco(`
-      15
-    `), */
   }),
     ...teste({
     entrada: bloco(`
@@ -66,9 +60,6 @@ export default [
     `),
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const x=_(()=>4);const y=_(()=>5);x()*y()",
     js_eval: 20,
-    /* saída: bloco(`
-      20
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -77,9 +68,6 @@ export default [
     `),
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const valor=_(()=>10);valor()+5",
     js_eval: 15,
-    /* saída: bloco(`
-      15
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -90,9 +78,6 @@ export default [
     `),
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>2);const b=_(()=>3);const c=_(()=>4);a()+b()*c()",
     js_eval: 14,
-    /* saída: bloco(`
-      14
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -102,9 +87,6 @@ export default [
     `),
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>5);const b=_(()=>a()*2);b()+3",
     js_eval: 13,
-    /* saída: bloco(`
-      13
-    `), */
   }),
   ...teste({
     entrada: bloco(`
@@ -118,8 +100,5 @@ export default [
     `),
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>2);const b=_(()=>{const x=_(()=>3);const y=_(()=>4);return x()+y()});a()*b()",
     js_eval: 14,
-    /* saída: bloco(`
-      14
-    `), */
   }),
 ]
