@@ -1,10 +1,10 @@
-import { encadeamento, esquerda, fim, mapear, repetição, sequência, tipo } from "./dialeto.js"
+import { alternativa, encadeamento, esquerda, fim, mapear, repetição, sequência, símbolo, tipo } from "./dialeto.js"
 
-const operações = número => mapear(
+const operações = (árvore, analisador_átomo) => mapear(
   repetição(
     sequência(
       tipo("operador"),
-      tipo("número"),
+      analisador_átomo,
     ),
   ),
   operações => operações.reduce((esquerda, [operador, direita]) => ({
@@ -13,19 +13,28 @@ const operações = número => mapear(
       esquerda,
       direita,
     },
-  }), número),
+  }), árvore),
 )
 
-const expressão = encadeamento(
+let expressão
+
+const agrupamento = encadeamento(
+  símbolo("("),
+  () => esquerda(expressão, símbolo(")")),
+)
+
+const átomo = alternativa(
   tipo("número"),
-  número => esquerda(
-    operações(número),
-    fim,
-  ),
+  agrupamento,
+)
+
+expressão = encadeamento(
+  átomo,
+  árvore => operações(árvore, átomo),
 )
 
 export const analisador_sintático = ({ entrada, posição }) => {
-  const resultado = expressão({ entrada, posição })
+  const resultado = esquerda(expressão, fim)({ entrada, posição })
   if (resultado.erro) return resultado
   return resultado.valor
 }

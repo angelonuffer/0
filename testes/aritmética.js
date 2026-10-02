@@ -137,6 +137,19 @@ export default [
       { operador: '*' },
       { número: '4' },
     ],
+    árvore: {
+      operação: {
+        operador: { operador: "*" },
+        esquerda: {
+          operação: {
+            operador: { operador: "+" },
+            esquerda: { número: "2" },
+            direita: { número: "3" },
+          },
+        },
+        direita: { número: "4" },
+      },
+    },
     /* saída: bloco(`
       20
     `), */
