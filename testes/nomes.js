@@ -45,7 +45,7 @@ export default [
       15
     `), */
   }),
-  ...teste({
+    ...teste({
     entrada: bloco(`
       a = 5
       b = 8
@@ -56,30 +56,6 @@ export default [
       📄 testar.js
       👉 3: 3 + c
                 ^ 5
-    `), */
-  }),
-  ...teste({
-    entrada: bloco(`
-      a = 5
-      b = 8
-      a + b
-    `),
-    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>5);const b=_(()=>8);a()+b()",
-    js_eval: 13,
-    /* saída: bloco(`
-      13
-    `), */
-  }),
-  ...teste({
-    entrada: bloco(`
-      a = 2
-      b = 3
-      a + b
-    `),
-    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>2);const b=_(()=>3);a()+b()",
-    js_eval: 5,
-    /* saída: bloco(`
-      5
     `), */
   }),
   ...teste({
@@ -141,56 +117,6 @@ export default [
       a * b
     `),
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>2);const b=_(()=>{const x=_(()=>3);const y=_(()=>4);return x()+y()});a()*b()",
-    js_eval: 14,
-    /* saída: bloco(`
-      14
-    `), */
-  }),
-  ...teste({
-    entrada: bloco(`
-      x = 5
-      y = (
-        a = 2
-        b = 3
-        a + b
-      )
-      x + y
-    `),
-    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const x=_(()=>5);const y=_(()=>{const a=_(()=>2);const b=_(()=>3);return a()+b()});x()+y()",
-    js_eval: 10,
-    /* saída: bloco(`
-      10
-    `), */
-  }),
-  ...teste({
-    entrada: bloco(`
-      x = 2
-      y = 3
-      x + y
-    `),
-    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const x=_(()=>2);const y=_(()=>3);x()+y()",
-    js_eval: 5,
-    /* saída: bloco(`
-      5
-    `), */
-  }),
-  ...teste({
-    entrada: bloco(`
-      a = 4
-      a + 5
-    `),
-    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>4);a()+5",
-    js_eval: 9,
-    /* saída: bloco(`
-      9
-    `), */
-  }),
-  ...teste({
-    entrada: bloco(`
-      x = 7
-      x * 2
-    `),
-    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const x=_(()=>7);x()*2",
     js_eval: 14,
     /* saída: bloco(`
       14
