@@ -150,6 +150,7 @@ export default [
         direita: { número: "4" },
       },
     },
+    js: "(2+3)*4",
     /* saída: bloco(`
       20
     `), */

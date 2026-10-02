@@ -20,7 +20,10 @@ let expressão
 
 const agrupamento = encadeamento(
   símbolo("("),
-  () => esquerda(expressão, símbolo(")")),
+  () => mapear(
+    esquerda(expressão, símbolo(")")),
+    árvore => ({ ...árvore, agrupado: true }),
+  ),
 )
 
 const átomo = alternativa(
