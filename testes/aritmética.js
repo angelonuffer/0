@@ -159,15 +159,7 @@ export default [
     entrada: bloco(`
       10 - (6 / 2)
     `),
-    símbolos: [
-      { número: '10' },
-      { operador: '-' },
-      { pontuação: '(' },
-      { número: '6' },
-      { operador: '/' },
-      { número: '2' },
-      { pontuação: ')' },
-    ],
+    js: "10-(6/2)",
     /* saída: bloco(`
       7
     `), */
@@ -176,17 +168,7 @@ export default [
     entrada: bloco(`
       1 + 2 * 3 - 4 / 2
     `),
-    símbolos: [
-      { número: '1' },
-      { operador: '+' },
-      { número: '2' },
-      { operador: '*' },
-      { número: '3' },
-      { operador: '-' },
-      { número: '4' },
-      { operador: '/' },
-      { número: '2' },
-    ],
+    js: "1+2*3-4/2",
     /* saída: bloco(`
       5
     `), */
