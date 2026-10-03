@@ -17,22 +17,6 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      +
-    `),
-    símbolos: [
-      { operador: '+' },
-    ],
-    árvore: { erro: "\"!\" | \"(\" | identificador | número", posição: 0 },
-    erro: bloco(`
-      testar.js
-      1: +
-         ^ 1
-      Erro de sintaxe. Esperava:
-        "!" | "(" | identificador | número
-    `)
-  }),
-  ...teste({
-    entrada: bloco(`
       42 + 5
     `),
     símbolos: [
@@ -176,5 +160,99 @@ export default [
     `),
     js: "1+2*3-4/2",
     js_eval: 5,
+  }),
+  ...teste({
+    entrada: bloco(`
+      +
+    `),
+    símbolos: [
+      { operador: '+' },
+    ],
+    árvore: { erro: "\"!\" | \"(\" | identificador | número", posição: 0 },
+    erro: bloco(`
+      testar.js
+      1: +
+         ^ 1
+      Erro de sintaxe. Esperava:
+        "!" | "(" | identificador | número
+    `)
+  }),
+  ...teste({
+    entrada: bloco(`
+      1 +
+    `),
+    árvore: { erro: "\"!\" | \"(\" | identificador | número", posição: 2 },
+    erro: bloco(`
+      testar.js
+      1: 1 +
+            ^ 4
+      Erro de sintaxe. Esperava:
+        "!" | "(" | identificador | número
+    `)
+  }),
+  ...teste({
+    entrada: bloco(`
+      (1 + 2
+    `),
+    árvore: { erro: "\")\" | operador", posição: 4 },
+    erro: bloco(`
+      testar.js
+      1: (1 + 2
+               ^ 7
+      Erro de sintaxe. Esperava:
+        ")" | operador
+    `)
+  }),
+  ...teste({
+    entrada: bloco(`
+      (1 + 2 3
+    `),
+    árvore: { erro: "\")\" | operador", posição: 4 },
+    erro: bloco(`
+      testar.js
+      1: (1 + 2 3
+                ^ 8
+      Erro de sintaxe. Esperava:
+        ")" | operador
+    `)
+  }),
+  ...teste({
+    entrada: bloco(`
+      (1 + 2 a
+    `),
+    árvore: { erro: "\")\" | operador", posição: 4 },
+    erro: bloco(`
+      testar.js
+      1: (1 + 2 a
+                ^ 8
+      Erro de sintaxe. Esperava:
+        ")" | operador
+    `)
+  }),
+  ...teste({
+    entrada: bloco(`
+      1 )
+    `),
+    árvore: { erro: "fim da entrada | operador", posição: 1 },
+    erro: bloco(`
+      testar.js
+      1: 1 )
+           ^ 3
+      Erro de sintaxe. Esperava:
+        fim da entrada | operador
+    `)
+  }),
+  ...teste({
+    entrada: bloco(`
+      * 2
+    `),
+    árvore: { erro: "\"!\" | \"(\" | identificador | número", posição: 0 },
+    erro: bloco(`
+      testar.js
+      1: * 2
+         ^ 1
+      Erro de sintaxe. Esperava:
+        "!" | "(" | identificador | número
+    `)
   }),
 ]

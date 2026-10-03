@@ -171,9 +171,12 @@ export const localizar = (analisador, tipo) => ({ entrada, posição }) => {
 
 export const repetição = analisador => ({ entrada, posição }) => {
   const resultado_1 = analisador({ entrada, posição })
-  if (resultado_1.erro) return {
-    valor: entrada_tokenizada(entrada) ? [] : "",
-    posição,
+  if (resultado_1.erro) {
+    if (resultado_1.posição > posição) return resultado_1
+    return {
+      valor: entrada_tokenizada(entrada) ? [] : "",
+      posição,
+    }
   }
   const resultado_2 = repetição(analisador)({ entrada, posição: resultado_1.posição })
   return {
