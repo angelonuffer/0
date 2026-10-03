@@ -18,6 +18,7 @@ export default [
         direita: { número: "8" },
       },
     },
+    valor: { booleano: false },
     js: `2>8`,
     js_eval: false,
   }),
@@ -74,6 +75,7 @@ export default [
     entrada: bloco(`
       8 == 8
     `),
+    valor: { booleano: true },
     js: `8==8`,
     js_eval: true,
   }),

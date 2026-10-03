@@ -27,6 +27,18 @@ export default [
         },
       ],
     },
+    valor: {
+      bloco: [
+        { associação: { identificador: 'a', valor: { número: '11' } } },
+        {
+          operação: {
+            operador: '+',
+            esquerda: { número: '12' },
+            direita: { identificador: 'a' },
+          },
+        },
+      ],
+    },
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>11);12+a()",
     js_eval: 23,
   }),

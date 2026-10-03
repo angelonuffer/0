@@ -9,6 +9,8 @@ const converter = (árvore, topo, corpo_de_função = false) => {
 
   if (árvore?.número !== undefined) return árvore.número
 
+  if (árvore?.booleano !== undefined) return String(árvore.booleano)
+
   if (árvore?.identificador !== undefined) return `${árvore.identificador}()`
 
   if (árvore?.bloco) {
