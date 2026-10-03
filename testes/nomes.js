@@ -29,11 +29,11 @@ export default [
     },
     valor: {
       bloco: [
-        { associação: { identificador: 'a', valor: { número: '11' } } },
+        { associação: { identificador: 'a', valor: 11 } },
         {
           operação: {
             operador: '+',
-            esquerda: { número: '12' },
+            esquerda: 12,
             direita: { identificador: 'a' },
           },
         },

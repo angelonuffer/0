@@ -18,7 +18,7 @@ export default [
         direita: { número: "0" },
       },
     },
-    valor: { número: "0" },
+    valor: 0,
     js: `0&&0`,
     js_eval: 0,
   }),
@@ -75,7 +75,7 @@ export default [
     entrada: bloco(`
       ! 0
     `),
-    valor: { booleano: true },
+    valor: true,
     js: `!0`,
     js_eval: true,
   }),
@@ -90,7 +90,7 @@ export default [
     entrada: bloco(`
       ! ! 0
     `),
-    valor: { booleano: false },
+    valor: false,
     js: `!!0`,
     js_eval: false,
   }),
@@ -98,7 +98,7 @@ export default [
     entrada: bloco(`
       0 && (1 / 0)
     `),
-    valor: { número: "0" },
+    valor: 0,
     js: `0&&(1/0)`,
     js_eval: 0,
   }),
