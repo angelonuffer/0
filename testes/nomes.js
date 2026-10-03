@@ -27,18 +27,7 @@ export default [
         },
       ],
     },
-    valor: {
-      bloco: [
-        { associação: { identificador: 'a', valor: 11 } },
-        {
-          operação: {
-            operador: '+',
-            esquerda: 12,
-            direita: { identificador: 'a' },
-          },
-        },
-      ],
-    },
+    valor: 23,
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>11);12+a()",
     js_eval: 23,
   }),
@@ -50,6 +39,15 @@ export default [
     `),
     js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>5);const b=_(()=>8);2+a()+b()",
     js_eval: 15,
+  }),
+  ...teste({
+    entrada: bloco(`
+      a = b + 1
+      b = 10
+      a
+    `),
+    valor: 11,
+    js_eval: 11,
   }),
     ...teste({
     entrada: bloco(`
