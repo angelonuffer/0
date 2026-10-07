@@ -168,65 +168,65 @@ export default [
     símbolos: [
       { operador: '+' },
     ],
-    árvore: { erro: "\"!\" | \"(\" | identificador | número", posição: 0 },
+    árvore: { erro: "\"!\" | \"(\" | \"$\" | identificador | número", posição: 0 },
     erro: bloco(`
       testar.js
       1: +
          ^ 1
       Erro de sintaxe. Esperava:
-        "!" | "(" | identificador | número
+        "!" | "(" | "$" | identificador | número
     `)
   }),
   ...teste({
     entrada: bloco(`
       1 +
     `),
-    árvore: { erro: "\"!\" | \"(\" | identificador | número", posição: 2 },
+    árvore: { erro: "\"!\" | \"(\" | \"$\" | identificador | número", posição: 2 },
     erro: bloco(`
       testar.js
       1: 1 +
             ^ 4
       Erro de sintaxe. Esperava:
-        "!" | "(" | identificador | número
+        "!" | "(" | "$" | identificador | número
     `)
   }),
   ...teste({
     entrada: bloco(`
       (1 + 2
     `),
-    árvore: { erro: "\")\" | operador", posição: 4 },
+    árvore: { erro: "\")\" | \"$\" | operador", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2
                ^ 7
       Erro de sintaxe. Esperava:
-        ")" | operador
+        ")" | "$" | operador
     `)
   }),
   ...teste({
     entrada: bloco(`
       (1 + 2 3
     `),
-    árvore: { erro: "\")\" | operador", posição: 4 },
+    árvore: { erro: "\")\" | \"$\" | operador", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2 3
                 ^ 8
       Erro de sintaxe. Esperava:
-        ")" | operador
+        ")" | "$" | operador
     `)
   }),
   ...teste({
     entrada: bloco(`
       (1 + 2 a
     `),
-    árvore: { erro: "\")\" | operador", posição: 4 },
+    árvore: { erro: "\")\" | \"$\" | operador", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2 a
                 ^ 8
       Erro de sintaxe. Esperava:
-        ")" | operador
+        ")" | "$" | operador
     `)
   }),
   ...teste({
@@ -246,13 +246,13 @@ export default [
     entrada: bloco(`
       * 2
     `),
-    árvore: { erro: "\"!\" | \"(\" | identificador | número", posição: 0 },
+    árvore: { erro: "\"!\" | \"(\" | \"$\" | identificador | número", posição: 0 },
     erro: bloco(`
       testar.js
       1: * 2
          ^ 1
       Erro de sintaxe. Esperava:
-        "!" | "(" | identificador | número
+        "!" | "(" | "$" | identificador | número
     `)
   }),
 ]

@@ -118,9 +118,19 @@ export const lista = (analisador) => ({ entrada, posição }) => {
 
 export const opcional = (analisador, valor_padrão) => ({ entrada, posição }) => {
   const resultado = analisador({ entrada, posição })
+  if (! resultado.erro) return resultado
   if (resultado.posição > posição) return resultado
   return {
     valor: valor_padrão,
+    posição,
+  }
+}
+
+export const tente = analisador => ({ entrada, posição }) => {
+  const resultado = analisador({ entrada, posição })
+  if (! resultado.erro) return resultado
+  return {
+    ...resultado,
     posição,
   }
 }

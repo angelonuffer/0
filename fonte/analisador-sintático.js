@@ -1,4 +1,4 @@
-import { encadeamento, esquerda, fim, mapear, prever, repetição, sequência, símbolo, tipo } from "./dialeto.js"
+import { alternativa, encadeamento, esquerda, fim, mapear, prever, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
 
 const operações = (árvore, analisador_átomo) => mapear(
   repetição(
@@ -86,11 +86,8 @@ const associação = encadeamento(
   ),
 )
 
-const instrução = prever(
-  ({ entrada, posição }) => entrada[posição]?.pontuação === "$"
-    && entrada[posição + 1]?.identificador !== undefined
-    && entrada[posição + 2]?.pontuação === "=",
-  associação,
+const instrução = alternativa(
+  tente(associação),
   expressão,
 )
 
