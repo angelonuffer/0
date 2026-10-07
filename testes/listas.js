@@ -4,12 +4,13 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      lista = [ 2 ; 3 ]
+      $ lista = [ 2 ; 3 ]
       lista 0
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '2' },
       { pontuação: ';' },
@@ -24,7 +25,7 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista = [
+      $ lista = [
         4 ;
         5 ;
         6 ;
@@ -33,8 +34,9 @@ export default [
       \`\${lista 0} \${lista 1} \${lista 2} \${lista 3}\`
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '4' },
       { pontuação: ';' },
@@ -65,12 +67,13 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista = [ 2 ; 3 ]
+      $lista = [ 2 ; 3 ]
       lista 1
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '2' },
       { pontuação: ';' },
@@ -85,12 +88,13 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista = [ 2 ; 3 ]
+      $ lista = [ 2 ; 3 ]
       #lista
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '2' },
       { pontuação: ';' },
@@ -105,12 +109,13 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista = [[ 1 ; 2 ] ; [ 3 ; 4 ]]
+      $lista = [[ 1 ; 2 ] ; [ 3 ; 4 ]]
       lista 0 1
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { pontuação: '[' },
       { número: '1' },
@@ -134,12 +139,13 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista = [ 1 ; 2 ; 3 ]
+      $ lista = [ 1 ; 2 ; 3 ]
       lista 2
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '1' },
       { pontuação: ';' },
@@ -156,12 +162,13 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista = [ 10 ; 20 ; 30 ]
+      $ lista = [ 10 ; 20 ; 30 ]
       lista 1 + 1
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '10' },
       { pontuação: ';' },
@@ -180,13 +187,14 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista_1 = [ 10 ; 20 ; 30 ]
-      lista_2 = [ lista_1 2 ; 40 ]
+      $ lista_1 = [ 10 ; 20 ; 30 ]
+      $ lista_2 = [ lista_1 2 ; 40 ]
       lista_2 0
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista_1' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '10' },
       { pontuação: ';' },
@@ -194,8 +202,9 @@ export default [
       { pontuação: ';' },
       { número: '30' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_2' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { identificador: 'lista_1' },
       { número: '2' },
@@ -211,13 +220,14 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista_1 = [ 10 ; 20 ; 30 ]
-      lista_2 = [ ...lista_1 ; 40 ]
+      $ lista_1 = [ 10 ; 20 ; 30 ]
+      $ lista_2 = [ ...lista_1 ; 40 ]
       #lista_2
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista_1' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '10' },
       { pontuação: ';' },
@@ -225,8 +235,9 @@ export default [
       { pontuação: ';' },
       { número: '30' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_2' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { pontuação: '...' },
       { identificador: 'lista_1' },
@@ -242,13 +253,14 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista_1 = [ 10 ; 20 ; 30 ]
-      lista_2 = [ ...lista_1 ; 40 ]
+      $ lista_1 = [ 10 ; 20 ; 30 ]
+      $ lista_2 = [ ...lista_1 ; 40 ]
       \`\${lista_2 0} \${lista_2 1} \${lista_2 2} \${lista_2 3}\`
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista_1' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '10' },
       { pontuação: ';' },
@@ -256,8 +268,9 @@ export default [
       { pontuação: ';' },
       { número: '30' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_2' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { pontuação: '...' },
       { identificador: 'lista_1' },
@@ -284,28 +297,31 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista_1 = [ 10 ; 20 ]
-      lista_2 = [ 30 ; 40 ]
-      lista_3 = [ ...lista_1 ; ...lista_2 ]
+      $ lista_1 = [ 10 ; 20 ]
+      $ lista_2 = [ 30 ; 40 ]
+      $ lista_3 = [ ...lista_1 ; ...lista_2 ]
       \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista_1' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '10' },
       { pontuação: ';' },
       { número: '20' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_2' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '30' },
       { pontuação: ';' },
       { número: '40' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_3' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { pontuação: '...' },
       { identificador: 'lista_1' },
@@ -333,29 +349,32 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista_1 = [ 10 ; 20 ]
-      lista_2 = [ ...lista_1 ; 30 ]
-      lista_3 = [ ...lista_2 ; 40 ]
+      $ lista_1 = [ 10 ; 20 ]
+      $ lista_2 = [ ...lista_1 ; 30 ]
+      $ lista_3 = [ ...lista_2 ; 40 ]
       \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista_1' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '10' },
       { pontuação: ';' },
       { número: '20' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_2' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { pontuação: '...' },
       { identificador: 'lista_1' },
       { pontuação: ';' },
       { número: '30' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_3' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { pontuação: '...' },
       { identificador: 'lista_2' },
@@ -382,28 +401,31 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      lista_1 = [ 20 ; 30 ]
-      lista_2 = [ 50 ; 60 ]
-      lista_3 = [ 10 ; ...lista_1 ; 40 ; ...lista_2 ; 70 ]
+      $ lista_1 = [ 20 ; 30 ]
+      $ lista_2 = [ 50 ; 60 ]
+      $ lista_3 = [ 10 ; ...lista_1 ; 40 ; ...lista_2 ; 70 ]
       \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3} \${lista_3 4} \${lista_3 5} \${lista_3 6}\`
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'lista_1' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '20' },
       { pontuação: ';' },
       { número: '30' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_2' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '50' },
       { pontuação: ';' },
       { número: '60' },
       { pontuação: ']' },
+      { pontuação: '$' },
       { identificador: 'lista_3' },
-      { operador: '=' },
+      { pontuação: '=' },
       { pontuação: '[' },
       { número: '10' },
       { pontuação: ';' },

@@ -32,8 +32,9 @@ const agrupamento = encadeamento(
   símbolo("("),
   () => mapear(
     prever(
-      ({ entrada, posição }) => entrada[posição]?.identificador !== undefined
-        && entrada[posição + 1]?.operador === "=",
+      ({ entrada, posição }) => entrada[posição]?.pontuação === "$"
+        && entrada[posição + 1]?.identificador !== undefined
+        && entrada[posição + 2]?.pontuação === "=",
       esquerda(bloco, símbolo(")")),
       esquerda(expressão, fechamento_de_expressão),
     ),
@@ -72,19 +73,23 @@ expressão = encadeamento(
 )
 
 const associação = encadeamento(
-  tipo("identificador"),
-  nome => encadeamento(
-    símbolo("="),
-    () => mapear(
-      expressão,
-      valor => ({ associação: { identificador: nome.identificador, valor } }),
+  símbolo("$"),
+  () => encadeamento(
+    tipo("identificador"),
+    nome => encadeamento(
+      símbolo("="),
+      () => mapear(
+        expressão,
+        valor => ({ associação: { identificador: nome.identificador, valor } }),
+      ),
     ),
   ),
 )
 
 const instrução = prever(
-  ({ entrada, posição }) => entrada[posição]?.identificador !== undefined
-    && entrada[posição + 1]?.operador === "=",
+  ({ entrada, posição }) => entrada[posição]?.pontuação === "$"
+    && entrada[posição + 1]?.identificador !== undefined
+    && entrada[posição + 2]?.pontuação === "=",
   associação,
   expressão,
 )

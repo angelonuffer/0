@@ -4,12 +4,13 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
-      str = "abcdef"
+      $ str = "abcdef"
       str
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'str' },
-      { operador: '=' },
+      { pontuação: '=' },
       { texto: '"abcdef"' },
       { identificador: 'str' },
     ],
@@ -19,12 +20,13 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      a = "abcd"
+      $ a = "abcd"
       #a
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'a' },
-      { operador: '=' },
+      { pontuação: '=' },
       { texto: '"abcd"' },
       { pontuação: '#' },
       { identificador: 'a' },
@@ -35,16 +37,18 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      nome = "Alice"
-      sobrenome = "Silva"
+      $ nome = "Alice"
+      $ sobrenome = "Silva"
       \`\${nome} \${sobrenome}\`
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'nome' },
-      { operador: '=' },
+      { pontuação: '=' },
       { texto: '"Alice"' },
+      { pontuação: '$' },
       { identificador: 'sobrenome' },
-      { operador: '=' },
+      { pontuação: '=' },
       { texto: '"Silva"' },
       { modelo_texto: '`${' },
       { identificador: 'nome' },
@@ -58,12 +62,13 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
-      str = "abcdef"
+      $ str = "abcdef"
       str 5
     `),
     símbolos: [
+      { pontuação: '$' },
       { identificador: 'str' },
-      { operador: '=' },
+      { pontuação: '=' },
       { texto: '"abcdef"' },
       { identificador: 'str' },
       { número: '5' },

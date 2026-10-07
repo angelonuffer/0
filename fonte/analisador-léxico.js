@@ -4,8 +4,8 @@ const regras = {
   modelo_texto: /(?:`|})[^`]*?(?:\$\{|`)/g,
   número: /[0-9]+/g,
   identificador: /[a-zA-Z_][a-zA-Z_0-9]*/g,
-  operador: />=|<=|==|!=|&&|\|\||[+*/><!\-=]/g,
-  pontuação: /\.\.\.|[\[\]();#]/g,
+  operador: />=|<=|==|!=|&&|\|\||[+*/><!-]/g,
+  pontuação: /\.\.\.|[\[\]();#$=]/g,
 }
 
 export const analisador_léxico = entrada => {
