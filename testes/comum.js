@@ -1,7 +1,7 @@
 import { analisador_léxico } from "../fonte/analisador-léxico.js";
 import { analisador_sintático } from "../fonte/analisador-sintático.js";
 import { analisador_semântico } from "../fonte/analisador-semântico.js";
-import { árvore_para_js } from "../fonte/árvore_para_js.js";
+import { árvore_para_js } from "../fonte/árvore-para-js.js";
 import { formatar_erro } from "../fonte/erro.js";
 
 export const teste = opções => {
