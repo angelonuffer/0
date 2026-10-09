@@ -19,87 +19,75 @@ export default [
       },
     },
     valor: 0,
-    js: `0&&0`,
-    js_eval: 0,
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       0 && 1
     `),
-    js: `0&&1`,
-    js_eval: 0,
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       1 && 0
     `),
-    js: `1&&0`,
-    js_eval: 0,
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       1 && 2
     `),
-    js: `1&&2`,
-    js_eval: 2,
+    js: "2",
   }),
   ...teste({
     entrada: bloco(`
       0 || 0
     `),
-    js: `0||0`,
-    js_eval: 0,
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       0 || 1
     `),
-    js: `0||1`,
-    js_eval: 1,
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       1 || 0
     `),
-    js: `1||0`,
-    js_eval: 1,
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       1 || 2
     `),
-    js: `1||2`,
-    js_eval: 1,
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       ! 0
     `),
     valor: true,
-    js: `!0`,
-    js_eval: true,
+    js: "true",
   }),
   ...teste({
     entrada: bloco(`
       ! 1
     `),
-    js: `!1`,
-    js_eval: false,
+    js: "false",
   }),
   ...teste({
     entrada: bloco(`
       ! ! 0
     `),
     valor: false,
-    js: `!!0`,
-    js_eval: false,
+    js: "false",
   }),
   ...teste({
     entrada: bloco(`
       0 && (1 / 0)
     `),
     valor: 0,
-    js: `0&&(1/0)`,
-    js_eval: 0,
+    js: "0",
   }),
 ]

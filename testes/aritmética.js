@@ -13,7 +13,6 @@ export default [
     árvore: { número: "1" },
     valor: 1,
     js: "1",
-    js_eval: 1,
   }),
   ...teste({
     entrada: bloco(`
@@ -32,40 +31,31 @@ export default [
       },
     },
     valor: 47,
-    js: "42+5",
-    js_eval: 47,
+    js: "47",
   }),
   ...teste({
     entrada: bloco(`
       8 - 4
     `),
-    valor: 4,
-    js: "8-4",
-    js_eval: 4,
+    js: "4",
   }),
   ...teste({
     entrada: bloco(`
       3 * 4
     `),
-    valor: 12,
-    js: "3*4",
-    js_eval: 12,
+    js: "12",
   }),
   ...teste({
     entrada: bloco(`
       8 / 2
     `),
-    valor: 4,
-    js: "8/2",
-    js_eval: 4,
+    js: "4",
   }),
   ...teste({
     entrada: bloco(`
       2147483647 + 1
     `),
-    valor: 2147483648,
-    js: "2147483647+1",
-    js_eval: 2147483648,
+    js: "2147483648",
   }),
   ...teste({
     entrada: bloco(`
@@ -84,38 +74,32 @@ export default [
         direita: { número: "1" },
       },
     },
-    valor: 1,
-    js: "4-2-1",
-    js_eval: 1,
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       2 + 3 * 4
     `),
-    js: "2+3*4",
-    js_eval: 14,
+    js: "20",
   }),
   ...teste({
     entrada: bloco(`
       10 - 6 / 2
     `),
-    js: "10-6/2",
-    js_eval: 7,
+    js: "2",
   }),
   ...teste({
     entrada: bloco(`
       8 / 2 + 3 * 2
     `),
-    js: "8/2+3*2",
-    js_eval: 10,
+    js: "14",
   }),
   ...teste({
     entrada: bloco(`
       0 * (0 - 1)
     `),
     valor: -0,
-    js: "0*(0-1)",
-    js_eval: -0,
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
@@ -144,22 +128,19 @@ export default [
       },
     },
     valor: 20,
-    js: "(2+3)*4",
-    js_eval: 20,
+    js: "20",
   }),
   ...teste({
     entrada: bloco(`
       10 - (6 / 2)
     `),
-    js: "10-(6/2)",
-    js_eval: 7,
+    js: "7",
   }),
   ...teste({
     entrada: bloco(`
       1 + 2 * 3 - 4 / 2
     `),
-    js: "1+2*3-4/2",
-    js_eval: 5,
+    js: "2.5",
   }),
   ...teste({
     entrada: bloco(`

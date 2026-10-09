@@ -1,6 +1,8 @@
 const declaração_preguiça = "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};"
 
 const converter = (árvore, topo, corpo_de_função = false) => {
+  if (typeof árvore === "number" || typeof árvore === "boolean") return String(árvore)
+
   if (árvore?.agrupado) {
     const { agrupado, ...expressão } = árvore
     if (corpo_de_função && expressão.bloco) return converter(expressão, false, true)
