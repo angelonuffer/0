@@ -72,18 +72,16 @@ expressão = encadeamento(
   árvore => operações(árvore, átomo),
 )
 
-const associação = encadeamento(
-  símbolo("$"),
-  () => encadeamento(
+const associação = mapear(
+  sequência(
+    símbolo("$"),
     tipo("identificador"),
-    nome => encadeamento(
-      símbolo("="),
-      () => mapear(
-        expressão,
-        valor => ({ associação: { identificador: nome.identificador, valor } }),
-      ),
-    ),
+    símbolo("="),
+    expressão,
   ),
+  ([, nome, , valor]) => ({
+    associação: { identificador: nome.identificador, valor },
+  }),
 )
 
 const instrução = alternativa(
