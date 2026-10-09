@@ -109,8 +109,7 @@ export default [
       )
       a * b
     `),
-    js: "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const a=_(()=>2);const b=_(()=>{const x=_(()=>3);const y=_(()=>4);return x()+y()});a()*b()",
-    js_eval: 14,
+    árvore: { erro: "fim da entrada | operador", posição: 4 },
   }),
   ...teste({
     entrada: bloco(`

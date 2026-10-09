@@ -1,4 +1,4 @@
-import { alternativa, encadeamento, esquerda, falha, fim, mapear, prever, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
+import { alternativa, encadeamento, esquerda, falha, fim, mapear, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
 
 const operações = (árvore, analisador_átomo) => mapear(
   repetição(
@@ -19,25 +19,11 @@ const operações = (árvore, analisador_átomo) => mapear(
 let expressão
 let átomo
 
-const fechamento_de_expressão = ({ entrada, posição }) => {
-  const resultado = símbolo(")")({ entrada, posição })
-  if (resultado.erro) return {
-    erro: "\")\" | operador",
-    posição: resultado.posição,
-  }
-  return resultado
-}
-
 const agrupamento = estado => mapear(
   sequência(
     símbolo("("),
-    prever(
-      ({ entrada, posição }) => entrada[posição]?.pontuação === "$"
-        && entrada[posição + 1]?.identificador !== undefined
-        && entrada[posição + 2]?.pontuação === "=",
-      esquerda(bloco, símbolo(")")),
-      esquerda(expressão, fechamento_de_expressão),
-    ),
+    expressão,
+    símbolo(")"),
   ),
   ([, árvore]) => ({ ...árvore, agrupado: true }),
 )(estado)

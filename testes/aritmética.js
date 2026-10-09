@@ -194,39 +194,39 @@ export default [
     entrada: bloco(`
       (1 + 2
     `),
-    árvore: { erro: "\")\" | operador", posição: 4 },
+    árvore: { erro: "\")\"", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2
                ^ 7
       Erro de sintaxe. Esperava:
-        ")" | operador
+        ")"
     `)
   }),
   ...teste({
     entrada: bloco(`
       (1 + 2 3
     `),
-    árvore: { erro: "\")\" | operador", posição: 4 },
+    árvore: { erro: "\")\"", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2 3
                 ^ 8
       Erro de sintaxe. Esperava:
-        ")" | operador
+        ")"
     `)
   }),
   ...teste({
     entrada: bloco(`
       (1 + 2 a
     `),
-    árvore: { erro: "\")\" | operador", posição: 4 },
+    árvore: { erro: "\")\"", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2 a
                 ^ 8
       Erro de sintaxe. Esperava:
-        ")" | operador
+        ")"
     `)
   }),
   ...teste({
