@@ -28,9 +28,9 @@ const fechamento_de_expressão = ({ entrada, posição }) => {
   return resultado
 }
 
-const agrupamento = encadeamento(
-  símbolo("("),
-  () => mapear(
+const agrupamento = estado => mapear(
+  sequência(
+    símbolo("("),
     prever(
       ({ entrada, posição }) => entrada[posição]?.pontuação === "$"
         && entrada[posição + 1]?.identificador !== undefined
@@ -38,9 +38,9 @@ const agrupamento = encadeamento(
       esquerda(bloco, símbolo(")")),
       esquerda(expressão, fechamento_de_expressão),
     ),
-    árvore => ({ ...árvore, agrupado: true }),
   ),
-)
+  ([, árvore]) => ({ ...árvore, agrupado: true }),
+)(estado)
 
 const prefixo = encadeamento(
   símbolo("!"),
