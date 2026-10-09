@@ -55,17 +55,12 @@ const prefixo = encadeamento(
   ),
 )
 
-átomo = ({ entrada, posição }) => {
-  const token = entrada[posição]
-  if (token?.identificador !== undefined) return tipo("identificador")({ entrada, posição })
-  if (token?.número !== undefined) return tipo("número")({ entrada, posição })
-  if (token?.pontuação === "(") return agrupamento({ entrada, posição })
-  if (token?.operador === "!") return prefixo({ entrada, posição })
-  return {
-    erro: "\"!\" | \"(\" | identificador | número",
-    posição,
-  }
-}
+átomo = alternativa(
+  tipo("identificador"),
+  tipo("número"),
+  agrupamento,
+  prefixo,
+)
 
 expressão = encadeamento(
   átomo,

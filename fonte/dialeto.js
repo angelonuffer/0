@@ -54,8 +54,13 @@ export const alternativa = (...analisadores) => então(
           alternativa(
             ...analisadores.slice(1)
           ),
-          erro_2 => falha(
-            ordenar([...new Set(`${erro_1} | ${erro_2}`.split(" | "))]).join(" | ")
+          erro_2 => então(
+            posição,
+            fim => fim > início
+              ? falha(erro_2)
+              : falha(
+                ordenar([...new Set(`${erro_1} | ${erro_2}`.split(" | "))]).join(" | ")
+              )
           )
         )
       }
