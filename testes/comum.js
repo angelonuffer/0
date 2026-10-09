@@ -30,10 +30,13 @@ export const teste = opções => {
       retorno_esperado: símbolos,
     }] : []),
     ...(árvore !== undefined ? [{
-      função: entrada => analisador_sintático({
-        entrada: analisador_léxico(entrada),
-        posição: 0,
-      }),
+      função: entrada => {
+        const sintaxe = analisador_sintático({
+          entrada: analisador_léxico(entrada),
+          posição: 0,
+        })
+        return sintaxe.erro ? sintaxe : sintaxe.valor
+      },
       argumento: entrada,
       retorno_esperado: árvore,
     }] : []),
@@ -53,7 +56,7 @@ export const teste = opções => {
           entrada: analisador_léxico(entrada),
           posição: 0,
         })
-        return analisador_semântico(sintaxe)
+        return analisador_semântico(sintaxe.valor)
       },
       argumento: entrada,
       retorno_esperado: valor,
@@ -64,7 +67,7 @@ export const teste = opções => {
           entrada: analisador_léxico(entrada),
           posição: 0,
         })
-        return árvore_para_js(sintaxe) ?? ""
+        return árvore_para_js(sintaxe.valor) ?? ""
       },
       argumento: entrada,
       retorno_esperado: js,
@@ -75,7 +78,7 @@ export const teste = opções => {
           entrada: analisador_léxico(entrada),
           posição: 0,
         })
-        return eval(árvore_para_js(sintaxe) ?? "")
+        return eval(árvore_para_js(sintaxe.valor) ?? "")
       },
       argumento: entrada,
       retorno_esperado: js_eval,

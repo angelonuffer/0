@@ -16,7 +16,7 @@ const executar = arquivo => {
 		throw new Error(formatar_erro({ ...sintaxe, entrada: código, tokens, arquivo }))
 	}
 
-	return analisador_semântico(sintaxe)
+	return analisador_semântico(sintaxe.valor)
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === realpathSync(process.argv[1])) {

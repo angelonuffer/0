@@ -25,7 +25,7 @@ const sucesso = valor => ({ posição }) => ({
   posição,
 })
 
-const falha = erro => ({ posição }) => ({
+export const falha = erro => ({ posição }) => ({
   erro,
   posição,
 })

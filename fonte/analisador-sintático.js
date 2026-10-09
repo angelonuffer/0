@@ -1,4 +1,4 @@
-import { alternativa, encadeamento, esquerda, fim, mapear, prever, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
+import { alternativa, encadeamento, esquerda, falha, fim, mapear, prever, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
 
 const operações = (árvore, analisador_átomo) => mapear(
   repetição(
@@ -96,13 +96,10 @@ const bloco = mapear(
   ([primeira, demais]) => demais.length === 0 ? primeira : { bloco: [primeira, ...demais] },
 )
 
-export const analisador_sintático = ({ entrada, posição }) => {
-  const fim_ou_operador = ({ entrada, posição }) => {
-    const resultado = fim({ entrada, posição })
-    if (resultado.erro) return { ...resultado, erro: "fim da entrada | operador" }
-    return resultado
-  }
-  const resultado = esquerda(bloco, fim_ou_operador)({ entrada, posição })
-  if (resultado.erro) return resultado
-  return resultado.valor
-}
+export const analisador_sintático = esquerda(
+  bloco,
+  alternativa(
+    fim,
+    falha("operador"),
+  )
+)
