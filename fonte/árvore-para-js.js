@@ -2,6 +2,7 @@ const declaração_preguiça = "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())
 const operadores_booleanos = new Set(["!", ">", ">=", "<", "<=", "==", "!=", "===", "!=="])
 
 const converter = (árvore, topo, corpo_de_função = false) => {
+  if (typeof árvore === "string") return JSON.stringify(árvore)
   if (typeof árvore === "number" || typeof árvore === "boolean") return String(árvore)
 
   if (árvore?.agrupado) {

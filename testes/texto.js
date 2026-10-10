@@ -15,6 +15,7 @@ export default [
       ],
     },
     valor: "abc",
+    js: "\"abc\"",
   }),
   ...teste({
     entrada: bloco(`
