@@ -136,25 +136,7 @@ export default [
       $ lista = [ 10 ; 20 ; 30 ]
       lista 1 + 1
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '10' },
-      { pontuação: ';' },
-      { número: '20' },
-      { pontuação: ';' },
-      { número: '30' },
-      { pontuação: ']' },
-      { identificador: 'lista' },
-      { número: '1' },
-      { operador: '+' },
-      { número: '1' },
-    ],
-    /* saída: bloco(`
-      21
-    `), */
+    js: "21",
   }),
   ...teste({
     entrada: bloco(`
@@ -162,32 +144,7 @@ export default [
       $ lista_2 = [ lista_1 2 ; 40 ]
       lista_2 0
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista_1' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '10' },
-      { pontuação: ';' },
-      { número: '20' },
-      { pontuação: ';' },
-      { número: '30' },
-      { pontuação: ']' },
-      { pontuação: '$' },
-      { identificador: 'lista_2' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { identificador: 'lista_1' },
-      { número: '2' },
-      { pontuação: ';' },
-      { número: '40' },
-      { pontuação: ']' },
-      { identificador: 'lista_2' },
-      { número: '0' },
-    ],
-    /* saída: bloco(`
-      30
-    `), */
+    js: "30",
   }),
   ...teste({
     entrada: bloco(`
