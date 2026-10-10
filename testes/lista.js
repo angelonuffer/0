@@ -71,21 +71,7 @@ export default [
       $ lista = [ 2 ; 3 ]
       #lista
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '2' },
-      { pontuação: ';' },
-      { número: '3' },
-      { pontuação: ']' },
-      { pontuação: '#' },
-      { identificador: 'lista' },
-    ],
-    /* saída: bloco(`
-      2
-    `), */
+    js: "2",
   }),
   ...teste({
     entrada: bloco(`

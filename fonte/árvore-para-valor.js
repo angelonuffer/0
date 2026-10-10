@@ -68,7 +68,9 @@ const transformar = (árvore, ambiente = new Map()) => {
       const direita = transformar(operação.direita, ambiente)
       const resultado = { ...árvore, operação: { ...operação, direita } }
       if (operação.operador === "!" && é_constante(direita)) return Number(!direita)
-      if (operação.operador === "#" && typeof direita === "string") return direita.length
+      if (operação.operador === "#" && (typeof direita === "string" || Array.isArray(direita))) {
+        return direita.length
+      }
       return resultado
     }
 
