@@ -1,7 +1,7 @@
-import { analisador_léxico } from "../fonte/analisador-léxico.js";
-import { analisador_sintático } from "../fonte/analisador-sintático.js";
-import { analisador_semântico } from "../fonte/analisador-semântico.js";
-import { árvore_para_js } from "../fonte/árvore-para-js.js";
+import { código_para_símbolos } from "../fonte/código-para-símbolos.js";
+import { símbolos_para_árvore } from "../fonte/símbolos-para-árvore.js";
+import { árvore_para_valor } from "../fonte/árvore-para-valor.js";
+import { valor_para_js } from "../fonte/valor-para-js.js";
 import { formatar_erro } from "../fonte/erro.js";
 
 export const bloco = texto => {
@@ -36,14 +36,14 @@ export const teste = opções => {
   const { entrada, símbolos, árvore = undefined, valor = undefined, js = undefined, erro = undefined } = opções
   return [
     ...(símbolos !== undefined ? [{
-      função: analisador_léxico,
+      função: código_para_símbolos,
       argumento: entrada,
       retorno_esperado: símbolos,
     }] : []),
     ...(árvore !== undefined ? [{
       função: entrada => {
-        const sintaxe = analisador_sintático({
-          entrada: analisador_léxico(entrada),
+        const sintaxe = símbolos_para_árvore({
+          entrada: código_para_símbolos(entrada),
           posição: 0,
         })
         return sintaxe.erro ? sintaxe : sintaxe.valor
@@ -53,8 +53,8 @@ export const teste = opções => {
     }] : []),
     ...(erro !== undefined ? [{
       função: entrada => {
-        const tokens = analisador_léxico(entrada)
-        const sintaxe = analisador_sintático({ entrada: tokens, posição: 0 })
+        const tokens = código_para_símbolos(entrada)
+        const sintaxe = símbolos_para_árvore({ entrada: tokens, posição: 0 })
         if (!sintaxe.erro) return undefined
         return formatar_erro({ ...sintaxe, entrada, tokens })
       },
@@ -63,22 +63,22 @@ export const teste = opções => {
     }] : []),
     ...(valor !== undefined ? [{
       função: entrada => {
-        const sintaxe = analisador_sintático({
-          entrada: analisador_léxico(entrada),
+        const sintaxe = símbolos_para_árvore({
+          entrada: código_para_símbolos(entrada),
           posição: 0,
         })
-        return analisador_semântico(sintaxe.valor)
+        return árvore_para_valor(sintaxe.valor)
       },
       argumento: entrada,
       retorno_esperado: valor,
     }] : []),
     ...(js !== undefined ? [{
       função: entrada => {
-        const sintaxe = analisador_sintático({
-          entrada: analisador_léxico(entrada),
+        const sintaxe = símbolos_para_árvore({
+          entrada: código_para_símbolos(entrada),
           posição: 0,
         })
-        return árvore_para_js(analisador_semântico(sintaxe.valor)) ?? ""
+        return valor_para_js(árvore_para_valor(sintaxe.valor)) ?? ""
       },
       argumento: entrada,
       retorno_esperado: js,

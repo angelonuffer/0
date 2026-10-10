@@ -52,4 +52,4 @@ const converter = (árvore, topo, corpo_de_função = false) => {
   }
 }
 
-export const árvore_para_js = árvore => converter(árvore, true)
+export const valor_para_js = árvore => converter(árvore, true)

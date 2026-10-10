@@ -169,7 +169,7 @@ const bloco = mapear(
     : { bloco: [primeira, ...demais] },
 )
 
-export const analisador_sintático = esquerda(
+export const símbolos_para_árvore = esquerda(
   bloco,
   fim,
 )

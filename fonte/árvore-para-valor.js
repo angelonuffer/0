@@ -135,4 +135,4 @@ const transformar = (árvore, ambiente = new Map()) => {
   )
 }
 
-export const analisador_semântico = árvore => transformar(árvore)
+export const árvore_para_valor = árvore => transformar(árvore)

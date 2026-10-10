@@ -8,7 +8,7 @@ const regras = {
   pontuação: /\.\.\.|[\[\]();#$=]/g,
 }
 
-export const analisador_léxico = entrada => {
+export const código_para_símbolos = entrada => {
   const tokens = [];
   let posição = 0;
   let linha = 1;
