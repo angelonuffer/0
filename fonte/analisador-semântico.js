@@ -49,6 +49,15 @@ const transformar = (árvore, ambiente = new Map()) => {
     return última?.associação ? undefined : transformar(última, escopo)
   }
 
+  if (árvore.aplicação) {
+    const função = transformar(árvore.aplicação.função, ambiente)
+    const argumentos = transformar(árvore.aplicação.argumentos, ambiente)
+    if (typeof função === "string" && argumentos.length === 1 && typeof argumentos[0] === "number") {
+      return função[argumentos[0]]
+    }
+    return { ...árvore, aplicação: { função, argumentos } }
+  }
+
   if (árvore.operação) {
     const operação = árvore.operação
     if (operação.esquerda === undefined) {

@@ -131,8 +131,7 @@ export default [
         { aplicação: { função: { identificador: 'str' }, argumentos: [ { número: '5' } ] } },
       ],
     },
-    /* saída: bloco(`
-      f
-    `), */
+    valor: "f",
+    js: "\"f\"",
   }),
 ]
