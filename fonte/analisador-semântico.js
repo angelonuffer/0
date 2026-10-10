@@ -2,6 +2,13 @@ const é_constante = valor => typeof valor === "number" || typeof valor === "boo
 
 const valor_literal = árvore => {
   if (árvore.texto !== undefined) return árvore.texto.slice(1, -1)
+  if (Array.isArray(árvore.modelo_texto)) {
+    return árvore.modelo_texto.reduce((resultado, item) => {
+      if (typeof item === "string") return resultado + item
+      const valor = transformar(item)
+      return resultado + String(valor)
+    }, "")
+  }
   if (árvore.modelo_texto !== undefined) return árvore.modelo_texto.slice(1, -1)
   if (árvore.número !== undefined) {
     const número = Number(árvore.número)

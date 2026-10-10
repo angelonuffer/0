@@ -15,6 +15,15 @@ const converter = (árvore, topo, corpo_de_função = false) => {
 
   if (árvore?.booleano !== undefined) return String(árvore.booleano)
 
+  if (Array.isArray(árvore?.modelo_texto)) {
+    return "`" + árvore.modelo_texto.map(item => {
+      if (typeof item === "string") return item.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${")
+      return `\${${converter(item, false)}}`
+    }).join("") + "`"
+  }
+
+  if (árvore?.modelo_texto !== undefined) return `\`${árvore.modelo_texto.slice(1, -1)}\``
+
   if (árvore?.identificador !== undefined) return `${árvore.identificador}()`
 
   if (árvore?.bloco) {

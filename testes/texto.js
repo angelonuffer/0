@@ -96,6 +96,19 @@ export default [
       { identificador: 'sobrenome' },
       { modelo_texto: '}`' },
     ],
+    árvore: {
+      bloco: [
+        { associação: { identificador: 'nome', valor: { texto: '"Alice"' } } },
+        { associação: { identificador: 'sobrenome', valor: { texto: '"Silva"' } } },
+        { modelo_texto: [
+          "",
+          { identificador: 'nome' },
+          " ",
+          { identificador: 'sobrenome' },
+          "",
+        ] },
+      ],
+    },
     /* saída: bloco(`
       Alice Silva
     `), */

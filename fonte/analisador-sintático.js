@@ -40,11 +40,48 @@ const prefixo = encadeamento(
   ),
 )
 
+const modelo_texto = ({ entrada, posição }) => {
+  const primeiro = tipo("modelo_texto")({ entrada, posição })
+  if (primeiro.erro) return primeiro
+
+  const literal_inicial = primeiro.valor.modelo_texto
+  if (!literal_inicial.includes("${")) {
+    return {
+      valor: { modelo_texto: literal_inicial },
+      posição: primeiro.posição,
+    }
+  }
+
+  const partes = []
+  const inicial = literal_inicial
+    .replace(/^`/, "")
+    .replace(/\$\{$/, "")
+  partes.push(inicial)
+
+  let posição_atual = primeiro.posição
+  while (true) {
+    const valor = expressão({ entrada, posição: posição_atual })
+    if (valor.erro) break
+    partes.push(valor.valor)
+    posição_atual = valor.posição
+
+    const literal = tipo("modelo_texto")({ entrada, posição: posição_atual })
+    if (literal.erro) return literal
+    const texto = literal.valor.modelo_texto.includes("${")
+      ? literal.valor.modelo_texto.replace(/^\}/, "").replace(/\$\{$/, "")
+      : literal.valor.modelo_texto.replace(/^\}/, "").replace(/`$/, "")
+    partes.push(texto)
+    posição_atual = literal.posição
+  }
+
+  return { valor: { modelo_texto: partes }, posição: posição_atual }
+}
+
 átomo = alternativa(
   tipo("identificador"),
   tipo("número"),
   tipo("texto"),
-  tipo("modelo_texto"),
+  modelo_texto,
   agrupamento,
 )
 
