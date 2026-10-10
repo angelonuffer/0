@@ -4,6 +4,32 @@ import { teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
+      "abc"
+    `),
+    símbolos: [
+      { texto: '"abc"' },
+    ],
+    árvore: {
+      bloco: [
+        { texto: '"abc"' },
+      ],
+    },
+  }),
+  ...teste({
+    entrada: bloco(`
+      \`abc\`
+    `),
+    símbolos: [
+      { modelo_texto: '`abc`' },
+    ],
+    árvore: {
+      bloco: [
+        { modelo_texto: '`abc`' },
+      ],
+    },
+  }),
+  ...teste({
+    entrada: bloco(`
       $ str = "abcdef"
       str
     `),

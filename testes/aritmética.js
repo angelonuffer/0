@@ -162,13 +162,13 @@ export default [
     símbolos: [
       { operador: '+' },
     ],
-    árvore: { erro: "\"!\" | \"(\" | \"$\" | identificador | número", posição: 0 },
+    árvore: { erro: "\"!\" | \"(\" | \"$\" | identificador | modelo_texto | número | texto", posição: 0 },
     erro: bloco(`
       testar.js
       1: +
          ^ 1
       Erro de sintaxe. Esperava:
-        "!" | "(" | "$" | identificador | número
+        "!" | "(" | "$" | identificador | modelo_texto | número | texto
     `)
   }),
   ...teste({
@@ -180,7 +180,7 @@ export default [
       1: 1 +
             ^ 4
       Erro de sintaxe. Esperava:
-        "!" | "(" | identificador | número
+        "!" | "(" | identificador | modelo_texto | número | texto
     `)
   }),
   ...teste({
@@ -240,7 +240,7 @@ export default [
       1: * 2
          ^ 1
       Erro de sintaxe. Esperava:
-        "!" | "(" | "$" | identificador | número
+        "!" | "(" | "$" | identificador | modelo_texto | número | texto
     `)
   }),
 ]

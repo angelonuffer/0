@@ -43,6 +43,8 @@ const prefixo = encadeamento(
 átomo = alternativa(
   tipo("identificador"),
   tipo("número"),
+  tipo("texto"),
+  tipo("modelo_texto"),
   agrupamento,
 )
 
@@ -55,32 +57,27 @@ const igualdade = operações(comparação, ["==", "!="])
 const conjunção = operações(igualdade, ["&&"])
 expressão = operações(conjunção, ["||"])
 
-const valor = alternativa(
-  tipo("texto"),
-  tipo("modelo_texto"),
-  expressão,
-)
-
 const associação = mapear(
   sequência(
     símbolo("$"),
     tipo("identificador"),
     símbolo("="),
-    valor,
+    expressão,
   ),
   ([, nome, , valor]) => ({
     associação: { identificador: nome.identificador, valor },
   }),
 )
 
-const instrução = alternativa(
-  tente(associação),
-  expressão,
-)
+const elemento_do_bloco = alternativa(tente(associação), expressão)
 
 const bloco = mapear(
-  sequência(instrução, repetição(instrução)),
-  ([primeira, demais]) => demais.length === 0 ? primeira : { bloco: [primeira, ...demais] },
+  sequência(elemento_do_bloco, repetição(elemento_do_bloco)),
+  ([primeira, demais]) => demais.length === 0
+    && primeira.texto === undefined
+    && primeira.modelo_texto === undefined
+    ? primeira
+    : { bloco: [primeira, ...demais] },
 )
 
 export const analisador_sintático = esquerda(
