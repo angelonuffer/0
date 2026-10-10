@@ -214,13 +214,13 @@ export default [
     entrada: bloco(`
       1 )
     `),
-    árvore: { erro: "fim da entrada | operador", posição: 1 },
+    árvore: { erro: "fim da entrada", posição: 1 },
     erro: bloco(`
       testar.js
       1: 1 )
            ^ 3
       Erro de sintaxe. Esperava:
-        fim da entrada | operador
+        fim da entrada
     `)
   }),
   ...teste({

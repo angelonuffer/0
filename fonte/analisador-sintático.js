@@ -1,4 +1,4 @@
-import { alternativa, encadeamento, esquerda, falha, fim, mapear, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
+import { alternativa, encadeamento, esquerda, fim, mapear, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
 
 const operações = (árvore, analisador_átomo) => mapear(
   repetição(
@@ -77,8 +77,5 @@ const bloco = mapear(
 
 export const analisador_sintático = esquerda(
   bloco,
-  alternativa(
-    fim,
-    falha("operador"),
-  )
+  fim,
 )

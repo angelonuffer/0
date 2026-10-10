@@ -103,12 +103,12 @@ export default [
       )
       a * b
     `),
-    árvore: { erro: "fim da entrada | operador", posição: 4 },
+    árvore: { erro: "fim da entrada", posição: 4 },
   }),
   ...teste({
     entrada: bloco(`
       a = 11
     `),
-    árvore: { erro: "fim da entrada | operador", posição: 1 },
+    árvore: { erro: "fim da entrada", posição: 1 },
   }),
 ]
