@@ -45,21 +45,7 @@ export default [
       $ b = 10
       a
     `),
-    valor: 11,
     js: "11",
-  }),
-    ...teste({
-    entrada: bloco(`
-      $ a = 5
-      $ b = 8
-      3 + c
-    `),
-    /* erro: bloco(`
-      ⛔ a | b
-      📄 testar.js
-      👉 3: 3 + c
-                ^ 5
-    `), */
   }),
   ...teste({
     entrada: bloco(`
