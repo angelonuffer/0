@@ -14,6 +14,7 @@ export default [
         { texto: '"abc"' },
       ],
     },
+    valor: "abc",
   }),
   ...teste({
     entrada: bloco(`

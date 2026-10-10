@@ -1,6 +1,7 @@
 const é_constante = valor => typeof valor === "number" || typeof valor === "boolean"
 
 const valor_literal = árvore => {
+  if (árvore.texto !== undefined) return árvore.texto.slice(1, -1)
   if (árvore.número !== undefined) {
     const número = Number(árvore.número)
     return Number.isNaN(número) ? árvore : número
