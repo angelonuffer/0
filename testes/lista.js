@@ -18,6 +18,7 @@ export default [
         { número: '3' },
       ],
     },
+    valor: [2, 3],
   }),
   ...teste({
     entrada: bloco(`

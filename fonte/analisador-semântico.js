@@ -33,6 +33,10 @@ const transformar = (árvore, ambiente = new Map()) => {
     return associação.valor
   }
 
+  if (árvore.lista !== undefined) {
+    return árvore.lista.map(item => transformar(item, ambiente))
+  }
+
   if (árvore.bloco) {
     const escopo = new Map(ambiente)
     for (const instrução of árvore.bloco) {
