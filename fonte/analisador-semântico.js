@@ -45,7 +45,7 @@ const transformar = (árvore, ambiente = new Map()) => {
     if (operação.esquerda === undefined) {
       const direita = transformar(operação.direita, ambiente)
       const resultado = { ...árvore, operação: { ...operação, direita } }
-      if (operação.operador === "!" && é_constante(direita)) return !direita
+      if (operação.operador === "!" && é_constante(direita)) return Number(!direita)
       return resultado
     }
 
@@ -99,6 +99,7 @@ const transformar = (árvore, ambiente = new Map()) => {
         operação: { ...operação, esquerda, direita },
       }
     }
+    if (typeof valor === "boolean") return Number(valor)
     return valor
   }
 

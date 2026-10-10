@@ -1,4 +1,5 @@
 const declaração_preguiça = "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};"
+const operadores_booleanos = new Set(["!", ">", ">=", "<", "<=", "==", "!=", "===", "!=="])
 
 const converter = (árvore, topo, corpo_de_função = false) => {
   if (typeof árvore === "number" || typeof árvore === "boolean") return String(árvore)
@@ -33,8 +34,10 @@ const converter = (árvore, topo, corpo_de_função = false) => {
 
   if (árvore?.operação) {
     const { operador, esquerda, direita } = árvore.operação
-    if (esquerda === undefined) return `${operador}${converter(direita, false)}`
-    return `${converter(esquerda, false)}${operador}${converter(direita, false)}`
+    const expressão = esquerda === undefined
+      ? `${operador}${converter(direita, false)}`
+      : `${converter(esquerda, false)}${operador}${converter(direita, false)}`
+    return operadores_booleanos.has(operador) ? `(${expressão}?1:0)` : expressão
   }
 }
 

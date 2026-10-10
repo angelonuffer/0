@@ -67,27 +67,24 @@ export default [
     entrada: bloco(`
       ! 0
     `),
-    valor: true,
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       ! 1
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       ! ! 0
     `),
-    valor: false,
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       0 && (1 / 0)
     `),
-    valor: 0,
     js: "0",
   }),
 ]

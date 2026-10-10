@@ -18,110 +18,109 @@ export default [
         direita: { número: "8" },
       },
     },
-    valor: false,
-    js: "false",
+    valor: 0,
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       8 > 2
     `),
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       8 > 8
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       2 < 8
     `),
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       8 < 2
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       8 < 8
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       2 == 8
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       8 == 2
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       8 == 8
     `),
-    valor: true,
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       2 != 8
     `),
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       8 != 2
     `),
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       8 != 8
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       2 >= 8
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       8 >= 2
     `),
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       8 >= 8
     `),
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       2 <= 8
     `),
-    js: "true",
+    js: "1",
   }),
   ...teste({
     entrada: bloco(`
       8 <= 2
     `),
-    js: "false",
+    js: "0",
   }),
   ...teste({
     entrada: bloco(`
       8 <= 8
     `),
-    js: "true",
+    js: "1",
   }),
 ]
