@@ -66,9 +66,12 @@ export default [
       { pontuação: '#' },
       { identificador: 'a' },
     ],
-    /* saída: bloco(`
-      4
-    `), */
+    árvore: {
+      bloco: [
+        { associação: { identificador: 'a', valor: { texto: '"abcd"' } } },
+        { operação: { operador: "#", direita: { identificador: 'a' } } },
+      ],
+    },
   }),
   ...teste({
     entrada: bloco(`

@@ -28,12 +28,12 @@ const agrupamento = estado => mapear(
 )(estado)
 
 const prefixo = encadeamento(
-  símbolo("!"),
+  alternativa(símbolo("!"), símbolo("#")),
   operador => mapear(
     unário,
     direita => ({
       operação: {
-        operador: operador.operador,
+        operador: operador.operador ?? operador.pontuação,
         direita,
       },
     }),
