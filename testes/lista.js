@@ -99,6 +99,28 @@ export default [
       { número: '0' },
       { número: '1' },
     ],
+    árvore: {
+      bloco: [
+        { associação: { identificador: 'lista', valor: { lista: [ { lista: [ { número: '1' }, { número: '2' } ] }, { lista: [ { número: '3' }, { número: '4' } ] } ] } } },
+        {
+          aplicação: {
+            função: {
+              aplicação: {
+                função: {
+                  identificador: 'lista',
+                },
+                argumento: {
+                  número: '0',
+                },
+              },
+            },
+            argumento: {
+              número: '1',
+            },
+          },
+        },
+      ],
+    },
     /* saída: bloco(`
       2
     `), */

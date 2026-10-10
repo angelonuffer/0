@@ -128,13 +128,14 @@ const aplicação = encadeamento(
       }
       return unário(estado)
     }
-    const resultado = opcional(argumento)({ entrada, posição })
+    const resultado = repetição(argumento)({ entrada, posição })
     if (resultado.erro) return resultado
     return {
       ...resultado,
-      valor: resultado.valor === undefined
-        ? função
-        : { aplicação: { função, argumento: resultado.valor } },
+      valor: resultado.valor.reduce(
+        (função, argumento) => ({ aplicação: { função, argumento } }),
+        função,
+      ),
     }
   },
 )
