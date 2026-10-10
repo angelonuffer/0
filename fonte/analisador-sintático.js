@@ -96,7 +96,29 @@ const modelo_texto = prever(
 
 unário = alternativa(prefixo, átomo)
 
-const produto = operações(unário, ["*", "/"])
+const aplicação = encadeamento(
+  unário,
+  função => ({ entrada, posição }) => {
+    const linha = entrada[posição - 1]?.linha
+    const argumento = estado => {
+      const próximo = entrada[estado.posição]
+      if (próximo?.linha !== linha || próximo?.modelo_texto?.startsWith("}")) {
+        return { erro: "aplicação", posição: estado.posição }
+      }
+      return unário(estado)
+    }
+    const resultado = repetição(argumento)({ entrada, posição })
+    if (resultado.erro) return resultado
+    return {
+      ...resultado,
+      valor: resultado.valor.length === 0
+        ? função
+        : { aplicação: { função, argumentos: resultado.valor } },
+    }
+  },
+)
+
+const produto = operações(aplicação, ["*", "/"])
 const soma = operações(produto, ["+", "-"])
 const comparação = operações(soma, [">", ">=", "<", "<="])
 const igualdade = operações(comparação, ["==", "!="])

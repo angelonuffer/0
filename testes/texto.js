@@ -125,6 +125,12 @@ export default [
       { identificador: 'str' },
       { número: '5' },
     ],
+    árvore: {
+      bloco: [
+        { associação: { identificador: 'str', valor: { texto: '"abcdef"' } } },
+        { aplicação: { função: { identificador: 'str' }, argumentos: [ { número: '5' } ] } },
+      ],
+    },
     /* saída: bloco(`
       f
     `), */

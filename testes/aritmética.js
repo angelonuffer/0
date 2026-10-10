@@ -202,7 +202,7 @@ export default [
     erro: bloco(`
       testar.js
       1: (1 + 2 3
-                ^ 8
+                 ^ 9
       Erro de sintaxe. Esperava:
         ")"
     `)
@@ -214,7 +214,7 @@ export default [
     erro: bloco(`
       testar.js
       1: (1 + 2 a
-                ^ 8
+                 ^ 9
       Erro de sintaxe. Esperava:
         ")"
     `)

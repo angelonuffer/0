@@ -11,6 +11,7 @@ const regras = {
 export const analisador_léxico = entrada => {
   const tokens = [];
   let posição = 0;
+  let linha = 1;
 
   while (posição < entrada.length) {
     let correspondência;
@@ -33,8 +34,10 @@ export const analisador_léxico = entrada => {
         [regra_encontrada]: correspondência[0],
         início: posição,
         fim,
+        linha,
       });
     }
+    linha += (correspondência[0].match(/\n/g) ?? []).length;
     posição = fim;
   }
 
