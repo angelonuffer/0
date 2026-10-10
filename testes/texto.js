@@ -72,6 +72,8 @@ export default [
         { operação: { operador: "#", direita: { identificador: 'a' } } },
       ],
     },
+    valor: 4,
+    js: "4",
   }),
   ...teste({
     entrada: bloco(`
