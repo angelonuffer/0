@@ -50,9 +50,8 @@ export default [
         { identificador: 'str' },
       ],
     },
-    /* saída: bloco(`
-      abcdef
-    `), */
+    valor: "abcdef",
+    js: "\"abcdef\"",
   }),
   ...teste({
     entrada: bloco(`
