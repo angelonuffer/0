@@ -3,6 +3,24 @@ import { bloco, teste } from "./comum.js"
 export default [
   ...teste({
     entrada: bloco(`
+      [ 2 ; 3 ]
+    `),
+    símbolos: [
+      { pontuação: '[' },
+      { número: '2' },
+      { pontuação: ';' },
+      { número: '3' },
+      { pontuação: ']' },
+    ],
+    árvore: {
+      lista: [
+        { número: '2' },
+        { número: '3' },
+      ],
+    },
+  }),
+  ...teste({
+    entrada: bloco(`
       $ lista = [ 2 ; 3 ]
       lista 0
     `),

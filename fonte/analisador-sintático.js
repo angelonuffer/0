@@ -1,4 +1,4 @@
-import { alternativa, encadeamento, esquerda, fim, mapear, prever, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
+import { alternativa, encadeamento, esquerda, fim, mapear, opcional, prever, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
 
 let expressão
 let unário
@@ -86,11 +86,32 @@ const modelo_texto = prever(
   modelo_texto_simples,
 )
 
+const lista = mapear(
+  sequência(
+    símbolo("["),
+    opcional(
+      sequência(
+        expressão_diferida,
+        repetição(tente(sequência(símbolo(";"), expressão_diferida))),
+        opcional(símbolo(";"), undefined),
+      ),
+      undefined,
+    ),
+    símbolo("]"),
+  ),
+  ([, elementos]) => ({
+    lista: elementos
+      ? [elementos[0], ...elementos[1].map(([, elemento]) => elemento)]
+      : [],
+  }),
+)
+
 átomo = alternativa(
   tipo("identificador"),
   tipo("número"),
   tipo("texto"),
   modelo_texto,
+  lista,
   agrupamento,
 )
 
