@@ -6,6 +6,7 @@ import nome from "./testes/nome.js"
 import texto from "./testes/texto.js"
 import lista from "./testes/lista.js"
 import região from "./testes/região.js"
+import objeto from "./testes/objeto.js"
 
 const resultado = testar([
   ...aritmética,
@@ -15,6 +16,7 @@ const resultado = testar([
   ...texto,
   ...lista,
   ...região,
+  ...objeto,
 ])
 
 process.stdout.write(resultado.saída + "\n")

@@ -5,7 +5,7 @@ const regras = {
   número: /[0-9]+/g,
   identificador: /[a-zA-Z_][a-zA-Z_0-9]*/g,
   operador: />=|<=|==|!=|&&|\|\||[+*/><!-]/g,
-  pontuação: /\.\.\.|[\[\]();#$=]/g,
+  pontuação: /\.\.\.|[\[\]{}();:#$=]/g,
 }
 
 export const código_para_símbolos = entrada => {

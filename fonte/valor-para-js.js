@@ -16,6 +16,13 @@ const converter = (árvore, topo, corpo_de_função = false) => {
 
   if (árvore?.booleano !== undefined) return String(árvore.booleano)
 
+  if (árvore?.objeto !== undefined) {
+    const propriedades = Object.entries(árvore.objeto)
+      .map(([chave, valor]) => `${JSON.stringify(chave)}:${converter(valor, false)}`)
+      .join(",")
+    return `({${propriedades}})`
+  }
+
   if (Array.isArray(árvore?.modelo_texto)) {
     return "`" + árvore.modelo_texto.map(item => {
       if (typeof item === "string") return item.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${")

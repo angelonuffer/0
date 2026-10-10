@@ -114,12 +114,42 @@ const lista = mapear(
   }),
 )
 
+const membro_do_objeto = mapear(
+  sequência(
+    tipo("texto"),
+    símbolo(":"),
+    expressão_diferida,
+  ),
+  ([chave, , valor]) => [chave.texto.slice(1, -1), valor],
+)
+
+const objeto = mapear(
+  sequência(
+    símbolo("{"),
+    opcional(
+      sequência(
+        membro_do_objeto,
+        repetição(tente(sequência(símbolo(";"), membro_do_objeto))),
+        opcional(símbolo(";"), undefined),
+      ),
+      undefined,
+    ),
+    símbolo("}"),
+  ),
+  ([, membros]) => ({
+    objeto: Object.fromEntries(
+      membros ? [membros[0], ...membros[1].map(([, membro]) => membro)] : [],
+    ),
+  }),
+)
+
 átomo = alternativa(
   tipo("identificador"),
   tipo("número"),
   tipo("texto"),
   modelo_texto,
   lista,
+  objeto,
   agrupamento,
 )
 
