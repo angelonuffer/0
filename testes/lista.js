@@ -38,9 +38,14 @@ export default [
       { identificador: 'lista' },
       { número: '0' },
     ],
-    /* saída: bloco(`
-      2
-    `), */
+    árvore: {
+      bloco: [
+        { associação: { identificador: 'lista', valor: { lista: [ { número: '2' }, { número: '3' } ] } } },
+        { aplicação: { função: { identificador: 'lista' }, argumento: { número: '0' } } },
+      ],
+    },
+    valor: 2,
+    js: "2",
   }),
   ...teste({
     entrada: bloco(`
