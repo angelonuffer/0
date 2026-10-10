@@ -1,8 +1,10 @@
-import { alternativa, encadeamento, esquerda, fim, mapear, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
+import { alternativa, encadeamento, esquerda, fim, mapear, prever, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
 
 let expressão
 let unário
 let átomo
+
+const expressão_diferida = estado => expressão(estado)
 
 const operações = (analisador, operadores) => encadeamento(
   analisador,
@@ -40,42 +42,49 @@ const prefixo = encadeamento(
   ),
 )
 
-const modelo_texto = ({ entrada, posição }) => {
-  const primeiro = tipo("modelo_texto")({ entrada, posição })
-  if (primeiro.erro) return primeiro
+const texto_inicial = texto => texto
+  .replace(/^`/, "")
+  .replace(/\$\{$/, "")
 
-  const literal_inicial = primeiro.valor.modelo_texto
-  if (!literal_inicial.includes("${")) {
-    return {
-      valor: { modelo_texto: literal_inicial },
-      posição: primeiro.posição,
-    }
-  }
+const texto_seguinte = texto => texto
+  .replace(/^\}/, "")
+  .replace(/\$\{$|`$/, "")
 
-  const partes = []
-  const inicial = literal_inicial
-    .replace(/^`/, "")
-    .replace(/\$\{$/, "")
-  partes.push(inicial)
+const inicia_interpolação = ({ entrada, posição }) =>
+  entrada[posição]?.modelo_texto?.includes("${") ?? false
 
-  let posição_atual = primeiro.posição
-  while (true) {
-    const valor = expressão({ entrada, posição: posição_atual })
-    if (valor.erro) break
-    partes.push(valor.valor)
-    posição_atual = valor.posição
+const modelo_texto_simples = mapear(
+  tipo("modelo_texto"),
+  literal => ({ modelo_texto: literal.modelo_texto }),
+)
 
-    const literal = tipo("modelo_texto")({ entrada, posição: posição_atual })
-    if (literal.erro) return literal
-    const texto = literal.valor.modelo_texto.includes("${")
-      ? literal.valor.modelo_texto.replace(/^\}/, "").replace(/\$\{$/, "")
-      : literal.valor.modelo_texto.replace(/^\}/, "").replace(/`$/, "")
-    partes.push(texto)
-    posição_atual = literal.posição
-  }
+const modelo_texto_interpolado = mapear(
+  sequência(
+    tipo("modelo_texto"),
+    repetição(
+      sequência(
+        expressão_diferida,
+        tipo("modelo_texto"),
+      ),
+    ),
+  ),
+  ([inicial, partes]) => ({
+    modelo_texto: partes.reduce(
+      (resultado, [valor, literal]) => [
+        ...resultado,
+        valor,
+        texto_seguinte(literal.modelo_texto),
+      ],
+      [texto_inicial(inicial.modelo_texto)],
+    ),
+  }),
+)
 
-  return { valor: { modelo_texto: partes }, posição: posição_atual }
-}
+const modelo_texto = prever(
+  inicia_interpolação,
+  modelo_texto_interpolado,
+  modelo_texto_simples,
+)
 
 átomo = alternativa(
   tipo("identificador"),
