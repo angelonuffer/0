@@ -57,58 +57,14 @@ export default [
       ]
       \`\${lista 0} \${lista 1} \${lista 2} \${lista 3}\`
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '4' },
-      { pontuação: ';' },
-      { número: '5' },
-      { pontuação: ';' },
-      { número: '6' },
-      { pontuação: ';' },
-      { número: '7' },
-      { pontuação: ';' },
-      { pontuação: ']' },
-      { modelo_texto: '`${' },
-      { identificador: 'lista' },
-      { número: '0' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista' },
-      { número: '1' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista' },
-      { número: '2' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista' },
-      { número: '3' },
-      { modelo_texto: '}`' },
-    ],
-    /* saída: bloco(`
-      4 5 6 7
-    `), */
+    js: "\"4 5 6 7\"",
   }),
   ...teste({
     entrada: bloco(`
-      $lista = [ 2 ; 3 ]
+      $ lista = [ 2 ; 3 ]
       lista 1
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '2' },
-      { pontuação: ';' },
-      { número: '3' },
-      { pontuação: ']' },
-      { identificador: 'lista' },
-      { número: '1' },
-    ],
-    /* saída: bloco(`
-      3
-    `), */
+    js: "3",
   }),
   ...teste({
     entrada: bloco(`
