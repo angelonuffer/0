@@ -29,6 +29,8 @@ export default [
         { modelo_texto: '`abc`' },
       ],
     },
+    valor: "abc",
+    js: "\"abc\"",
   }),
   ...teste({
     entrada: bloco(`
