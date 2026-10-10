@@ -80,19 +80,32 @@ export default [
     entrada: bloco(`
       2 + 3 * 4
     `),
-    js: "20",
+    árvore: {
+      operação: {
+        operador: "+",
+        esquerda: { número: "2" },
+        direita: {
+          operação: {
+            operador: "*",
+            esquerda: { número: "3" },
+            direita: { número: "4" },
+          },
+        },
+      },
+    },
+    js: "14",
   }),
   ...teste({
     entrada: bloco(`
       10 - 6 / 2
     `),
-    js: "2",
+    js: "7",
   }),
   ...teste({
     entrada: bloco(`
       8 / 2 + 3 * 2
     `),
-    js: "14",
+    js: "10",
   }),
   ...teste({
     entrada: bloco(`
@@ -140,7 +153,7 @@ export default [
     entrada: bloco(`
       1 + 2 * 3 - 4 / 2
     `),
-    js: "2.5",
+    js: "5",
   }),
   ...teste({
     entrada: bloco(`

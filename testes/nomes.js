@@ -83,7 +83,7 @@ export default [
       $ c = 4
       a + b * c
     `),
-    js: "20",
+    js: "14",
   }),
   ...teste({
     entrada: bloco(`

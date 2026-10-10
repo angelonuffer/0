@@ -1,23 +1,22 @@
 import { alternativa, encadeamento, esquerda, fim, mapear, repetição, sequência, símbolo, tente, tipo } from "./dialeto.js"
 
-const operações = (árvore, analisador_átomo) => mapear(
-  repetição(
-    sequência(
-      tipo("operador"),
-      analisador_átomo,
-    ),
-  ),
-  operações => operações.reduce((esquerda, [operador, direita]) => ({
-    operação: {
-      operador: operador.operador,
-      esquerda,
-      direita,
-    },
-  }), árvore),
-)
-
 let expressão
+let unário
 let átomo
+
+const operações = (analisador, operadores) => encadeamento(
+  analisador,
+  árvore => mapear(
+    repetição(sequência(alternativa(...operadores.map(símbolo)), analisador)),
+    operações => operações.reduce((esquerda, [operador, direita]) => ({
+      operação: {
+        operador: operador.operador,
+        esquerda,
+        direita,
+      },
+    }), árvore),
+  ),
+)
 
 const agrupamento = estado => mapear(
   sequência(
@@ -31,7 +30,7 @@ const agrupamento = estado => mapear(
 const prefixo = encadeamento(
   símbolo("!"),
   operador => mapear(
-    átomo,
+    unário,
     direita => ({
       operação: {
         operador: operador.operador,
@@ -45,13 +44,16 @@ const prefixo = encadeamento(
   tipo("identificador"),
   tipo("número"),
   agrupamento,
-  prefixo,
 )
 
-expressão = encadeamento(
-  átomo,
-  árvore => operações(árvore, átomo),
-)
+unário = alternativa(prefixo, átomo)
+
+const produto = operações(unário, ["*", "/"])
+const soma = operações(produto, ["+", "-"])
+const comparação = operações(soma, [">", ">=", "<", "<="])
+const igualdade = operações(comparação, ["==", "!="])
+const conjunção = operações(igualdade, ["&&"])
+expressão = operações(conjunção, ["||"])
 
 const associação = mapear(
   sequência(
