@@ -86,13 +86,21 @@ const modelo_texto = prever(
   modelo_texto_simples,
 )
 
+const elemento_da_lista = alternativa(
+  mapear(
+    sequência(símbolo("..."), expressão_diferida),
+    ([, valor]) => ({ espalhamento: valor }),
+  ),
+  expressão_diferida,
+)
+
 const lista = mapear(
   sequência(
     símbolo("["),
     opcional(
       sequência(
-        expressão_diferida,
-        repetição(tente(sequência(símbolo(";"), expressão_diferida))),
+        elemento_da_lista,
+        repetição(tente(sequência(símbolo(";"), elemento_da_lista))),
         opcional(símbolo(";"), undefined),
       ),
       undefined,

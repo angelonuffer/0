@@ -34,7 +34,9 @@ const transformar = (árvore, ambiente = new Map()) => {
   }
 
   if (árvore.lista !== undefined) {
-    return árvore.lista.map(item => transformar(item, ambiente))
+    return árvore.lista.flatMap(item => item.espalhamento !== undefined
+      ? [...transformar(item.espalhamento, ambiente)]
+      : [transformar(item, ambiente)])
   }
 
   if (árvore.bloco) {

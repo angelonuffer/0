@@ -150,7 +150,7 @@ export default [
     entrada: bloco(`
       $ lista_1 = [ 10 ; 20 ; 30 ]
       $ lista_2 = [ ...lista_1 ; 40 ]
-      #lista_2
+      lista_2
     `),
     símbolos: [
       { pontuação: '$' },
@@ -172,226 +172,43 @@ export default [
       { pontuação: ';' },
       { número: '40' },
       { pontuação: ']' },
-      { pontuação: '#' },
       { identificador: 'lista_2' },
     ],
-    /* saída: bloco(`
-      4
-    `), */
-  }),
-  ...teste({
-    entrada: bloco(`
-      $ lista_1 = [ 10 ; 20 ; 30 ]
-      $ lista_2 = [ ...lista_1 ; 40 ]
-      \`\${lista_2 0} \${lista_2 1} \${lista_2 2} \${lista_2 3}\`
-    `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista_1' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '10' },
-      { pontuação: ';' },
-      { número: '20' },
-      { pontuação: ';' },
-      { número: '30' },
-      { pontuação: ']' },
-      { pontuação: '$' },
-      { identificador: 'lista_2' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { pontuação: '...' },
-      { identificador: 'lista_1' },
-      { pontuação: ';' },
-      { número: '40' },
-      { pontuação: ']' },
-      { modelo_texto: '`${' },
-      { identificador: 'lista_2' },
-      { número: '0' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_2' },
-      { número: '1' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_2' },
-      { número: '2' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_2' },
-      { número: '3' },
-      { modelo_texto: '}`' },
-    ],
-    /* saída: bloco(`
-      10 20 30 40
-    `), */
+    árvore: {
+      bloco: [
+        { associação: { identificador: 'lista_1', valor: { lista: [ { número: '10' }, { número: '20' }, { número: '30' } ] } } },
+        { associação: { identificador: 'lista_2', valor: { lista: [ { espalhamento: { identificador: 'lista_1' } }, { número: '40' } ] } } },
+        { identificador: 'lista_2' },
+      ],
+    },
+    valor: [10, 20, 30, 40],
+    js: "[10,20,30,40]",
   }),
   ...teste({
     entrada: bloco(`
       $ lista_1 = [ 10 ; 20 ]
       $ lista_2 = [ 30 ; 40 ]
       $ lista_3 = [ ...lista_1 ; ...lista_2 ]
-      \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
+      lista_3
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista_1' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '10' },
-      { pontuação: ';' },
-      { número: '20' },
-      { pontuação: ']' },
-      { pontuação: '$' },
-      { identificador: 'lista_2' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '30' },
-      { pontuação: ';' },
-      { número: '40' },
-      { pontuação: ']' },
-      { pontuação: '$' },
-      { identificador: 'lista_3' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { pontuação: '...' },
-      { identificador: 'lista_1' },
-      { pontuação: ';' },
-      { pontuação: '...' },
-      { identificador: 'lista_2' },
-      { pontuação: ']' },
-      { modelo_texto: '`${' },
-      { identificador: 'lista_3' },
-      { número: '0' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '1' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '2' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '3' },
-      { modelo_texto: '}`' },
-    ],
-    /* saída: bloco(`
-      10 20 30 40
-    `), */
+    js: "[10,20,30,40]",
   }),
   ...teste({
     entrada: bloco(`
       $ lista_1 = [ 10 ; 20 ]
       $ lista_2 = [ ...lista_1 ; 30 ]
       $ lista_3 = [ ...lista_2 ; 40 ]
-      \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3}\`
+      lista_3
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista_1' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '10' },
-      { pontuação: ';' },
-      { número: '20' },
-      { pontuação: ']' },
-      { pontuação: '$' },
-      { identificador: 'lista_2' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { pontuação: '...' },
-      { identificador: 'lista_1' },
-      { pontuação: ';' },
-      { número: '30' },
-      { pontuação: ']' },
-      { pontuação: '$' },
-      { identificador: 'lista_3' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { pontuação: '...' },
-      { identificador: 'lista_2' },
-      { pontuação: ';' },
-      { número: '40' },
-      { pontuação: ']' },
-      { modelo_texto: '`${' },
-      { identificador: 'lista_3' },
-      { número: '0' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '1' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '2' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '3' },
-      { modelo_texto: '}`' },
-    ],
-    /* saída: bloco(`
-      10 20 30 40
-    `), */
+    js: "[10,20,30,40]",
   }),
   ...teste({
     entrada: bloco(`
       $ lista_1 = [ 20 ; 30 ]
       $ lista_2 = [ 50 ; 60 ]
       $ lista_3 = [ 10 ; ...lista_1 ; 40 ; ...lista_2 ; 70 ]
-      \`\${lista_3 0} \${lista_3 1} \${lista_3 2} \${lista_3 3} \${lista_3 4} \${lista_3 5} \${lista_3 6}\`
+      lista_3
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista_1' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '20' },
-      { pontuação: ';' },
-      { número: '30' },
-      { pontuação: ']' },
-      { pontuação: '$' },
-      { identificador: 'lista_2' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '50' },
-      { pontuação: ';' },
-      { número: '60' },
-      { pontuação: ']' },
-      { pontuação: '$' },
-      { identificador: 'lista_3' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '10' },
-      { pontuação: ';' },
-      { pontuação: '...' },
-      { identificador: 'lista_1' },
-      { pontuação: ';' },
-      { número: '40' },
-      { pontuação: ';' },
-      { pontuação: '...' },
-      { identificador: 'lista_2' },
-      { pontuação: ';' },
-      { número: '70' },
-      { pontuação: ']' },
-      { modelo_texto: '`${' },
-      { identificador: 'lista_3' },
-      { número: '0' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '1' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '2' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '3' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '4' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '5' },
-      { modelo_texto: '} ${' },
-      { identificador: 'lista_3' },
-      { número: '6' },
-      { modelo_texto: '}`' },
-    ],
-    /* saída: bloco(`
-      10 20 30 40 50 60 70
-    `), */
+    js: "[10,20,30,40,50,60,70]",
   }),
 ]
