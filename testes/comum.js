@@ -4,6 +4,17 @@ import { analisador_semântico } from "../fonte/analisador-semântico.js";
 import { árvore_para_js } from "../fonte/árvore-para-js.js";
 import { formatar_erro } from "../fonte/erro.js";
 
+export const bloco = texto => {
+  const linhas = texto.split("\n")
+  if (linhas[0].trim() === "") linhas.shift()
+  if (linhas.at(-1).trim() === "") linhas.pop()
+
+  const indentação = linhas[0]?.match(/^ */)?.[0].length ?? 0
+  return linhas
+    .map(linha => linha.replace(new RegExp(`^ {0,${indentação}}`), ""))
+    .join("\n")
+}
+
 export const teste = opções => {
   const chaves_permitidas = ["entrada", "símbolos", "árvore", "valor", "js", "erro"]
   const chaves = opções && typeof opções === "object" ? Object.keys(opções) : []

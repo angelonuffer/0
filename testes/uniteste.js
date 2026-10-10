@@ -1,4 +1,4 @@
-import { bloco } from "./texto-comum.js"
+import { bloco } from "./comum.js"
 
 const iguais = (a, b) => {
   if (a === b) return true;

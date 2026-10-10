@@ -1,5 +1,4 @@
-import { bloco } from "./texto-comum.js"
-import { teste } from "./comum.js"
+import { bloco, teste } from "./comum.js"
 
 export default [
   ...teste({
