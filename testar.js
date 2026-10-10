@@ -2,7 +2,7 @@ import { testar } from "./testes/uniteste.js"
 import aritmética from "./testes/aritmética.js"
 import comparação from "./testes/comparação.js"
 import lógica from "./testes/lógica.js"
-import nomes from "./testes/nomes.js"
+import nome from "./testes/nome.js"
 import texto from "./testes/texto.js"
 import listas from "./testes/listas.js"
 import região from "./testes/região.js"
@@ -11,7 +11,7 @@ const resultado = testar([
   ...aritmética,
   ...comparação,
   ...lógica,
-  ...nomes,
+  ...nome,
   ...texto,
   ...listas,
   ...região,
