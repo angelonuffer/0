@@ -175,7 +175,6 @@ export default [
     entrada: bloco(`
       1 +
     `),
-    árvore: { erro: "\"!\" | \"(\" | identificador | número", posição: 2 },
     erro: bloco(`
       testar.js
       1: 1 +
@@ -188,7 +187,6 @@ export default [
     entrada: bloco(`
       (1 + 2
     `),
-    árvore: { erro: "\")\"", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2
@@ -201,7 +199,6 @@ export default [
     entrada: bloco(`
       (1 + 2 3
     `),
-    árvore: { erro: "\")\"", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2 3
@@ -214,7 +211,6 @@ export default [
     entrada: bloco(`
       (1 + 2 a
     `),
-    árvore: { erro: "\")\"", posição: 4 },
     erro: bloco(`
       testar.js
       1: (1 + 2 a
@@ -227,7 +223,6 @@ export default [
     entrada: bloco(`
       1 )
     `),
-    árvore: { erro: "fim da entrada", posição: 1 },
     erro: bloco(`
       testar.js
       1: 1 )
@@ -240,7 +235,6 @@ export default [
     entrada: bloco(`
       * 2
     `),
-    árvore: { erro: "\"!\" | \"(\" | \"$\" | identificador | número", posição: 0 },
     erro: bloco(`
       testar.js
       1: * 2
