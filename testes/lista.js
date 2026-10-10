@@ -121,32 +121,15 @@ export default [
         },
       ],
     },
-    /* saída: bloco(`
-      2
-    `), */
+    valor: 2,
+    js: "2",
   }),
   ...teste({
     entrada: bloco(`
       $ lista = [ 1 ; 2 ; 3 ]
       lista 2
     `),
-    símbolos: [
-      { pontuação: '$' },
-      { identificador: 'lista' },
-      { pontuação: '=' },
-      { pontuação: '[' },
-      { número: '1' },
-      { pontuação: ';' },
-      { número: '2' },
-      { pontuação: ';' },
-      { número: '3' },
-      { pontuação: ']' },
-      { identificador: 'lista' },
-      { número: '2' },
-    ],
-    /* saída: bloco(`
-      3
-    `), */
+    js: "3",
   }),
   ...teste({
     entrada: bloco(`
