@@ -4,7 +4,7 @@ import comparação from "./testes/comparação.js"
 import lógica from "./testes/lógica.js"
 import nome from "./testes/nome.js"
 import texto from "./testes/texto.js"
-import listas from "./testes/listas.js"
+import lista from "./testes/lista.js"
 import região from "./testes/região.js"
 
 const resultado = testar([
@@ -13,7 +13,7 @@ const resultado = testar([
   ...lógica,
   ...nome,
   ...texto,
-  ...listas,
+  ...lista,
   ...região,
 ])
 
