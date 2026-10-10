@@ -14,6 +14,12 @@ export default [
       { texto: '"abcdef"' },
       { identificador: 'str' },
     ],
+    árvore: {
+      bloco: [
+        { associação: { identificador: 'str', valor: { texto: '"abcdef"' } } },
+        { identificador: 'str' },
+      ],
+    },
     /* saída: bloco(`
       abcdef
     `), */

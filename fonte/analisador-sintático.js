@@ -55,12 +55,18 @@ const igualdade = operações(comparação, ["==", "!="])
 const conjunção = operações(igualdade, ["&&"])
 expressão = operações(conjunção, ["||"])
 
+const valor = alternativa(
+  tipo("texto"),
+  tipo("modelo_texto"),
+  expressão,
+)
+
 const associação = mapear(
   sequência(
     símbolo("$"),
     tipo("identificador"),
     símbolo("="),
-    expressão,
+    valor,
   ),
   ([, nome, , valor]) => ({
     associação: { identificador: nome.identificador, valor },
