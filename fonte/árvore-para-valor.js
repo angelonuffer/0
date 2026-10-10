@@ -55,11 +55,11 @@ const transformar = (árvore, ambiente = new Map()) => {
 
   if (árvore.aplicação) {
     const função = transformar(árvore.aplicação.função, ambiente)
-    const argumentos = transformar(árvore.aplicação.argumentos, ambiente)
-    if (typeof função === "string" && argumentos.length === 1 && typeof argumentos[0] === "number") {
-      return função[argumentos[0]]
+    const argumento = transformar(árvore.aplicação.argumento, ambiente)
+    if (typeof função === "string" && typeof argumento === "number") {
+      return função[argumento]
     }
-    return { ...árvore, aplicação: { função, argumentos } }
+    return { ...árvore, aplicação: { função, argumento } }
   }
 
   if (árvore.operação) {

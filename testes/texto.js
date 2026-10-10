@@ -127,7 +127,7 @@ export default [
     árvore: {
       bloco: [
         { associação: { identificador: 'str', valor: { texto: '"abcdef"' } } },
-        { aplicação: { função: { identificador: 'str' }, argumentos: [ { número: '5' } ] } },
+        { aplicação: { função: { identificador: 'str' }, argumento: { número: '5' } } },
       ],
     },
     valor: "f",
