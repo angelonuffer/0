@@ -109,9 +109,8 @@ export default [
         ] },
       ],
     },
-    /* saída: bloco(`
-      Alice Silva
-    `), */
+    valor: "Alice Silva",
+    js: "\"Alice Silva\"",
   }),
   ...teste({
     entrada: bloco(`

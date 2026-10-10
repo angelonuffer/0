@@ -1,11 +1,11 @@
 const é_constante = valor => typeof valor === "number" || typeof valor === "boolean"
 
-const valor_literal = árvore => {
+const valor_literal = (árvore, ambiente) => {
   if (árvore.texto !== undefined) return árvore.texto.slice(1, -1)
   if (Array.isArray(árvore.modelo_texto)) {
     return árvore.modelo_texto.reduce((resultado, item) => {
       if (typeof item === "string") return resultado + item
-      const valor = transformar(item)
+      const valor = transformar(item, ambiente)
       return resultado + String(valor)
     }, "")
   }
@@ -114,7 +114,7 @@ const transformar = (árvore, ambiente = new Map()) => {
   }
 
   const { agrupado, ...resto } = árvore
-  const literal = valor_literal(resto)
+  const literal = valor_literal(resto, ambiente)
   if (literal !== resto) return literal
 
   return Object.fromEntries(
