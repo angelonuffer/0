@@ -17,6 +17,12 @@ const converter = (árvore, topo, corpo_de_função = false) => {
   if (árvore?.booleano !== undefined) return String(árvore.booleano)
 
   if (árvore?.objeto !== undefined) {
+    if (árvore.membros !== undefined) {
+      const propriedades = árvore.membros.map(membro => membro.espalhamento !== undefined
+        ? `...${converter(membro.espalhamento, false)}`
+        : `${JSON.stringify(membro[0])}:${converter(membro[1], false)}`)
+      return `({${propriedades.join(",")}})`
+    }
     const propriedades = Object.entries(árvore.objeto)
       .map(([chave, valor]) => `${JSON.stringify(chave)}:${converter(valor, false)}`)
       .join(",")

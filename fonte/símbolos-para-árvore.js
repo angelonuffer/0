@@ -114,13 +114,19 @@ const lista = mapear(
   }),
 )
 
-const membro_do_objeto = mapear(
-  sequência(
-    tipo("texto"),
-    símbolo(":"),
-    expressão_diferida,
+const membro_do_objeto = alternativa(
+  mapear(
+    sequência(símbolo("..."), expressão_diferida),
+    ([, valor]) => ({ espalhamento: valor }),
   ),
-  ([chave, , valor]) => [chave.texto.slice(1, -1), valor],
+  mapear(
+    sequência(
+      tipo("texto"),
+      símbolo(":"),
+      expressão_diferida,
+    ),
+    ([chave, , valor]) => [chave.texto.slice(1, -1), valor],
+  ),
 )
 
 const objeto = mapear(
@@ -136,11 +142,19 @@ const objeto = mapear(
     ),
     símbolo("}"),
   ),
-  ([, membros]) => ({
-    objeto: Object.fromEntries(
-      membros ? [membros[0], ...membros[1].map(([, membro]) => membro)] : [],
-    ),
-  }),
+  ([, membros]) => {
+    const lista_de_membros = membros
+      ? [membros[0], ...membros[1].map(([, membro]) => membro)]
+      : []
+    return {
+      objeto: Object.fromEntries(
+        lista_de_membros.filter(membro => !membro.espalhamento).map(membro => membro),
+      ),
+      ...(lista_de_membros.some(membro => membro.espalhamento !== undefined)
+        ? { membros: lista_de_membros }
+        : {}),
+    }
+  },
 )
 
 átomo = alternativa(

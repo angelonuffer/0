@@ -33,6 +33,45 @@ const transformar = (árvore, ambiente = new Map()) => {
     return associação.valor
   }
 
+  if (árvore.membros !== undefined) {
+    const membros = árvore.membros.map(membro => membro.espalhamento !== undefined
+      ? { espalhamento: transformar(membro.espalhamento, ambiente) }
+      : [membro[0], transformar(membro[1], ambiente)])
+    const entradas = []
+    let diferido = false
+
+    for (const membro of membros) {
+      if (membro.espalhamento === undefined) {
+        entradas.push(membro)
+        continue
+      }
+
+      const fonte = membro.espalhamento
+      if (fonte && typeof fonte === "object" && !Array.isArray(fonte)) {
+        if (fonte.membros !== undefined) {
+          diferido = true
+          continue
+        }
+        if (fonte.objeto !== undefined) {
+          entradas.push(...Object.entries(fonte.objeto))
+          continue
+        }
+        if (["identificador", "aplicação", "operação", "bloco", "lista"].some(
+          tipo => fonte[tipo] !== undefined,
+        )) {
+          diferido = true
+          continue
+        }
+      }
+      if (fonte != null) entradas.push(...Object.entries(fonte))
+    }
+
+    const objeto = Object.fromEntries(entradas)
+    return diferido
+      ? { objeto, membros }
+      : { objeto }
+  }
+
   if (árvore.lista !== undefined) {
     return árvore.lista.flatMap(item => item.espalhamento !== undefined
       ? [...transformar(item.espalhamento, ambiente)]

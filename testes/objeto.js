@@ -85,4 +85,25 @@ export default [
     `),
     js: '"Alice"',
   }),
+  ...teste({
+    entrada: bloco(`
+      $ pessoa = { "nome": "Alice" ; "idade": 42 }
+      { ...pessoa ; "ativo": 1 }
+    `),
+    js: '({"nome":"Alice","idade":42,"ativo":1})',
+  }),
+  ...teste({
+    entrada: bloco(`
+      $ pessoa = { "nome": "Alice" }
+      { "nome": "Beatriz" ; ...pessoa }
+    `),
+    js: '({"nome":"Alice"})',
+  }),
+  ...teste({
+    entrada: bloco(`
+      $ pessoa = { "nome": "Alice" }
+      { ...pessoa ; "nome": "Beatriz" }
+    `),
+    js: '({"nome":"Beatriz"})',
+  }),
 ]
