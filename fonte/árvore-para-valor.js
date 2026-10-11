@@ -27,10 +27,15 @@ const transformar = (árvore, ambiente = new Map()) => {
     if (!associação || associação.avaliando) return árvore
     if (associação.avaliada) return associação.valor
     associação.avaliando = true
-    associação.valor = transformar(associação.expressão, ambiente)
-    associação.avaliando = false
-    associação.avaliada = true
-    return associação.valor
+    try {
+      associação.valor = associação.avaliar
+        ? associação.avaliar()
+        : transformar(associação.expressão, ambiente)
+      associação.avaliada = true
+      return associação.valor
+    } finally {
+      associação.avaliando = false
+    }
   }
 
   if (árvore.função !== undefined) {
@@ -245,4 +250,4 @@ const transformar = (árvore, ambiente = new Map()) => {
   )
 }
 
-export const árvore_para_valor = árvore => transformar(árvore)
+export const árvore_para_valor = (árvore, ambiente = new Map()) => transformar(árvore, ambiente)

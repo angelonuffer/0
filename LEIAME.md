@@ -11,6 +11,9 @@ npx angelonuffer/0 <módulo.0>
 ```
 
 Avalia a expressão final do módulo e imprime o resultado.
+Arquivos `.0` na mesma pasta ficam disponíveis como identificadores com o nome
+do arquivo sem a extensão. Eles só são lidos e avaliados quando o identificador
+é utilizado.
 
 ## Executar os testes
 

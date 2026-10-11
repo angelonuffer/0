@@ -3,6 +3,7 @@ import { símbolos_para_árvore } from "../fonte/símbolos-para-árvore.js";
 import { árvore_para_valor } from "../fonte/árvore-para-valor.js";
 import { valor_para_js } from "../fonte/valor-para-js.js";
 import { formatar_erro } from "../fonte/erro.js";
+import { avaliar } from "../fonte/módulo.js";
 
 export const bloco = texto => {
   const linhas = texto.split("\n")
@@ -16,7 +17,7 @@ export const bloco = texto => {
 }
 
 export const teste = opções => {
-  const chaves_permitidas = ["entrada", "símbolos", "árvore", "valor", "js", "erro"]
+  const chaves_permitidas = ["entrada", "símbolos", "árvore", "valor", "js", "erro", "arquivo"]
   const chaves = opções && typeof opções === "object" ? Object.keys(opções) : []
   const ausentes = ["entrada"].filter(chave => !chaves.includes(chave))
   const extras = chaves.filter(chave => !chaves_permitidas.includes(chave))
@@ -33,7 +34,15 @@ export const teste = opções => {
     }]
   }
 
-  const { entrada, símbolos, árvore = undefined, valor = undefined, js = undefined, erro = undefined } = opções
+  const {
+    entrada,
+    símbolos,
+    árvore = undefined,
+    valor = undefined,
+    js = undefined,
+    erro = undefined,
+    arquivo,
+  } = opções
   return [
     ...(símbolos !== undefined ? [{
       função: código_para_símbolos,
@@ -63,6 +72,7 @@ export const teste = opções => {
     }] : []),
     ...(valor !== undefined ? [{
       função: entrada => {
+        if (arquivo !== undefined) return avaliar(entrada, arquivo)
         const sintaxe = símbolos_para_árvore({
           entrada: código_para_símbolos(entrada),
           posição: 0,
