@@ -66,4 +66,40 @@ export default [
     `),
     valor: 5,
   }),
+  ...teste({
+    entrada: bloco(`
+      x =>
+        $ y = x + 1
+        y + 3
+    `),
+    valor: {
+      função: {
+        parâmetro: "x",
+        corpo: {
+          operação: {
+            operador: "+",
+            esquerda: {
+              operação: {
+                operador: "+",
+                esquerda: { identificador: "x" },
+                direita: 1,
+              },
+            },
+            direita: 3,
+          },
+        },
+        ambiente: {},
+      },
+    },
+    js: "(x)=>x+1+3",
+  }),
+  ...teste({
+    entrada: bloco(`
+      x => (
+        $ y = x + 1
+        y + 3
+      )
+    `),
+    árvore: { erro: "fim da entrada", posição: 1 },
+  }),
 ]

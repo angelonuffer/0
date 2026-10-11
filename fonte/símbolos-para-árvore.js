@@ -202,11 +202,16 @@ const igualdade = operações(comparação, ["==", "!="])
 const conjunção = operações(igualdade, ["&&"])
 const expressão_com_operadores = operações(conjunção, ["||"])
 
+const corpo_da_função = estado => {
+  const próximo = estado.entrada[estado.posição]
+  return próximo?.pontuação === "$" ? bloco(estado) : expressão_diferida(estado)
+}
+
 const função = mapear(
   sequência(
     tipo("identificador"),
     símbolo("=>"),
-    expressão_diferida,
+    corpo_da_função,
   ),
   ([parâmetro, , corpo]) => ({
     função: { parâmetro: parâmetro.identificador, corpo },
