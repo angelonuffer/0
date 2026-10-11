@@ -33,6 +33,15 @@ const transformar = (árvore, ambiente = new Map()) => {
     return associação.valor
   }
 
+  if (árvore.função !== undefined) {
+    return {
+      função: {
+        ...árvore.função,
+        ambiente,
+      },
+    }
+  }
+
   if (árvore.membros !== undefined) {
     const membros = árvore.membros.map(membro => membro.espalhamento !== undefined
       ? { espalhamento: transformar(membro.espalhamento, ambiente) }
@@ -97,6 +106,14 @@ const transformar = (árvore, ambiente = new Map()) => {
   if (árvore.aplicação) {
     const função = transformar(árvore.aplicação.função, ambiente)
     const argumento = transformar(árvore.aplicação.argumento, ambiente)
+    if (função?.função?.parâmetro !== undefined) {
+      const escopo = new Map(função.função.ambiente)
+      escopo.set(função.função.parâmetro, {
+        avaliada: true,
+        valor: argumento,
+      })
+      return transformar(função.função.corpo, escopo)
+    }
     if (função?.objeto !== undefined && typeof argumento === "string") {
       return função.objeto[argumento]
     }

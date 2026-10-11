@@ -135,4 +135,52 @@ export default [
     `),
     js: '({"nome":"Beatriz"})',
   }),
+  ...teste({
+    entrada: bloco(`
+      { "incrementar": x => x + 1 }
+    `),
+    símbolos: [
+      { pontuação: '{' },
+      { texto: '"incrementar"' },
+      { pontuação: ':' },
+      { identificador: 'x' },
+      { operador: '=>' },
+      { identificador: 'x' },
+      { operador: '+' },
+      { número: '1' },
+      { pontuação: '}' },
+    ],
+    árvore: {
+      objeto: {
+        incrementar: {
+          função: {
+            parâmetro: 'x',
+            corpo: {
+              operação: {
+                operador: '+',
+                esquerda: { identificador: 'x' },
+                direita: { número: '1' },
+              },
+            },
+          },
+        },
+      },
+    },
+    js: '({"incrementar":(x)=>x+1})',
+  }),
+  ...teste({
+    entrada: bloco(`
+      $ operacoes = { "incrementar": x => x + 1 }
+      operacoes "incrementar" 4
+    `),
+    js: "5",
+  }),
+  ...teste({
+    entrada: bloco(`
+      $ fator = 3
+      $ operacoes = { "multiplicar": x => x * fator }
+      operacoes "multiplicar" 4
+    `),
+    js: "12",
+  }),
 ]

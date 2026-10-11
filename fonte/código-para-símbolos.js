@@ -4,7 +4,7 @@ const regras = {
   modelo_texto: /(?:`|})[^`]*?(?:\$\{|`)/g,
   número: /[0-9]+/g,
   identificador: /[a-zA-Z_][a-zA-Z_0-9]*/g,
-  operador: />=|<=|==|!=|&&|\|\||[+*/><!-]/g,
+  operador: /=>|>=|<=|==|!=|&&|\|\||[+*/><!-]/g,
   pontuação: /\.\.\.|[\[\]{}();:#$=]/g,
 }
 

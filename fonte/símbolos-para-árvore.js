@@ -200,7 +200,23 @@ const soma = operações(produto, ["+", "-"])
 const comparação = operações(soma, [">", ">=", "<", "<="])
 const igualdade = operações(comparação, ["==", "!="])
 const conjunção = operações(igualdade, ["&&"])
-expressão = operações(conjunção, ["||"])
+const expressão_com_operadores = operações(conjunção, ["||"])
+
+const função = mapear(
+  sequência(
+    tipo("identificador"),
+    símbolo("=>"),
+    expressão_diferida,
+  ),
+  ([parâmetro, , corpo]) => ({
+    função: { parâmetro: parâmetro.identificador, corpo },
+  }),
+)
+
+expressão = alternativa(
+  tente(função),
+  expressão_com_operadores,
+)
 
 const associação = mapear(
   sequência(
