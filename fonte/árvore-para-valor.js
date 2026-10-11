@@ -58,6 +58,9 @@ const transformar = (árvore, ambiente = new Map()) => {
   if (árvore.aplicação) {
     const função = transformar(árvore.aplicação.função, ambiente)
     const argumento = transformar(árvore.aplicação.argumento, ambiente)
+    if (função?.objeto !== undefined && typeof argumento === "string") {
+      return função.objeto[argumento]
+    }
     if ((typeof função === "string" || Array.isArray(função)) && typeof argumento === "number") {
       return função[argumento]
     }

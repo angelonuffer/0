@@ -66,4 +66,23 @@ export default [
     valor: { objeto: {} },
     js: '({})',
   }),
+  ...teste({
+    entrada: bloco(`
+      { "nome": "Alice" } "nome"
+    `),
+    js: '"Alice"',
+  }),
+  ...teste({
+    entrada: bloco(`
+      { "perfil": { "ativo": 1 } } "perfil"
+    `),
+    js: '({"ativo":1})',
+  }),
+  ...teste({
+    entrada: bloco(`
+      $ pessoa = { "nome": "Alice" }
+      pessoa "nome"
+    `),
+    js: '"Alice"',
+  }),
 ]
