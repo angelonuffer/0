@@ -34,15 +34,12 @@ const transformar = (árvore, ambiente = new Map()) => {
   }
 
   if (árvore.função !== undefined) {
-    const tem_guardas = árvore.função.corpo?.bloco?.some(
-      instrução => instrução.guarda !== undefined,
-    )
+    const ambiente_da_função = new Map(ambiente)
+    ambiente_da_função.delete(árvore.função.parâmetro)
     return {
       função: {
         ...árvore.função,
-        corpo: tem_guardas
-          ? árvore.função.corpo
-          : transformar(árvore.função.corpo, ambiente),
+        corpo: transformar(árvore.função.corpo, ambiente_da_função),
         ambiente,
       },
     }
@@ -107,7 +104,7 @@ const transformar = (árvore, ambiente = new Map()) => {
 
     const guardas = árvore.bloco.filter(instrução => instrução.guarda !== undefined)
     if (guardas.length > 0) {
-      for (const instrução of guardas) {
+      for (const [índice, instrução] of guardas.entries()) {
         if (instrução.guarda.condição === undefined) {
           return transformar(instrução.guarda.corpo, escopo)
         }
@@ -116,7 +113,16 @@ const transformar = (árvore, ambiente = new Map()) => {
           && !Array.isArray(condição)
           && condição.objeto === undefined
           && condição.função === undefined) {
-          return árvore
+          return {
+            bloco: guardas.slice(índice).map(({ guarda }) => ({
+              guarda: {
+                ...(guarda.condição === undefined
+                  ? {}
+                  : { condição: transformar(guarda.condição, escopo) }),
+                corpo: transformar(guarda.corpo, escopo),
+              },
+            })),
+          }
         }
         if (condição) return transformar(instrução.guarda.corpo, escopo)
       }

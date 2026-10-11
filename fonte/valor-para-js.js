@@ -1,15 +1,14 @@
-const declaração_preguiça = "const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};"
 const operadores_booleanos = new Set(["!", ">", ">=", "<", "<=", "==", "!=", "===", "!=="])
 
-const converter = (árvore, topo, corpo_de_função = false, parâmetros = new Set()) => {
-  if (Array.isArray(árvore)) return `[${árvore.map(item => converter(item, false, false, parâmetros)).join(",")}]`
+const converter = (árvore, topo, corpo_de_função = false, condição = false) => {
+  if (Array.isArray(árvore)) return `[${árvore.map(item => converter(item, false)).join(",")}]`
   if (typeof árvore === "string") return JSON.stringify(árvore)
   if (typeof árvore === "number" || typeof árvore === "boolean") return String(árvore)
 
   if (árvore?.agrupado) {
     const { agrupado, ...expressão } = árvore
-    if (corpo_de_função && expressão.bloco) return converter(expressão, false, true, parâmetros)
-    return `(${converter(expressão, false, false, parâmetros)})`
+    if (corpo_de_função && expressão.bloco) return converter(expressão, false, true)
+    return `(${converter(expressão, false)})`
   }
 
   if (árvore?.número !== undefined) return árvore.número
@@ -19,18 +18,18 @@ const converter = (árvore, topo, corpo_de_função = false, parâmetros = new S
   if (árvore?.função !== undefined) {
     const { parâmetro, corpo } = árvore.função
     const tem_guardas = corpo?.bloco?.some(instrução => instrução.guarda !== undefined)
-    return `(${parâmetro})=>${converter(corpo, false, tem_guardas, new Set([...parâmetros, parâmetro]))}`
+    return `(${parâmetro})=>${converter(corpo, false, tem_guardas)}`
   }
 
   if (árvore?.objeto !== undefined) {
     if (árvore.membros !== undefined) {
       const propriedades = árvore.membros.map(membro => membro.espalhamento !== undefined
-        ? `...${converter(membro.espalhamento, false, false, parâmetros)}`
-        : `${JSON.stringify(membro[0])}:${converter(membro[1], false, false, parâmetros)}`)
+        ? `...${converter(membro.espalhamento, false)}`
+        : `${JSON.stringify(membro[0])}:${converter(membro[1], false)}`)
       return `({${propriedades.join(",")}})`
     }
     const propriedades = Object.entries(árvore.objeto)
-      .map(([chave, valor]) => `${JSON.stringify(chave)}:${converter(valor, false, false, parâmetros)}`)
+      .map(([chave, valor]) => `${JSON.stringify(chave)}:${converter(valor, false)}`)
       .join(",")
     return `({${propriedades}})`
   }
@@ -38,49 +37,56 @@ const converter = (árvore, topo, corpo_de_função = false, parâmetros = new S
   if (Array.isArray(árvore?.modelo_texto)) {
     return "`" + árvore.modelo_texto.map(item => {
       if (typeof item === "string") return item.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${")
-      return `\${${converter(item, false, false, parâmetros)}}`
+      return `\${${converter(item, false)}}`
     }).join("") + "`"
   }
 
   if (árvore?.modelo_texto !== undefined) return `\`${árvore.modelo_texto.slice(1, -1)}\``
 
   if (árvore?.identificador !== undefined) {
-    return parâmetros.has(árvore.identificador)
-      ? árvore.identificador
-      : `${árvore.identificador}()`
+    return árvore.identificador
   }
 
   if (árvore?.bloco) {
+    if (corpo_de_função && árvore.bloco.some(instrução => instrução.guarda !== undefined)) {
+      return árvore.bloco
+        .filter(instrução => instrução.guarda !== undefined)
+        .reduceRight((alternativa, instrução) => {
+          const { condição, corpo } = instrução.guarda
+          if (condição === undefined) return converter(corpo, false)
+          return `${converter(condição, false, false, true)}?${converter(corpo, false)}:${alternativa}`
+        }, "undefined")
+    }
+
     const último = árvore.bloco.length - 1
     const instruções = árvore.bloco.map((instrução, i) => {
       if (instrução.associação) {
         const { identificador, valor } = instrução.associação
-        return `const ${identificador}=_(()=>${converter(valor, false, true, parâmetros)})`
+        return `const ${identificador}=${converter(valor, false, true)}`
       }
       if (instrução.guarda) {
         const { condição, corpo } = instrução.guarda
         if (condição === undefined) {
-          return `return ${converter(corpo, false, false, parâmetros)}`
+          return `return ${converter(corpo, false)}`
         }
-        return `if(${converter(condição, false, false, parâmetros)})return ${converter(corpo, false, false, parâmetros)}`
+        return `if(${converter(condição, false)})return ${converter(corpo, false)}`
       }
-      const código = converter(instrução, false, false, parâmetros)
+      const código = converter(instrução, false)
       return !topo && i === último ? `return ${código}` : código
     }).join(";")
     if (corpo_de_função) {
-      const tem_associações = árvore.bloco.some(instrução => instrução.associação !== undefined)
-      return `{${tem_associações ? declaração_preguiça : ""}${instruções}}`
+      return `{${instruções}}`
     }
-    return topo
-      ? `${declaração_preguiça}${instruções}`
-      : `(()=>{${instruções}})()`
+    return topo ? instruções : `(()=>{${instruções}})()`
   }
 
   if (árvore?.operação) {
     const { operador, esquerda, direita } = árvore.operação
+    const contexto_condicional = condição && ["!", "&&", "||"].includes(operador)
     const expressão = esquerda === undefined
-      ? `${operador}${converter(direita, false, false, parâmetros)}`
-      : `${converter(esquerda, false, false, parâmetros)}${operador}${converter(direita, false, false, parâmetros)}`
+      ? `${operador}${converter(direita, false, false, contexto_condicional)}`
+      : `${converter(esquerda, false, false, contexto_condicional)}${operador}${converter(direita, false, false, contexto_condicional)}`
+    if (condição) return expressão
     return operadores_booleanos.has(operador) ? `(${expressão}?1:0)` : expressão
   }
 }

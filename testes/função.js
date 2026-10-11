@@ -61,6 +61,13 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
+      $ x = 10
+      x => x + 1
+    `),
+    js: "(x)=>x+1",
+  }),
+  ...teste({
+    entrada: bloco(`
       $ somar = x => y => x + y
       somar 2 3
     `),
@@ -146,7 +153,17 @@ export default [
         | y > 0 => y
         | 0
     `),
-    js: "(x)=>{const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const y=_(()=>x+1);if((y()>0?1:0))return y();return 0}",
+    js: "(x)=>x+1>0?x+1:0",
+  }),
+  ...teste({
+    entrada: bloco(`
+      x =>
+        $ unused = 1 / 0
+        $ y = x + 1
+        | y > 0 => y
+        | 0
+    `),
+    js: "(x)=>x+1>0?x+1:0",
   }),
   ...teste({
     entrada: bloco(`
