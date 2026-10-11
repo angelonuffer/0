@@ -15,6 +15,48 @@ Arquivos `.0` na mesma pasta ficam disponíveis como identificadores com o nome
 do arquivo sem a extensão. Eles só são lidos e avaliados quando o identificador
 é utilizado.
 
+## Usar com Vite
+
+Instale o plugin a partir do GitHub, fixando a dependência em um commit:
+
+```bash
+npm install --save-dev github:angelonuffer/0#COMMIT_SHA
+```
+
+Substitua `COMMIT_SHA` pelo SHA completo do commit desejado.
+
+Adicione-o à configuração do Vite:
+
+```js
+import { defineConfig } from "vite"
+import plugin0 from "0"
+
+export default defineConfig({
+  plugins: [plugin0()],
+})
+```
+
+Depois, importe arquivos `.0` como módulos. O valor da expressão final do
+módulo fica disponível como `default`. Referências a módulos `.0` da mesma
+pasta são resolvidas pelo nome do arquivo, como no interpretador:
+
+```js
+import incrementar from "./incrementar.0"
+```
+
+Para incluir todos os arquivos `.0` de uma pasta no bundle, use a descoberta
+de módulos do Vite:
+
+```js
+const módulos = import.meta.glob("./**/*.0", {
+  eager: true,
+  import: "default",
+})
+```
+
+O plugin transforma os arquivos `.0` encontrados pelo Vite; ele não inclui
+arquivos que não sejam importados nem encontrados por `import.meta.glob`.
+
 ## Executar os testes
 
 ```bash

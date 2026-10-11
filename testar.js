@@ -9,6 +9,7 @@ import região from "./testes/região.js"
 import objeto from "./testes/objeto.js"
 import função from "./testes/função.js"
 import importação from "./testes/importação.js"
+import vite from "./testes/vite.js"
 
 const resultado = testar([
   ...aritmética,
@@ -21,6 +22,7 @@ const resultado = testar([
   ...objeto,
   ...função,
   ...importação,
+  ...vite,
 ])
 
 process.stdout.write(resultado.saída + "\n")
