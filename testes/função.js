@@ -31,7 +31,7 @@ export default [
           operação: {
             operador: "+",
             esquerda: { identificador: "x" },
-            direita: { número: "1" },
+            direita: 1,
           },
         },
       },

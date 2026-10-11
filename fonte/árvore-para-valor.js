@@ -37,6 +37,7 @@ const transformar = (árvore, ambiente = new Map()) => {
     return {
       função: {
         ...árvore.função,
+        corpo: transformar(árvore.função.corpo, ambiente),
         ambiente,
       },
     }
