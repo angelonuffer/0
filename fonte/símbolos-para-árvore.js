@@ -121,11 +121,14 @@ const membro_do_objeto = alternativa(
   ),
   mapear(
     sequência(
-      tipo("texto"),
+      alternativa(tipo("texto"), tipo("identificador")),
       símbolo(":"),
       expressão_diferida,
     ),
-    ([chave, , valor]) => [chave.texto.slice(1, -1), valor],
+    ([chave, , valor]) => [
+      chave.texto === undefined ? chave.identificador : chave.texto.slice(1, -1),
+      valor,
+    ],
   ),
 )
 

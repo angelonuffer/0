@@ -32,6 +32,35 @@ export default [
   }),
   ...teste({
     entrada: bloco(`
+      { nome: "Alice" ; idade: 42 }
+    `),
+    símbolos: [
+      { pontuação: '{' },
+      { identificador: 'nome' },
+      { pontuação: ':' },
+      { texto: '"Alice"' },
+      { pontuação: ';' },
+      { identificador: 'idade' },
+      { pontuação: ':' },
+      { número: '42' },
+      { pontuação: '}' },
+    ],
+    árvore: {
+      objeto: {
+        nome: { texto: '"Alice"' },
+        idade: { número: '42' },
+      },
+    },
+    valor: {
+      objeto: {
+        nome: "Alice",
+        idade: 42,
+      },
+    },
+    js: '({"nome":"Alice","idade":42})',
+  }),
+  ...teste({
+    entrada: bloco(`
       { "perfil": { "ativo": 1 } ; }
     `),
     árvore: {
