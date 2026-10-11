@@ -18,7 +18,8 @@ const converter = (árvore, topo, corpo_de_função = false, parâmetros = new S
 
   if (árvore?.função !== undefined) {
     const { parâmetro, corpo } = árvore.função
-    return `(${parâmetro})=>${converter(corpo, false, false, new Set([...parâmetros, parâmetro]))}`
+    const tem_guardas = corpo?.bloco?.some(instrução => instrução.guarda !== undefined)
+    return `(${parâmetro})=>${converter(corpo, false, tem_guardas, new Set([...parâmetros, parâmetro]))}`
   }
 
   if (árvore?.objeto !== undefined) {
@@ -56,10 +57,20 @@ const converter = (árvore, topo, corpo_de_função = false, parâmetros = new S
         const { identificador, valor } = instrução.associação
         return `const ${identificador}=_(()=>${converter(valor, false, true, parâmetros)})`
       }
+      if (instrução.guarda) {
+        const { condição, corpo } = instrução.guarda
+        if (condição === undefined) {
+          return `return ${converter(corpo, false, false, parâmetros)}`
+        }
+        return `if(${converter(condição, false, false, parâmetros)})return ${converter(corpo, false, false, parâmetros)}`
+      }
       const código = converter(instrução, false, false, parâmetros)
       return !topo && i === último ? `return ${código}` : código
     }).join(";")
-    if (corpo_de_função) return `{${instruções}}`
+    if (corpo_de_função) {
+      const tem_associações = árvore.bloco.some(instrução => instrução.associação !== undefined)
+      return `{${tem_associações ? declaração_preguiça : ""}${instruções}}`
+    }
     return topo
       ? `${declaração_preguiça}${instruções}`
       : `(()=>{${instruções}})()`

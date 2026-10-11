@@ -202,9 +202,58 @@ const igualdade = operações(comparação, ["==", "!="])
 const conjunção = operações(igualdade, ["&&"])
 const expressão_com_operadores = operações(conjunção, ["||"])
 
+const guarda = mapear(
+  sequência(
+    símbolo("|"),
+    expressão_diferida,
+    símbolo("=>"),
+    expressão_diferida,
+  ),
+  ([, condição, , corpo]) => ({ guarda: { condição, corpo } }),
+)
+
+const guarda_final = mapear(
+  sequência(
+    símbolo("|"),
+    expressão_diferida,
+  ),
+  ([, corpo]) => ({ guarda: { corpo } }),
+)
+
+const associação = mapear(
+  sequência(
+    símbolo("$"),
+    tipo("identificador"),
+    símbolo("="),
+    expressão_diferida,
+  ),
+  ([, nome, , valor]) => ({
+    associação: { identificador: nome.identificador, valor },
+  }),
+)
+
+const elemento_do_corpo_da_função = alternativa(
+  tente(guarda),
+  tente(associação),
+  expressão_diferida,
+)
+
+const bloco_do_corpo_da_função = mapear(
+  sequência(
+    elemento_do_corpo_da_função,
+    repetição(elemento_do_corpo_da_função),
+    opcional(tente(guarda_final), undefined),
+  ),
+  ([primeira, demais, final]) => ({
+    bloco: [primeira, ...demais, ...(final ? [final] : [])],
+  }),
+)
+
 const corpo_da_função = estado => {
   const próximo = estado.entrada[estado.posição]
-  return próximo?.pontuação === "$" ? bloco(estado) : expressão_diferida(estado)
+  return próximo?.pontuação === "$" || próximo?.operador === "|"
+    ? bloco_do_corpo_da_função(estado)
+    : expressão_diferida(estado)
 }
 
 const função = mapear(
@@ -221,18 +270,6 @@ const função = mapear(
 expressão = alternativa(
   tente(função),
   expressão_com_operadores,
-)
-
-const associação = mapear(
-  sequência(
-    símbolo("$"),
-    tipo("identificador"),
-    símbolo("="),
-    expressão,
-  ),
-  ([, nome, , valor]) => ({
-    associação: { identificador: nome.identificador, valor },
-  }),
 )
 
 const elemento_do_bloco = alternativa(tente(associação), expressão)

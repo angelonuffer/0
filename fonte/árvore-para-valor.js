@@ -34,10 +34,15 @@ const transformar = (árvore, ambiente = new Map()) => {
   }
 
   if (árvore.função !== undefined) {
+    const tem_guardas = árvore.função.corpo?.bloco?.some(
+      instrução => instrução.guarda !== undefined,
+    )
     return {
       função: {
         ...árvore.função,
-        corpo: transformar(árvore.função.corpo, ambiente),
+        corpo: tem_guardas
+          ? árvore.função.corpo
+          : transformar(árvore.função.corpo, ambiente),
         ambiente,
       },
     }
@@ -98,6 +103,24 @@ const transformar = (árvore, ambiente = new Map()) => {
         avaliando: false,
         avaliada: false,
       })
+    }
+
+    const guardas = árvore.bloco.filter(instrução => instrução.guarda !== undefined)
+    if (guardas.length > 0) {
+      for (const instrução of guardas) {
+        if (instrução.guarda.condição === undefined) {
+          return transformar(instrução.guarda.corpo, escopo)
+        }
+        const condição = transformar(instrução.guarda.condição, escopo)
+        if (condição !== null && typeof condição === "object"
+          && !Array.isArray(condição)
+          && condição.objeto === undefined
+          && condição.função === undefined) {
+          return árvore
+        }
+        if (condição) return transformar(instrução.guarda.corpo, escopo)
+      }
+      return undefined
     }
 
     const última = árvore.bloco.at(-1)

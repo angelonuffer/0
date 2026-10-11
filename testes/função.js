@@ -96,4 +96,65 @@ export default [
     `),
     árvore: { erro: "fim da entrada", posição: 1 },
   }),
+  ...teste({
+    entrada: bloco(`
+      x =>
+        $ y = x + 1
+        | y > 0 => y
+        | 0
+    `),
+    árvore: {
+      função: {
+        parâmetro: "x",
+        corpo: {
+          bloco: [
+            { associação: { identificador: "y", valor: { operação: {
+              operador: "+",
+              esquerda: { identificador: "x" },
+              direita: { número: "1" },
+            } } } },
+            { guarda: {
+              condição: { operação: {
+                operador: ">",
+                esquerda: { identificador: "y" },
+                direita: { número: "0" },
+              } },
+              corpo: { identificador: "y" },
+            } },
+            { guarda: {
+              corpo: { número: "0" },
+            } },
+          ],
+        },
+      },
+    },
+  }),
+  ...teste({
+    entrada: bloco(`
+      (x =>
+        $ y = x + 1
+        | y > 0 => y
+        | 0
+      ) 4
+    `),
+    valor: 5,
+  }),
+  ...teste({
+    entrada: bloco(`
+      x =>
+        $ y = x + 1
+        | y > 0 => y
+        | 0
+    `),
+    js: "(x)=>{const _=f=>{let d,v;return()=>d?v:(d=true,v=f())};const y=_(()=>x+1);if((y()>0?1:0))return y();return 0}",
+  }),
+  ...teste({
+    entrada: bloco(`
+      (x =>
+        | x > 0 => x
+        | 0
+      ) 0
+    `),
+    valor: 0,
+  }),
 ]
