@@ -78,20 +78,14 @@ export default [
         corpo: {
           operação: {
             operador: "+",
-            esquerda: {
-              operação: {
-                operador: "+",
-                esquerda: { identificador: "x" },
-                direita: 1,
-              },
-            },
-            direita: 3,
+            esquerda: { identificador: "x" },
+            direita: 4,
           },
         },
         ambiente: {},
       },
     },
-    js: "(x)=>x+1+3",
+    js: "(x)=>x+4",
   }),
   ...teste({
     entrada: bloco(`

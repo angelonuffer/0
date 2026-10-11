@@ -138,12 +138,29 @@ const transformar = (árvore, ambiente = new Map()) => {
 
     const esquerda = transformar(operação.esquerda, ambiente)
     if (!é_constante(esquerda)) {
+      const direita = transformar(operação.direita, ambiente)
+      const soma_de_constantes = esquerda?.operação?.operador === "+"
+        && operação.operador === "+"
+        && typeof esquerda.operação.direita === "number"
+        && typeof direita === "number"
+        ? esquerda.operação.direita + direita
+        : undefined
+      if (Number.isFinite(soma_de_constantes)) {
+        return {
+          ...árvore,
+          operação: {
+            ...operação,
+            esquerda: esquerda.operação.esquerda,
+            direita: soma_de_constantes,
+          },
+        }
+      }
       return {
         ...árvore,
         operação: {
           ...operação,
           esquerda,
-          direita: transformar(operação.direita, ambiente),
+          direita,
         },
       }
     }
